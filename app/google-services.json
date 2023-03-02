@@ -1,63 +1,34 @@
 {
   "project_info": {
-    "project_number": "327071377077",
-    "firebase_url": "https://sdp-firebase-bootcamp-2c8db-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "sdp-firebase-bootcamp-2c8db",
-    "storage_bucket": "sdp-firebase-bootcamp-2c8db.appspot.com"
+    "project_number": "528837768558",
+    "firebase_url": "https://polypoly-db-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "polypoly-db",
+    "storage_bucket": "polypoly-db.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:327071377077:android:a7ec86015f4b8239b680fc",
+        "mobilesdk_app_id": "1:528837768558:android:21f578425d785eab54fd7f",
         "android_client_info": {
           "package_name": "com.github.polypoly.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "327071377077-5afhcsu55nh8v3fl94j0m5e3udksofbi.apps.googleusercontent.com",
+          "client_id": "528837768558-38kg3fepkresq4decf0edr1av8n2vp15.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCSzdx2K3FYli40uAvkgMnTYIhDuBLvxJw"
+          "current_key": "AIzaSyB_4c2qHNauRzetmDPaz9WBCMY2oRYzrO8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "327071377077-5afhcsu55nh8v3fl94j0m5e3udksofbi.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:327071377077:android:c6321452d517b9d9b680fc",
-        "android_client_info": {
-          "package_name": "com.github.superseth794.firebase_bootcamp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "327071377077-5afhcsu55nh8v3fl94j0m5e3udksofbi.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCSzdx2K3FYli40uAvkgMnTYIhDuBLvxJw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "327071377077-5afhcsu55nh8v3fl94j0m5e3udksofbi.apps.googleusercontent.com",
+              "client_id": "528837768558-38kg3fepkresq4decf0edr1av8n2vp15.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
