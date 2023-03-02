@@ -1,6 +1,6 @@
 env:
   CC_TEST_REPORTER_ID: ENCRYPTED[729d703dabe07f9797508fd1d6d4e46fa7fd4c6784c7683f8544638198a3489733bdd1aa176faafa693e87b66a37edda]
-
+  MAPS_API_KEY: ENCRYPTED[!23172a9f606c3935f0a61a1a2887100de3669fbb2b3c3c4b7584c81da1e846e48783712531f1bd19e410bb61f1970b68!]
 container:
   image: cirrusci/android-sdk:30
   cpu: 4
@@ -26,6 +26,7 @@ check_android_task:
       -camera-back none
   assemble_instrumented_tests_script: |
     chmod +x gradlew
+    echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
     ./gradlew assembleDebugAndroidTest
   wait_for_avd_script:
     adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 3; done; input keyevent 82'
