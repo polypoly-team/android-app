@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
+import dagger.internal.DaggerGenerated
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,8 +17,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.random.Random
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+    @Inject lateinit var boredApiService: BoredApiService
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,24 +33,22 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val component = DaggerBoredApiComponent.builder()
+            .boredApiModule(BoredApiModule("https://www.boredapi.com/api/"))
+            .build()
+        component.inject(this)
+
         // Set up the database for activities caching
         val db = Room.databaseBuilder(
             applicationContext,
             BoredActivityDatabase::class.java, "bored-activity-database"
         ).build()
 
-        // Set up retrofit instance for requests
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.boredapi.com/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val boredApi = retrofit.create(BoredApi::class.java)
-
         val buttonBored: Button = findViewById(R.id.buttonBored)
         buttonBored.setOnClickListener {
             // On click, fetch an activity from the API
             val activity: TextView = findViewById(R.id.boredActivity)
-            boredApi.getActivity().enqueue(object : Callback<BoredActivity> {
+            boredApiService.getActivity().enqueue(object : Callback<BoredActivity> {
                 override fun onResponse(call: Call<BoredActivity>, response: Response<BoredActivity>) {
                     // Display activity
                     activity.text = response.body()?.activity

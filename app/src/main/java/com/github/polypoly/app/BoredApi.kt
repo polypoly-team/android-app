@@ -1,9 +1,13 @@
 package com.github.polypoly.app
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import retrofit2.Call
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 /**
@@ -22,7 +26,7 @@ data class BoredActivity (
 /**
  * The interface to the Bored API
  */
-interface BoredApi {
+interface BoredApiService {
     @GET("activity")
     fun getActivity(): Call<BoredActivity>
 }
@@ -59,6 +63,23 @@ abstract class BoredActivityDatabase : RoomDatabase() {
     abstract fun activityDao(): ActivityDao
 }
 
-open class BoredApp : Application() {
-    open fun getBaseUrl() = "https://www.boredapi.com/api/"
+@Module
+class BoredApiModule(private val baseUrl: String) {
+    @Provides
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    fun provideApiService(retrofit: Retrofit): BoredApiService {
+        return retrofit.create(BoredApiService::class.java)
+    }
+}
+
+@Component(modules = [BoredApiModule::class])
+interface BoredApiComponent {
+    fun inject(activity: MainActivity)
 }
