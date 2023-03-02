@@ -3,6 +3,7 @@ package com.github.polypoly.app
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 
@@ -17,5 +18,9 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("name", nameField.text.toString())
             startActivity(intent)
         }
+    }
+    fun startMapActivity(view: View) {
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
     }
 }
