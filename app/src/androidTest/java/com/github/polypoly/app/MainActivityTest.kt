@@ -9,6 +9,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.hamcrest.CoreMatchers.allOf
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,23 +20,32 @@ class MainActivityTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    @Test
-    fun buttonClickFiresIntent() {
+    @Before
+    fun setup() {
         Intents.init()
-        onView(withId(R.id.button))
-            .perform(click())
-        intended(hasComponent(GreetingActivity::class.java.name))
+    }
+
+    @After
+    fun teardown() {
         Intents.release()
     }
 
     @Test
-    fun buttonClickIntentContainsUsername() {
-        Intents.init()
-        onView(withId(R.id.mainName))
-            .perform(replaceText("homme du hall"))
-        onView(withId(R.id.button))
-            .perform(click())
-        intended(allOf(hasComponent(GreetingActivity::class.java.name), hasExtra("name", "homme du hall")))
-        Intents.release()
+    fun testGreetingActivityIntent() {
+        onView(withId(R.id.mainName)).perform(replaceText("John"))
+        onView(withId(R.id.button)).perform(click())
+        intended(
+            allOf(
+                hasComponent(GreetingActivity::class.java.name),
+                hasExtra("name", "John")
+            )
+        )
+    }
+
+    @Test
+    fun testMapActivityIntent() {
+        onView(withId(R.id.mapButton)).perform(click())
+        intended(hasComponent(MapsActivity::class.java.name))
+
     }
 }
