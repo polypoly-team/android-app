@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
+import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -27,16 +27,21 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val buttonToGoogleLogin: SignInButton = findViewById(R.id.google_sign_in)
-        buttonToGoogleLogin.setOnClickListener {
-            login()
+        val buttonToGoogleSignIn: SignInButton = findViewById(R.id.google_sign_in)
+        buttonToGoogleSignIn.setOnClickListener {
+            signIn()
+        }
+
+        val buttonToSignOut: Button = findViewById(R.id.sign_out_button)
+        buttonToSignOut.setOnClickListener {
+            signOut()
         }
     }
 
     /**
      * kicks off the FirebaseUI sign in flow
      */
-    private fun login(){
+    private fun signIn(){
         // Choose authentication providers (only google yet)
         val providers = arrayListOf(
             AuthUI.IdpConfig.GoogleBuilder().build())
@@ -49,11 +54,11 @@ class LoginActivity : AppCompatActivity() {
         signInLauncher.launch(signInIntent)
     }
 
-    private fun logout(){
+    private fun signOut(){
         AuthUI.getInstance()
             .signOut(this)
             .addOnCompleteListener {
-
+                Toast.makeText(applicationContext, "Signed Out", Toast.LENGTH_SHORT).show()
             }
     }
 
