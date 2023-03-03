@@ -1,27 +1,36 @@
 package com.github.polypoly.app
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-//import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
+import com.google.firebase.database.DatabaseReference
+import java.util.concurrent.CompletableFuture
 
 class FirebaseActivity : AppCompatActivity() {
+    // TODO: It might be better to limit callback to an instance instead of a companion object, but
+    //  it should be fine for now as two activity's instances should not be running at the same time
+    companion object {
+        private val onGetCompleteCallbacks: ArrayList<() -> Unit> = ArrayList();
+        private val onSetCompleteCallbacks: ArrayList<() -> Unit> = ArrayList();
+
+        fun addOnGetCompleteCallback(callback: () -> Unit) {
+            onGetCompleteCallbacks.add(callback)
+        }
+
+        fun addOnSetCompleteCallback(callback: () -> Unit) {
+            onSetCompleteCallbacks.add(callback)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_firebase)
     }
 
-    operator fun get(view: View?) {
+    fun get(view: View?) {
         val email = findViewById<TextView>(R.id.editTextTextEmailAddress)
         val phone = findViewById<TextView>(R.id.editTextPhone)
 
@@ -37,6 +46,10 @@ class FirebaseActivity : AppCompatActivity() {
 
         future.thenAccept { text: String? ->
             email.text = text
+            for (callback in onGetCompleteCallbacks) {
+                callback.invoke()
+            }
+            onGetCompleteCallbacks.clear()
         }
     }
 
@@ -46,7 +59,10 @@ class FirebaseActivity : AppCompatActivity() {
 
         val myRef: DatabaseReference = remoteDB.child(phone.text.toString())
         myRef.setValue(email.text.toString()).addOnSuccessListener {
-            Log.d("successes", "Set successfully")
+            for (callback in onSetCompleteCallbacks) {
+                callback.invoke()
+            }
+            onSetCompleteCallbacks.clear()
         }
     }
 }
