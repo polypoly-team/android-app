@@ -31,5 +31,6 @@ internal class ProfileFragmentTest {
                 )
             )
         )
+        Intents.release()
     }
 }

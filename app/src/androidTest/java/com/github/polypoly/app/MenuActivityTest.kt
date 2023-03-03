@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class MenuActivityTest {
-    @Test
+    /*@Test
     fun buttonClickOpenMenu() {
 
     }
@@ -31,5 +31,5 @@ internal class MenuActivityTest {
     @Test
     fun buttonClickNavigateToProfile() {
 
-    }
+    }*/
 }
