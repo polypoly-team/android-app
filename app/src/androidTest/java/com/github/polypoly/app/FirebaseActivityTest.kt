@@ -9,6 +9,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.settings.SharedInstances.Companion.DB
 import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
 //import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
 import com.google.firebase.database.ktx.database
@@ -34,7 +35,11 @@ class FirebaseActivityTest
     init {
         // 10.0.2.2 is the special IP address to connect to the 'localhost' of
         // the host computer from an Android emulator.
-//        remoteDB.useEmulator("10.0.2.2", 4400)
+        try {
+            DB.useEmulator("10.0.2.2", 9000)
+            remoteDB = DB.reference
+        } catch (_: IllegalStateException) { }
+        remoteDB.setValue(null)
     }
 
     @Test

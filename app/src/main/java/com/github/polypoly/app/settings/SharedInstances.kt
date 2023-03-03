@@ -6,6 +6,7 @@ import com.google.firebase.ktx.Firebase
 
 class SharedInstances {
     companion object {
-        var remoteDB = Firebase.database.reference
+        var DB = Firebase.database
+        var remoteDB = DB.reference
     }
 }
