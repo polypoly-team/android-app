@@ -32,8 +32,8 @@ class FirebaseActivityTest
         try {
             DB.useEmulator("10.0.2.2", 9000)
             remoteDB = DB.reference
+            remoteDB.setValue(null)
         } catch (_: IllegalStateException) { }
-        remoteDB.setValue(null)
     }
 
     @Test
