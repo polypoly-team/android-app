@@ -4,4 +4,7 @@
     <string name="your_name">Your name</string>
     <string name="button_greet">Greet</string>
     <string name="login">LOGIN</string>
+    <string name="textview">TextView</string>
+    <string name="database">Database</string>
+    <string name="sign_out">Sign Out</string>
 </resources>
