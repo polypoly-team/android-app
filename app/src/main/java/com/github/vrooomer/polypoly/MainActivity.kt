@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -70,6 +71,7 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(10.dp))
             Button(
                 shape = CircleShape,
+                modifier = Modifier.testTag("greetButton"),
                 // When clicking, another Activity is launched (only if the name isn't empty)
                 onClick = {
                     if(nameText.isEmpty()) {
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
     fun NameTextField(maxLength: Int) {
         var text by remember { mutableStateOf(TextFieldValue(""))}
         OutlinedTextField(
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.width(200.dp).testTag("nameField"),
             value = text,
             label = { Text("Enter your name") },
             singleLine = true,

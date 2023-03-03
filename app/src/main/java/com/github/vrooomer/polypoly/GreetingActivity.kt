@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.vrooomer.polypoly.ui.theme.PolypolyTheme
 
@@ -52,6 +53,7 @@ fun GreetingText(name: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
+            modifier = Modifier.testTag("greetingText"),
             text = "Good morning $name",
             style = MaterialTheme.typography.h6
         )
