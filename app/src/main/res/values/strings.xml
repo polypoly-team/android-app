@@ -3,4 +3,5 @@
     <string name="greeting_message">Hello %1$s!</string>
     <string name="your_name">Your name</string>
     <string name="button_greet">Greet</string>
+    <string name="map">Map</string>
 </resources>

@@ -17,5 +17,11 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("name", nameField.text.toString())
             startActivity(intent)
         }
+
+        val mapButton: Button = findViewById(R.id.buttonMap)
+        mapButton.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
