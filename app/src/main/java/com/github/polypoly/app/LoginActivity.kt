@@ -73,22 +73,12 @@ class LoginActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             // Successfully signed in
             val user = FirebaseAuth.getInstance().currentUser
-            //print("___________________________________\n")
-            //print("User Successfully Authenticated: \n")
-            //print("Username : " + (user?.displayName ?: "Null Username") + "\n")
-            //print("E-Mail address : " + (user?.email ?: "Null E-Mail address") + "\n")
-            //print("___________________________________\n")
             Intent(this, GreetingActivity::class.java).putExtra("name", user!!.displayName)
             startActivity(intent)
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
-            //print("___________________________________\n")
-            //print("User Failed to Authenticate: \n")
-            //print("Error Code : " + (response?.error?.errorCode ?: "User Canceled Sign-In Flow") + "\n")
-            //print("___________________________________\n")
-
         }
     }
 
