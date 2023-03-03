@@ -1,7 +1,9 @@
 package com.github.polypoly.app
 
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
@@ -11,7 +13,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.settings.SharedInstances.Companion.DB
 import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
-//import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -71,6 +72,7 @@ class FirebaseActivityTest
     }
 
     @Test
+    @RequiresApi(api = Build.VERSION_CODES.S)
     fun updatesCorrectlyPhoneEmailPair() {
         val intent = Intent(ApplicationProvider.getApplicationContext(), FirebaseActivity::class.java)
         ActivityScenario.launch<FirebaseActivity>(intent)
