@@ -29,7 +29,7 @@ class FirebaseActivity : AppCompatActivity() {
 
         remoteDB.child(phone.text.toString()).get().addOnSuccessListener { it ->
             if (it.exists()) {
-                future.complete(it.getValue() as String)
+                future.complete(it.value as String)
             } else {
                 future.completeExceptionally(RuntimeException(it.toString()))
             }

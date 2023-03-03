@@ -1,6 +1,7 @@
 package com.github.polypoly.app
 
 import android.content.Intent
+import android.util.Log
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
@@ -8,6 +9,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
 //import com.github.polypoly.app.settings.SharedInstances.Companion.remoteDB
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -26,7 +28,8 @@ import java.util.concurrent.TimeUnit
 class FirebaseActivityTest
 {
     private val email = "unit_test@gmail.com"
-    private val phone = "0120120120"
+    private val fake_email = "fake_unit_test@gmail.com"
+    private val phone = "FirebaseActivityTest"
 
     init {
         // 10.0.2.2 is the special IP address to connect to the 'localhost' of
@@ -36,60 +39,65 @@ class FirebaseActivityTest
 
     @Test
     fun displaysCorrectEmailFromPhoneNumber() {
-        val remoteDB = Firebase.database.reference
-
         val intent = Intent(ApplicationProvider.getApplicationContext(), FirebaseActivity::class.java)
         ActivityScenario.launch<FirebaseActivity>(intent)
 
-        val ref = remoteDB.child("displaysCorrectEmailFromPhoneNumber")
-        val textExpected = "unit_test@gmail.com";
-        val preOpTask = ref.setValue(textExpected)
+        val ref = remoteDB.child(phone)
 
         val timeoutFuture = CompletableFuture<Boolean>()
 
-        preOpTask.continueWith {
-            Espresso.onView(ViewMatchers.withId(R.id.editTextPhone))
-                .perform(ViewActions.replaceText("0120120120"))
-            Espresso.onView(ViewMatchers.withId(R.id.buttonDBGet))
-                .perform(ViewActions.click())
-
-            Fail(java.lang.RuntimeException("Debug"))
-
-            Thread.sleep(50) // TODO Bad practice but I see no other way to wait for both DB response and UI update
-
-            Espresso.onView(ViewMatchers.withId(R.id.editTextTextEmailAddress))
-                .check(ViewAssertions.matches(ViewMatchers.withText(textExpected)))
-
+        ref.setValue(email).addOnSuccessListener {
+            Log.d("success-test", "prep-done")
             timeoutFuture.complete(true)
-        }
-        preOpTask.addOnFailureListener(timeoutFuture::completeExceptionally)
+        }.addOnFailureListener(timeoutFuture::completeExceptionally)
 
         timeoutFuture.orTimeout(5, TimeUnit.SECONDS)
             .join()
+
+        Espresso.onView(ViewMatchers.withId(R.id.editTextPhone))
+            .perform(ViewActions.replaceText(phone))
+        Espresso.onView(ViewMatchers.withId(R.id.buttonDBGet))
+            .perform(ViewActions.click())
+
+        Thread.sleep(500) // TODO Bad practice but I see no other way to wait for both DB response and UI update
+
+        Espresso.onView(ViewMatchers.withId(R.id.editTextTextEmailAddress))
+            .check(ViewAssertions.matches(ViewMatchers.withText(email)))
     }
 
     @Test
     fun updatesCorrectlyPhoneEmailPair() {
-//        val intent = Intent(ApplicationProvider.getApplicationContext(), FirebaseActivity::class.java)
-//        ActivityScenario.launch<FirebaseActivity>(intent)
-//
-//        val ref = remoteDB.getReference("displaysCorrectEmailFromPhoneNumber")
-//
-//        val preOpTask = ref.setValue("wrond_email@hotmail.fr")
-//        preOpTask.addOnSuccessListener {// Real test starts now
-//            Espresso.onView(ViewMatchers.withId(R.id.editTextPhone))
-//                .perform(ViewActions.replaceText(phone))
-//            Espresso.onView(ViewMatchers.withId(R.id.editTextTextEmailAddress))
-//                .perform(ViewActions.replaceText(email))
-//            Espresso.onView(ViewMatchers.withId(R.id.buttonDBSet))
-//                .perform(ViewActions.click())
-//
-//            Thread.sleep(50) // TODO Bad practice but I see no other way to wait for both UI update and DB response
-//
-//            assertEquals(ref.get().toString(), email)
-//        }
-//        preOpTask.addOnFailureListener {
-//            Fail(it)
-//        }
+        val intent = Intent(ApplicationProvider.getApplicationContext(), FirebaseActivity::class.java)
+        ActivityScenario.launch<FirebaseActivity>(intent)
+
+        val ref = remoteDB.child(phone)
+
+        val timeoutFuture = CompletableFuture<Boolean>()
+
+        ref.setValue(fake_email).addOnSuccessListener {
+            Log.d("success-test", "prep-done")
+            timeoutFuture.complete(true)
+        }.addOnFailureListener(timeoutFuture::completeExceptionally)
+
+        timeoutFuture.orTimeout(5, TimeUnit.SECONDS)
+            .join()
+
+        Espresso.onView(ViewMatchers.withId(R.id.editTextPhone))
+            .perform(ViewActions.replaceText(phone))
+        Espresso.onView(ViewMatchers.withId(R.id.editTextTextEmailAddress))
+            .perform(ViewActions.replaceText(email))
+        Espresso.onView(ViewMatchers.withId(R.id.buttonDBSet))
+            .perform(ViewActions.click())
+
+        Thread.sleep(50) // TODO Bad practice but I see no other way to wait for both UI update and DB response
+
+        val retrievedFuture = CompletableFuture<String>()
+        ref.get().addOnSuccessListener {
+            retrievedFuture.complete(it.value as String)
+        }.addOnFailureListener(retrievedFuture::completeExceptionally)
+
+        timeoutFuture.orTimeout(5, TimeUnit.SECONDS)
+            .join()
+        assertEquals(retrievedFuture.get(), email)
     }
 }
