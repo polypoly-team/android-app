@@ -13,7 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-
-# firebase debug logs
-database-debug.log
-firebase-debug.log
+.idea/*

@@ -2,21 +2,13 @@ env:
   CC_TEST_REPORTER_ID: ENCRYPTED[729d703dabe07f9797508fd1d6d4e46fa7fd4c6784c7683f8544638198a3489733bdd1aa176faafa693e87b66a37edda]
 
 container:
-  image: cirrusci/android-sdk:30 # node:latest
+  image: cirrusci/android-sdk:30
   cpu: 4
   memory: 16G
   kvm: true
 
 check_android_task:
   name: Run Android tests
-#  node_modules_cache:
-#    folder: node_modules
-#    fingerprint_script: cat package-lock.json
-#    populate_script: npm ci
-  install_firebase_emulator:
-#      npm install -g firebase-tools
-      curl -sL https://firebase.tools | bash
-      firebase emulators:start
   install_emulator_script:
     sdkmanager --install "system-images;android-30;google_apis;x86"
   create_avd_script:
