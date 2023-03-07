@@ -14,3 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "polypoly"
 include ':app'
+
+ext.isCiServer = System.getenv().containsKey("CIRRUS_CI")
