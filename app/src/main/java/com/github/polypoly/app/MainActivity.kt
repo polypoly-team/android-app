@@ -39,12 +39,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-        val mapButton: Button = findViewById(R.id.buttonMap)
-        mapButton.setOnClickListener {
-            val intent = Intent(this, MapActivity::class.java)
-            startActivity(intent)
-        }
     }
 
 
