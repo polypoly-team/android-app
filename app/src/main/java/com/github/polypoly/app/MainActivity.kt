@@ -1,14 +1,17 @@
 package com.github.polypoly.app
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +20,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat.checkSelfPermission
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 
 class MainActivity : ComponentActivity() {
     /**
@@ -35,12 +45,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     NameForm()
-
                 }
             }
         }
     }
-
 
     /**
      * A view where the user can write their name, if the name isn't empty, the button shows
@@ -50,6 +58,29 @@ class MainActivity : ComponentActivity() {
     fun NameForm() {
         val mContext = LocalContext.current
         var warningText by remember { mutableStateOf("") }
+
+        val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+
+        if (permissions.all { checkSelfPermission(this, it) != PERMISSION_GRANTED })
+            requestPermissions(this, permissions, 1)
+
+        var distanceWalked by remember { mutableStateOf(0f) }
+
+        val locationClient = remember { getFusedLocationProviderClient(mContext) }
+
+        val locationRequest = remember {
+            LocationRequest.Builder(PRIORITY_HIGH_ACCURACY, 100).build()
+        }
+
+        var lastLocation by remember { mutableStateOf(Location("")) }
+
+        locationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                distanceWalked += lastLocation.distanceTo(locationResult.lastLocation!!)
+                lastLocation = locationResult.lastLocation!!
+            }
+        }, mainLooper)
+
         // This column contains the message displayed if the name is empty
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -74,7 +105,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.testTag("greetButton"),
                 // When clicking, another Activity is launched (only if the name isn't empty)
                 onClick = {
-                    if(nameText.isEmpty()) {
+                    if (nameText.isEmpty()) {
                         warningText = "You can't have an empty name!"
                     } else {
                         val greetIntent = Intent(mContext, GreetingActivity::class.java)
@@ -85,10 +116,24 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Greet")
             }
+            Button(
+                shape = CircleShape,
+                modifier = Modifier.testTag("resetButton"),
+                onClick = { distanceWalked = 0f }
+            ) {
+                Text(text = "Reset")
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(text = "Distance walked: ${formattedDistance(distanceWalked)}")
         }
     }
 
-
+    private fun formattedDistance(distance: Float): String {
+        return if (distance < 1000) "${"%.1f".format(distance)}m"
+        else "${"%.1f".format(distance / 1000)}km"
+    }
 
     /**
      * This function returns the TextField where the user prompts their name.
@@ -96,9 +141,11 @@ class MainActivity : ComponentActivity() {
      */
     @Composable
     fun NameTextField(maxLength: Int) {
-        var text by remember { mutableStateOf(TextFieldValue(""))}
+        var text by remember { mutableStateOf(TextFieldValue("")) }
         OutlinedTextField(
-            modifier = Modifier.width(200.dp).testTag("nameField"),
+            modifier = Modifier
+                .width(200.dp)
+                .testTag("nameField"),
             value = text,
             label = { Text("Enter your name") },
             singleLine = true,
