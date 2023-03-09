@@ -85,6 +85,25 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Greet")
             }
+            // new Button
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(
+                shape = CircleShape,
+                modifier = Modifier.testTag("greetButton"),
+                // When clicking, another Activity is launched (only if the name isn't empty)
+                onClick = {
+                    if(nameText.isEmpty()) {
+                        warningText = "You can't have an empty name!"
+                    } else {
+                        val greetIntent = Intent(mContext, GreetingActivity::class.java)
+                        greetIntent.putExtra("name", nameText)
+                        startActivity(greetIntent)
+                    }
+                }
+            ) {
+                Text(text = "Greet")
+            }
+
         }
     }
 
