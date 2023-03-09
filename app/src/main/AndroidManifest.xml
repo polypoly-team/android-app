@@ -12,6 +12,11 @@
         android:theme="@style/Theme.Polypoly"
         tools:targetApi="31">
         <activity
+            android:name=".JoinGroupActivity"
+            android:exported="false"
+            android:label="@string/title_activity_join_group"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".GreetingActivity"
             android:exported="false"
             android:label="@string/title_activity_greeting"
