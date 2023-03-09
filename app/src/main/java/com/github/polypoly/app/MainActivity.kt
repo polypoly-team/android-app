@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
      * The attributes of the class
      */
     private var nameText: String = ""
+    private val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +101,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun LocationLogic() {
-        var distanceWalked by remember { mutableStateOf(0f) }
         val mContext = LocalContext.current
         val locationClient = remember { getFusedLocationProviderClient(mContext) }
 
@@ -110,17 +110,10 @@ class MainActivity : ComponentActivity() {
 
         var lastLocation by remember { mutableStateOf(Location("")) }
 
-        val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
-
-        if (permissions.all {
-                checkSelfPermission(
-                    this@MainActivity,
-                    it
-                ) != PERMISSION_GRANTED
-            })
+        if (permissions.all { checkSelfPermission(this@MainActivity, it) != PERMISSION_GRANTED })
             requestPermissions(this@MainActivity, permissions, 1)
 
-
+        var distanceWalked by remember { mutableStateOf(0f) }
         locationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 distanceWalked += lastLocation.distanceTo(locationResult.lastLocation!!)
