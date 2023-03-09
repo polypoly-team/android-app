@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 
 import androidx.compose.runtime.*
@@ -35,7 +36,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     NameForm()
-
                 }
             }
         }
@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Greet")
             }
+            JoinGroupActivityButton()
         }
     }
 
@@ -98,7 +99,9 @@ class MainActivity : ComponentActivity() {
     fun NameTextField(maxLength: Int) {
         var text by remember { mutableStateOf(TextFieldValue(""))}
         OutlinedTextField(
-            modifier = Modifier.width(200.dp).testTag("nameField"),
+            modifier = Modifier
+                .width(200.dp)
+                .testTag("nameField"),
             value = text,
             label = { Text("Enter your name") },
             singleLine = true,
@@ -107,6 +110,24 @@ class MainActivity : ComponentActivity() {
                 nameText = text.text
             })
 
+    }
+
+    /**
+     * This function returns the button that launches the JoinGroupActivity
+     */
+    @Composable
+    fun JoinGroupActivityButton(){
+        val mContext = LocalContext.current
+        Button(
+            shape = RoundedCornerShape(5.dp),
+            modifier = Modifier.testTag("joinGroupButton"),
+            onClick = {
+                val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
+                startActivity(joinGroupIntent)
+            }
+        ) {
+            Text(text = "Join Group")
+        }
     }
 
     // =================================== PREVIEW ==============
