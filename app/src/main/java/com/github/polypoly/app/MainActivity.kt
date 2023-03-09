@@ -59,28 +59,6 @@ class MainActivity : ComponentActivity() {
         val mContext = LocalContext.current
         var warningText by remember { mutableStateOf("") }
 
-        val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
-
-        if (permissions.all { checkSelfPermission(this, it) != PERMISSION_GRANTED })
-            requestPermissions(this, permissions, 1)
-
-        var distanceWalked by remember { mutableStateOf(0f) }
-
-        val locationClient = remember { getFusedLocationProviderClient(mContext) }
-
-        val locationRequest = remember {
-            LocationRequest.Builder(PRIORITY_HIGH_ACCURACY, 100).build()
-        }
-
-        var lastLocation by remember { mutableStateOf(Location("")) }
-
-        locationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                distanceWalked += lastLocation.distanceTo(locationResult.lastLocation!!)
-                lastLocation = locationResult.lastLocation!!
-            }
-        }, mainLooper)
-
         // This column contains the message displayed if the name is empty
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -116,19 +94,53 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = "Greet")
             }
-            Button(
-                shape = CircleShape,
-                modifier = Modifier.testTag("resetButton"),
-                onClick = { distanceWalked = 0f }
-            ) {
-                Text(text = "Reset")
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(text = "Distance walked: ${formattedDistance(distanceWalked)}")
+            LocationLogic()
         }
     }
+
+    @Composable
+    fun LocationLogic() {
+        var distanceWalked by remember { mutableStateOf(0f) }
+        val mContext = LocalContext.current
+        val locationClient = remember { getFusedLocationProviderClient(mContext) }
+
+        val locationRequest = remember {
+            LocationRequest.Builder(PRIORITY_HIGH_ACCURACY, 100).build()
+        }
+
+        var lastLocation by remember { mutableStateOf(Location("")) }
+
+        val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+
+        if (permissions.all {
+                checkSelfPermission(
+                    this@MainActivity,
+                    it
+                ) != PERMISSION_GRANTED
+            })
+            requestPermissions(this@MainActivity, permissions, 1)
+
+
+        locationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                distanceWalked += lastLocation.distanceTo(locationResult.lastLocation!!)
+                lastLocation = locationResult.lastLocation!!
+            }
+        }, mainLooper)
+
+        Button(
+            shape = CircleShape,
+            modifier = Modifier.testTag("resetButton"),
+            onClick = { distanceWalked = 0f }
+        ) {
+            Text(text = "Reset")
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(text = "Distance walked: ${formattedDistance(distanceWalked)}")
+    }
+
 
     private fun formattedDistance(distance: Float): String {
         return if (distance < 1000) "${"%.1f".format(distance)}m"
