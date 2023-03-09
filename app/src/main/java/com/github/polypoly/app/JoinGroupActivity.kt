@@ -95,8 +95,8 @@ class JoinGroupActivity : ComponentActivity() {
 
 
     /**
-     * This function returns the TextField where the user prompts their name.
-     * @param maxLength (Int): The maximal allowed name
+     * This function returns the TextField where the user prompts their group code.
+     * @param maxLength (Int): The maximal allowed code length
      */
     @Composable
     fun GroupTextField(maxLength: Int) {
@@ -158,6 +158,7 @@ class JoinGroupActivity : ComponentActivity() {
 
     /**
      * This function checks if the group code is in the database.
+     * @param groupCode (String): The group code to check
      * TODO: rewrite this function to check the real database
      */
     private fun dbContainsGroupCode(groupCode: String): Boolean {
@@ -166,6 +167,7 @@ class JoinGroupActivity : ComponentActivity() {
 
     /**
      * This function checks if the group is full.
+     * @param groupCode (String): The group code to check
      * TODO: rewrite this function to check the real database
      */
     private fun groupIsFull(groupCode: String): Boolean {
