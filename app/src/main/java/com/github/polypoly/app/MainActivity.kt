@@ -89,7 +89,6 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(10.dp))
             Button(
                 shape = CircleShape,
-                modifier = Modifier.testTag("greetButton"),
                 // When clicking, another Activity is launched (only if the name isn't empty)
                 onClick = {
                     if(nameText.isEmpty()) {
