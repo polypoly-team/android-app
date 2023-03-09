@@ -129,10 +129,10 @@ class MainActivity : ComponentActivity() {
             Text(text = "Reset")
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
         Text(text = "Distance walked: ${formattedDistance(distanceWalked)}")
     }
+
+
 
 
     private fun formattedDistance(distance: Float): String {
