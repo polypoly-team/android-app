@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class GreetingActivity : ComponentActivity() {
