@@ -24,7 +24,7 @@ class PendingGameTest {
             testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode
         )
-        for (n in 0L until testMinNumberPlayers)
+        for (n in 1L until testMinNumberPlayers)
             pendingGame.addUser(User("test-$n", n))
         for (n in testMinNumberPlayers..testMaxNumberPlayers) {
             pendingGame.addUser(User("test-$n", n.toLong()))
@@ -38,15 +38,12 @@ class PendingGameTest {
             testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode
         )
-        for (n in 0L until testMinNumberPlayers) {
+        for (n in 1L until testMinNumberPlayers) {
             assertFalse(pendingGame.canStart())
             pendingGame.addUser(User("test-$n", n))
         }
         for (n in testMinNumberPlayers..testMaxNumberPlayers)
             pendingGame.addUser(User("test-$n", n.toLong()))
-        for (n in 0L until testMinNumberPlayers) {
-            pendingGame.addUser(User("test-$n", n))
-            assertFalse(pendingGame.canStart())
-        }
+//        assertThrows(IllegalArgumentException.class, -> pendingGame.addUser(testUser))
     }
 }

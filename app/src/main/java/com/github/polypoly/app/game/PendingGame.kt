@@ -46,10 +46,6 @@ class PendingGame(
         return currentUsersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
     }
 
-    fun getRoundDuration(): Duration {
-        return roundDuration
-    }
-
     fun removeUser(withId: Long) {
         for (i in 0 until currentUsersRegistered.size) {
             if (currentUsersRegistered[i].id == withId) {
