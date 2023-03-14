@@ -17,18 +17,14 @@
             android:label="@string/title_activity_join_group"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".WelcomeActivity"
-            android:exported="false"
-            android:label="@string/title_activity_welcome"
-            android:theme="@style/Theme.Polypoly" />
-        <activity
             android:name=".GreetingActivity"
             android:exported="false"
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true"
+            android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
