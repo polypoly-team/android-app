@@ -1,5 +1,6 @@
 package com.github.polypoly.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -78,6 +80,7 @@ class WelcomeActivity : ComponentActivity() {
      */
     @Composable
     fun GameButtons() {
+        val mContext = LocalContext.current
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
@@ -87,7 +90,10 @@ class WelcomeActivity : ComponentActivity() {
                 modifier = Modifier.padding(2.dp)
             ) {
                 // Join button
-                GameButton(onClick = { /*TODO*/ }, text = "Join Game!")
+                GameButton(onClick = {
+                    val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
+                    startActivity(joinGroupIntent)
+                }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
                 GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
