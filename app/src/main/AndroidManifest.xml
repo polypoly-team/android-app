@@ -17,6 +17,11 @@
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ProfileModifyingActivity"
+            android:exported="true"
+            android:label="@string/title_activity_greeting"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Polypoly">
