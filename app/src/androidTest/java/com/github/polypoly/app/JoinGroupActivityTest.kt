@@ -1,15 +1,11 @@
 package com.github.polypoly.app
 
-import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class JoinGroupActivityTest {
@@ -26,15 +22,12 @@ class JoinGroupActivityTest {
 
     @Test
     fun inputInvalidGroupCode_displayWarningMessage() {
+        //TODO: Check for a group code that is not in the DB once we have the queries set
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput("polypoly")
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
-        val recordedLogs = mutableListOf<String>()
-        Timber.plant(object : Timber.Tree() {
-            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                recordedLogs.add(message)
-            }
-        })
+
+        composeTestRule.onNodeWithText("Group does not exist").assertIsDisplayed()
 
     }
 
@@ -44,18 +37,19 @@ class JoinGroupActivityTest {
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
         // Check that a warning message is displayed
-        composeTestRule.onNodeWithText("Group code cannot be empty!").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Group code is empty").assertIsDisplayed()
     }
 
     @Test
     fun inputValidGroupCode_joinGroupRoom() {
         // Enter a valid group code
-        // TODO: Check for a valid group code in the DB once we have the queries set
-        composeTestRule.onNodeWithTag("groupCodeField").performTextInput("abcd")
+        //TODO: Check for a valid group code in the DB once we have the queries set
+        val groupCode = "abcd"
+        composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
         // Check that a message with the joined group code is displayed
-        composeTestRule.onNodeWithText("Joined group with code abcd").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Joined group with code $groupCode").assertIsDisplayed()
     }
 
     }

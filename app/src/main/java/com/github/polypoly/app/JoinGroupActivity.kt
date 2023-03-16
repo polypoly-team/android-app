@@ -1,11 +1,8 @@
 package com.github.polypoly.app
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -15,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,11 +20,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import timber.log.Timber
-import java.io.Console
 
 @Suppress("UNUSED_EXPRESSION")
 class JoinGroupActivity : ComponentActivity() {
@@ -90,7 +83,7 @@ class JoinGroupActivity : ComponentActivity() {
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.testTag("JoinGroupButton"),
                 onClick = {
-                    warningState.value = groupCodeButtonOnClick(mContext)
+                    warningState.value = groupCodeButtonOnClick()
                     if (warningState.value == "Joined group with code $groupCode") {
                         joinGroupRoom(mContext)
                     }
@@ -113,7 +106,6 @@ class JoinGroupActivity : ComponentActivity() {
      */
     @Composable
     fun GroupTextField(maxLength: Int, warningState : MutableState<String>) {
-        val mContext = LocalContext.current
         val focusManager = LocalFocusManager.current
 
         var text by remember { mutableStateOf("") }
@@ -126,7 +118,7 @@ class JoinGroupActivity : ComponentActivity() {
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-                warningState.value = groupCodeButtonOnClick(mContext)
+                warningState.value = groupCodeButtonOnClick()
             }),
             value = text,
             label = { Text("Enter a group code") },
@@ -147,7 +139,7 @@ class JoinGroupActivity : ComponentActivity() {
      * it displays a warning message.
      * Otherwise, it calls the function to join the group.
      */
-    private fun groupCodeButtonOnClick(mContext : Context): String {
+    private fun groupCodeButtonOnClick(): String {
         if (groupCode.isEmpty()) {
             return "Group code is empty"
             //showLoggableToast("Group code is empty")
@@ -163,11 +155,6 @@ class JoinGroupActivity : ComponentActivity() {
         }
     }
 
-    fun Context.showLoggableToast(message: String) {
-        Timber.tag("Toast").d(message)
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-
     /**
      * This function launches the group room activity and passes the group code to it.
      */
@@ -176,7 +163,6 @@ class JoinGroupActivity : ComponentActivity() {
         groupIntent.putExtra("groupCode", groupCode)
 
         // TODO: link to the group room activity
-        Toast.makeText(mContext, "Joined group with code $groupCode", Toast.LENGTH_LONG).show()
     }
 
     /**
