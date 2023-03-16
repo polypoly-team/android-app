@@ -1,5 +1,7 @@
 package com.github.polypoly.app
 
+import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -103,7 +106,7 @@ class WelcomeActivity : ComponentActivity() {
      * - Button 1: Rules
      * - Button 2:
      * - Button 3:
-     * - Button 4:
+     * - Button 4: Settings
      */
     @Composable
     fun RowOptionButtons() {
@@ -113,6 +116,7 @@ class WelcomeActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
+            // Option Button 1: Rules
             RulesOptionButton()
             // Option Button 2
             OptionButton(
@@ -124,11 +128,8 @@ class WelcomeActivity : ComponentActivity() {
                 onClick = { /*TODO*/ },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton3")
-            // Option Button 4
-            OptionButton(
-                onClick = { /*TODO*/ },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton4")
+            // Option Button 4: Settings
+            SettingsOptionButton()
         }
 
     }
@@ -154,7 +155,9 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.95f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .fillMaxHeight(0.95f)
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
@@ -179,10 +182,17 @@ class WelcomeActivity : ComponentActivity() {
                 }
             }
         }
-
-
     }
 
+    @Composable
+    fun SettingsOptionButton() {
+        val settingsIntent = Intent(LocalContext.current, SettingsActivity::class.java)
+        OptionButton(
+            onClick = { startActivity(settingsIntent) },
+            icon_id = R.drawable.tmp_happysmile,
+            description = "Open Settings"
+        )
+    }
 
 
     // ============================================================= HELPERS
@@ -230,6 +240,8 @@ class WelcomeActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
+        val gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+        gameMusic.startSong()
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
