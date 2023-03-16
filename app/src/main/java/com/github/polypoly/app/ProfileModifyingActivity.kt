@@ -136,7 +136,7 @@ class ProfileModifyingActivity : ComponentActivity() {
         uiMode = Configuration.UI_MODE_NIGHT_YES
     )
     @Composable
-    fun ProfilePreview() {
+    fun ProfileModifyingPreview() {
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
