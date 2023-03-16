@@ -1,8 +1,10 @@
 package com.github.polypoly.app
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import timber.log.Timber
+import java.io.Console
 
 @Suppress("UNUSED_EXPRESSION")
 class JoinGroupActivity : ComponentActivity() {
@@ -52,12 +57,12 @@ class JoinGroupActivity : ComponentActivity() {
                             contentDescription = "polypoly logo",
                             modifier = Modifier
                                 .width(200.dp)
-                                .height(200.dp),
+                                .height(200.dp)
+                                .testTag("logo"),
                             )
                         Spacer(modifier = Modifier.height(50.dp))
                         GroupForm()
                     }
-
                 }
             }
         }
@@ -71,6 +76,8 @@ class JoinGroupActivity : ComponentActivity() {
     @Composable
     fun GroupForm() {
         val mContext = LocalContext.current
+        var warningText by remember { mutableStateOf("") }
+
 
         // Contains all the form, centered in the screen
         Column(
@@ -83,13 +90,20 @@ class JoinGroupActivity : ComponentActivity() {
             Button(
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.testTag("JoinGroupButton"),
-                // When clicking, another Activity is launched (only if the name isn't empty)
                 onClick = {
-                    groupCodeButtonOnClick(mContext)
+                    warningText = groupCodeButtonOnClick(mContext)
+                    if (warningText == "Joined group with code $groupCode") {
+                        joinGroupRoom(mContext)
+                    }
                 }
             ) {
-                Text(text = "Join")
+                Text(text = getString(R.string.join_group_button_text))
             }
+            Text(
+                modifier = Modifier.offset(y = 200.dp),
+                text = warningText,
+                style = MaterialTheme.typography.body2
+            )
         }
     }
 
@@ -133,16 +147,25 @@ class JoinGroupActivity : ComponentActivity() {
      * it displays a warning message.
      * Otherwise, it calls the function to join the group.
      */
-    private fun groupCodeButtonOnClick(mContext : Context) {
+    private fun groupCodeButtonOnClick(mContext : Context): String {
         if (groupCode.isEmpty()) {
-            Toast.makeText(mContext, "Group code cannot be empty!", Toast.LENGTH_LONG).show()
+            return "Group code is empty"
+            //showLoggableToast("Group code is empty")
         } else if (!dbContainsGroupCode(groupCode)) {
-            Toast.makeText(mContext, "Group code not found", Toast.LENGTH_LONG).show()
+            return "Group does not exist"
+            //showLoggableToast("Group does nos exist")
         } else if(groupIsFull(groupCode)){
-            Toast.makeText(mContext, "Group is full", Toast.LENGTH_LONG).show()
+            return "Group is full"
+            //showLoggableToast("Group is full")
+
         } else {
-            joinGroupRoom(mContext)
+            return "Joined group with code $groupCode"
         }
+    }
+
+    fun Context.showLoggableToast(message: String) {
+        Timber.tag("Toast").d(message)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     /**
