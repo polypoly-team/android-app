@@ -54,6 +54,8 @@ class WelcomeActivityTest {
     fun clickingOutsideRulesTogglesOffThem() {
         // First display the rules
         optionButtonRules.performClick()
+
+        // TODO: find a way to click outside the rules
     }
 
     @Test
