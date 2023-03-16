@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat.checkSelfPermission
+
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
