@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +39,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
@@ -81,21 +81,6 @@ class MapActivity : ComponentActivity() {
             val locationOverlay = initLocationOverlay(mapView)
             mapView.overlays.add(locationOverlay)
 
-            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-            if (permissions.all {
-                    ContextCompat.checkSelfPermission(
-                        this@MapActivity,
-                        it
-                    ) != PackageManager.PERMISSION_GRANTED
-                })
-                ActivityCompat.requestPermissions(this@MapActivity, permissions, 1)
-
-            locationManager
-                .requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f) {
-                    updateAllDistances(mapView, locationOverlay.myLocation)
-                }
-
             mapView
         })
     }
@@ -112,12 +97,14 @@ class MapActivity : ComponentActivity() {
 
         var lastLocation by remember { mutableStateOf(Location("")) }
 
-        if (permissions.all {
-                ContextCompat.checkSelfPermission(
-                    this@MapActivity,
-                    it
-                ) != PackageManager.PERMISSION_GRANTED
-            })
+        if (permissions
+                .all {
+                    ContextCompat.checkSelfPermission(
+                        this@MapActivity,
+                        it
+                    ) != PackageManager.PERMISSION_GRANTED
+                }
+        )
             ActivityCompat.requestPermissions(this@MapActivity, permissions, 1)
 
         var distanceWalked by remember { mutableStateOf(0f) }
@@ -180,7 +167,13 @@ class MapActivity : ComponentActivity() {
 
     private fun initLocationOverlay(mapView: MapView): MyLocationNewOverlay {
         val locationProvider = GpsMyLocationProvider(this)
-        val locationOverlay = MyLocationNewOverlay(locationProvider, mapView)
+        val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
+            override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
+                super.onLocationChanged(location, provider)
+                if (location != null)
+                    updateAllDistances(mapView, GeoPoint(location))
+            }
+        }
         locationOverlay.enableMyLocation()
         locationOverlay.enableFollowLocation()
 
@@ -199,12 +192,11 @@ class MapActivity : ComponentActivity() {
         return mapView.overlays.filterIsInstance<Marker>()
     }
 
-    private fun updateDistance(marker: Marker, myLocation: GeoPoint) {
-        val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
-        marker.snippet = "Distance: ${formattedDistance(distance)}"
-    }
-
     private fun updateAllDistances(mapView: MapView, myLocation: GeoPoint) {
+        fun updateDistance(marker: Marker, myLocation: GeoPoint) {
+            val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
+            marker.snippet = "Distance: ${formattedDistance(distance)}"
+        }
         for (marker in markersOf(mapView))
             updateDistance(marker, myLocation)
     }
