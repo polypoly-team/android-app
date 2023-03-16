@@ -76,8 +76,7 @@ class JoinGroupActivity : ComponentActivity() {
     @Composable
     fun GroupForm() {
         val mContext = LocalContext.current
-        var warningText by remember { mutableStateOf("") }
-
+        val warningState = remember { mutableStateOf("") }
 
         // Contains all the form, centered in the screen
         Column(
@@ -85,14 +84,14 @@ class JoinGroupActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            GroupTextField(15)
+            GroupTextField(15, warningState)
             Spacer(modifier = Modifier.height(10.dp))
             Button(
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.testTag("JoinGroupButton"),
                 onClick = {
-                    warningText = groupCodeButtonOnClick(mContext)
-                    if (warningText == "Joined group with code $groupCode") {
+                    warningState.value = groupCodeButtonOnClick(mContext)
+                    if (warningState.value == "Joined group with code $groupCode") {
                         joinGroupRoom(mContext)
                     }
                 }
@@ -100,9 +99,9 @@ class JoinGroupActivity : ComponentActivity() {
                 Text(text = getString(R.string.join_group_button_text))
             }
             Text(
-                modifier = Modifier.offset(y = 200.dp),
-                text = warningText,
-                style = MaterialTheme.typography.body2
+                text = warningState.value,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.testTag("warningMessage")
             )
         }
     }
@@ -113,10 +112,11 @@ class JoinGroupActivity : ComponentActivity() {
      * @param maxLength (Int): The maximal allowed code length
      */
     @Composable
-    fun GroupTextField(maxLength: Int) {
+    fun GroupTextField(maxLength: Int, warningState : MutableState<String>) {
         val mContext = LocalContext.current
         val focusManager = LocalFocusManager.current
-        var text by remember { mutableStateOf(TextFieldValue("")) }
+
+        var text by remember { mutableStateOf("") }
 
         OutlinedTextField(
             modifier = Modifier
@@ -126,15 +126,15 @@ class JoinGroupActivity : ComponentActivity() {
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-                groupCodeButtonOnClick(mContext)
+                warningState.value = groupCodeButtonOnClick(mContext)
             }),
             value = text,
             label = { Text("Enter a group code") },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
             onValueChange = { newText ->
-                text = if (newText.text.matches(Regex("[a-zA-Z\\d]*")) && newText.text.length <= maxLength) newText else text
-                groupCode = text.text
+                text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
+                groupCode = text
             }
 
         )
