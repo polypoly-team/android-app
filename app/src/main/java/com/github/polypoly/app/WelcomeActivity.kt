@@ -13,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -113,11 +115,20 @@ class WelcomeActivity : ComponentActivity() {
         ) {
             RulesOptionButton()
             // Option Button 2
-            OptionButton(onClick = { /*TODO*/ }, icon_id = R.drawable.tmp_happysmile)
+            OptionButton(
+                onClick = { /*TODO*/ },
+                icon_id = R.drawable.tmp_happysmile,
+                description = "optionButton2")
             // Option Button 3
-            OptionButton(onClick = { /*TODO*/ }, icon_id = R.drawable.tmp_happysmile)
+            OptionButton(
+                onClick = { /*TODO*/ },
+                icon_id = R.drawable.tmp_happysmile,
+                description = "optionButton3")
             // Option Button 4
-            OptionButton(onClick = { /*TODO*/ }, icon_id = R.drawable.tmp_happysmile)
+            OptionButton(
+                onClick = { /*TODO*/ },
+                icon_id = R.drawable.tmp_happysmile,
+                description = "optionButton4")
         }
 
     }
@@ -133,7 +144,9 @@ class WelcomeActivity : ComponentActivity() {
         var openRules by remember { mutableStateOf(false) }
         OptionButton(
             onClick = { openRules = true },
-            icon_id = R.drawable.tmp_happysmile)
+            icon_id = R.drawable.tmp_happysmile,
+            description = "Show Rules"
+        )
 
         if(openRules) {
             Dialog(
@@ -141,9 +154,7 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .fillMaxHeight(0.95f)
+                    modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.95f)
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
@@ -179,10 +190,12 @@ class WelcomeActivity : ComponentActivity() {
      * Creates a square button with a small image that'll be used to open other pop-ups or activities.
      */
     @Composable
-    fun OptionButton(onClick: () -> Unit, icon_id: Int) {
+    fun OptionButton(onClick: () -> Unit, icon_id: Int, description: String) {
         Button(
             onClick = onClick,
-            modifier = Modifier.size(70.dp),
+            modifier = Modifier
+                .size(70.dp)
+                .semantics { contentDescription = description },
             shape = RoundedCornerShape(10.dp),
             contentPadding = PaddingValues(0.dp)
         ) {

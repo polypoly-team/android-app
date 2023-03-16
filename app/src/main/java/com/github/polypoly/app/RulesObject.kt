@@ -7,9 +7,10 @@ package com.github.polypoly.app
 object RulesObject {
     const val rulesTitle = "polypoly, the rules"
     val rulesChapters : List<RulesChapter> = listOf(
+        // Mock chapters
         RulesChapter("Chap1", ((0..100).map { "empty" }).toString()),
-        RulesChapter("Chap2", ((0..100).map { "empty" }).toString()),
-        RulesChapter("Conclusion", ((0..100).map { "empty" }).toString())
+        RulesChapter("Chap2", ((5..98).map { "vide" }).toString()),
+        RulesChapter("Conclusion", ((2..66).map { "vacío" }).toString())
     )
 }
 
