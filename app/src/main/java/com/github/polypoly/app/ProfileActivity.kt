@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +36,10 @@ class ProfileActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Display the user profile with all the statistics of the user, his/her nickname, his/her
+     * description and his/her appearance in the game
+     */
     @Composable
     fun ProfileAndStats() {
         Column(
@@ -52,6 +55,9 @@ class ProfileActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Display the information of the user's profile and the appearance of player in game
+     */
     @Composable
     fun Profile() {
         Column(
@@ -81,6 +87,9 @@ class ProfileActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Display some statistics about the player
+     */
     @Composable
     fun Statistics() {
         Column(
@@ -110,6 +119,11 @@ class ProfileActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * One statistic about the player
+     * @param number the number of the stat
+     * @param statName the name of the stat
+     */
     @Composable
     fun Stat(number: Int, statName: String) {
         Row(
@@ -130,6 +144,9 @@ class ProfileActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The customisable appearance of the player in game
+     */
     @Composable
     fun UserAppearance() {
         Box(
@@ -140,6 +157,9 @@ class ProfileActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Display the info of the player (name and description
+     */
     @Composable
     fun ProfileInfo() {
         Column(
