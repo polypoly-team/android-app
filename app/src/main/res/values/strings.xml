@@ -2,4 +2,5 @@
     <string name="app_name">polypoly</string>
     <string name="title_activity_greeting" />
     <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>

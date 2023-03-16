@@ -21,6 +21,11 @@
             android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".MapActivity"
             android:exported="true" />
         <activity
