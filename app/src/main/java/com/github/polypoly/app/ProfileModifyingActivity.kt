@@ -114,7 +114,7 @@ class ProfileModifyingActivity : ComponentActivity() {
         OutlinedTextField(
             modifier = Modifier
                 .width(300.dp)
-                .testTag("nameField"),
+                .testTag("nicknameText"),
             value = text,
             label = { Text("nickname") },
             singleLine = true,
@@ -134,7 +134,7 @@ class ProfileModifyingActivity : ComponentActivity() {
             modifier = Modifier
                 .width(300.dp)
                 .height(150.dp)
-                .testTag("nameField"),
+                .testTag("descriptionText"),
             value = text,
             label = { Text("description") },
             singleLine = false,

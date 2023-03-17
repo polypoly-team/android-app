@@ -228,11 +228,13 @@ class ProfileActivity : ComponentActivity() {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
+                modifier =  Modifier.testTag("nickname"),
                 text = user.get().name,
                 style = MaterialTheme.typography.h5
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
+                modifier =  Modifier.testTag("bio"),
                 text = user.get().bio,
                 style = MaterialTheme.typography.body2
             )
