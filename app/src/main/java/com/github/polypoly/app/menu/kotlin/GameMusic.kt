@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu.kotlin
 
 import android.content.Context
 import android.media.MediaPlayer

@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

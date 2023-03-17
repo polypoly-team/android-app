@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.content.Intent
 import android.content.res.Configuration

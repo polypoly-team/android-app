@@ -12,6 +12,8 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
+import com.github.polypoly.app.menu.ProfileActivity
+import com.github.polypoly.app.menu.ProfileModifyingActivity
 
 @RunWith(AndroidJUnit4::class)
 class ProfileActivityTest {

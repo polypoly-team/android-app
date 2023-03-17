@@ -8,6 +8,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.menu.ProfileActivity
+import com.github.polypoly.app.menu.ProfileModifyingActivity
 import com.github.polypoly.app.network.FakeRemoteStorage
 import org.junit.Rule
 import org.junit.Test

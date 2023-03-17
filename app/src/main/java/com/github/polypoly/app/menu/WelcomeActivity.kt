@@ -1,7 +1,6 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.content.Intent
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +20,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.*
+import com.github.polypoly.app.R
+import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
@@ -31,9 +33,12 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
+    private lateinit var gameMusic: GameMusic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+            gameMusic.startSong()
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -77,6 +82,7 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
+    // TODO: add the real activity directions to the buttons
     /**
      * So far, the player has two main options, join an existing game or create a new one,
      * these buttons are then used for these purposes and have a fixed size.
@@ -98,20 +104,18 @@ class WelcomeActivity : ComponentActivity() {
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
-                // Create button (TODO: change this, as map activity is for demo purposes)
-                GameButton(onClick = {
-                    val mapIntent = Intent(mContext, MapActivity::class.java)
-                    startActivity(mapIntent)
-                }, text = "Create Game?")
+                // Create button
+                GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
             }
         }
     }
 
+    // TODO: add the real activity directions to the buttons
     /**
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
      * - Button 1: Rules
-     * - Button 2: MainActivity for demo purposes
+     * - Button 2: MapActivity for demo purposes
      * - Button 3: ProfileActivity for demo purposes
      * - Button 4: Settings
      */
@@ -129,8 +133,8 @@ class WelcomeActivity : ComponentActivity() {
             // Option Button 2
             OptionButton(
                 onClick = {
-                    val mainIntent = Intent(mContext, MainActivity::class.java)
-                    startActivity(mainIntent)
+                    val mapIntent = Intent(mContext, MapActivity::class.java)
+                    startActivity(mapIntent)
                 },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton2")
@@ -254,7 +258,7 @@ class WelcomeActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
-        val gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+        gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
         gameMusic.startSong()
         PolypolyTheme {
             Surface(
