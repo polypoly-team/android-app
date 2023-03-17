@@ -20,7 +20,7 @@ class WelcomeActivityTest {
 
     private val optionButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
     private val optionButton2 = composeTestRule.onNodeWithContentDescription("optionButton2")
-    private val optionButton3 = composeTestRule.onNodeWithContentDescription("optionButton3")
+    private val optionButton3 = composeTestRule.onNodeWithContentDescription("See Profile")
     private val optionButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
