@@ -33,15 +33,19 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.MapTileProviderBasic
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-
+import org.osmdroid.views.overlay.TilesOverlay
+import kotlin.random.Random
 
 class MapActivity : ComponentActivity() {
 
@@ -77,6 +81,11 @@ class MapActivity : ComponentActivity() {
             val mapView = initMapView(context, donutPosition)
 
             addMarkerTo(mapView, donutPosition, "Donut")
+
+            val campusTileSource = CampusTileSource(Random.nextInt(2), 0)
+            val tileProvider = MapTileProviderBasic(applicationContext, campusTileSource)
+            val tilesOverlay = TilesOverlay(tileProvider, applicationContext)
+            mapView.overlays.add(tilesOverlay)
 
             val locationOverlay = initLocationOverlay(mapView)
             mapView.overlays.add(locationOverlay)
@@ -206,6 +215,12 @@ class MapActivity : ComponentActivity() {
         else "${"%.1f".format(distance / 1000)}km"
     }
 
+
+    class CampusTileSource(private val serverId: Int, private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
+        override fun getTileURLString(pMapTileIndex: Long): String {
+            return "https://plan-epfl-tiles$serverId.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
+        }
+    }
 
     @Preview
     @Composable
