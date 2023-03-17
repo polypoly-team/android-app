@@ -107,12 +107,13 @@ class WelcomeActivity : ComponentActivity() {
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
      * - Button 1: Rules
-     * - Button 2:
-     * - Button 3:
-     * - Button 4:
+     * - Button 2: MainActivity for demo purposes
+     * - Button 3: ProfileActivity for demo purposes
+     * - Button 4: MapActivity for demo purposes
      */
     @Composable
     fun RowOptionButtons() {
+        val mContext = LocalContext.current
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -122,17 +123,26 @@ class WelcomeActivity : ComponentActivity() {
             RulesOptionButton()
             // Option Button 2
             OptionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val mainIntent = Intent(mContext, MainActivity::class.java)
+                    startActivity(mainIntent)
+                },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton2")
             // Option Button 3
             OptionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val profileIntent = Intent(mContext, ProfileActivity::class.java)
+                    startActivity(profileIntent)
+                },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton3")
             // Option Button 4
             OptionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val mapIntent = Intent(mContext, MapActivity::class.java)
+                    startActivity(mapIntent)
+                },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton4")
         }
