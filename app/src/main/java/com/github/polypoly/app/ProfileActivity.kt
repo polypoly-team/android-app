@@ -1,5 +1,6 @@
 package com.github.polypoly.app
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,17 +8,23 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : ComponentActivity() {
@@ -60,6 +67,7 @@ class ProfileActivity : ComponentActivity() {
      */
     @Composable
     fun Profile() {
+        val mContext = LocalContext.current
         Column(
             modifier = Modifier
                 .padding(all = 30.dp),
@@ -76,7 +84,10 @@ class ProfileActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
-                onClick = {},
+                onClick = {
+                    val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
+                    startActivity(profileModifyingIntent)
+                },
                 shape = CircleShape,
                 modifier = Modifier.testTag("modifyProfileButton"),
                 colors = ButtonDefaults.buttonColors(
@@ -94,8 +105,9 @@ class ProfileActivity : ComponentActivity() {
     fun Statistics() {
         Column(
             modifier = Modifier
-                .padding(all = 30.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(all = 30.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -103,19 +115,56 @@ class ProfileActivity : ComponentActivity() {
                 textAlign = TextAlign.Center)
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(vertical = 20.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-                Stat(46, "Parties jouées")
+                Stat(78, "Games played")
                 Spacer(modifier = Modifier.height(10.dp))
-                Stat(69, "Parties gagnées")
+                Stat(12, "Games won")
                 Spacer(modifier = Modifier.height(10.dp))
-                Stat(40, "kilomètre effectué")
+                Stat(40, "kilometers traveled")
                 Spacer(modifier = Modifier.height(10.dp))
-                Stat(9, "Trophée gagné")
+                Stat(5, "Trophies won")
             }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("All Trophies", style = MaterialTheme.typography.h5,
+                textAlign = TextAlign.Center)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(6),
+                modifier = Modifier
+                    .padding(vertical = 20.dp)
+                    .height(((allTrophies.size * 60 - 10) / 6).dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                content = {
+                    items(allTrophies.size) { index ->
+                        Trophy(index)
+                    }
+                }
+            )
+        }
+    }
+
+    /**
+     * A trophy that the player has won or not
+     */
+    @Composable
+    fun Trophy(trophyIdx: Int) {
+        val won = trophyIdx%4 == 0
+        var toDisplay = "?"
+        if(won) toDisplay = allTrophies[trophyIdx].toString()
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(color = if (won) MaterialTheme.colors.primary else Color.DarkGray)
+                .size(50.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(toDisplay,
+                style = MaterialTheme.typography.body1,
+                color = Color.White)
         }
     }
 
@@ -175,6 +224,17 @@ class ProfileActivity : ComponentActivity() {
                 text = "description blabla bla blablabla bla bla blabla bla bla blabla bla blabla",
                 style = MaterialTheme.typography.body2
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Trophy(0)
+                Spacer(modifier = Modifier.width(10.dp))
+                Trophy(4)
+                Spacer(modifier = Modifier.width(10.dp))
+                Trophy(16)
+            }
         }
     }
 

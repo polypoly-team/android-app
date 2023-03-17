@@ -67,11 +67,8 @@ class ProfileModifyingActivity : ComponentActivity() {
                     if(nickname.isEmpty()) {
                         warningText = "You can't have an empty nickname!"
                     } else {
-                        // For later
-                        /*val registerInfoIntent = Intent(mContext, ProfileActivity::class.java)
-                        registerInfoIntent.putExtra("nickname", nickname)
-                        registerInfoIntent.putExtra("description", description)
-                        startActivity(registerInfoIntent)*/
+                        val profileIntent = Intent(mContext, ProfileActivity::class.java)
+                        startActivity(profileIntent)
                     }
                 }
             ) {
