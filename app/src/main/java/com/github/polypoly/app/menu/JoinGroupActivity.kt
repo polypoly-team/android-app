@@ -156,8 +156,6 @@ class JoinGroupActivity : ComponentActivity() {
      * This function launches the group room activity and passes the group code to it.
      */
     private fun joinGroupRoom(mContext : Context) {
-        //val groupIntent = Intent(mContext, GreetingActivity::class.java)
-        //groupIntent.putExtra("groupCode", groupCode)
 
         // TODO: link to the group room activity
     }
