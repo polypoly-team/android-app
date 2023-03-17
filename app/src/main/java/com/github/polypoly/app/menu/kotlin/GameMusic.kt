@@ -2,8 +2,7 @@ package com.github.polypoly.app.menu.kotlin
 
 import android.content.Context
 import android.media.MediaPlayer
-import java.lang.Float.max
-import kotlin.math.min
+import androidx.core.math.MathUtils.clamp
 
 class GameMusic(private val context: Context, private val songId: Int) {
     private lateinit var mediaPlayer: MediaPlayer
@@ -14,15 +13,16 @@ class GameMusic(private val context: Context, private val songId: Int) {
         mediaPlayer.start()
     }
 
+    /**
+     * The function setVolume of MediaPlayer only accepts values between 0f and 1f.
+     * To avoid issues, before applying the given value, we force it to be in the correct range
+      */
     fun setVolume(value: Float) {
-        var validValue = max(value, 1f)
-        validValue = min(validValue, 0f)
+        val validValue = clamp(value, 0f, 1f)
         mediaPlayer.setVolume(validValue, validValue)
     }
 
     fun mute() {
         setVolume(0f)
     }
-
-
 }

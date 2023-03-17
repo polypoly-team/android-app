@@ -110,43 +110,29 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
-    // TODO: add the real activity directions to the buttons
+    // TODO: add a usage for button3
     /**
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
-     * - Button 1: Rules
-     * - Button 2: MapActivity for demo purposes
-     * - Button 3: ProfileActivity for demo purposes
+     * - Button 1: Profile
+     * - Button 2: Rules
+     * - Button 3:
      * - Button 4: Settings
      */
     @Composable
     fun RowOptionButtons() {
-        val mContext = LocalContext.current
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            // Option Button 1: Rules
+            ProfileOptionButton()
             RulesOptionButton()
-            // Option Button 2
             OptionButton(
-                onClick = {
-                    val mapIntent = Intent(mContext, MapActivity::class.java)
-                    startActivity(mapIntent)
-                },
+                onClick = { /*TODO*/ },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton2")
-            // Option Button 3
-            OptionButton(
-                onClick = {
-                    val profileIntent = Intent(mContext, ProfileActivity::class.java)
-                    startActivity(profileIntent)
-                },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton3")
-            // Option Button 4: Settings
             SettingsOptionButton()
         }
 
@@ -204,16 +190,37 @@ class WelcomeActivity : ComponentActivity() {
 
     @Composable
     fun SettingsOptionButton() {
-        val settingsIntent = Intent(LocalContext.current, SettingsActivity::class.java)
-        OptionButton(
-            onClick = { startActivity(settingsIntent) },
+        ActivityOptionButton(
+            activity = SettingsActivity::class.java,
             icon_id = R.drawable.tmp_happysmile,
             description = "Open Settings"
         )
     }
 
+    @Composable
+    fun ProfileOptionButton() {
+        ActivityOptionButton(
+            activity = ProfileActivity::class.java,
+            icon_id = R.drawable.tmp_happysmile,
+            description = "See Profile"
+        )
+    }
 
     // ============================================================= HELPERS
+
+    /**
+     * An OptionButton that launches a given activity
+     */
+    @Composable
+    fun ActivityOptionButton(activity: Class<*>, icon_id: Int, description: String) {
+        val activityIntent = Intent(LocalContext.current, activity)
+        OptionButton(
+            onClick = { startActivity(activityIntent) },
+            icon_id = icon_id,
+            description = description
+        )
+    }
+    
     /**
      * Creates a square button with a small image that'll be used to open other pop-ups or activities.
      */
