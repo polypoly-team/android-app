@@ -6,7 +6,7 @@ import java.util.concurrent.Future
 interface IRemoteStorage {
     fun getUserProfileWithId(userId: Long): Future<User>
 
-    fun setUserProfileWithId(userId: Long, user: User): Future<User>
+    fun setUserProfileWithId(userId: Long, user: User)
 
     fun getAllUsers(): Future<List<User>>
 
