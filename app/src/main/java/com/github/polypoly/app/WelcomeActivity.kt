@@ -1,6 +1,7 @@
 package com.github.polypoly.app
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -97,8 +98,11 @@ class WelcomeActivity : ComponentActivity() {
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
-                // Create button
-                GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
+                // Create button (TODO: change this, as map activity is for demo purposes)
+                GameButton(onClick = {
+                    val mapIntent = Intent(mContext, MapActivity::class.java)
+                    startActivity(mapIntent)
+                }, text = "Create Game?")
             }
         }
     }
@@ -109,7 +113,7 @@ class WelcomeActivity : ComponentActivity() {
      * - Button 1: Rules
      * - Button 2: MainActivity for demo purposes
      * - Button 3: ProfileActivity for demo purposes
-     * - Button 4: MapActivity for demo purposes
+     * - Button 4: Settings
      */
     @Composable
     fun RowOptionButtons() {
@@ -120,6 +124,7 @@ class WelcomeActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
+            // Option Button 1: Rules
             RulesOptionButton()
             // Option Button 2
             OptionButton(
@@ -137,14 +142,8 @@ class WelcomeActivity : ComponentActivity() {
                 },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton3")
-            // Option Button 4
-            OptionButton(
-                onClick = {
-                    val mapIntent = Intent(mContext, MapActivity::class.java)
-                    startActivity(mapIntent)
-                },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton4")
+            // Option Button 4: Settings
+            SettingsOptionButton()
         }
 
     }
@@ -170,7 +169,9 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.95f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .fillMaxHeight(0.95f)
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
@@ -195,10 +196,17 @@ class WelcomeActivity : ComponentActivity() {
                 }
             }
         }
-
-
     }
 
+    @Composable
+    fun SettingsOptionButton() {
+        val settingsIntent = Intent(LocalContext.current, SettingsActivity::class.java)
+        OptionButton(
+            onClick = { startActivity(settingsIntent) },
+            icon_id = R.drawable.tmp_happysmile,
+            description = "Open Settings"
+        )
+    }
 
 
     // ============================================================= HELPERS
@@ -246,6 +254,8 @@ class WelcomeActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
+        val gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+        gameMusic.startSong()
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),

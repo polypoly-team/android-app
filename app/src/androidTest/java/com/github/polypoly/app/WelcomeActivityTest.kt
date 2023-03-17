@@ -2,6 +2,8 @@ package com.github.polypoly.app
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import org.junit.Rule
 import org.junit.Test
 
@@ -17,7 +19,7 @@ class WelcomeActivityTest {
     private val optionButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
     private val optionButton2 = composeTestRule.onNodeWithContentDescription("optionButton2")
     private val optionButton3 = composeTestRule.onNodeWithContentDescription("optionButton3")
-    private val optionButton4 = composeTestRule.onNodeWithContentDescription("optionButton4")
+    private val optionButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
 
@@ -39,7 +41,7 @@ class WelcomeActivityTest {
         optionButtonRules.assertIsDisplayed()
         optionButton2.assertIsDisplayed()
         optionButton3.assertIsDisplayed()
-        optionButton4.assertIsDisplayed()
+        optionButtonSettings.assertIsDisplayed()
     }
     // ========================================================================
 
@@ -65,5 +67,18 @@ class WelcomeActivityTest {
 
         rules.performClick()
         rules.assertIsDisplayed()
+    }
+
+    // ========================================================================
+
+    @Test
+    fun settingsButtonFiresIntentWithSettingsActivity() {
+        Intents.init()
+
+        // Clicking on button
+        optionButtonSettings.performClick()
+        Intents.intended(IntentMatchers.hasComponent(SettingsActivity::class.java.name))
+
+        Intents.release()
     }
 }
