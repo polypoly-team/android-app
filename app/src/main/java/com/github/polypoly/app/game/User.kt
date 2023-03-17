@@ -9,8 +9,9 @@ class Skin(
 )
 
 class Stats(
-    val accountCreation: LocalDateTime? = null,
-    val lastConnection: LocalDateTime? = null,
+//    TODO(Add several other stats)
+//    val accountCreation: LocalDateTime? = null,
+//    val lastConnection: LocalDateTime? = null,
     val numberOfWins: Int? = null
 )
 
