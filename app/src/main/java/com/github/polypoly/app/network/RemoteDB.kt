@@ -107,6 +107,10 @@ open class RemoteDB(
         return future
     }
 
+    fun getUnderlyingDB(): FirebaseDatabase{
+        return db!!
+    }
+
     override fun setUserName(userId: Long, name: String): CompletableFuture<Boolean> {
         return setUserData(userId, DB_USER_NAME_DIRECTORY, name)
     }

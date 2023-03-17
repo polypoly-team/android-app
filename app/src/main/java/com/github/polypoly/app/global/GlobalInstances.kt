@@ -15,9 +15,8 @@ class GlobalInstances {
             }
             set(value) {
                 if (!isRemoteDBSet.compareAndSet(false, true)) {
-//                    throw java.lang.IllegalStateException("RemoteDB is already setup")
+                    field = value // cannot throw an IllegualArgumentException because it is not yet determinstic how the order of instantiation works for static methods
                 }
-                field = value
             }
     }
 }
