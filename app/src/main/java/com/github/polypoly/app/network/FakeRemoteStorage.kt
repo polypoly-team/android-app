@@ -17,7 +17,7 @@ class FakeRemoteStorage : IRemoteStorage {
     var user: User = User(
         id = 1,
         name = "Tamara",
-        bio = "Trop forte mais trop fatiguée la Tamara",
+        bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
         stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67)
     )
