@@ -15,10 +15,10 @@ class PendingGame(
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
-    val usersRegistered: List<User> get() = usersRegistered.toList()
+    val usersRegistered: List<User> get() = currentUsersRegistered.toList()
 
     init {
-        if (minimumNumberOfPlayers < 1)
+        if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
@@ -32,6 +32,7 @@ class PendingGame(
             throw java.lang.IllegalArgumentException("Game code cannot be empty")
         if (code.isBlank())
             throw java.lang.IllegalArgumentException("Game code cannot be blank")
+        addUser(admin)
     }
 
     fun addUser(user: User) {
