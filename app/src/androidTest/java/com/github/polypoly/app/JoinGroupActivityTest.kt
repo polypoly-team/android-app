@@ -27,8 +27,7 @@ class JoinGroupActivityTest {
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
 
-        composeTestRule.onNodeWithText("Group does not exist").assertIsDisplayed()
-
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_does_not_exist)).assertIsDisplayed()
     }
 
     @Test
@@ -37,19 +36,29 @@ class JoinGroupActivityTest {
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
         // Check that a warning message is displayed
-        composeTestRule.onNodeWithText("Group code is empty").assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_code_is_empty)).assertIsDisplayed()
     }
 
     @Test
     fun inputValidGroupCode_joinGroupRoom() {
-        // Enter a valid group code
         //TODO: Check for a valid group code in the DB once we have the queries set
-        val groupCode = "abcd"
+        val groupCode = "1234"
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
         // Check that a message with the joined group code is displayed
-        composeTestRule.onNodeWithText("Joined group with code $groupCode").assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.joined_group_with_code) + groupCode).assertIsDisplayed()
+    }
+
+    @Test
+    fun inputFullGroupCode_displayWarningMessage() {
+        //TODO: Check for a valid group code that is full in the DB once we have the queries set
+        val groupCode = "abcd"
+        composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
+        composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
+
+        // Check that a message that the group is full is displayed
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_is_full)).assertIsDisplayed()
     }
 
     }

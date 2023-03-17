@@ -141,17 +141,13 @@ class JoinGroupActivity : ComponentActivity() {
      */
     private fun groupCodeButtonOnClick(): String {
         if (groupCode.isEmpty()) {
-            return "Group code is empty"
-            //showLoggableToast("Group code is empty")
+            return getString(R.string.group_code_is_empty)
         } else if (!dbContainsGroupCode(groupCode)) {
-            return "Group does not exist"
-            //showLoggableToast("Group does nos exist")
+            return getString(R.string.group_does_not_exist)
         } else if(groupIsFull(groupCode)){
-            return "Group is full"
-            //showLoggableToast("Group is full")
-
+            return getString(R.string.group_is_full)
         } else {
-            return "Joined group with code $groupCode"
+            return getString(R.string.joined_group_with_code) + groupCode
         }
     }
 
@@ -180,7 +176,7 @@ class JoinGroupActivity : ComponentActivity() {
      * TODO: rewrite this function to check the real database
      */
     private fun groupIsFull(groupCode: String): Boolean {
-        return false
+        return groupCode != "1234"
     }
 
 
