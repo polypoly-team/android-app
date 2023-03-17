@@ -83,6 +83,7 @@ class WelcomeActivity : ComponentActivity() {
      */
     @Composable
     fun GameButtons() {
+        val mContext = LocalContext.current
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
@@ -92,10 +93,16 @@ class WelcomeActivity : ComponentActivity() {
                 modifier = Modifier.padding(2.dp)
             ) {
                 // Join button
-                GameButton(onClick = { /*TODO*/ }, text = "Join Game!")
+                GameButton(onClick = {
+                    val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
+                    startActivity(joinGroupIntent)
+                }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
-                // Create button
-                GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
+                // Create button (TODO: change this, as map activity is for demo purposes)
+                GameButton(onClick = {
+                    val mapIntent = Intent(mContext, MapActivity::class.java)
+                    startActivity(mapIntent)
+                }, text = "Create Game?")
             }
         }
     }
@@ -104,12 +111,13 @@ class WelcomeActivity : ComponentActivity() {
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
      * - Button 1: Rules
-     * - Button 2:
-     * - Button 3:
+     * - Button 2: MainActivity for demo purposes
+     * - Button 3: ProfileActivity for demo purposes
      * - Button 4: Settings
      */
     @Composable
     fun RowOptionButtons() {
+        val mContext = LocalContext.current
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -120,12 +128,18 @@ class WelcomeActivity : ComponentActivity() {
             RulesOptionButton()
             // Option Button 2
             OptionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val mainIntent = Intent(mContext, MainActivity::class.java)
+                    startActivity(mainIntent)
+                },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton2")
             // Option Button 3
             OptionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    val profileIntent = Intent(mContext, ProfileActivity::class.java)
+                    startActivity(profileIntent)
+                },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton3")
             // Option Button 4: Settings
