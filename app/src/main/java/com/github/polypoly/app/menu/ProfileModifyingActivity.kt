@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -126,6 +126,7 @@ class ProfileModifyingActivity : ComponentActivity() {
 
     /**
      * The field where the player can write his/her description
+     * //TODO: add a limit of characters to avoid 'return' spam
      */
     @Composable
     fun DescriptionTextField() {

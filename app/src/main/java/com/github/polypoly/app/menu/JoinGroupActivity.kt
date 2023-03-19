@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.content.Context
 import android.content.Intent
@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 @Suppress("UNUSED_EXPRESSION")
@@ -155,8 +156,6 @@ class JoinGroupActivity : ComponentActivity() {
      * This function launches the group room activity and passes the group code to it.
      */
     private fun joinGroupRoom(mContext : Context) {
-        val groupIntent = Intent(mContext, GreetingActivity::class.java)
-        groupIntent.putExtra("groupCode", groupCode)
 
         // TODO: link to the group room activity
     }

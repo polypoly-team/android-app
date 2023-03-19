@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -20,6 +20,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.*
+import com.github.polypoly.app.R
+import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
@@ -30,9 +33,12 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
+    private lateinit var gameMusic: GameMusic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+            gameMusic.startSong()
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -76,6 +82,7 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
+    // TODO: add the real activity directions to the buttons
     /**
      * So far, the player has two main options, join an existing game or create a new one,
      * these buttons are then used for these purposes and have a fixed size.
@@ -103,13 +110,14 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
+    // TODO: add a usage for button3
     /**
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
-     * - Button 1: Rules
-     * - Button 2:
+     * - Button 1: Profile
+     * - Button 2: Rules
      * - Button 3:
-     * - Button 4:
+     * - Button 4: Settings
      */
     @Composable
     fun RowOptionButtons() {
@@ -119,22 +127,13 @@ class WelcomeActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
+            ProfileOptionButton()
             RulesOptionButton()
-            // Option Button 2
             OptionButton(
                 onClick = { /*TODO*/ },
                 icon_id = R.drawable.tmp_happysmile,
                 description = "optionButton2")
-            // Option Button 3
-            OptionButton(
-                onClick = { /*TODO*/ },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton3")
-            // Option Button 4
-            OptionButton(
-                onClick = { /*TODO*/ },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton4")
+            SettingsOptionButton()
         }
 
     }
@@ -160,7 +159,9 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.95f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .fillMaxHeight(0.95f)
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
@@ -185,13 +186,41 @@ class WelcomeActivity : ComponentActivity() {
                 }
             }
         }
-
-
     }
 
+    @Composable
+    fun SettingsOptionButton() {
+        ActivityOptionButton(
+            activity = SettingsActivity::class.java,
+            icon_id = R.drawable.tmp_happysmile,
+            description = "Open Settings"
+        )
+    }
 
+    @Composable
+    fun ProfileOptionButton() {
+        ActivityOptionButton(
+            activity = ProfileActivity::class.java,
+            icon_id = R.drawable.tmp_happysmile,
+            description = "See Profile"
+        )
+    }
 
     // ============================================================= HELPERS
+
+    /**
+     * An OptionButton that launches a given activity
+     */
+    @Composable
+    fun ActivityOptionButton(activity: Class<*>, icon_id: Int, description: String) {
+        val activityIntent = Intent(LocalContext.current, activity)
+        OptionButton(
+            onClick = { startActivity(activityIntent) },
+            icon_id = icon_id,
+            description = description
+        )
+    }
+    
     /**
      * Creates a square button with a small image that'll be used to open other pop-ups or activities.
      */
@@ -236,6 +265,8 @@ class WelcomeActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
+        gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
+        gameMusic.startSong()
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
