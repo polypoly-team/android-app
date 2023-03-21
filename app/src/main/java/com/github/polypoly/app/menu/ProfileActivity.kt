@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.purpleVeryDark
+import com.github.polypoly.app.ui.theme.purpleVeryLight
 
 class ProfileActivity : ComponentActivity() {
 
@@ -63,7 +67,10 @@ class ProfileActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(elevation = 8.dp) {
+            Surface(
+                elevation = 8.dp,
+                color = MaterialTheme.colors.background
+            ) {
                 Profile()
             }
             Statistics()
@@ -79,7 +86,8 @@ class ProfileActivity : ComponentActivity() {
         val mContext = LocalContext.current
         Column(
             modifier = Modifier
-                .padding(all = 30.dp),
+                .padding(all = 30.dp)
+                .background(color = Color.White),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -93,15 +101,23 @@ class ProfileActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp
+                ),
                 onClick = {
                     val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                     profileModifyingIntent.putExtra("userId", userId)
                     startActivity(profileModifyingIntent)
                 },
                 shape = CircleShape,
-                modifier = Modifier.testTag("modifyProfileButton"),
+                modifier = Modifier
+                    .testTag("modifyProfileButton")
+                    .background(color = Color.White),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(red = 240, blue = 240, green = 240))
+                    backgroundColor = purpleVeryLight,
+                    disabledBackgroundColor = Color.White)
             ) {
                 Text("Modify profile")
             }
@@ -168,7 +184,7 @@ class ProfileActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(color = if (won) MaterialTheme.colors.primary else Color.DarkGray)
+                .background(color = if (won) MaterialTheme.colors.secondary else purpleVeryDark)
                 .size(50.dp),
             contentAlignment = Alignment.Center
         ) {
