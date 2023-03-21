@@ -111,6 +111,10 @@ open class RemoteDB(
         return db!!
     }
 
+    override fun setUserProfileWithId(userId: Long, user: User) {
+        throw UnsupportedOperationException("Not implemented yet")
+    }
+
     override fun setUserName(userId: Long, name: String): CompletableFuture<Boolean> {
         return setUserData(userId, DB_USER_NAME_DIRECTORY, name)
     }

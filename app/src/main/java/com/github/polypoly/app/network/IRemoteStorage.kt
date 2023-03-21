@@ -18,6 +18,8 @@ interface IRemoteStorage {
      */
     fun addUser(userId: Long, user: User): CompletableFuture<Boolean>
 
+    fun setUserProfileWithId(userId: Long, user: User)
+
     fun setUserName(userId: Long, name: String): CompletableFuture<Boolean>
     fun setUserBio(userId: Long, bio: String): CompletableFuture<Boolean>
     fun setUserSkin(userId: Long, skin: Skin): CompletableFuture<Boolean>

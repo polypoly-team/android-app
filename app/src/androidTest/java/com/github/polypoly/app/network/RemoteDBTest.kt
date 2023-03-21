@@ -35,7 +35,7 @@ class RemoteDBTest {
 
     @Test
     fun userProfileCanBeRetrievedFromId() {
-        val user = User(testUserId,"John", "Hi!", Skin(1, 1, 1), Stats(10))
+        val user = User(testUserId,"John", "Hi!", Skin(1, 1, 1), Stats())
 
         val setTimeout = CompletableFuture<Boolean>()
         underlyingDB.child(DB_USERS_PROFILES_PATH).setValue(user).addOnSuccessListener {

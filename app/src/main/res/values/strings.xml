@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">polypoly</string>
     <string name="title_activity_greeting" />
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_welcome">polypoly</string>
+    <string name="title_activity_join_group">JoinGroup</string>
+    <string name="join_group_button_text">Join</string>
+    <string name="group_does_not_exist">Group does not exist</string>
+    <string name="group_code_is_empty">Group code is empty</string>
+    <string name="group_is_full">Group is full</string>
+    <string name="joined_group_with_code">Joined group with code: </string>
 </resources>
