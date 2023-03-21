@@ -22,7 +22,7 @@ class RemoteDBTest {
 
     private lateinit var underlyingDB: DatabaseReference
 
-    private val testUserId = 123456789L
+    private val testUserId = 1234L
 
     init {
         val db = Firebase.database
@@ -38,12 +38,12 @@ class RemoteDBTest {
         val user = User(testUserId,"John", "Hi!", Skin(1, 1, 1), Stats())
 
         val setTimeout = CompletableFuture<Boolean>()
-        underlyingDB.child(DB_USERS_PROFILES_PATH).setValue(user).addOnSuccessListener {
+        underlyingDB.child(DB_USERS_PROFILES_PATH).child(user.id.toString()).setValue(user).addOnSuccessListener {
             setTimeout.complete(true)
         }.addOnFailureListener { setTimeout.completeExceptionally(it) }
         setTimeout.get(5, TimeUnit.SECONDS)
 
-        val retrieveTimeout = RemoteDB.getUserProfileWithId(testUserId)
+        val retrieveTimeout = GlobalInstances.remoteDB.getUserProfileWithId(testUserId)
         retrieveTimeout.get(5, TimeUnit.SECONDS)
         val userFound = retrieveTimeout.get()
 

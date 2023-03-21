@@ -14,7 +14,7 @@ class GlobalInstances {
                 return field
             }
             set(value) {
-                if (!isRemoteDBSet.compareAndSet(false, true)) {
+                if (isRemoteDBSet.compareAndSet(false, true)) {
                     field = value // cannot throw an IllegualArgumentException because it is not yet determinstic how the order of instantiation works for static methods
                 }
             }

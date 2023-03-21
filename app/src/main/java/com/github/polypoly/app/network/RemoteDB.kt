@@ -31,11 +31,11 @@ open class RemoteDB(
     override fun getUserProfileWithId(userId: Long): CompletableFuture<User> {
         val future = CompletableFuture<User>()
         usersProfilesRef.child(userId.toString()).get().addOnSuccessListener {
-            future.complete(it.getValue<User>())
+            val user = it.getValue<User>()
+            future.complete(user)
         }.addOnFailureListener {
             future.completeExceptionally(it)
         }
-        future.complete(User())
         return future
     }
 
