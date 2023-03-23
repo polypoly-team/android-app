@@ -82,7 +82,7 @@ class MapActivity : ComponentActivity() {
 
             addMarkerTo(mapView, donutPosition, "Donut")
 
-            val campusTileSource = CampusTileSource(Random.nextInt(2), 0)
+            val campusTileSource = CampusTileSource(0)
             val tileProvider = MapTileProviderBasic(applicationContext, campusTileSource)
             val tilesOverlay = TilesOverlay(tileProvider, applicationContext)
             mapView.overlays.add(tilesOverlay)
@@ -216,9 +216,9 @@ class MapActivity : ComponentActivity() {
     }
 
 
-    class CampusTileSource(private val serverId: Int, private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
+    class CampusTileSource(private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
-            return "https://plan-epfl-tiles$serverId.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
+            return "https://plan-epfl-tiles${Random.nextInt(3)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
         }
     }
 
