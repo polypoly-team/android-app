@@ -7,10 +7,12 @@ import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -21,11 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.github.polypoly.app.game.PlayerGlobalData
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -67,6 +73,7 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     LocationLogic()
+                    Hud(PlayerGlobalData(false, 420), 16)
                 }
             }
         }
@@ -150,6 +157,48 @@ class MapActivity : ComponentActivity() {
                     color = Color.Black,
                     modifier = Modifier.padding(8.dp)
                 )
+            }
+        }
+    }
+
+    @Composable
+    fun Hud(data: PlayerGlobalData, round: Int) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                .background(Color.White)
+                .border(1.dp, Color.Black)
+                .align(Alignment.TopStart)
+            ) {
+                Row(modifier = Modifier.padding(8.dp)) {
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .size(70.dp)
+                            .semantics { contentDescription = "" },
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.tmp_happysmile),
+                            contentDescription = "",
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(
+                            text = "${data.balance} $",
+                            color = Color.Black,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(
+                            text = "Round $round",
+                            color = Color.Black,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
             }
         }
     }
