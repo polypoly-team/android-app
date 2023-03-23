@@ -1,9 +1,10 @@
 package com.github.polypoly.app.network
 
-import android.util.Log
+import com.github.polypoly.app.game.PendingGame
 import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.global.Settings.Companion.DB_ALL_USERS_ID_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_GROUPS_LIST_DIRECTORY
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USER_BIO_DIRECTORY
 import com.github.polypoly.app.global.Settings.Companion.DB_USER_NAME_DIRECTORY
@@ -20,11 +21,13 @@ open class RemoteDB(
 
     private lateinit var rootRef: DatabaseReference
     private lateinit var usersProfilesRef: DatabaseReference
+    private lateinit var groupsListRef: DatabaseReference
 
     init {
         if (db != null) {
             rootRef = db.getReference()
             usersProfilesRef = db.getReference(DB_USERS_PROFILES_PATH)
+            groupsListRef = db.getReference(DB_GROUPS_LIST_DIRECTORY)
         }
     }
 
@@ -131,6 +134,50 @@ open class RemoteDB(
         return setUserData(userId, "$DB_USER_STATS_DIRECTORY/$statName", stat)
     }
 
+    override fun getGroupFromId(groupId: String): CompletableFuture<PendingGame> {
+
+        val future = CompletableFuture<PendingGame>()
+        groupsListRef.child(groupId.toString()).get().addOnSuccessListener {
+            val group = it.getValue<PendingGame>()
+            future.complete(group)
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+        }
+        return future
+    }
+
+    override fun addGroup(group: PendingGame): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val id = group.code
+
+        val ids_future = getAllGroupsIds()
+        ids_future.whenComplete { ids, error ->
+            if (ids_future.isCompletedExceptionally) {
+                future.completeExceptionally(error)
+            } else {
+                if (ids.contains(id)) {
+                    future.completeExceptionally(throw IllegalAccessError("Group already exists"))
+                } else {
+                    groupsListRef.child(id).setValue(group).addOnSuccessListener {
+                        future.complete(true)
+                    }.addOnFailureListener{future.completeExceptionally(it)}
+                }
+            }
+        }
+
+        return future
+    }
+
+    override fun getAllGroupsIds(): CompletableFuture<List<String>> {
+        val future: CompletableFuture<List<String>> = CompletableFuture<List<String>>()
+        rootRef.child(DB_GROUPS_LIST_DIRECTORY).get().addOnSuccessListener {
+            future.complete(it.getValue<List<String>>())
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+        }
+        return future
+    }
+
     companion object InvalidRemoteDB: RemoteDB(null) {
         override fun getUserProfileWithId(userId: Long): CompletableFuture<User> {
             throw IllegalAccessError("This RemoteDB is invalid")
@@ -157,6 +204,18 @@ open class RemoteDB(
         }
 
         override fun <T>setUserStat(userId: Long, statName: String, stat: T): CompletableFuture<Boolean> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun getGroupFromId(groupId: String): CompletableFuture<PendingGame> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun addGroup(group: PendingGame): CompletableFuture<Boolean> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun getAllGroupsIds(): CompletableFuture<List<String>> {
             throw IllegalAccessError("This RemoteDB is invalid")
         }
     }
