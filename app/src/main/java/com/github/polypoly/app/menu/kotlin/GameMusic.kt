@@ -6,7 +6,7 @@ import androidx.core.math.MathUtils.clamp
 
 object GameMusic {
     private lateinit var mediaPlayer: MediaPlayer
-    private var volume = 1f // default value
+    private var volume = 0.8f // default value
     private var isMute = false
 
     fun setSong(context: Context, songId: Int) {

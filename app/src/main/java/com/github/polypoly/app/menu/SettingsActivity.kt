@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,7 @@ class SettingsActivity : ComponentActivity() {
     fun SettingsContent() {
         PolypolyTheme {
             Surface(modifier = Modifier.fillMaxSize()) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
@@ -81,7 +82,9 @@ class SettingsActivity : ComponentActivity() {
                     sliderValue = newValue
                     GameMusic.setVolume(newValue) },
                 steps = 10,
-                modifier = Modifier.fillMaxWidth(0.85f)
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .testTag("music_slider")
             )
             Spacer(modifier = Modifier.width(10.dp))
             MusicMuter()
@@ -99,7 +102,8 @@ class SettingsActivity : ComponentActivity() {
         var isMute by remember { mutableStateOf(false) }
         val interactionSource = remember { MutableInteractionSource() }
         Box(
-            modifier = Modifier.clickable(
+            modifier = Modifier
+                .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = {
@@ -110,15 +114,15 @@ class SettingsActivity : ComponentActivity() {
                         GameMusic.mute()
                         true
                     }
-                },
-            )
+                })
+                .testTag("music_muter")
         ) {
             Image(
                 painter = painterResource(
                     id = if (isMute) {
-                        R.drawable.tmp_happysmile
-                    } else {
                         R.drawable.tmp_sadsmile
+                    } else {
+                        R.drawable.tmp_happysmile
                     }
                 ),
                 contentDescription = "mute_icon",
