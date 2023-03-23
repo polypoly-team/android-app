@@ -11,10 +11,10 @@ private val LightColorPalette = darkColors(
     primary = redPrincipal,
     secondary = purpleLight,
     background = white,
-    secondaryVariant = purpleMid,
+    secondaryVariant = purpleVeryLight,
     onPrimary = Color.White,
-    onBackground = Color.Black,
-    onSecondary = Color.Black
+    onBackground = purpleVeryDark,
+    onSecondary = purpleVeryDark
 )
 
 private val DarkColorPalette = lightColors(

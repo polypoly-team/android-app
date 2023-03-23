@@ -20,9 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -31,13 +28,11 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.ui.theme.purpleVeryDark
-import com.github.polypoly.app.ui.theme.purpleVeryLight
 
 class ProfileActivity : ComponentActivity() {
 
     //ONLY TO TEST WITHOUT THE DATABASE
-    val userId: Long = 1
+    private val userId: Long = 1
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,8 +81,7 @@ class ProfileActivity : ComponentActivity() {
         val mContext = LocalContext.current
         Column(
             modifier = Modifier
-                .padding(all = 30.dp)
-                .background(color = Color.White),
+                .padding(all = 30.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -113,11 +107,9 @@ class ProfileActivity : ComponentActivity() {
                 },
                 shape = CircleShape,
                 modifier = Modifier
-                    .testTag("modifyProfileButton")
-                    .background(color = Color.White),
+                    .testTag("modifyProfileButton"),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = purpleVeryLight,
-                    disabledBackgroundColor = Color.White)
+                    backgroundColor = MaterialTheme.colors.secondaryVariant)
             ) {
                 Text("Modify profile")
             }
@@ -184,13 +176,13 @@ class ProfileActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(color = if (won) MaterialTheme.colors.secondary else purpleVeryDark)
+                .background(color = if (won) MaterialTheme.colors.secondary else
+                    MaterialTheme.colors.onSecondary)
                 .size(50.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(toDisplay,
-                style = MaterialTheme.typography.body1,
-                color = Color.White)
+                style = MaterialTheme.typography.body1)
         }
     }
 
