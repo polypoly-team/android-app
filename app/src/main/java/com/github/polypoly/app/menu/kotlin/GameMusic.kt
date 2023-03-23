@@ -7,6 +7,7 @@ import androidx.core.math.MathUtils.clamp
 object GameMusic {
     private lateinit var mediaPlayer: MediaPlayer
     private var volume = 1f // default value
+    private var isMute = false
 
     fun setSong(context: Context, songId: Int) {
         mediaPlayer = MediaPlayer.create(context, songId)
@@ -15,6 +16,7 @@ object GameMusic {
     fun startSong() {
         mediaPlayer.isLooping = true
         mediaPlayer.start()
+        setVolume(volume)
     }
 
     /**
@@ -23,14 +25,22 @@ object GameMusic {
       */
     fun setVolume(value: Float) {
         volume = clamp(value, 0f, 1f)
-        mediaPlayer.setVolume(volume, volume)
+        if(!isMute) {
+            mediaPlayer.setVolume(volume, volume)
+        }
+    }
+
+    fun getVolume(): Float {
+        return volume
     }
 
     fun mute() {
         mediaPlayer.setVolume(0f, 0f)
+        isMute = true
     }
 
     fun unMute() {
         mediaPlayer.setVolume(volume, volume)
+        isMute = false
     }
 }
