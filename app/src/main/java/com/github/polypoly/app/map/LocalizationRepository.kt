@@ -2,9 +2,17 @@ package com.github.polypoly.app.map
 
 import com.github.polypoly.app.game.Localization
 import com.github.polypoly.app.game.LocalizationLevel
+import com.github.polypoly.app.game.Zone
 import org.osmdroid.util.GeoPoint
 
+/**
+ * Repository for providing the zones and localizations on the map.
+ */
 object LocalizationRepository {
+
+    /**
+     * List of localizations in the EPFL campus area.
+     */
     private val localizations = listOf(
         Localization(
             name = "BC",
@@ -56,5 +64,31 @@ object LocalizationRepository {
         )
     )
 
-    fun getLocalizations(): List<Localization> = localizations
+    /**
+     * List of zones in the EPFL campus area. Each zone has a color associated with it.
+     */
+    private val zones = listOf(
+        Zone(
+            localizations = listOf(
+                localizations[3],
+                localizations[4],
+                localizations[5]
+            ),
+            color = 0xFF00FF00.toInt()
+        ),
+        Zone(
+            localizations = listOf(
+                localizations[0],
+                localizations[1],
+                localizations[2],
+
+            ),
+            color = 0xFF0000FF.toInt()
+        ),
+    )
+
+    /**
+     * Returns the list of localizations.
+     */
+    fun getZones(): List<Zone> = zones
 }

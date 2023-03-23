@@ -1,6 +1,11 @@
 package com.github.polypoly.app.map
 
 import android.content.Context
+import android.graphics.*
+import android.graphics.Bitmap.createScaledBitmap
+import android.graphics.BitmapFactory.decodeResource
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,8 +26,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import com.github.polypoly.app.BuildConfig
-import com.github.polypoly.app.map.LocalizationRepository.getLocalizations
+import com.github.polypoly.app.R
+import com.github.polypoly.app.map.LocalizationRepository.getZones
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
@@ -39,14 +46,18 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import kotlin.random.Random
 
+/**
+ * Activity for displaying the map used in the game.
+ */
 class MapActivity : ComponentActivity() {
 
     private val mapViewModel: MapViewModel = MapViewModel()
     private val initialPosition = GeoPoint(46.518726, 6.566613)
+    private val initialZoom = 18.0
+    private val markerSideLength = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             PolypolyTheme {
                 Surface(
@@ -67,19 +78,15 @@ class MapActivity : ComponentActivity() {
 
             val mapView = initMapView(context, initialPosition)
 
-            for (localization in getLocalizations())
-                addMarkerTo(mapView, localization.position, localization.name)
+            for (zone in getZones())
+                zone.localizations
+                    .forEach { addMarkerTo(mapView, it.position, it.name, zone.color) }
 
-            val campusTileSource = CampusTileSource(Random.nextInt(2), 0)
-            val tileProvider = MapTileProviderBasic(applicationContext, campusTileSource)
-            val tilesOverlay = TilesOverlay(tileProvider, applicationContext)
-            mapView.overlays.add(tilesOverlay)
-
-            val locationOverlay = initLocationOverlay(mapView)
-            mapView.overlays.add(locationOverlay)
+            val currentLocationOverlay = initLocationOverlay(mapView)
+            mapView.overlays.add(currentLocationOverlay)
 
             mapView
-        })
+        }, modifier = Modifier.testTag("map"))
     }
 
     @Composable
@@ -118,40 +125,55 @@ class MapActivity : ComponentActivity() {
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         mapView.setMultiTouchControls(true)
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        mapView.controller.setZoom(19.5)
+        mapView.controller.setZoom(initialZoom)
         mapView.controller.setCenter(startPosition)
+        val campusTileSource = CampusTileSource(Random.nextInt(2), 0) // TODO: fix random
+        val tileProvider = MapTileProviderBasic(context, campusTileSource)
+        val tilesOverlay = TilesOverlay(tileProvider, context)
+        mapView.overlays.add(tilesOverlay)
         return mapView
     }
 
-    private fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String) {
+    private fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int) {
         val marker = Marker(mapView)
         marker.position = position
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.title = title
+        marker.isDraggable = false
+        marker.icon = buildMarkerIcon(mapView.context, zoneColor)
         mapView.overlays.add(marker)
     }
 
+    private fun buildMarkerIcon(context: Context, color: Int): Drawable {
+        val markerIcon = decodeResource(context.resources, R.drawable.location_pin)
+        val scaledBitmap = createScaledBitmap(markerIcon, markerSideLength, markerSideLength, true)
+        val paint = Paint()
+        paint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+        val canvas = Canvas(scaledBitmap)
+        canvas.drawBitmap(scaledBitmap, 0f, 0f, paint)
+        return BitmapDrawable(context.resources, scaledBitmap)
+    }
+
     private fun initLocationOverlay(mapView: MapView): MyLocationNewOverlay {
-        val locationProvider = GpsMyLocationProvider(this)
+        val locationProvider = GpsMyLocationProvider(mapView.context)
         var lastLocation = Location("")
+
         val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
             override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
                 super.onLocationChanged(location, provider)
-                if (location != null)
-                    updateAllDistances(mapView, GeoPoint(location))
-                val distance = lastLocation.distanceTo(location!!)
-                mapViewModel.updateDistanceWalked(distance)
-                lastLocation = location
+                updateAllDistances(mapView, GeoPoint(location))
+                mapViewModel.updateDistanceWalked(lastLocation.distanceTo(location!!))
+                lastLocation = locationProvider.lastKnownLocation
             }
         }
+
         locationOverlay.enableMyLocation()
         locationOverlay.enableFollowLocation()
-
         locationOverlay.runOnFirstFix {
             runOnUiThread {
                 updateAllDistances(mapView, locationOverlay.myLocation)
-                mapView.controller.setCenter(locationOverlay.myLocation)
                 mapView.controller.animateTo(locationOverlay.myLocation)
+                mapViewModel.resetDistanceWalked()
             }
         }
         return locationOverlay
@@ -175,7 +197,9 @@ class MapActivity : ComponentActivity() {
         else "${"%.1f".format(distance / 1000)}km"
     }
 
-
+    /**
+     * Tile source for EPFL campus map.
+     */
     class CampusTileSource(private val serverId: Int, private val floorId: Int) :
         OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
@@ -187,6 +211,7 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    // ============================== PREVIEW ==============================
     @Preview
     @Composable
     fun MapViewPreview() {
@@ -196,6 +221,7 @@ class MapActivity : ComponentActivity() {
                 color = MaterialTheme.colors.background
             ) {
                 MapView()
+                DistanceWalkedUIComponents()
             }
         }
     }
