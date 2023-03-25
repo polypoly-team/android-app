@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +32,7 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 class ProfileActivity : ComponentActivity() {
 
     //ONLY TO TEST WITHOUT THE DATABASE
-    val userId: Long = 1
+    private val userId: Long = 1
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +62,10 @@ class ProfileActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(elevation = 8.dp) {
+            Surface(
+                elevation = 8.dp,
+                color = MaterialTheme.colors.background
+            ) {
                 Profile()
             }
             Statistics()
@@ -93,15 +95,21 @@ class ProfileActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp
+                ),
                 onClick = {
                     val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                     profileModifyingIntent.putExtra("userId", userId)
                     startActivity(profileModifyingIntent)
                 },
                 shape = CircleShape,
-                modifier = Modifier.testTag("modifyProfileButton"),
+                modifier = Modifier
+                    .testTag("modifyProfileButton"),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(red = 240, blue = 240, green = 240))
+                    backgroundColor = MaterialTheme.colors.secondaryVariant)
             ) {
                 Text("Modify profile")
             }
@@ -168,13 +176,13 @@ class ProfileActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(color = if (won) MaterialTheme.colors.primary else Color.DarkGray)
+                .background(color = if (won) MaterialTheme.colors.secondary else
+                    MaterialTheme.colors.onSecondary)
                 .size(50.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(toDisplay,
-                style = MaterialTheme.typography.body1,
-                color = Color.White)
+                style = MaterialTheme.typography.body1)
         }
     }
 
