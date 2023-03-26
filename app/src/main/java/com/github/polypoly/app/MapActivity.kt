@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -33,6 +32,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.github.polypoly.app.game.PlayerGlobalData
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.Shapes
+import com.github.polypoly.app.utils.Padding
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -161,42 +162,62 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * A button that is used in the HUD
+     */
+    @Composable
+    fun HudButton(name: String, onClick: () -> Unit, icon_id: Int, description: String) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .size(70.dp)
+                .semantics { contentDescription = description }
+                .testTag(name),
+            shape = Shapes.medium,
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            Image(
+                painter = painterResource(icon_id),
+                contentDescription = "",
+                modifier = Modifier.size(50.dp)
+            )
+        }
+    }
+
+    /**
+     * A text that is used in the HUD
+     */
+    @Composable
+    fun HudText(name: String, text: String) {
+        Text(
+            text = text,
+            color = MaterialTheme.colors.onBackground,
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier
+                .padding(Padding.small)
+                .testTag(name)
+        )
+    }
+
     @Composable
     fun Hud(data: PlayerGlobalData, round: Int) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
-                    .padding(16.dp)
-                .background(Color.White)
-                .border(1.dp, Color.Black)
-                .align(Alignment.TopStart)
+                    .padding(Padding.medium)
+                    .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                    .align(Alignment.TopStart)
             ) {
-                Row(modifier = Modifier.padding(8.dp)) {
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .size(70.dp)
-                            .semantics { contentDescription = "" },
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.tmp_happysmile),
-                            contentDescription = "",
-                            modifier = Modifier.size(50.dp)
-                        )
-                    }
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(
-                            text = "${data.balance} $",
-                            color = Color.Black,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                        Text(
-                            text = "Round $round",
-                            color = Color.Black,
-                            modifier = Modifier.padding(8.dp)
-                        )
+                Row(Modifier.padding(Padding.medium)) {
+                    HudButton(
+                        name = "gameInfoButton",
+                        onClick = { /* TODO: Add a toast that shows the full game information */ },
+                        icon_id = R.drawable.tmp_happysmile,
+                        description = "See full game information"
+                    )
+                    Column(Modifier.padding(Padding.medium)) {
+                        HudText("playerBalance", "${data.balance} $")
+                        HudText("gameRound", text = "Round $round")
                     }
                 }
             }
