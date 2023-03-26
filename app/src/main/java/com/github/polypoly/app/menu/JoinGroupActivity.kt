@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,10 +20,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
+import com.github.polypoly.app.RulesObject
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 @Suppress("UNUSED_EXPRESSION")
@@ -36,13 +42,12 @@ class JoinGroupActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PolypolyTheme {
-                // This is the surface where all the view lies
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
                     Column(modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = Modifier.height(100.dp))
@@ -50,8 +55,6 @@ class JoinGroupActivity : ComponentActivity() {
                             painter = painterResource(id = R.drawable.super_cool_logo),
                             contentDescription = "polypoly logo",
                             modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
                                 .testTag("logo"),
                             )
                         Spacer(modifier = Modifier.height(50.dp))
@@ -72,38 +75,43 @@ class JoinGroupActivity : ComponentActivity() {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
 
-        // Contains all the form, centered in the screen
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            GroupTextField(15, warningState)
-            Spacer(modifier = Modifier.height(10.dp))
-            Button(
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.testTag("JoinGroupButton"),
-                onClick = {
-                    warningState.value = groupCodeButtonOnClick()
-                    if (warningState.value == "Joined group with code $groupCode") {
-                        joinGroupRoom(mContext)
-                    }
-                }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ){
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = getString(R.string.join_group_button_text))
+                GroupTextField(15, warningState) // TODO: create a constant for the max length -> create a class for the constants
+                Spacer(modifier = Modifier.height(10.dp))
+                RectangleButton(
+                    onClick = {
+                        warningState.value = groupCodeButtonOnClick()
+                        if (warningState.value == "Joined group with code $groupCode") {
+                            joinGroupRoom(mContext)
+                        }
+                    }
+                    , description = getString(R.string.join_group_button_text)
+                    , testTag = "JoinGroupButton")
+                Text(
+                    text = warningState.value,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.testTag("warningMessage")
+                )
             }
-            Text(
-                text = warningState.value,
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.testTag("warningMessage")
-            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            GroupListButton()
         }
     }
 
 
     /**
      * This function returns the TextField where the user prompts their group code.
-     * @param maxLength (Int): The maximal allowed code length
      */
     @Composable
     fun GroupTextField(maxLength: Int, warningState : MutableState<String>) {
@@ -135,10 +143,77 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     /**
+     * This function returns the button that lets the user open the groups list.
+     */
+    @Composable
+    fun GroupListButton() {
+        var openRules by remember { mutableStateOf(false) }
+        RectangleButton(
+            onClick = { openRules = true },
+            description = "Show Groups",
+            testTag = "showGroupsButton"
+        )
+
+        if(openRules) {
+            Dialog(
+                onDismissRequest = { openRules = false },
+            ) {
+                Surface(
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .fillMaxHeight(0.95f)
+                ) {
+                    LazyColumn(modifier = Modifier.padding(20.dp)) {
+                        item {
+                            Text(
+                                text = getString(R.string.group_list_title),
+                                style = MaterialTheme.typography.h4
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
+                        items(items = RulesObject.rulesChapters, itemContent = { item ->
+                            Text(
+                                text = item.title,
+                                style = MaterialTheme.typography.h5
+                            )
+                            Text(
+                                text = item.content,
+                                style = MaterialTheme.typography.body1
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a rectangle button with a text and a linked action.
+     * @param onClick (Function): The action to be performed when the button is clicked
+     * @param description (String): The text to be displayed
+     * @param testTag (String): The test tag to be used for testing
+     */
+    @Composable
+    fun RectangleButton(onClick: () -> Unit, description: String = "blank description", testTag: String = "Undefined",) {
+        Button(
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .testTag(testTag)
+                .semantics { contentDescription = description },
+            onClick = onClick
+        ) {
+            Text(text = description)
+        }
+    }
+
+    /**
      * This function is called when the user clicks on the button to join a group.
      * If the group code is empty, or the code is not in the DB, or the group is full,
      * it displays a warning message.
      * Otherwise, it calls the function to join the group.
+     * @return (String): The warning message to be displayed
      */
     private fun groupCodeButtonOnClick(): String {
         if (groupCode.isEmpty()) {
@@ -163,6 +238,7 @@ class JoinGroupActivity : ComponentActivity() {
     /**
      * This function checks if the group code is in the database.
      * @param groupCode (String): The group code to check
+     * @return (Boolean): True if the group code is in the database, false otherwise
      * TODO: rewrite this function to check the real database
      */
     private fun dbContainsGroupCode(groupCode: String): Boolean {
@@ -172,6 +248,7 @@ class JoinGroupActivity : ComponentActivity() {
     /**
      * This function checks if the group is full.
      * @param groupCode (String): The group code to check
+     * @return (Boolean): True if the group is full, false otherwise
      * TODO: rewrite this function to check the real database
      */
     private fun groupIsFull(groupCode: String): Boolean {

@@ -9,4 +9,5 @@
     <string name="group_code_is_empty">Group code is empty</string>
     <string name="group_is_full">Group is full</string>
     <string name="joined_group_with_code">Joined group with code: </string>
+    <string name="group_list_title">Join a group! </string>
 </resources>
