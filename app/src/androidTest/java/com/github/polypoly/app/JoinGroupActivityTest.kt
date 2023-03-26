@@ -43,7 +43,7 @@ class JoinGroupActivityTest {
     @Test
     fun inputValidGroupCode_joinGroupRoom() {
         //TODO: Check for a valid group code in the DB once we have the queries set
-        val groupCode = "1234"
+        val groupCode = "abcd"
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
@@ -54,7 +54,7 @@ class JoinGroupActivityTest {
     @Test
     fun inputFullGroupCode_displayWarningMessage() {
         //TODO: Check for a valid group code that is full in the DB once we have the queries set
-        val groupCode = "abcd"
+        val groupCode = "1234"
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 

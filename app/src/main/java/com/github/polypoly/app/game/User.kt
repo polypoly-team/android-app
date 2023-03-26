@@ -10,7 +10,7 @@ class Skin(
     val idBody: Int = 0,
     val idLegs: Int = 0
 )
-class Stats @RequiresApi(Build.VERSION_CODES.O) constructor(
+class Stats constructor(
     val accountCreation: LocalDateTime = LocalDateTime.MIN,
     val lastConnection: LocalDateTime = LocalDateTime.MIN,
     val numberOfWins: Int = 0

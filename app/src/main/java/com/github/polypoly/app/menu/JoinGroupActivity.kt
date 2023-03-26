@@ -1,7 +1,6 @@
 package com.github.polypoly.app.menu
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.RulesObject
+import com.github.polypoly.app.game.*
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import kotlin.time.Duration.Companion.hours
 
 @Suppress("UNUSED_EXPRESSION")
 class JoinGroupActivity : ComponentActivity() {
@@ -147,16 +148,16 @@ class JoinGroupActivity : ComponentActivity() {
      */
     @Composable
     fun GroupListButton() {
-        var openRules by remember { mutableStateOf(false) }
+        var openList by remember { mutableStateOf(false) }
         RectangleButton(
-            onClick = { openRules = true },
+            onClick = { openList = true },
             description = "Show Groups",
             testTag = "showGroupsButton"
         )
 
-        if(openRules) {
+        if(openList) {
             Dialog(
-                onDismissRequest = { openRules = false },
+                onDismissRequest = { openList = false },
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
@@ -196,7 +197,7 @@ class JoinGroupActivity : ComponentActivity() {
      * @param testTag (String): The test tag to be used for testing
      */
     @Composable
-    fun RectangleButton(onClick: () -> Unit, description: String = "blank description", testTag: String = "Undefined",) {
+    fun RectangleButton(onClick: () -> Unit, description: String = "", testTag: String = "Undefined",) {
         Button(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
@@ -216,23 +217,27 @@ class JoinGroupActivity : ComponentActivity() {
      * @return (String): The warning message to be displayed
      */
     private fun groupCodeButtonOnClick(): String {
-        if (groupCode.isEmpty()) {
-            return getString(R.string.group_code_is_empty)
+        return if (groupCode.isEmpty()) {
+            getString(R.string.group_code_is_empty)
         } else if (!dbContainsGroupCode(groupCode)) {
-            return getString(R.string.group_does_not_exist)
+            getString(R.string.group_does_not_exist)
         } else if(groupIsFull(groupCode)){
-            return getString(R.string.group_is_full)
+            getString(R.string.group_is_full)
         } else {
-            return getString(R.string.joined_group_with_code) + groupCode
+            getString(R.string.joined_group_with_code) + groupCode
         }
     }
 
     /**
      * This function launches the group room activity and passes the group code to it.
+     * @param mContext (Context): The context of the activity
      */
     private fun joinGroupRoom(mContext : Context) {
-
         // TODO: link to the group room activity
+    }
+
+    private fun getPublicGroupsFromDB(): List<PendingGame> {
+        return mockPendingGames.values.toList()
     }
 
     /**
@@ -242,7 +247,7 @@ class JoinGroupActivity : ComponentActivity() {
      * TODO: rewrite this function to check the real database
      */
     private fun dbContainsGroupCode(groupCode: String): Boolean {
-        return mockGroupCodes.contains(groupCode)
+        return mockPendingGames.containsKey(groupCode)
     }
 
     /**
@@ -252,7 +257,10 @@ class JoinGroupActivity : ComponentActivity() {
      * TODO: rewrite this function to check the real database
      */
     private fun groupIsFull(groupCode: String): Boolean {
-        return groupCode != "1234"
+
+        val pendingGame = mockPendingGames.getOrElse(groupCode) { return false }
+
+        return pendingGame.usersRegistered.size >= pendingGame.maximumNumberOfPlayers
     }
 
 
@@ -260,9 +268,58 @@ class JoinGroupActivity : ComponentActivity() {
     // This code is only here to show how the group room activity should be called
     // It will be removed when the group room activity is created and the database is set up
 
-    // mock DB
-    private val mockGroupCodes = listOf("1234", "abcd", "123abc", "abc123")
 
+    // mock DB
+
+    private val code1 = "1234"
+    private val code2 = "abcd"
+    private val code3 = "123abc"
+
+    private val emptySkin = Skin(0, 0, 0)
+    private val zeroStats = Stats()
+    private val testUser1 = User(1, "test_user_1", "", emptySkin, zeroStats)
+    private val testUser2 = User(2, "test_user_2", "", emptySkin, zeroStats)
+    private val testUser3 = User(3, "test_user_3", "", emptySkin, zeroStats)
+    private val testUser4 = User(4, "test_user_4", "", emptySkin, zeroStats)
+    private val testUser5 = User(5, "test_user_5", "", emptySkin, zeroStats)
+
+    private val testMinNumberPlayers = 2
+    private val testMaxNumberPlayers = 5
+    private val testDuration = 2.hours
+    private val testInitialBalance = 100
+    private val testName = "Unit Test Game"
+
+    private val pendingGame1 = PendingGame(
+        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, testName, "1234"
+    )
+    private val pendingGame2 = PendingGame(
+        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, testName, "abcd"
+    )
+    private val pendingGame3 = PendingGame(
+        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, testName, "123abc"
+    )
+
+    private val mockPendingGames :HashMap<String, PendingGame> = hashMapOf(
+        code1 to pendingGame1,
+        code2 to pendingGame2,
+        code3 to pendingGame3
+    )
+
+    init {
+        pendingGame1.addUser(testUser2)
+        pendingGame1.addUser(testUser3)
+        pendingGame1.addUser(testUser4)
+        pendingGame1.addUser(testUser5)
+
+        pendingGame2.addUser(testUser2)
+        pendingGame2.addUser(testUser3)
+
+        pendingGame3.addUser(testUser2)
+        pendingGame3.addUser(testUser3)
+    }
 
 }
 
