@@ -215,10 +215,11 @@ class MapActivity : ComponentActivity() {
         else "${"%.1f".format(distance / 1000)}km"
     }
 
-
     class CampusTileSource(private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
-            return "https://plan-epfl-tiles${Random.nextInt(3)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
+            // Randomly select a server to avoid overloading one, servers go from 0 to 2
+            val epflCampusServerCount = 3
+            return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
         }
     }
 
