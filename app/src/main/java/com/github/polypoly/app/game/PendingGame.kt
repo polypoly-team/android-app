@@ -11,7 +11,8 @@ class PendingGame(
     val gameMap: List<Zone>,
     val initialPlayerBalance: Int,
     val name: String,
-    val code: String
+    val code: String,
+    val private: Boolean = false
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
