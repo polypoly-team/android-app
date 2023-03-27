@@ -1,12 +1,7 @@
 package com.github.polypoly.app.menu
 
-import android.app.Activity
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -35,6 +30,7 @@ import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.game.*
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.hours
 
 @Suppress("UNUSED_EXPRESSION")
@@ -93,10 +89,7 @@ class JoinGroupActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(10.dp))
                 RectangleButton(
                     onClick = {
-                        warningState.value = groupCodeButtonOnClick()
-                        if (warningState.value == "Joined group with code $groupCode") {
-                            joinGroupRoom(mContext)
-                        }
+                        groupCodeButtonOnClick(warningState, mContext)
                     }
                     , description = getString(R.string.join_group_button_text)
                     , testTag = "JoinGroupButton")
@@ -124,7 +117,7 @@ class JoinGroupActivity : ComponentActivity() {
     @Composable
     fun GroupTextField(maxLength: Int, warningState : MutableState<String>) {
         val focusManager = LocalFocusManager.current
-
+        val mContext = LocalContext.current
         var text by remember { mutableStateOf("") }
 
         OutlinedTextField(
@@ -135,7 +128,7 @@ class JoinGroupActivity : ComponentActivity() {
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-                warningState.value = groupCodeButtonOnClick()
+                groupCodeButtonOnClick(warningState, mContext)
             }),
             value = text,
             label = { Text("Enter a group code") },
@@ -150,6 +143,7 @@ class JoinGroupActivity : ComponentActivity() {
 
     }
 
+
     /**
      * This function returns the button that lets the user open the groups list.
      */
@@ -157,8 +151,15 @@ class JoinGroupActivity : ComponentActivity() {
     fun GroupListButton() {
         var openList by remember { mutableStateOf(false) }
         var openCardIndex by remember { mutableStateOf(-1) }
+
+        var groups by remember { mutableStateOf(getPublicGroupsFromDB()) }
+
+        val refreshInterval = 5000L
+
         RectangleButton(
-            onClick = { openList = true },
+            onClick = {
+                openList = true
+            },
             description = "Show Groups",
             testTag = "showGroupsButton"
         )
@@ -170,6 +171,14 @@ class JoinGroupActivity : ComponentActivity() {
                     openCardIndex = -1
                 },
             ) {
+
+                LaunchedEffect(Unit) {
+                    while (openList) {
+                        delay(refreshInterval)
+                        groups = getPublicGroupsFromDB()
+                    }
+                }
+
                 Surface(
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
@@ -184,22 +193,29 @@ class JoinGroupActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                         }
-                        items(items = getPublicGroupsFromDB(), itemContent = { item ->
-                            val index = getPublicGroupsFromDB().indexOf(item)
-                            GroupCardComponent(
-                                group = item,
-                                isOpen = index == openCardIndex,
-                                onOpenChange = { open ->
-                                    openCardIndex = if (open) index else -1
-                                }
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                        })
+                        items(
+                            items = groups,
+                            itemContent = {
+                                    item ->
+                                val index = groups.indexOf(item)
+                                GroupCardComponent(
+                                    group = item,
+                                    isOpen = index == openCardIndex,
+                                    onOpenChange = { open ->
+                                        openCardIndex = if (open) index else -1
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
+                        )
                     }
                 }
             }
         }
     }
+
+
+
 
     /**
      * This function returns the group card. It contains the header and the details of the group.
@@ -223,7 +239,7 @@ class JoinGroupActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .clickable { onOpenChange(!isOpen) }
             ) {
-                GroupCardHeader(group, isOpen)
+                GroupCardHeader(group)
                 if (isOpen) {
                     GroupCardDetails(group)
                 }
@@ -237,7 +253,7 @@ class JoinGroupActivity : ComponentActivity() {
      * @param group the game that holds the name and the number of players
      */
     @Composable
-    private fun GroupCardHeader(group: PendingGame, openGroup: Boolean) {
+    private fun GroupCardHeader(group: PendingGame) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -313,8 +329,6 @@ class JoinGroupActivity : ComponentActivity() {
 
             GroupCardGameMode(group)
 
-            Spacer(modifier = Modifier.height(10.dp))
-
             GroupCardJoinButton(group.code)
         }
     }
@@ -325,11 +339,32 @@ class JoinGroupActivity : ComponentActivity() {
      */
     @Composable
     private fun GroupCardJoinButton(code: String) {
-        RectangleButton(
-            onClick = { groupCodeButtonOnClick() },
-            description = "Join Group",
-            testTag = "joinGroupButton"
-        )
+        val mContext = LocalContext.current
+        val warningState = remember { mutableStateOf("") }
+        groupCode = code
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RectangleButton(
+                onClick = { groupCodeButtonOnClick(warningState,mContext)},
+                description = "Join Group",
+                testTag = "joinGroupButton"
+            )
+            if(warningState.value != "") {
+                Text(
+                    text = warningState.value,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier
+                        .testTag("warningMessage")
+                        .padding(bottom = 5.dp)
+                )
+                Text(text = "Updating in a few seconds")
+            }
+        }
     }
 
     /**
@@ -424,17 +459,20 @@ class JoinGroupActivity : ComponentActivity() {
      * If the group code is empty, or the code is not in the DB, or the group is full,
      * it displays a warning message.
      * Otherwise, it calls the function to join the group.
+     * @param warningState (MutableState<String>): The state of the warning message
+     * @param mContext (Context): The context of the activity
      * @return (String): The warning message to be displayed
      */
-    private fun groupCodeButtonOnClick(): String {
+    private fun groupCodeButtonOnClick(warningState: MutableState<String>, mContext: Context) {
         return if (groupCode.isEmpty()) {
-            getString(R.string.group_code_is_empty)
+            warningState.value = getString(R.string.group_code_is_empty)
         } else if (!dbContainsGroupCode(groupCode)) {
-            getString(R.string.group_does_not_exist)
+            warningState.value = getString(R.string.group_does_not_exist)
         } else if(groupIsFull(groupCode)){
-            getString(R.string.group_is_full)
+            warningState.value = getString(R.string.group_is_full)
         } else {
-            getString(R.string.joined_group_with_code) + groupCode
+            warningState.value = ""
+            joinGroupRoom(mContext)
         }
     }
 
@@ -447,7 +485,7 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     private fun getPublicGroupsFromDB(): List<PendingGame> {
-        return mockPendingGames.values.toList().filter { !it.private && !groupIsFull(it) }
+        return mockPendingGames.values.toList().filter { !it.private  && !groupIsFull(it) }
     }
 
     /**
@@ -496,12 +534,14 @@ class JoinGroupActivity : ComponentActivity() {
     private val code3 = "123abc"
     private val code4 = "1234abc"
     private val code5 = "abc123"
+    private val code6 = "abc1234"
 
     private val name1 = "Full group"
     private val name2 = "Joinable 1"
     private val name3 = "Joinable 2"
     private val name4 = "Joinable 3"
     private val name5 = "Private group"
+    private val name6= "Joinable 4"
 
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats()
@@ -535,6 +575,11 @@ class JoinGroupActivity : ComponentActivity() {
     private val pendingGamePrivate = PendingGame(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
         testDuration, emptyList(), testInitialBalance, name5, code5, true
+    )
+
+    private val pendingGameJoinable4 = PendingGame(
+        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, name6, code6
     )
 
     private val mockPendingGames :HashMap<String, PendingGame> = hashMapOf(
