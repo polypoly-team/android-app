@@ -18,9 +18,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import java.time.LocalDateTime
@@ -86,8 +86,9 @@ class ProfileModifyingActivity : ComponentActivity() {
                             name = nickname,
                             bio = description,
                             skin = Skin(0,0,0),
-                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45)
-                        ))
+                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45, 28, 14)
+                        )
+                        )
                         val profileIntent = Intent(mContext, ProfileActivity::class.java)
                         startActivity(profileIntent)
                     }

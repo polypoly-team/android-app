@@ -14,18 +14,26 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.game.allTrophies
+import com.github.polypoly.app.R
+import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.menu.shared_component.TrophiesView
+import com.github.polypoly.app.menu.shared_component.TrophyView
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
@@ -68,7 +76,7 @@ class ProfileActivity : ComponentActivity() {
             ) {
                 Profile()
             }
-            Statistics()
+            StatisticsAndTrophies()
         }
     }
 
@@ -117,72 +125,95 @@ class ProfileActivity : ComponentActivity() {
     }
 
     /**
-     * Display some statistics about the player
+     * Display some statistics about the player and all the trophies that the
+     * player has won or can win.
      */
     @Composable
-    fun Statistics() {
+    fun StatisticsAndTrophies() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .paint(
+                    painterResource(id = R.drawable.epfl_osm),
+                    contentScale = ContentScale.FillHeight
+                )
+                .background(color = Color.Black.copy(alpha = 0.4f))
                 .padding(all = 30.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("statistics", style = MaterialTheme.typography.h5,
-                textAlign = TextAlign.Center)
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 20.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-                Stat(78, "Games played")
-                Spacer(modifier = Modifier.height(10.dp))
-                Stat(12, "Games won")
-                Spacer(modifier = Modifier.height(10.dp))
-                Stat(40, "kilometers traveled")
-                Spacer(modifier = Modifier.height(10.dp))
-                Stat(5, "Trophies won")
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Text("All Trophies", style = MaterialTheme.typography.h5,
-                textAlign = TextAlign.Center)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(6),
-                modifier = Modifier
-                    .padding(vertical = 20.dp)
-                    .height(((allTrophies.size * 60 - 10) / 6).dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                content = {
-                    items(allTrophies.size) { index ->
-                        Trophy(index)
-                    }
-                }
-            )
+            Statistics()
+            Spacer(modifier = Modifier.height(20.dp))
+            Trophies()
         }
     }
 
     /**
-     * A trophy that the player has won or not
+     * Display some statistics about the player
      */
     @Composable
-    fun Trophy(trophyIdx: Int) {
-        val won = trophyIdx%4 == 0
-        var toDisplay = "?"
-        if(won) toDisplay = allTrophies[trophyIdx].toString()
+    fun Statistics() {
         Box(
             modifier = Modifier
-                .clip(CircleShape)
-                .background(color = if (won) MaterialTheme.colors.secondary else
-                    MaterialTheme.colors.onSecondary)
-                .size(50.dp),
-            contentAlignment = Alignment.Center
+                .background(
+                    color = MaterialTheme.colors.background,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .padding(20.dp)
         ) {
-            Text(toDisplay,
-                style = MaterialTheme.typography.body1)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "statistics", style = MaterialTheme.typography.h5,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Stat(78, "Games played")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Stat(12, "Games won")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Stat(40, "kilometers traveled")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Stat(5, "Trophies won")
+                }
+            }
+        }
+    }
+
+    /**
+     * Display all the trophies that the player has won or can win.
+     * The title and description of the trophy is displayed when you click on it.
+     */
+    @Composable
+    fun Trophies() {
+        Box(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colors.background,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("All Trophies", style = MaterialTheme.typography.h5,
+                    textAlign = TextAlign.Center)
+                Spacer(modifier = Modifier.height(20.dp))
+                TrophiesView(callBack = {}, maxSelected = 1)
+            }
         }
     }
 
@@ -251,11 +282,11 @@ class ProfileActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Trophy(0)
+                TrophyView(allTrophies[0], true, selected = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                Trophy(4)
+                TrophyView(allTrophies[4], true, selected = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                Trophy(16)
+                TrophyView(allTrophies[16], true, selected = true)
             }
         }
     }

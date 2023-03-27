@@ -1,5 +1,6 @@
 package com.github.polypoly.app.game
 
+import com.github.polypoly.app.game.user.User
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

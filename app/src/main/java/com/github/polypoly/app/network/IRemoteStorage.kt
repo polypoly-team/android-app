@@ -1,6 +1,6 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.User
 import java.util.concurrent.Future
 
 interface IRemoteStorage {
