@@ -1,10 +1,16 @@
 package com.github.polypoly.app.menu
 
+import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,9 +30,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.RulesObject
 import com.github.polypoly.app.game.*
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlin.time.Duration.Companion.hours
@@ -75,7 +81,6 @@ class JoinGroupActivity : ComponentActivity() {
     fun GroupForm() {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -103,7 +108,9 @@ class JoinGroupActivity : ComponentActivity() {
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
             GroupListButton()
@@ -149,15 +156,19 @@ class JoinGroupActivity : ComponentActivity() {
     @Composable
     fun GroupListButton() {
         var openList by remember { mutableStateOf(false) }
+        var openCardIndex by remember { mutableStateOf(-1) }
         RectangleButton(
             onClick = { openList = true },
             description = "Show Groups",
             testTag = "showGroupsButton"
         )
 
-        if(openList) {
+        if (openList) {
             Dialog(
-                onDismissRequest = { openList = false },
+                onDismissRequest = {
+                    openList = false
+                    openCardIndex = -1
+                },
             ) {
                 Surface(
                     color = MaterialTheme.colors.primary,
@@ -173,20 +184,219 @@ class JoinGroupActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                         }
-                        items(items = RulesObject.rulesChapters, itemContent = { item ->
-                            Text(
-                                text = item.title,
-                                style = MaterialTheme.typography.h5
-                            )
-                            Text(
-                                text = item.content,
-                                style = MaterialTheme.typography.body1
+                        items(items = getPublicGroupsFromDB(), itemContent = { item ->
+                            val index = getPublicGroupsFromDB().indexOf(item)
+                            GroupCardComponent(
+                                group = item,
+                                isOpen = index == openCardIndex,
+                                onOpenChange = { open ->
+                                    openCardIndex = if (open) index else -1
+                                }
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                         })
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * This function returns the group card. It contains the header and the details of the group.
+     * @param group the game that holds the name and the number of players
+     */
+    @Composable
+    fun GroupCardComponent(
+        group: PendingGame,
+        isOpen: Boolean,
+        onOpenChange: (Boolean) -> Unit
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("groupCard"),
+            elevation = 10.dp,
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOpenChange(!isOpen) }
+            ) {
+                GroupCardHeader(group, isOpen)
+                if (isOpen) {
+                    GroupCardDetails(group)
+                }
+            }
+        }
+    }
+
+
+    /**
+     * This function returns the header of the group card. It contains the name of the group and the number of players.
+     * @param group the game that holds the name and the number of players
+     */
+    @Composable
+    private fun GroupCardHeader(group: PendingGame, openGroup: Boolean) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = group.name,
+                style = MaterialTheme.typography.h5
+            )
+            GroupCardPlayerCount(group)
+        }
+    }
+
+    /**
+     * This function returns the number of players that are currently in the group.
+     * @param group the game that holds the number of players
+     */
+    @Composable
+    private fun GroupCardPlayerCount(group: PendingGame) {
+        Row() {
+            Image(
+                painter = painterResource(id = R.drawable.avatar),
+                contentDescription = "people icon",
+                modifier = Modifier
+                    .size(30.dp)
+                    .testTag("peopleIcon")
+                    .padding(top = 5.dp)
+            )
+            Text(
+                text = "${group.usersRegistered.size}/${group.maximumNumberOfPlayers}",
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.padding(start = 5.dp)
+            )
+        }
+    }
+
+    /**
+     * This function returns the hidden content of the group card, that un-rolls when the user clicks on the card.
+     * @param group the game that the card will contain the details of
+     */
+    @Composable
+    private fun GroupCardDetails(group: PendingGame) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp)
+        ) {
+            Divider(
+                modifier = Modifier.padding(bottom = 5.dp),
+                thickness = 1.dp,
+                color = androidx.compose.ui.graphics.Color.Black
+            )
+            Text(
+                text = "Players:",
+                style = MaterialTheme.typography.h6,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            GroupCardPlayerList(group)
+
+            Divider(
+                modifier = Modifier.padding(vertical = 5.dp),
+                thickness = 1.dp,
+                color = androidx.compose.ui.graphics.Color.Black
+            )
+
+            GroupCardRoundDuration(group)
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            GroupCardGameMode(group)
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            GroupCardJoinButton(group.code)
+        }
+    }
+
+    /**
+     * Creates a button to join the group
+     * @param code the code of the group to join
+     */
+    @Composable
+    private fun GroupCardJoinButton(code: String) {
+        RectangleButton(
+            onClick = { groupCodeButtonOnClick() },
+            description = "Join Group",
+            testTag = "joinGroupButton"
+        )
+    }
+
+    /**
+     * Creates a text that displays the list of players in the group.
+     * @param group the group to display the players of
+     */
+    @Composable
+    fun GroupCardPlayerList(group: PendingGame) {
+        for (player in group.usersRegistered) {
+            Row() {
+                Image(
+                    painter = painterResource(id = R.drawable.tmp_happysmile),
+                    contentDescription = "${player.name} icon",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .testTag("playerIcon")
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = player.name,
+                    style = MaterialTheme.typography.body1
+                )
+            }
+        }
+    }
+
+    /**
+     * Creates a text that displays the round duration of the game.
+     * @param group the group to display the round duration of
+     */
+    @Composable
+    fun GroupCardRoundDuration(group: PendingGame) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+        ) {
+            Text(
+                text = "Round duration: ",
+                style = MaterialTheme.typography.h6,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${group.roundDuration}",
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+
+    /**
+     * Creates a text that displays the game mode of the game.
+     * @param group the group to display the game mode of
+     */
+    @Composable
+    fun GroupCardGameMode(group: PendingGame) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+        ) {
+            Text(
+                text = "Game mode: ",
+                style = MaterialTheme.typography.h6,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${group.gameMode}",
+                style = MaterialTheme.typography.body1
+            )
         }
     }
 
@@ -237,7 +447,7 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     private fun getPublicGroupsFromDB(): List<PendingGame> {
-        return mockPendingGames.values.toList()
+        return mockPendingGames.values.toList().filter { !it.private && !groupIsFull(it) }
     }
 
     /**
@@ -260,7 +470,17 @@ class JoinGroupActivity : ComponentActivity() {
 
         val pendingGame = mockPendingGames.getOrElse(groupCode) { return false }
 
-        return pendingGame.usersRegistered.size >= pendingGame.maximumNumberOfPlayers
+        return groupIsFull(pendingGame)
+    }
+
+    /**
+     * This function checks if the group is full.
+     * @param group (PendingGame): The group to check
+     * @return (Boolean): True if the group is full, false otherwise
+     */
+    private fun groupIsFull(group: PendingGame): Boolean {
+
+        return group.usersRegistered.size >= group.maximumNumberOfPlayers
     }
 
 
@@ -274,6 +494,14 @@ class JoinGroupActivity : ComponentActivity() {
     private val code1 = "1234"
     private val code2 = "abcd"
     private val code3 = "123abc"
+    private val code4 = "1234abc"
+    private val code5 = "abc123"
+
+    private val name1 = "Full group"
+    private val name2 = "Joinable 1"
+    private val name3 = "Joinable 2"
+    private val name4 = "Joinable 3"
+    private val name5 = "Private group"
 
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats()
@@ -287,38 +515,52 @@ class JoinGroupActivity : ComponentActivity() {
     private val testMaxNumberPlayers = 5
     private val testDuration = 2.hours
     private val testInitialBalance = 100
-    private val testName = "Unit Test Game"
 
-    private val pendingGame1 = PendingGame(
+    private val pendingGameFull = PendingGame(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, testName, "1234"
+        testDuration, emptyList(), testInitialBalance, name1, code1
     )
-    private val pendingGame2 = PendingGame(
+    private val pendingGameJoinable1 = PendingGame(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, testName, "abcd"
+        testDuration, emptyList(), testInitialBalance, name2, code2
     )
-    private val pendingGame3 = PendingGame(
+    private val pendingGameJoinable2 = PendingGame(
+        testUser1, GameMode.LAST_STANDING, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, name3, code3
+    )
+    private val pendingGameJoinable3 = PendingGame(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, testName, "123abc"
+        testDuration, emptyList(), testInitialBalance, name4, code4
+    )
+    private val pendingGamePrivate = PendingGame(
+        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+        testDuration, emptyList(), testInitialBalance, name5, code5, true
     )
 
     private val mockPendingGames :HashMap<String, PendingGame> = hashMapOf(
-        code1 to pendingGame1,
-        code2 to pendingGame2,
-        code3 to pendingGame3
+        code1 to pendingGameFull,
+        code2 to pendingGameJoinable1,
+        code3 to pendingGameJoinable2,
+        code4 to pendingGameJoinable3,
+        code5 to pendingGamePrivate
     )
 
     init {
-        pendingGame1.addUser(testUser2)
-        pendingGame1.addUser(testUser3)
-        pendingGame1.addUser(testUser4)
-        pendingGame1.addUser(testUser5)
+        pendingGameFull.addUser(testUser2)
+        pendingGameFull.addUser(testUser3)
+        pendingGameFull.addUser(testUser4)
+        pendingGameFull.addUser(testUser5)
 
-        pendingGame2.addUser(testUser2)
-        pendingGame2.addUser(testUser3)
+        pendingGameJoinable1.addUser(testUser2)
+        pendingGameJoinable1.addUser(testUser3)
 
-        pendingGame3.addUser(testUser2)
-        pendingGame3.addUser(testUser3)
+        pendingGameJoinable2.addUser(testUser2)
+        pendingGameJoinable2.addUser(testUser3)
+        pendingGameJoinable2.addUser(testUser4)
+
+        pendingGamePrivate.addUser(testUser2)
+        pendingGamePrivate.addUser(testUser3)
+        pendingGamePrivate.addUser(testUser4)
     }
 
 }
