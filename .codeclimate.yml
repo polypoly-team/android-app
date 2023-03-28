@@ -7,3 +7,7 @@ checks:
   method-lines:
     config:
       threshold: 35
+  similar-code:
+    enabled: false
+  identical-code:
+    enabled: false
