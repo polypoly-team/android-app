@@ -19,7 +19,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.STUDY_ROOM,
             position = GeoPoint(46.51861304708622, 6.561904544895297)
         ),
         Localization(
@@ -27,7 +26,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.AMPHITHEATER,
             position = GeoPoint(46.51862967945017, 6.563195429654059)
         ),
         Localization(
@@ -35,7 +33,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.ARENA,
             position = GeoPoint(46.5187569432044, 6.563754302940894)
         ),
         Localization(
@@ -43,7 +40,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.STADIUM,
             position = GeoPoint(46.5183787509451, 6.563782977860895)
         ),
         Localization(
@@ -51,7 +47,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.STUDY_ROOM,
             position = GeoPoint(46.5187602318236, 6.562524865762242)
         ),
         Localization(
@@ -59,7 +54,6 @@ object LocalizationRepository {
             basePrice = 200,
             baseTaxPrice = 20,
             baseMortgagePrice = 50,
-            currentLevel = LocalizationLevel.STUDY_ROOM,
             position = GeoPoint(46.51837464014728, 6.562565488564992)
         )
     )

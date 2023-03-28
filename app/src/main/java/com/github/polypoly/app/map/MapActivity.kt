@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
 import com.github.polypoly.app.map.LocalizationRepository.getZones
@@ -51,7 +50,8 @@ import kotlin.random.Random
  */
 class MapActivity : ComponentActivity() {
 
-    private val mapViewModel: MapViewModel = MapViewModel()
+    // Not public for testing purposes
+    val mapViewModel: MapViewModel = MapViewModel()
     private val initialPosition = GeoPoint(46.518726, 6.566613)
     private val initialZoom = 18.0
     private val markerSideLength = 100
@@ -117,7 +117,7 @@ class MapActivity : ComponentActivity() {
                 Text(
                     text = "Distance walked: ${formattedDistance(mapViewModel.distanceWalked.value)}",
                     color = Color.Black,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp).testTag("distanceWalked")
                 )
             }
         }
@@ -165,7 +165,7 @@ class MapActivity : ComponentActivity() {
             override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
                 super.onLocationChanged(location, provider)
                 updateAllDistances(mapView, GeoPoint(location))
-                mapViewModel.updateDistanceWalked(lastLocation.distanceTo(location!!))
+                mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
                 lastLocation = locationProvider.lastKnownLocation
             }
         }

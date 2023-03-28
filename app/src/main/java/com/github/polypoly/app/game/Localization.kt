@@ -31,7 +31,6 @@ enum class LocalizationLevel {
     @property basePrice the initial price of the [Localization].
     @property baseTaxPrice the tax price of the [Localization] when it is owned.
     @property baseMortgagePrice the mortgage price of the [Localization] when it is mortgaged.
-    @property currentLevel the current level of the [Localization].
     @property position the geographical position of the [Localization] on the map.
  */
 class Localization(
@@ -39,6 +38,5 @@ class Localization(
     val basePrice: Int,
     val baseTaxPrice: Int,
     val baseMortgagePrice: Int,
-    var currentLevel: LocalizationLevel,
     val position: GeoPoint
 )
