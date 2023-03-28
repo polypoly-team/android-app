@@ -71,6 +71,9 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Initialize the map view that sits beneath the UI components.
+     */
     @Composable
     fun MapView() {
         AndroidView(factory = { context ->
