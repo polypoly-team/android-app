@@ -86,7 +86,8 @@ class ProfileModifyingActivity : ComponentActivity() {
                             name = nickname,
                             bio = description,
                             skin = Skin(0,0,0),
-                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45, 28, 14)
+                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45, 28, 14),
+                            trophiesWon = listOf(0, 4, 8, 11, 12)
                         )
                         )
                         val profileIntent = Intent(mContext, ProfileActivity::class.java)

@@ -17,7 +17,7 @@ data class Trophy(
     private val icon: ImageVector,
 ) {
     override fun toString(): String {
-        return title
+        return "$title: $description"
     }
 
     fun getIcon(): ImageVector {

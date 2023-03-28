@@ -8,9 +8,14 @@ data class User(
     val name: String,
     val bio: String,
     val skin: Skin,
-    val stats: Stats
+    val stats: Stats,
+    val trophiesWon: List<Int>
 ){
     override fun toString(): String {
         return "User{$id: $name}"
+    }
+
+    fun hasTrophy(trophyId: Int): Boolean {
+        return trophiesWon.contains(trophyId)
     }
 }

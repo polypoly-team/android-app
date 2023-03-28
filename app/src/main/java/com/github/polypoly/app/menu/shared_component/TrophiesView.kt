@@ -1,11 +1,9 @@
 package com.github.polypoly.app.menu.shared_component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -14,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Trophy
 import com.github.polypoly.app.game.user.allTrophies
@@ -27,7 +24,8 @@ import com.github.polypoly.app.ui.theme.advancedShadow
  * @param selected if the trophy is selected, i.e. is highlighted compared to a normal trophy
  */
 @Composable
-fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean) {
+fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
+               onClick: () -> Unit = {}, disable: Boolean = false) {
 
     val trophyColor: Color = if (won) MaterialTheme.colors.primary else
         MaterialTheme.colors.onSecondary
@@ -35,9 +33,9 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean) {
     Box(
         modifier = Modifier
             .advancedShadow(
-                alpha = if (selected) 0.3f else 0f,
+                alpha = if (selected && !disable) 0.3f else 0f,
                 color = MaterialTheme.colors.onSecondary,
-                shadowBlurRadius = 8.dp,
+                shadowBlurRadius = 10.dp,
                 cornersRadius = 50.dp
             )
             .clip(CircleShape)
@@ -45,9 +43,10 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean) {
                 color = trophyColor
             )
             .background(
-                color = Color.White.copy(alpha = if (selected) 0f else 0.2f)
+                color = Color.White.copy(alpha = if (selected) 0f else 0.3f)
             )
-            .size(50.dp),
+            .size(50.dp)
+            .clickable(onClick = if(disable) {{}} else onClick),
         contentAlignment = Alignment.Center,
     ) {
         if (won)
@@ -71,8 +70,11 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean) {
  * @param maxSelected the max number of trophies the user can select
  */
 @Composable
-fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int) {
+fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: List<Int>) {
 
+    assert(selected.size <= maxSelected)
+
+    // TODO : add an adaptive layout
     val maxPerRow = 5
     val maxPerColumn = 3
 
@@ -89,7 +91,11 @@ fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int) {
                 repeat(maxPerColumn) {rowIdx ->
                     if(rowIdx > 0) Spacer(modifier = Modifier.height(10.dp))
                     val idx: Int = rowIdx*maxPerRow +columnIdx
-                    TrophyView(trophy = allTrophies[idx], won = idx%4 == 0, selected = idx==4)
+                    TrophyView(
+                        trophy = allTrophies[idx],
+                        won = idx%4 == 0,
+                        selected = selected.contains(idx),
+                        onClick = { callBack(idx) })
                 }
             }
         }

@@ -10,14 +10,14 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -128,6 +128,7 @@ class ProfileActivity : ComponentActivity() {
      * Display some statistics about the player and all the trophies that the
      * player has won or can win.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun StatisticsAndTrophies() {
         Column(
@@ -194,8 +195,12 @@ class ProfileActivity : ComponentActivity() {
      * Display all the trophies that the player has won or can win.
      * The title and description of the trophy is displayed when you click on it.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun Trophies() {
+        val user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
+        val selectedTrophy = remember { mutableStateListOf(0) }
+
         Box(
             modifier = Modifier
                 .background(
@@ -209,10 +214,34 @@ class ProfileActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("All Trophies", style = MaterialTheme.typography.h5,
+                Text("Trophies", style = MaterialTheme.typography.h5,
                     textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(20.dp))
-                TrophiesView(callBack = {}, maxSelected = 1)
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colors.secondaryVariant,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                ) {
+                    val trophyId = selectedTrophy.first()
+                    Text(
+                        if(user.hasTrophy(trophyId)) allTrophies[trophyId].toString()
+                        else "???",
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.body2,
+                        textAlign = if(user.hasTrophy(trophyId)) TextAlign.Left else
+                            TextAlign.Center
+                    )
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+                TrophiesView(callBack = {
+                    idx ->
+                    selectedTrophy.clear()
+                    selectedTrophy.add(idx)
+                }, maxSelected = 1, selected = selectedTrophy)
             }
         }
     }
@@ -282,11 +311,11 @@ class ProfileActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TrophyView(allTrophies[0], true, selected = true)
+                TrophyView(allTrophies[0], true, selected = true, disable = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[4], true, selected = true)
+                TrophyView(allTrophies[4], true, selected = true, disable = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[16], true, selected = true)
+                TrophyView(allTrophies[16], true, selected = true, disable = true)
             }
         }
     }
