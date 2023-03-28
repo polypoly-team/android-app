@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Trophy
+import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.ui.theme.advancedShadow
 
@@ -22,6 +23,8 @@ import com.github.polypoly.app.ui.theme.advancedShadow
  * @param trophy the trophy to display
  * @param won if the trophy is won by the player
  * @param selected if the trophy is selected, i.e. is highlighted compared to a normal trophy
+ * @param onClick what happens when the user click on the trophy
+ * @param disable if the trophy is not clickable
  */
 @Composable
 fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
@@ -36,15 +39,12 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
                 alpha = if (selected && !disable) 0.3f else 0f,
                 color = MaterialTheme.colors.onSecondary,
                 shadowBlurRadius = 10.dp,
-                cornersRadius = 50.dp
-            )
+                cornersRadius = 50.dp)
             .clip(CircleShape)
             .background(
-                color = trophyColor
-            )
+                color = trophyColor)
             .background(
-                color = Color.White.copy(alpha = if (selected) 0f else 0.3f)
-            )
+                color = Color.White.copy(alpha = if (selected) 0f else 0.3f))
             .size(50.dp)
             .clickable(onClick = if(disable) {{}} else onClick),
         contentAlignment = Alignment.Center,
@@ -52,15 +52,13 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
         if (won)
             Icon(
                 imageVector = trophy.getIcon(),
-                contentDescription = "Person Icon",
-                tint = MaterialTheme.colors.onPrimary
-            )
+                contentDescription = "Trophy Icon",
+                tint = MaterialTheme.colors.onPrimary)
         else
             Text(
                 "?",
                 color = MaterialTheme.colors.secondaryVariant,
-                style = MaterialTheme.typography.h6
-            )
+                style = MaterialTheme.typography.h6)
     }
 }
 
@@ -68,9 +66,12 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
  * Display all the trophies that the player has won or can win.
  * @param callBack the function that will be call back when we selected the trophy of index "input"
  * @param maxSelected the max number of trophies the user can select
+ * @param selected the current selected trophies
+ * @param user the user to whom the profile belongs
  */
 @Composable
-fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: List<Int>) {
+fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: List<Int>,
+                 user: User) {
 
     assert(selected.size <= maxSelected)
 
@@ -93,7 +94,7 @@ fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: Lis
                     val idx: Int = rowIdx*maxPerRow +columnIdx
                     TrophyView(
                         trophy = allTrophies[idx],
-                        won = idx%4 == 0,
+                        won = user.hasTrophy(idx),
                         selected = selected.contains(idx),
                         onClick = { callBack(idx) })
                 }
