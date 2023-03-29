@@ -58,7 +58,7 @@ class ProfileModifyingActivityTest {
     }
 
     @Test
-    fun okButtonGoToTheProfilePage() {
+    fun validateProfileButtonGoToTheProfilePage() {
 
         Intents.init()
 
@@ -77,7 +77,7 @@ class ProfileModifyingActivityTest {
     }
 
     @Test
-    fun okButtonGoToTheProfilePageAndModifyTheName() {
+    fun validateProfileButtonGoToTheProfilePageAndModifyTheName() {
 
         Intents.init()
 
@@ -95,5 +95,50 @@ class ProfileModifyingActivityTest {
         nickname.assert(hasText("bigflo"))
 
         Intents.release()
+    }
+
+    @Test
+    fun cantValidateTheProfileIfThePlayerGiveAnEmptyNickName() {
+
+    }
+
+    @Test
+    fun seeAnErrorMessageIfThePlayerGiveAnEmptyNickName() {
+
+    }
+
+    @Test
+    fun canSelectANewTrophiesToDisplay() {
+
+    }
+
+    @Test
+    fun aTrophyIsDeselectIfTheUserSelectANewOneAndThereAreAlreadyThreeSelected() {
+
+    }
+
+    @Test
+    fun canWriteMoreThan15CharactersInTheNicknameField() {
+
+    }
+
+    @Test
+    fun canWriteMoreThan130CharactersInTheDescriptionField() {
+
+    }
+
+    @Test
+    fun canWriteMoreThan4LineReturnsInTheDescriptionField() {
+
+    }
+
+    @Test
+    fun allTheTrophiesAreDeselectedWhenTheClearButtonIsPressed() {
+
+    }
+
+    @Test
+    fun validateProfileButtonChangeTheTrophiesDisplayed() {
+
     }
 }
