@@ -36,25 +36,32 @@ class WelcomeActivity : ComponentActivity() {
     private lateinit var gameMusic: GameMusic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
-            gameMusic.startSong()
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+        setContent { WelcomeContent() }
+    }
+    @Preview(showBackground = true)
+    @Composable
+    fun WelcomePreview() { WelcomeContent() }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun WelcomeContent() {
+        GameMusic.setSong(LocalContext.current, R.raw.mocksong)
+        GameMusic.startSong()
+        PolypolyTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // The first element is the logo of the game
-                        GameLogo()
-                        Spacer(modifier = Modifier.weight(1f))
-                        // Then the game buttons are in the center of the screen
-                        GameButtons()
-                        Spacer(modifier = Modifier.weight(1f))
-                        RowOptionButtons()
-                    }
+                    // The first element is the logo of the game
+                    GameLogo()
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Then the game buttons are in the center of the screen
+                    GameButtons()
+                    Spacer(modifier = Modifier.weight(1f))
+                    RowOptionButtons()
                 }
             }
         }
@@ -254,36 +261,6 @@ class WelcomeActivity : ComponentActivity() {
                 .height(70.dp),
         ) {
             Text(text = text)
-        }
-    }
-
-
-
-
-
-    // =================================== PREVIEW ==============
-    @Preview(showBackground = true)
-    @Composable
-    fun WelcomePreview() {
-        gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
-        gameMusic.startSong()
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // The first element is the logo of the game
-                    GameLogo()
-                    Spacer(modifier = Modifier.weight(1f))
-                    // Then the game buttons are in the center of the screen
-                    GameButtons()
-                    Spacer(modifier = Modifier.weight(1f))
-                    RowOptionButtons()
-                }
-            }
         }
     }
 }

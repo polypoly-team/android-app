@@ -4,13 +4,19 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.core.math.MathUtils.clamp
 
-class GameMusic(private val context: Context, private val songId: Int) {
+object GameMusic {
     private lateinit var mediaPlayer: MediaPlayer
+    private var volume = 0.8f // default value
+    private var isMute = false
+
+    fun setSong(context: Context, songId: Int) {
+        mediaPlayer = MediaPlayer.create(context, songId)
+    }
 
     fun startSong() {
-        mediaPlayer = MediaPlayer.create(context, songId)
         mediaPlayer.isLooping = true
         mediaPlayer.start()
+        setVolume(volume)
     }
 
     /**
@@ -18,11 +24,23 @@ class GameMusic(private val context: Context, private val songId: Int) {
      * To avoid issues, before applying the given value, we force it to be in the correct range
       */
     fun setVolume(value: Float) {
-        val validValue = clamp(value, 0f, 1f)
-        mediaPlayer.setVolume(validValue, validValue)
+        volume = clamp(value, 0f, 1f)
+        if(!isMute) {
+            mediaPlayer.setVolume(volume, volume)
+        }
+    }
+
+    fun getVolume(): Float {
+        return volume
     }
 
     fun mute() {
-        setVolume(0f)
+        mediaPlayer.setVolume(0f, 0f)
+        isMute = true
+    }
+
+    fun unMute() {
+        mediaPlayer.setVolume(volume, volume)
+        isMute = false
     }
 }
