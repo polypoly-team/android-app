@@ -2,6 +2,7 @@ package com.github.polypoly.app.menu
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -31,9 +32,9 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.game.*
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlinx.coroutines.delay
+import timber.log.Timber
 import kotlin.time.Duration.Companion.hours
 
-@Suppress("UNUSED_EXPRESSION")
 class JoinGroupActivity : ComponentActivity() {
 
     /**
@@ -103,7 +104,7 @@ class JoinGroupActivity : ComponentActivity() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(30.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
             GroupListButton()
@@ -146,6 +147,8 @@ class JoinGroupActivity : ComponentActivity() {
 
     /**
      * This function returns the button that lets the user open the groups list.
+     * The groups list is a dialog that shows the public groups that the user can join.
+     * The groups list is refreshed every 5 seconds.
      */
     @Composable
     fun GroupListButton() {
@@ -176,6 +179,8 @@ class JoinGroupActivity : ComponentActivity() {
                     while (openList) {
                         delay(refreshInterval)
                         groups = getPublicGroupsFromDB()
+                        Timber.tag("GroupList")
+                            .d("Refreshing groups list")
                     }
                 }
 
@@ -484,6 +489,10 @@ class JoinGroupActivity : ComponentActivity() {
         // TODO: link to the group room activity
     }
 
+    /**
+     * This function fetches the public groups from the database.
+     * @return (List<PendingGame>): The list of public groups
+     */
     private fun getPublicGroupsFromDB(): List<PendingGame> {
         return mockPendingGames.values.toList().filter { !it.private  && !groupIsFull(it) }
     }
@@ -517,7 +526,6 @@ class JoinGroupActivity : ComponentActivity() {
      * @return (Boolean): True if the group is full, false otherwise
      */
     private fun groupIsFull(group: PendingGame): Boolean {
-
         return group.usersRegistered.size >= group.maximumNumberOfPlayers
     }
 
@@ -541,7 +549,7 @@ class JoinGroupActivity : ComponentActivity() {
     private val name3 = "Joinable 2"
     private val name4 = "Joinable 3"
     private val name5 = "Private group"
-    private val name6= "Joinable 4"
+    private val name6 = "Joinable 4"
 
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats()

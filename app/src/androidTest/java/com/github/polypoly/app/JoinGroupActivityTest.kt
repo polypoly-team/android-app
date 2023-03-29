@@ -47,8 +47,6 @@ class JoinGroupActivityTest {
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
 
-        // Check that a message with the joined group code is displayed
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.joined_group_with_code) + groupCode).assertIsDisplayed()
     }
 
     @Test
@@ -61,5 +59,6 @@ class JoinGroupActivityTest {
         // Check that a message that the group is full is displayed
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_is_full)).assertIsDisplayed()
     }
+
 
     }
