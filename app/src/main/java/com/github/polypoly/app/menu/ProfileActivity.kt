@@ -7,24 +7,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -66,19 +63,30 @@ class ProfileActivity : ComponentActivity() {
     @Composable
     fun ProfileAndStats() {
         val user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+
+        var profileHeight by remember { mutableStateOf(340.dp) }
+        val localDensity = LocalDensity.current
+
+        // In order for the shadow of the surface elevation to be displayed on the bottom of the
+        // screen, I had to put the elements one on top of the other and not in a column
+        Box {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(profileHeight))
+                StatisticsAndTrophies(user)
+            }
             Surface(
+                modifier = Modifier.onGloballyPositioned { coordinates ->
+                    profileHeight = with(localDensity) { coordinates.size.height.toDp() } },
                 elevation = 8.dp,
                 color = MaterialTheme.colors.background
             ) {
                 Profile(user)
             }
-            StatisticsAndTrophies(user)
         }
     }
 
@@ -315,6 +323,48 @@ class ProfileActivity : ComponentActivity() {
     }
 
     /**
+     * Display the main trophies the user want to show to other players
+     * @param user the user to whom the profile belongs
+     */
+    @Composable
+    fun DisplayedTrophies(user: User) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            DisplayedTrophy(user, 0)
+            Spacer(modifier = Modifier.width(10.dp))
+            DisplayedTrophy(user, 1)
+            Spacer(modifier = Modifier.width(10.dp))
+            DisplayedTrophy(user, 2)
+        }
+    }
+
+    /**
+     * Display one of the main trophies the user want to show to other players
+     * @param user the user to whom the profile belongs
+     * @param idxSlot the index of the slot where the trophy is showed
+     */
+    @Composable
+    fun DisplayedTrophy(user: User, idxSlot: Int) {
+        // test if the user has won enough trophies to display a trophy on this slot
+        if(user.trophiesDisplay.size > idxSlot) {
+            TrophyView(allTrophies[user.trophiesDisplay[idxSlot]],
+                won = true, selected = true, disable = true)
+        } else {
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(
+                        color = MaterialTheme.colors.secondaryVariant
+                    )
+                    .size(50.dp),
+                contentAlignment = Alignment.Center,
+            ){}
+        }
+    }
+
+    /**
      * Display the info of the player (name and description
      * @param user the user to whom the profile belongs
      */
@@ -336,19 +386,7 @@ class ProfileActivity : ComponentActivity() {
                 style = MaterialTheme.typography.body2
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TrophyView(allTrophies[user.trophiesDisplay[0]],
-                    won = true, selected = true, disable = true)
-                Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[user.trophiesDisplay[1]],
-                    won = true, selected = true, disable = true)
-                Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[user.trophiesDisplay[2]],
-                    won = true, selected = true, disable = true)
-            }
+            DisplayedTrophies(user = user)
         }
     }
 

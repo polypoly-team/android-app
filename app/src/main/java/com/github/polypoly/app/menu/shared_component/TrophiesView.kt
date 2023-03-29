@@ -7,16 +7,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Trophy
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.ui.theme.advancedShadow
+import com.github.polypoly.app.util.toDp
+
+
+/**
+ * The default size of trophies
+ */
+const val TROPHY_SIZE = 50
+
+/**
+ * The default padding between trophies
+ */
+const val PADDING_TROPHIES = 10
 
 /**
  * A trophy view that the player has won or not
@@ -38,14 +51,14 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
             .advancedShadow(
                 alpha = if (selected && !disable) 0.3f else 0f,
                 color = MaterialTheme.colors.onSecondary,
-                shadowBlurRadius = 10.dp,
-                cornersRadius = 50.dp)
+                shadowBlurRadius = PADDING_TROPHIES.dp,
+                cornersRadius = TROPHY_SIZE.dp)
             .clip(CircleShape)
             .background(
                 color = trophyColor)
             .background(
-                color = Color.White.copy(alpha = if (selected) 0f else 0.4f))
-            .size(50.dp)
+                color = Color.White.copy(alpha = if (selected) 0f else 0.6f))
+            .size(TROPHY_SIZE.dp)
             .clickable(onClick = if(disable) {{}} else onClick),
         contentAlignment = Alignment.Center,
     ) {
@@ -75,22 +88,35 @@ fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: Lis
 
     assert(selected.size <= maxSelected)
 
-    // TODO : add an adaptive layout
-    val maxPerRow = 5
-    val maxPerColumn = 3
+    val totalNumberOfTrophies = allTrophies.size
+    // default number of trophies per row is 5 , but this number change if the layout is too
+    // small to put 5 trophies per row
+    var maxPerRow by remember { mutableStateOf(5) }
+    var maxPerColumn = totalNumberOfTrophies/maxPerRow
 
     Row(
+        modifier = Modifier.fillMaxWidth()
+            .onGloballyPositioned { coordinates ->
+                val size = coordinates.size
+                val widthInDP = size.width.toDp
+                // to adapt the layout
+                while (widthInDP < maxPerRow*TROPHY_SIZE + (maxPerRow-1)*PADDING_TROPHIES
+                    && maxPerRow > 0) {
+                    --maxPerRow
+                }
+                maxPerColumn = totalNumberOfTrophies/maxPerRow
+            },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ){
         repeat(maxPerRow) { columnIdx ->
-            if(columnIdx > 0) Spacer(modifier = Modifier.width(10.dp))
+            if(columnIdx > 0) Spacer(modifier = Modifier.width(PADDING_TROPHIES.dp))
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 repeat(maxPerColumn) {rowIdx ->
-                    if(rowIdx > 0) Spacer(modifier = Modifier.height(10.dp))
+                    if(rowIdx > 0) Spacer(modifier = Modifier.height(PADDING_TROPHIES.dp))
                     val idx: Int = rowIdx*maxPerRow +columnIdx
                     TrophyView(
                         trophy = allTrophies[idx],

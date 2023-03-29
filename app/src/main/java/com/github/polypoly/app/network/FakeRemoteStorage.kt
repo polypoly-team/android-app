@@ -21,7 +21,7 @@ class FakeRemoteStorage : IRemoteStorage {
         skin = Skin(0,0,0),
         stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67, 28, 14),
         trophiesWon = listOf(0, 4, 8, 11, 12, 14),
-        trophiesDisplay = mutableListOf(0, 4, 12)
+        trophiesDisplay = mutableListOf(0, 4)
     )
 
     @RequiresApi(Build.VERSION_CODES.O)

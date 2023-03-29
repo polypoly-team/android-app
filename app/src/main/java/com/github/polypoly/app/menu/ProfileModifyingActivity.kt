@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Skin
@@ -70,17 +71,15 @@ class ProfileModifyingActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text("Write your info", style = MaterialTheme.typography.h5,
+                textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(10.dp))
             NicknameTextField()
             Spacer(modifier = Modifier.height(10.dp))
             DescriptionTextField()
-            Spacer(modifier = Modifier.height(10.dp))
-            TrophiesView(callBack = { idx ->
-                if(!trophiesDisplay.contains(idx) && user.hasTrophy(idx)) {
-                    if (trophiesDisplay.size >= 3) trophiesDisplay.removeAt(0)
-                    trophiesDisplay.add(idx)
-                }
-            }, maxSelected = 3, selected = trophiesDisplay, user= user)
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp))
+            TrophiesSelection(trophiesDisplay, user)
+            Spacer(modifier = Modifier.height(40.dp))
             ValidationButton ({ warningText = "You can't have an empty nickname!" }, trophiesDisplay)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
@@ -88,6 +87,43 @@ class ProfileModifyingActivity : ComponentActivity() {
                 text = warningText,
                 style = MaterialTheme.typography.body2
             )
+        }
+    }
+
+    /**
+     * Permit to select the trophies the user want to display on his/her profile
+     * @param trophiesDisplay trophies currently displayed on the user profile
+     * @param user the user to whom the profile belongs
+     */
+    @Composable
+    fun TrophiesSelection(trophiesDisplay: MutableList<Int>, user: User) {
+        Text("Select displayed trophies", style = MaterialTheme.typography.h5,
+            textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(20.dp))
+        TrophiesView(
+            callBack = { idx ->
+                if(!trophiesDisplay.contains(idx) && user.hasTrophy(idx)) {
+                    if (trophiesDisplay.size >= 3) trophiesDisplay.removeAt(0)
+                    trophiesDisplay.add(idx)
+                }
+            },
+            maxSelected = 3,
+            selected = trophiesDisplay,
+            user= user)
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(
+            onClick = { trophiesDisplay.clear() },
+            shape = CircleShape,
+            modifier = Modifier.testTag("clearTrophiesButton"),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.secondaryVariant),
+        ) {
+            Text("Clear")
         }
     }
 
@@ -124,7 +160,7 @@ class ProfileModifyingActivity : ComponentActivity() {
                 }
             }
         ) {
-            Text(text = "OK")
+            Text(text = "Validate profile")
         }
     }
 
@@ -154,7 +190,7 @@ class ProfileModifyingActivity : ComponentActivity() {
                 focusedLabelColor = MaterialTheme.colors.primary,
                 unfocusedLabelColor = MaterialTheme.colors.onSecondary,
             ),
-            maxLines = 4,
+            maxLines = 5,
             onValueChange = { newText ->
                 text = if (newText.text.length > maxTextLength) text else {
                     val lines = newText.text.split("\n")
