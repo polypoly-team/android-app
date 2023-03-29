@@ -73,8 +73,6 @@ class SettingsActivity : ComponentActivity() {
         var sliderValue by remember { mutableStateOf(GameMusic.getVolume()) }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             Slider(
                 value = sliderValue,
