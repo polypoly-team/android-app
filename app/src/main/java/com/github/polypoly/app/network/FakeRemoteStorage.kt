@@ -20,7 +20,8 @@ class FakeRemoteStorage : IRemoteStorage {
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
         stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67, 28, 14),
-        trophiesWon = listOf(0, 4, 8, 11, 12, 14)
+        trophiesWon = listOf(0, 4, 8, 11, 12, 14),
+        trophiesDisplay = mutableListOf(0, 4, 12)
     )
 
     @RequiresApi(Build.VERSION_CODES.O)

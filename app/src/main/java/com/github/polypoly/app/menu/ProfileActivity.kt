@@ -340,11 +340,14 @@ class ProfileActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TrophyView(allTrophies[0], true, selected = true, disable = true)
+                TrophyView(allTrophies[user.trophiesDisplay[0]],
+                    won = true, selected = true, disable = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[4], true, selected = true, disable = true)
+                TrophyView(allTrophies[user.trophiesDisplay[1]],
+                    won = true, selected = true, disable = true)
                 Spacer(modifier = Modifier.width(10.dp))
-                TrophyView(allTrophies[16], true, selected = true, disable = true)
+                TrophyView(allTrophies[user.trophiesDisplay[2]],
+                    won = true, selected = true, disable = true)
             }
         }
     }

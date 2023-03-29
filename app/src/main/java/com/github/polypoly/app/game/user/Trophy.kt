@@ -2,6 +2,7 @@ package com.github.polypoly.app.game.user
 
 import android.graphics.drawable.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,7 +34,7 @@ val allTrophies: List<Trophy> = listOf(
     Trophy(1, title = "trophy 1", description = "description 1", icon = Icons.Default.Person),
     Trophy(2, title = "trophy 2", description = "description 2", icon = Icons.Default.Person),
     Trophy(3, title = "trophy 3", description = "description 3", icon = Icons.Default.Person),
-    Trophy(4, title = "trophy 4", description = "description 4", icon = Icons.Default.Person),
+    Trophy(4, title = "trophy 4", description = "description 4", icon = Icons.Default.Album),
     Trophy(5, title = "trophy 5", description = "description 5", icon = Icons.Default.Person),
     Trophy(6, title = "trophy 6", description = "description 6", icon = Icons.Default.Person),
     Trophy(7, title = "trophy 7", description = "description 7", icon = Icons.Default.Person),

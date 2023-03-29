@@ -9,7 +9,8 @@ data class User(
     val bio: String,
     val skin: Skin,
     val stats: Stats,
-    val trophiesWon: List<Int>
+    val trophiesWon: List<Int>,
+    val trophiesDisplay: MutableList<Int>,
 ){
     override fun toString(): String {
         return "User{$id: $name}"

@@ -44,7 +44,7 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
             .background(
                 color = trophyColor)
             .background(
-                color = Color.White.copy(alpha = if (selected) 0f else 0.3f))
+                color = Color.White.copy(alpha = if (selected) 0f else 0.4f))
             .size(50.dp)
             .clickable(onClick = if(disable) {{}} else onClick),
         contentAlignment = Alignment.Center,
