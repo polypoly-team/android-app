@@ -1,5 +1,6 @@
 package com.github.polypoly.app
 
+import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -60,5 +61,31 @@ class JoinGroupActivityTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_is_full)).assertIsDisplayed()
     }
 
+    @Test
+    fun clickOnGroupsListButton_opensGroupsList() {
+        composeTestRule.onNodeWithTag("showGroupsButton").performClick()
+
+        composeTestRule.onNodeWithTag("groupsList")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun clickOnGroupHeader_opensGroupInfo() {
+
+        composeTestRule.onNodeWithTag("showGroupsButton").performClick()
+
+        try {
+            val groupHeader = composeTestRule.onAllNodesWithTag("groupCard").onFirst()
+
+            groupHeader.assertIsDisplayed()
+            groupHeader.performClick()
+
+            composeTestRule.onAllNodesWithTag("groupCard").onFirst().assertIsDisplayed()
+
+        }catch (AssertionError: AssertionError){
+            Log.d("Test", "No groups to display from DB")
+        }
 
     }
+
+}

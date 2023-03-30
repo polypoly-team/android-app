@@ -189,12 +189,13 @@ class JoinGroupActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth(0.95f)
                         .fillMaxHeight(0.95f)
+                        .testTag("groupsList"),
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
                             Text(
                                 text = getString(R.string.group_list_title),
-                                style = MaterialTheme.typography.h4
+                                style = MaterialTheme.typography.h4,
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                         }
@@ -208,7 +209,7 @@ class JoinGroupActivity : ComponentActivity() {
                                     isOpen = index == openCardIndex,
                                     onOpenChange = { open ->
                                         openCardIndex = if (open) index else -1
-                                    }
+                                    },
                                 )
                                 Spacer(modifier = Modifier.height(20.dp))
                             }
@@ -237,7 +238,7 @@ class JoinGroupActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .testTag("groupCard"),
             elevation = 10.dp,
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
         ) {
             Column(
                 modifier = Modifier
@@ -262,7 +263,8 @@ class JoinGroupActivity : ComponentActivity() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(10.dp)
+                .testTag("groupCardHeader"),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -306,6 +308,7 @@ class JoinGroupActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp)
+                .testTag("groupCardDetails")
         ) {
             Divider(
                 modifier = Modifier.padding(bottom = 5.dp),
@@ -356,7 +359,7 @@ class JoinGroupActivity : ComponentActivity() {
         ) {
             RectangleButton(
                 onClick = { groupCodeButtonOnClick(warningState,mContext)},
-                description = "Join Group",
+                description = getString(R.string.join_group_button_text),
                 testTag = "joinGroupButton"
             )
             if(warningState.value != "") {
