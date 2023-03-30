@@ -13,7 +13,5 @@ class Settings {
         val DB_USER_SKIN_DIRECTORY = "skin"
 
         val DB_USER_STATS_DIRECTORY = "stats"
-
-        val DB_GROUPS_LIST_DIRECTORY = "groups"
     }
 }

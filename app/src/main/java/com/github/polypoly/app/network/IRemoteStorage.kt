@@ -1,7 +1,7 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.PendingGame
 import com.github.polypoly.app.game.Skin
+import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import java.util.concurrent.CompletableFuture
 
@@ -24,23 +24,4 @@ interface IRemoteStorage {
     fun setUserBio(userId: Long, bio: String): CompletableFuture<Boolean>
     fun setUserSkin(userId: Long, skin: Skin): CompletableFuture<Boolean>
     fun <T>setUserStat(userId: Long, statName: String, stat: T): CompletableFuture<Boolean>
-
-    // ------------------- GROUPS -------------------//
-
-    /**
-     * fetches a group data from the database given an ID
-     * @param groupId the id of the group
-     */
-    fun getGroupFromId(groupId: String): CompletableFuture<PendingGame>
-
-    /**
-     * adds a group to the database
-     */
-    fun addGroup(group: PendingGame): CompletableFuture<Boolean>
-
-    /**
-     * fetches all the groups from the database
-     */
-    fun getAllGroupsIds(): CompletableFuture<List<String>>
-
 }

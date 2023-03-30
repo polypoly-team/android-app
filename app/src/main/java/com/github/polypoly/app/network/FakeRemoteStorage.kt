@@ -2,12 +2,12 @@ package com.github.polypoly.app.network
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.github.polypoly.app.game.PendingGame
 import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 /**
  * A fake remote storage to test the functionalities without the database
@@ -55,15 +55,6 @@ class FakeRemoteStorage : IRemoteStorage {
     ): CompletableFuture<Boolean> {
         throw UnsupportedOperationException("Not implemented yet")
     }
-
-    override fun getGroupFromId(groupId: String): CompletableFuture<PendingGame> {
-        throw UnsupportedOperationException("Not implemented yet")    }
-
-    override fun addGroup(group: PendingGame): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")    }
-
-    override fun getAllGroupsIds(): CompletableFuture<List<String>> {
-        throw UnsupportedOperationException("Not implemented yet")    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllUsers(): CompletableFuture<List<User>> {
