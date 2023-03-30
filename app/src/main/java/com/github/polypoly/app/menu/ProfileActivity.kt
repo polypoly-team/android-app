@@ -30,7 +30,7 @@ import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
-class ProfileActivity : ComponentActivity() {
+class ProfileActivity : MenuActivity("Profile") {
 
     //ONLY TO TEST WITHOUT THE DATABASE
     val userId: Long = 1
@@ -39,14 +39,21 @@ class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    ProfileAndStats()
-                }
+            MenuContent {
+                ProfileContent()
             }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Composable
+    fun ProfileContent() {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            ProfileAndStats()
         }
     }
 
@@ -69,6 +76,7 @@ class ProfileActivity : ComponentActivity() {
             Statistics()
         }
     }
+
 
     /**
      * Display the information of the user's profile and the appearance of player in game
@@ -263,13 +271,8 @@ class ProfileActivity : ComponentActivity() {
     )
     @Composable
     fun ProfilePreview() {
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                ProfileAndStats()
-            }
+        MenuContent {
+            ProfileContent()
         }
     }
 }

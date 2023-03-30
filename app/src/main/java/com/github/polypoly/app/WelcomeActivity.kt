@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu
+package com.github.polypoly.app
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -19,9 +17,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import com.github.polypoly.app.*
-import com.github.polypoly.app.R
+import com.github.polypoly.app.menu.JoinGroupActivity
+import com.github.polypoly.app.menu.ProfileActivity
+import com.github.polypoly.app.menu.SettingsActivity
+import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -60,7 +59,7 @@ class WelcomeActivity : ComponentActivity() {
                     // Then the game buttons are in the center of the screen
                     GameButtons()
                     Spacer(modifier = Modifier.weight(1f))
-                    RowOptionButtons()
+                    MenuComposable.RowButtons()
                 }
             }
         }
@@ -134,7 +133,6 @@ class WelcomeActivity : ComponentActivity() {
                 .padding(20.dp)
         ) {
             ProfileOptionButton()
-            RulesOptionButton()
             OptionButton(
                 onClick = { /*TODO*/ },
                 icon_id = R.drawable.tmp_happysmile,
@@ -144,55 +142,7 @@ class WelcomeActivity : ComponentActivity() {
 
     }
 
-    /**
-     * The button toggles on a dialog component where the rules are displayed.
-     * The rules are scrollable and all the text is stored in RulesObject.
-     *
-     * The dialog box is closed when clicking outside of it
-     */
-    @Composable
-    fun RulesOptionButton() {
-        var openRules by remember { mutableStateOf(false) }
-        OptionButton(
-            onClick = { openRules = true },
-            icon_id = R.drawable.tmp_happysmile,
-            description = "Show Rules"
-        )
 
-        if(openRules) {
-            Dialog(
-                onDismissRequest = { openRules = false },
-            ) {
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .fillMaxHeight(0.95f)
-                ) {
-                    LazyColumn(modifier = Modifier.padding(20.dp)) {
-                        item {
-                            Text(
-                                text = RulesObject.rulesTitle,
-                                style = MaterialTheme.typography.h4
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                        }
-                        items(items = RulesObject.rulesChapters, itemContent = { item ->
-                            Text(
-                                text = item.title,
-                                style = MaterialTheme.typography.h5
-                            )
-                            Text(
-                                text = item.content,
-                                style = MaterialTheme.typography.body1
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                        })
-                    }
-                }
-            }
-        }
-    }
 
     @Composable
     fun SettingsOptionButton() {

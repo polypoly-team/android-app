@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.menu.SettingsActivity
-import com.github.polypoly.app.menu.WelcomeActivity
 import org.junit.Rule
 import org.junit.Test
 
