@@ -152,26 +152,8 @@ class MapActivity : ComponentActivity() {
     @Composable
     fun BuildingInfoUIComponent() {
         val showBuyDialog = remember { mutableStateOf(false) }
+        if (showDialog.value) BuildingInfoDialog(showBuyDialog)
 
-        if (showDialog.value) {
-            AlertDialog(
-                onDismissRequest = { showDialog.value = false },
-                modifier = Modifier.testTag("buildingInfoDialog"),
-                title = {
-                    Row {
-                        Text(text = markerToLocalization[currentMarker]?.name ?: "Unknown")
-                        Spacer(modifier = Modifier.weight(0.5f))
-                        Text(text = "Base price: ${markerToLocalization[currentMarker]?.basePrice}")
-                    }
-                },
-                text = {
-                    Text(text = "This is some trivia related to the building and or some info related to it.")
-                },
-                buttons = {
-                    BuildingInfoButtons(showBuyDialog)
-                }
-            )
-        }
         if (showBuyDialog.value) {
             BetDialog(onBuy = { amount ->
                 showBuyDialog.value = false // TODO: Handle the buy action with the entered amount here
@@ -179,6 +161,27 @@ class MapActivity : ComponentActivity() {
                 showBuyDialog.value = false
             })
         }
+    }
+
+    @Composable
+    private fun BuildingInfoDialog(showBuyDialog: MutableState<Boolean>) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            modifier = Modifier.testTag("buildingInfoDialog"),
+            title = {
+                Row {
+                    Text(text = markerToLocalization[currentMarker]?.name ?: "Unknown")
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(text = "Base price: ${markerToLocalization[currentMarker]?.basePrice}")
+                }
+            },
+            text = {
+                Text(text = "This is some trivia related to the building and or some info related to it.")
+            },
+            buttons = {
+                BuildingInfoButtons(showBuyDialog)
+            }
+        )
     }
 
     @Composable
