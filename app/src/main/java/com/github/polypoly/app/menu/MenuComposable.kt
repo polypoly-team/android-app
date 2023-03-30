@@ -1,6 +1,5 @@
 package com.github.polypoly.app.menu
 
-import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -23,7 +22,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import com.github.polypoly.app.R
 import com.github.polypoly.app.RulesObject
-import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 object MenuComposable {
     /**
@@ -34,21 +32,34 @@ object MenuComposable {
     // ===================================================== MENU DISPOSITIONS
     @Composable
     fun RowButtons() {
-        PolypolyTheme {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spaceBetweenButtons, Alignment.CenterHorizontally),
-                modifier = Modifier
-                    .padding(spaceBetweenButtons)
-                    .fillMaxWidth()
-            ) {
-                AllButtons()
-            }
-            
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(spaceBetweenButtons, Alignment.CenterHorizontally),
+            modifier = Modifier
+                .padding(spaceBetweenButtons)
+                .fillMaxWidth()
+        ) {
+            AllButtons()
         }
     }
 
     @Composable
-    fun ColumnButtons(parentActivity: Activity) {
+    fun ColumnButtons() {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spaceBetweenButtons, Alignment.Bottom),
+            modifier = Modifier
+                .padding(spaceBetweenButtons)
+                .fillMaxHeight()
+        ) {
+            var display by remember { mutableStateOf(false) }
+            if(display) {
+                AllButtons()
+            }
+            OptionButton(
+                onClick = { display = !display },
+                iconId = if(display) R.drawable.tmp_sadsmile else R.drawable.tmp_happysmile,
+                description = "display_options"
+            )
+        }
 
     }
 

@@ -16,7 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,13 +26,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.game.User
 import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import java.util.concurrent.Future
 
 class ProfileActivity : MenuActivity("Profile") {
 
-    //ONLY TO TEST WITHOUT THE DATABASE
+    // ONLY TO TEST WITHOUT THE DATABASE
     val userId: Long = 1
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -104,6 +106,7 @@ class ProfileActivity : MenuActivity("Profile") {
                 onClick = {
                     val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                     profileModifyingIntent.putExtra("userId", userId)
+                    finish()
                     startActivity(profileModifyingIntent)
                 },
                 shape = CircleShape,
