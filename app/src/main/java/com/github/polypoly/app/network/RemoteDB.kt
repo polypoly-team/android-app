@@ -1,17 +1,9 @@
 package com.github.polypoly.app.network
 
-import android.util.Log
-import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.User
-import com.github.polypoly.app.global.Settings.Companion.DB_ALL_USERS_ID_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.global.Settings.Companion.DB_USER_BIO_DIRECTORY
-import com.github.polypoly.app.global.Settings.Companion.DB_USER_NAME_DIRECTORY
-import com.github.polypoly.app.global.Settings.Companion.DB_USER_SKIN_DIRECTORY
-import com.github.polypoly.app.global.Settings.Companion.DB_USER_STATS_DIRECTORY
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.getValue
 import java.util.concurrent.CompletableFuture
 
 open class RemoteDB(
@@ -19,67 +11,68 @@ open class RemoteDB(
 ) : IRemoteStorage {
 
     private lateinit var rootRef: DatabaseReference
-    private lateinit var usersProfilesRef: DatabaseReference
+    private lateinit var usersRootRef: DatabaseReference
 
     init {
         if (db != null) {
             rootRef = db.getReference()
-            usersProfilesRef = db.getReference(DB_USERS_PROFILES_PATH)
+            usersRootRef = db.getReference(DB_USERS_PROFILES_PATH)
         }
     }
 
     override fun getUserWithId(userId: Long): CompletableFuture<User> {
         val future = CompletableFuture<User>()
-        usersProfilesRef.child(userId.toString()).get().addOnSuccessListener {
-            val user = it.getValue<User>()
-            future.complete(user)
-        }.addOnFailureListener {
-            future.completeExceptionally(it)
-        }
+
+        usersRootRef.child(userId.toString()).get().addOnSuccessListener { userRef ->
+            future.complete(userRef.value as User)
+        }.addOnFailureListener(future::completeExceptionally)
+
         return future
     }
 
     override fun getAllUsers(): CompletableFuture<List<User>> {
-        val future = CompletableFuture<List<User>>()
-        val usersFound = ArrayList<User>()
+        val usersPromise = CompletableFuture<List<User>>()
 
-        val allIds = CompletableFuture.completedFuture(listOf(0, 1, 2)) // TODO: fetch real ids
-        allIds.whenComplete { ids, error ->
-            if (allIds.isCompletedExceptionally) {
-                future.completeExceptionally(error)
-            } else {
-                for (id in ids) {
-                    usersProfilesRef.child(id.toString()).get().addOnSuccessListener {
-                        usersFound.add(it.value as User)
-                        if (usersFound.size == ids.size)
-                            future.complete(usersFound)
-                    }.addOnFailureListener {
-                        future.completeExceptionally(it)
-                    }
-                }
+        usersRootRef.get().addOnSuccessListener{ usersRef ->
+            val users = ArrayList<User>()
+            for (child in usersRef.children) {
+                users.add(child.value as User)
             }
-        }
+            usersPromise.complete(users)
+        }.addOnFailureListener(usersPromise::completeExceptionally)
 
-        return future
+        return usersPromise
+    }
+
+    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
+        val usersIdsPromise = CompletableFuture<List<Long>>()
+
+        usersRootRef.get().addOnSuccessListener{ usersRef ->
+            val ids = ArrayList<Long>()
+            for (child in usersRef.children) {
+                ids.add(child.key?.toLong() ?: -1)
+            }
+            usersIdsPromise.complete(ids)
+        }.addOnFailureListener(usersIdsPromise::completeExceptionally)
+
+        return usersIdsPromise
     }
 
     override fun registerUser(user: User): CompletableFuture<Boolean> {
-        val future = CompletableFuture<Boolean>()
-        val userId = user.id
+        return getAllUsersIds().thenCompose { allIds ->
+            val registerPromise = CompletableFuture<Boolean>()
 
-        val ids = listOf<Long>() // TODO fetch on database
-        if (ids.contains(userId)) {
-                future.completeExceptionally(throw IllegalAccessError("You cannot register two times a single account"))
+            if (allIds.contains(user.id)) {
+                registerPromise.completeExceptionally(
+                    IllegalAccessError("You cannot register two times a single account"))
             } else {
-                val extendedIds = ArrayList(ids)
-                extendedIds.add(userId)
-                usersProfilesRef.child("$userId").setValue(user).addOnSuccessListener {
-                    rootRef.child("$DB_ALL_USERS_ID_PATH/$userId").setValue(extendedIds).addOnSuccessListener {
-                    } .addOnFailureListener {future.completeExceptionally(it)}
-                }.addOnFailureListener{future.completeExceptionally(it)}
+                usersRootRef.child(user.id.toString()).setValue(user).addOnSuccessListener {
+                    registerPromise.complete(true)
+                }.addOnFailureListener(registerPromise::completeExceptionally)
             }
 
-        return future
+            registerPromise
+        }
     }
 
     fun getUnderlyingDB(): FirebaseDatabase{
@@ -87,7 +80,20 @@ open class RemoteDB(
     }
 
     override fun updateUser(user: User): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")
+        return getAllUsersIds().thenCompose { allIds ->
+            val registerPromise = CompletableFuture<Boolean>()
+
+            if (!allIds.contains(user.id)) {
+                registerPromise.completeExceptionally(
+                    IllegalAccessError("Tries to update a user not registered yet"))
+            } else {
+                usersRootRef.child(user.id.toString()).setValue(user).addOnSuccessListener {
+                    registerPromise.complete(true)
+                }.addOnFailureListener(registerPromise::completeExceptionally)
+            }
+
+            registerPromise
+        }
     }
 
     companion object InvalidRemoteDB: RemoteDB(null) {
@@ -96,6 +102,18 @@ open class RemoteDB(
         }
 
         override fun getAllUsers(): CompletableFuture<List<User>> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun getAllUsersIds(): CompletableFuture<List<Long>> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun registerUser(user: User): CompletableFuture<Boolean> {
+            throw IllegalAccessError("This RemoteDB is invalid")
+        }
+
+        override fun updateUser(user: User): CompletableFuture<Boolean> {
             throw IllegalAccessError("This RemoteDB is invalid")
         }
     }
