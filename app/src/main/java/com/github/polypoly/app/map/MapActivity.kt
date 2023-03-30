@@ -1,9 +1,12 @@
 package com.github.polypoly.app.map
 
 import android.content.Context
-import android.graphics.*
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory.decodeResource
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
@@ -14,20 +17,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
+import com.github.polypoly.app.game.Localization
 import com.github.polypoly.app.map.LocalizationRepository.getZones
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import org.osmdroid.config.Configuration
@@ -56,6 +63,15 @@ class MapActivity : ComponentActivity() {
     private val initialZoom = 18.0
     private val markerSideLength = 100
 
+    private val markerToLocalization = mutableMapOf<Marker, Localization>()
+
+    // flag to show the dialog
+    val showDialog = mutableStateOf(false)
+    lateinit var currentMarker: Marker
+
+    // store the map view for testing purposes
+    lateinit var mapView: MapView private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -66,6 +82,7 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     DistanceWalkedUIComponents()
+                    BuyBuildingUIComponent()
                 }
             }
         }
@@ -83,11 +100,18 @@ class MapActivity : ComponentActivity() {
 
             for (zone in getZones())
                 zone.localizations
-                    .forEach { addMarkerTo(mapView, it.position, it.name, zone.color) }
+                    .forEach {
+                        markerToLocalization[addMarkerTo(
+                            mapView,
+                            it.position,
+                            it.name,
+                            zone.color
+                        )] = it
+                    }
 
             val currentLocationOverlay = initLocationOverlay(mapView)
             mapView.overlays.add(currentLocationOverlay)
-
+            this.mapView = mapView
             mapView
         }, modifier = Modifier.testTag("map"))
     }
@@ -117,7 +141,165 @@ class MapActivity : ComponentActivity() {
                 Text(
                     text = "Distance walked: ${formattedDistance(mapViewModel.distanceWalked.value)}",
                     color = Color.Black,
-                    modifier = Modifier.padding(8.dp).testTag("distanceWalked")
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .testTag("distanceWalked")
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun BuyBuildingUIComponent() {
+        val showBuyDialog = remember { mutableStateOf(false) }
+
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                modifier = Modifier.testTag("buildingInfoDialog"),
+                title = {
+                    Row {
+                        Text(text = markerToLocalization[currentMarker]?.name ?: "Unknown")
+                        Spacer(modifier = Modifier.weight(0.5f))
+                        Text(text = "Base price: ${markerToLocalization[currentMarker]?.basePrice}")
+                    }
+                },
+                text = {
+                    Text(text = "This is some trivia related to the building and or some info related to it.")
+                },
+                buttons = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = { showBuyDialog.value = true },
+                            modifier = Modifier.testTag("betButton")
+                        ) {
+                            Text(text = "Bet")
+                        }
+                        Button(
+                            onClick = { showDialog.value = false },
+                            modifier = Modifier.testTag("closeButton")
+                        ) {
+                            Text(text = "Close")
+                        }
+                    }
+                }
+            )
+        }
+
+        if (showBuyDialog.value) {
+            BetDialog(onBuy = { amount ->
+                // TODO: Handle the buy action with the entered amount here
+                showBuyDialog.value = false
+            }, onClose = {
+                showBuyDialog.value = false
+            })
+        }
+    }
+
+    @Composable
+    fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit) {
+        val inputPrice = remember { mutableStateOf("") }
+        val minBet = markerToLocalization[currentMarker]?.basePrice!!
+        val showError = remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = {
+                Text(text = "Enter your bet")
+            },
+            modifier = Modifier.testTag("betDialog"),
+            text = {
+                BetDialogBody(
+                    inputPrice = inputPrice,
+                    showError = showError
+                )
+            },
+            buttons = {
+                BetDialogButtons(
+                    onBuy = onBuy,
+                    onClose = onClose,
+                    inputPrice = inputPrice,
+                    minBet = minBet,
+                    showError = showError
+                )
+            }
+        )
+    }
+
+    @Composable
+    private fun BetDialogBody(
+        inputPrice: MutableState<String>,
+        showError: MutableState<Boolean>
+    ) {
+        Column {
+            TextField(
+                value = inputPrice.value,
+                onValueChange = { newValue -> inputPrice.value = newValue },
+                placeholder = { Text(text = "Enter amount") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("betInput")
+            )
+            if (showError.value) {
+                Text(
+                    text = "You cannot bet less than the base price!",
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .testTag("betErrorMessage")
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BetDialogButtons(
+        onBuy: (Float) -> Unit,
+        onClose: () -> Unit,
+        inputPrice: MutableState<String>,
+        minBet: Int,
+        showError: MutableState<Boolean>
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = {
+                    val amount = inputPrice.value.toFloatOrNull()
+                    if (amount != null && amount >= minBet) {
+                        onBuy(amount)
+                    } else {
+                        showError.value = true
+                    }
+                }
+            ) {
+                Text(
+                    text = "Confirm",
+                    modifier = Modifier.testTag("confirmBetButton")
+                )
+            }
+
+            Button(
+                onClick = onClose
+            ) {
+                Text(
+                    text = "Close",
+                    modifier = Modifier.testTag("closeBetButton")
                 )
             }
         }
@@ -137,14 +319,25 @@ class MapActivity : ComponentActivity() {
         return mapView
     }
 
-    private fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int) {
+    private fun addMarkerTo(
+        mapView: MapView,
+        position: GeoPoint,
+        title: String,
+        zoneColor: Int
+    ): Marker {
         val marker = Marker(mapView)
         marker.position = position
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         marker.title = title
         marker.isDraggable = false
         marker.icon = buildMarkerIcon(mapView.context, zoneColor)
+        marker.setOnMarkerClickListener { _, _ ->
+            currentMarker = marker
+            showDialog.value = true
+            true
+        }
         mapView.overlays.add(marker)
+        return marker
     }
 
     private fun buildMarkerIcon(context: Context, color: Int): Drawable {
@@ -225,6 +418,7 @@ class MapActivity : ComponentActivity() {
             ) {
                 MapView()
                 DistanceWalkedUIComponents()
+                BuyBuildingUIComponent()
             }
         }
     }
