@@ -2,6 +2,7 @@ package com.github.polypoly.app.network
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.github.polypoly.app.game.GameLobby
 import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
@@ -40,6 +41,26 @@ class FakeRemoteStorage : IRemoteStorage {
 
     override fun registerUser(user: User): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(false)
+    }
+
+    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllGameLobbies(): Future<List<GameLobby>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllGameLobbiesCodes(): Future<List<String>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
+        TODO("Not yet implemented")
     }
 
     companion object {

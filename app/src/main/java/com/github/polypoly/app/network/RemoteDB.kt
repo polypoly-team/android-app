@@ -1,6 +1,7 @@
 package com.github.polypoly.app.network
 
 import android.util.Log
+import com.github.polypoly.app.game.GameLobby
 import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.global.Settings.Companion.DB_ALL_USERS_ID_PATH
@@ -13,6 +14,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 open class RemoteDB(
     private val db: FirebaseDatabase?
@@ -82,12 +84,32 @@ open class RemoteDB(
         return future
     }
 
-    fun getUnderlyingDB(): FirebaseDatabase{
-        return db!!
-    }
-
     override fun updateUser(user: User): CompletableFuture<Boolean> {
         throw UnsupportedOperationException("Not implemented yet")
+    }
+
+    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllGameLobbies(): Future<List<GameLobby>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllGameLobbiesCodes(): Future<List<String>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    fun getUnderlyingDB(): FirebaseDatabase{
+        return db!!
     }
 
     companion object InvalidRemoteDB: RemoteDB(null) {
