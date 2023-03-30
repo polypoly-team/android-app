@@ -5,7 +5,6 @@ import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -43,7 +42,7 @@ class RemoteDBTest {
         }.addOnFailureListener { setTimeout.completeExceptionally(it) }
         setTimeout.get(5, TimeUnit.SECONDS)
 
-        val retrieveTimeout = GlobalInstances.remoteDB.getUserProfileWithId(testUserId)
+        val retrieveTimeout = GlobalInstances.remoteDB.getUserWithId(testUserId)
         retrieveTimeout.get(5, TimeUnit.SECONDS)
         val userFound = retrieveTimeout.get()
 

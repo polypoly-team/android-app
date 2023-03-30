@@ -23,37 +23,14 @@ class FakeRemoteStorage : IRemoteStorage {
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun getUserProfileWithId(userId: Long): CompletableFuture<User> {
+    override fun getUserWithId(userId: Long): CompletableFuture<User> {
         return CompletableFuture.completedFuture(user)
     }
 
-    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-        throw UnsupportedOperationException("Not implemented yet")
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun setUserProfileWithId(userId: Long, user: User) {
+    override fun updateUser(user: User): CompletableFuture<Boolean> {
         this.user = user
-    }
-
-    override fun setUserName(userId: Long, name: String): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")
-    }
-
-    override fun setUserBio(userId: Long, bio: String): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")
-    }
-
-    override fun setUserSkin(userId: Long, skin: Skin): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")
-    }
-
-    override fun <T> setUserStat(
-        userId: Long,
-        statName: String,
-        stat: T
-    ): CompletableFuture<Boolean> {
-        throw UnsupportedOperationException("Not implemented yet")
+        return CompletableFuture.completedFuture(true)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -61,7 +38,7 @@ class FakeRemoteStorage : IRemoteStorage {
         return CompletableFuture.completedFuture(listOf<User>(user))
     }
 
-    override fun addUser(userId: Long, user: User): CompletableFuture<Boolean> {
+    override fun registerUser(user: User): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(false)
     }
 

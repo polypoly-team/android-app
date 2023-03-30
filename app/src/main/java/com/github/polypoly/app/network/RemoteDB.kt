@@ -28,7 +28,7 @@ open class RemoteDB(
         }
     }
 
-    override fun getUserProfileWithId(userId: Long): CompletableFuture<User> {
+    override fun getUserWithId(userId: Long): CompletableFuture<User> {
         val future = CompletableFuture<User>()
         usersProfilesRef.child(userId.toString()).get().addOnSuccessListener {
             val user = it.getValue<User>()
@@ -39,21 +39,11 @@ open class RemoteDB(
         return future
     }
 
-    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-        val future: CompletableFuture<List<Long>> = CompletableFuture<List<Long>>()
-        rootRef.child(DB_ALL_USERS_ID_PATH).get().addOnSuccessListener {
-            future.complete(it.getValue<List<Long>>())
-        }.addOnFailureListener {
-            future.completeExceptionally(it)
-        }
-        return future
-    }
-
     override fun getAllUsers(): CompletableFuture<List<User>> {
         val future = CompletableFuture<List<User>>()
         val usersFound = ArrayList<User>()
 
-        val allIds = getAllUsersIds()
+        val allIds = CompletableFuture.completedFuture(listOf(0, 1, 2)) // TODO: fetch real ids
         allIds.whenComplete { ids, error ->
             if (allIds.isCompletedExceptionally) {
                 future.completeExceptionally(error)
@@ -73,9 +63,9 @@ open class RemoteDB(
         return future
     }
 
-    override fun addUser(userId: Long, user: User): CompletableFuture<Boolean> {
+    override fun registerUser(user: User): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
-        val id = userId.toString()
+        val userId = user.id
 
         val ids = listOf<Long>() // TODO fetch on database
         if (ids.contains(userId)) {
@@ -92,71 +82,20 @@ open class RemoteDB(
         return future
     }
 
-    private fun <T>setUserData(userId: Long, dataName: String, data: T): CompletableFuture<Boolean> {
-        val future = CompletableFuture<Boolean>()
-        val userProfileRef = usersProfilesRef.child(userId.toString())
-        userProfileRef.get().addOnSuccessListener {
-            userProfileRef.child(dataName).setValue(data).addOnSuccessListener {
-                future.complete(true)
-            }.addOnFailureListener {
-                future.completeExceptionally(it)
-            }
-        }.addOnFailureListener {
-            future.completeExceptionally(it)
-        }
-        return future
-    }
-
     fun getUnderlyingDB(): FirebaseDatabase{
         return db!!
     }
 
-    override fun setUserProfileWithId(userId: Long, user: User) {
+    override fun updateUser(user: User): CompletableFuture<Boolean> {
         throw UnsupportedOperationException("Not implemented yet")
     }
 
-    override fun setUserName(userId: Long, name: String): CompletableFuture<Boolean> {
-        return setUserData(userId, DB_USER_NAME_DIRECTORY, name)
-    }
-
-    override fun setUserBio(userId: Long, bio: String): CompletableFuture<Boolean> {
-        return setUserData(userId, DB_USER_BIO_DIRECTORY, bio)
-    }
-
-    override fun setUserSkin(userId: Long, skin: Skin): CompletableFuture<Boolean> {
-        return setUserData(userId, DB_USER_SKIN_DIRECTORY, skin)
-    }
-
-    override fun <T>setUserStat(userId: Long, statName: String, stat: T): CompletableFuture<Boolean> {
-        return setUserData(userId, "$DB_USER_STATS_DIRECTORY/$statName", stat)
-    }
-
     companion object InvalidRemoteDB: RemoteDB(null) {
-        override fun getUserProfileWithId(userId: Long): CompletableFuture<User> {
+        override fun getUserWithId(userId: Long): CompletableFuture<User> {
             throw IllegalAccessError("This RemoteDB is invalid")
         }
 
         override fun getAllUsers(): CompletableFuture<List<User>> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun addUser(userId: Long, user: User): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun setUserName(userId: Long, name: String): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun setUserBio(userId: Long, bio: String): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun setUserSkin(userId: Long, skin: Skin): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun <T>setUserStat(userId: Long, statName: String, stat: T): CompletableFuture<Boolean> {
             throw IllegalAccessError("This RemoteDB is invalid")
         }
     }
