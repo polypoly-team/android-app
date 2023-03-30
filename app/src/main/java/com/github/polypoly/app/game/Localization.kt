@@ -15,14 +15,9 @@ class Zone(
 
 /**
     An enum class representing the different levels of a [Localization].
-    @property EMPTY the lowest level of a [Localization], when it is not yet owned.
-    @property STUDY_ROOM a level of a [Localization], when it has been acquired by the player.
-    @property AMPHITHEATER a level of a [Localization], when it has been upgraded once.
-    @property ARENA a level of a [Localization], when it has been upgraded twice.
-    @property STADIUM the highest level of a [Localization], when it has been upgraded thrice.
  */
 enum class LocalizationLevel {
-    EMPTY, STUDY_ROOM, AMPHITHEATER, ARENA, STADIUM
+    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_MAX
 }
 
 /**
