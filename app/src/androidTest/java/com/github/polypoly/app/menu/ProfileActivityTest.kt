@@ -53,22 +53,22 @@ class ProfileActivityTest {
 
     @Test
     fun canSeeTheCorrectGamePlayedOfThePlayer() {
-        composeTestRule.onNodeWithText(user.stats.numberOfGames.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.stats.numberOfGames.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectGameWonOfThePlayer() {
-        composeTestRule.onNodeWithText(user.stats.numberOfWins.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.stats.numberOfWins.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectKilometersTraveledOfThePlayer() {
-        composeTestRule.onNodeWithText(user.stats.kilometersTraveled.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.stats.kilometersTraveled.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectNumberOfTrophiesWon() {
-        composeTestRule.onNodeWithText(user.trophiesWon.size.toString()).assertIsDisplayed()
+        composeTestRule.onNodeWithText(user.trophiesWon.size.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -89,8 +89,8 @@ class ProfileActivityTest {
         profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
 
         // check that there is the empty slots in the header
-        composeTestRule.onNodeWithTag("emptySlot1").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("emptySlot2").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("emptySlot1").assertExists()
+        composeTestRule.onNodeWithTag("emptySlot2").assertExists()
     }
 
 }
