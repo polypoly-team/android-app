@@ -82,7 +82,7 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     DistanceWalkedUIComponents()
-                    BuyBuildingUIComponent()
+                    BuildingInfoUIComponent()
                 }
             }
         }
@@ -150,7 +150,7 @@ class MapActivity : ComponentActivity() {
     }
 
     @Composable
-    fun BuyBuildingUIComponent() {
+    fun BuildingInfoUIComponent() {
         val showBuyDialog = remember { mutableStateOf(false) }
 
         if (showDialog.value) {
@@ -168,33 +168,13 @@ class MapActivity : ComponentActivity() {
                     Text(text = "This is some trivia related to the building and or some info related to it.")
                 },
                 buttons = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Button(
-                            onClick = { showBuyDialog.value = true },
-                            modifier = Modifier.testTag("betButton")
-                        ) {
-                            Text(text = "Bet")
-                        }
-                        Button(
-                            onClick = { showDialog.value = false },
-                            modifier = Modifier.testTag("closeButton")
-                        ) {
-                            Text(text = "Close")
-                        }
-                    }
+                    BuildingInfoButtons(showBuyDialog)
                 }
             )
         }
-
         if (showBuyDialog.value) {
             BetDialog(onBuy = { amount ->
-                // TODO: Handle the buy action with the entered amount here
-                showBuyDialog.value = false
+                showBuyDialog.value = false // TODO: Handle the buy action with the entered amount here
             }, onClose = {
                 showBuyDialog.value = false
             })
@@ -202,9 +182,31 @@ class MapActivity : ComponentActivity() {
     }
 
     @Composable
+    private fun BuildingInfoButtons(showBuyDialog: MutableState<Boolean>) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = { showBuyDialog.value = true },
+                modifier = Modifier.testTag("betButton")
+            ) {
+                Text(text = "Bet")
+            }
+            Button(
+                onClick = { showDialog.value = false },
+                modifier = Modifier.testTag("closeButton")
+            ) {
+                Text(text = "Close")
+            }
+        }
+    }
+
+    @Composable
     fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit) {
         val inputPrice = remember { mutableStateOf("") }
-        val minBet = markerToLocalization[currentMarker]?.basePrice!!
         val showError = remember { mutableStateOf(false) }
 
         AlertDialog(
@@ -224,7 +226,6 @@ class MapActivity : ComponentActivity() {
                     onBuy = onBuy,
                     onClose = onClose,
                     inputPrice = inputPrice,
-                    minBet = minBet,
                     showError = showError
                 )
             }
@@ -269,9 +270,9 @@ class MapActivity : ComponentActivity() {
         onBuy: (Float) -> Unit,
         onClose: () -> Unit,
         inputPrice: MutableState<String>,
-        minBet: Int,
         showError: MutableState<Boolean>
     ) {
+        val minBet = markerToLocalization[currentMarker]?.basePrice!!
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -418,7 +419,7 @@ class MapActivity : ComponentActivity() {
             ) {
                 MapView()
                 DistanceWalkedUIComponents()
-                BuyBuildingUIComponent()
+                BuildingInfoUIComponent()
             }
         }
     }

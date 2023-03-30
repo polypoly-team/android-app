@@ -11,3 +11,6 @@ checks:
     enabled: false
   identical-code:
     enabled: false
+  file-lines:
+    config:
+      threshold: 500
