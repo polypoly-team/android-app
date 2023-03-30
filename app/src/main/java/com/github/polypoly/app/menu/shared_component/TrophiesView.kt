@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Trophy
 import com.github.polypoly.app.game.user.User
@@ -59,7 +60,8 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
             .background(
                 color = Color.White.copy(alpha = if (selected) 0f else 0.6f))
             .size(TROPHY_SIZE.dp)
-            .clickable(onClick = if(disable) {{}} else onClick),
+            .clickable(onClick = if(disable) {{}} else onClick)
+            .testTag("Trophy${trophy.getId()}"),
         contentAlignment = Alignment.Center,
     ) {
         if (won)

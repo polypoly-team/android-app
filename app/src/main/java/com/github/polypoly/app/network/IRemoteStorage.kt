@@ -15,3 +15,8 @@ interface IRemoteStorage {
      */
     fun addUser(userId: Long): Future<Boolean>
 }
+
+enum class StorageType {
+    FIREBASE,
+    TEST
+}

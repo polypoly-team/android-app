@@ -100,45 +100,20 @@ class ProfileModifyingActivityTest {
     @Test
     fun cantValidateTheProfileIfThePlayerGiveAnEmptyNickName() {
 
-    }
+        Intents.init()
 
-    @Test
-    fun seeAnErrorMessageIfThePlayerGiveAnEmptyNickName() {
+        // An intent with a name is sent to the activity
+        val testIntent =
+            Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
+        testIntent.putExtra("n kqnd", 1)
+        ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
 
-    }
+        nicknameText.performTextReplacement("")
 
-    @Test
-    fun canSelectANewTrophiesToDisplay() {
+        // Clicking on button
+        button.performClick()
+        Intents.intended(IntentMatchers.hasComponent(ProfileModifyingActivity::class.java.name))
 
-    }
-
-    @Test
-    fun aTrophyIsDeselectIfTheUserSelectANewOneAndThereAreAlreadyThreeSelected() {
-
-    }
-
-    @Test
-    fun canWriteMoreThan15CharactersInTheNicknameField() {
-
-    }
-
-    @Test
-    fun canWriteMoreThan130CharactersInTheDescriptionField() {
-
-    }
-
-    @Test
-    fun canWriteMoreThan4LineReturnsInTheDescriptionField() {
-
-    }
-
-    @Test
-    fun allTheTrophiesAreDeselectedWhenTheClearButtonIsPressed() {
-
-    }
-
-    @Test
-    fun validateProfileButtonChangeTheTrophiesDisplayed() {
-
+        Intents.release()
     }
 }

@@ -24,6 +24,10 @@ data class Trophy(
     fun getIcon(): ImageVector {
         return icon
     }
+
+    fun getId(): Int {
+        return id
+    }
 }
 
 /**
@@ -45,7 +49,4 @@ val allTrophies: List<Trophy> = listOf(
     Trophy(12, title = "trophy 12", description = "description 12", icon = Icons.Default.Person),
     Trophy(13, title = "trophy 13", description = "description 13", icon = Icons.Default.Person),
     Trophy(14, title = "trophy 14", description = "description 14", icon = Icons.Default.Person),
-    Trophy(15, title = "trophy 15", description = "description 15", icon = Icons.Default.Person),
-    Trophy(16, title = "trophy 16", description = "description 16", icon = Icons.Default.Person),
-    Trophy(17, title = "trophy 17", description = "description 17", icon = Icons.Default.Person),
 )

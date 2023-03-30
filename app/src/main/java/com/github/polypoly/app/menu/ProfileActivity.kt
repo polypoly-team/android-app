@@ -33,12 +33,14 @@ import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.menu.shared_component.TrophyView
 import com.github.polypoly.app.network.FakeRemoteStorage
+import com.github.polypoly.app.network.StorageType
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : ComponentActivity() {
 
     //ONLY TO TEST WITHOUT THE DATABASE
-    private val userId: Long = 1
+    private var userId: Long = 1
+    private val storageId = StorageType.TEST
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +64,11 @@ class ProfileActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ProfileAndStats() {
-        val user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
+        val user: User
+        when(storageId) {
+            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
+            StorageType.FIREBASE -> throw NotImplementedError()
+        }
 
         var profileHeight by remember { mutableStateOf(340.dp) }
         val localDensity = LocalDensity.current
@@ -81,7 +87,8 @@ class ProfileActivity : ComponentActivity() {
             }
             Surface(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                    profileHeight = with(localDensity) { coordinates.size.height.toDp() } },
+                    profileHeight = with(localDensity) { coordinates.size.height.toDp() } }
+                    .testTag("profileSurface"),
                 elevation = 8.dp,
                 color = MaterialTheme.colors.background
             ) {
@@ -158,7 +165,8 @@ class ProfileActivity : ComponentActivity() {
                     contentScale = ContentScale.FillHeight
                 )
                 .background(color = Color.Black.copy(alpha = 0.4f))
-                .padding(all = 30.dp),
+                .padding(all = 30.dp)
+                .testTag("statisticsAndTrophies"),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -358,7 +366,8 @@ class ProfileActivity : ComponentActivity() {
                     .background(
                         color = MaterialTheme.colors.secondaryVariant
                     )
-                    .size(50.dp),
+                    .size(50.dp)
+                    .testTag("emptySlot$idxSlot"),
                 contentAlignment = Alignment.Center,
             ){}
         }
