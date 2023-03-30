@@ -7,15 +7,13 @@ import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.github.polypoly.app.game.PlayerGlobalData
@@ -74,7 +73,7 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     LocationLogic()
-                    Hud(PlayerGlobalData(false, 420), 16)
+                    Hud(PlayerGlobalData(false, 420), listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),16)
                 }
             }
         }
@@ -163,6 +162,181 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
+     * The heads-up display with player and game stats that is displayed on top of the map
+     */
+    @Composable
+    fun Hud(playerData: PlayerGlobalData, otherPlayersData: List<PlayerGlobalData>, round: Int) {
+        HudPlayer(playerData)
+        HudOtherPlayersAndGame(otherPlayersData, round)
+    }
+
+    /**
+     * The HUD for the player stats
+     */
+    @Composable
+    fun HudPlayer(playerData: PlayerGlobalData) {
+        var openPlayerInfo by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                    .align(Alignment.BottomStart)
+            ) {
+                Row(Modifier.padding(Padding.medium)) {
+                    HudButton(
+                        name = "playerInfoButton",
+                        onClick = { openPlayerInfo = true },
+                        icon_id = R.drawable.tmp_happysmile,
+                        description = "See player information"
+                    )
+                    Column(Modifier.padding(Padding.medium)) {
+                        HudText("playerBalance", "${playerData.balance} $")
+                    }
+                }
+            }
+        }
+
+        if (openPlayerInfo) {
+            Dialog(
+                onDismissRequest = { openPlayerInfo = false },
+            ) {
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    shape = Shapes.medium,
+                    modifier = Modifier
+                        .padding(Padding.medium)
+                        .fillMaxWidth()
+                ) {
+                    // TODO: Add information about the player
+                    Text(text = "Player info")
+                }
+            }
+        }
+    }
+
+    /**
+     * The HUD that shows the stats for other players and the game
+     */
+    @Composable
+    fun HudOtherPlayersAndGame(otherPlayersData: List<PlayerGlobalData>, round: Int) {
+        var isExpanded by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .align(Alignment.TopStart)
+            ) {
+                Column(Modifier.padding(Padding.medium)) {
+                    // A drop down button that expands and collapses the stats for other players and the game
+                    ToggleIconButton(
+                        "dropDownButton",
+                        "Expand or collapse the stats for other players and the game",
+                        { isExpanded = !isExpanded },
+                        isExpanded,
+                        R.drawable.tmp_happysmile,
+                        R.drawable.tmp_happysmile
+                    )
+
+                    // The stats for other players and the game slide in and out when the drop down button is pressed
+                    AnimatedVisibility(
+                        visible = isExpanded,
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colors.background,
+                            shape = Shapes.medium,
+                            modifier = Modifier
+                                .padding(Padding.medium)
+                        ) {
+                            Column(Modifier.padding(Padding.medium)) {
+                                HudGame(round)
+                                otherPlayersData.forEach {
+                                    HudOtherPlayer(it)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The HUD for the game stats
+     */
+    @Composable
+    fun HudGame(round: Int) {
+        var openGameInfo by remember { mutableStateOf(false) }
+
+        Row(Modifier.padding(Padding.medium)) {
+            HudButton(
+                name = "gameInfoButton",
+                onClick = { openGameInfo = true },
+                icon_id = R.drawable.tmp_happysmile,
+                description = "See game information"
+            )
+            Column(Modifier.padding(Padding.medium)) {
+                HudText("gameRound", text = "Round $round")
+            }
+        }
+
+        if (openGameInfo) {
+            Dialog(
+                onDismissRequest = { openGameInfo = false },
+            ) {
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    shape = Shapes.medium,
+                    modifier = Modifier
+                        .padding(Padding.medium)
+                        .fillMaxWidth()
+                ) {
+                    // TODO: Add information about the game
+                    Text(text = "Game info")
+                }
+            }
+        }
+    }
+
+    /**
+     * The HUD for the stats of other players
+     */
+    @Composable
+    fun HudOtherPlayer(playerData: PlayerGlobalData) {
+        var openOtherPlayerInfo by remember { mutableStateOf(false) }
+        Row(Modifier.padding(Padding.medium)) {
+            HudButton(
+                name = "otherPlayerInfoButton",
+                onClick = { openOtherPlayerInfo = true },
+                icon_id = R.drawable.tmp_happysmile,
+                description = "See other player information"
+            )
+            Column(Modifier.padding(Padding.medium)) {
+                HudText("playerBalance", "${playerData.balance} $")
+            }
+        }
+
+        if (openOtherPlayerInfo) {
+            Dialog(
+                onDismissRequest = { openOtherPlayerInfo = false },
+            ) {
+                Surface(
+                    color = MaterialTheme.colors.background,
+                    shape = Shapes.medium,
+                    modifier = Modifier
+                        .padding(Padding.medium)
+                        .fillMaxWidth()
+                ) {
+                    // TODO: Add information about other players
+                    Text(text = "Other player info")
+                }
+            }
+        }
+    }
+
+    /**
      * A button that is used in the HUD
      */
     @Composable
@@ -170,15 +344,13 @@ class MapActivity : ComponentActivity() {
         Button(
             onClick = onClick,
             modifier = Modifier
-                .size(70.dp)
                 .semantics { contentDescription = description }
                 .testTag(name),
-            shape = Shapes.medium,
-            contentPadding = PaddingValues(0.dp)
+            shape = CircleShape,
         ) {
             Image(
                 painter = painterResource(icon_id),
-                contentDescription = "",
+                contentDescription = description,
                 modifier = Modifier.size(50.dp)
             )
         }
@@ -199,27 +371,31 @@ class MapActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * A button whose icon changes depending on a toggle
+     */
     @Composable
-    fun Hud(data: PlayerGlobalData, round: Int) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                    .align(Alignment.TopStart)
-            ) {
-                Row(Modifier.padding(Padding.medium)) {
-                    HudButton(
-                        name = "gameInfoButton",
-                        onClick = { /* TODO: Add a toast that shows the full game information */ },
-                        icon_id = R.drawable.tmp_happysmile,
-                        description = "See full game information"
-                    )
-                    Column(Modifier.padding(Padding.medium)) {
-                        HudText("playerBalance", "${data.balance} $")
-                        HudText("gameRound", text = "Round $round")
-                    }
-                }
+    fun ToggleIconButton(name: String, description: String, onClick: () -> Unit, toggle: Boolean, onIcon: Int, offIcon: Int) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .semantics { contentDescription = description }
+                .testTag(name),
+            shape = CircleShape,
+        )
+        {
+            if (toggle) {
+                Image(
+                    painter = painterResource(onIcon),
+                    contentDescription = "Expand",
+                    modifier = Modifier.size(50.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(offIcon),
+                    contentDescription = "Collapse",
+                    modifier = Modifier.size(50.dp)
+                )
             }
         }
     }
