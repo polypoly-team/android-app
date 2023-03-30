@@ -100,7 +100,7 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 // Join button
                 GameButton(onClick = {
-                    val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
+                    val joinGroupIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))

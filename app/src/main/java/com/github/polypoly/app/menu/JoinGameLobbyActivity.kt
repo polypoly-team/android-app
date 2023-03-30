@@ -2,7 +2,6 @@ package com.github.polypoly.app.menu
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,18 +28,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.*
+import com.github.polypoly.app.game.GameLobby
+import com.github.polypoly.app.game.Skin
+import com.github.polypoly.app.game.Stats
+import com.github.polypoly.app.game.User
+import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import kotlin.time.Duration.Companion.hours
 
-class JoinGroupActivity : ComponentActivity() {
+/**
+ * Activity where the user can join a gameLobby
+ */
+class JoinGameLobbyActivity : ComponentActivity() {
 
     /**
      * The attributes of the class
      */
-    private var groupCode: String = ""
+    private var gameLobbyCode: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +67,7 @@ class JoinGroupActivity : ComponentActivity() {
                                 .testTag("logo"),
                             )
                         Spacer(modifier = Modifier.height(50.dp))
-                        GroupForm()
+                        GameLobbyForm()
                     }
                 }
             }
@@ -71,11 +76,11 @@ class JoinGroupActivity : ComponentActivity() {
 
 
     /**
-     * Component where the user can write the group number. If the group number is valid,
-     * the button lets the player join the group. Otherwise, it displays a warning message.
+     * Component where the user can write the gameLobby number. If the gameLobby number is valid,
+     * the button lets the player join the gameLobby. Otherwise, it displays a warning message.
      */
     @Composable
-    fun GroupForm() {
+    fun GameLobbyForm() {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
         Row(
@@ -86,14 +91,14 @@ class JoinGroupActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                GroupTextField(15, warningState) // TODO: create a constant for the max length -> create a class for the constants
+                GameLobbyTextField(15, warningState) // TODO: create a constant for the max length -> create a class for the constants
                 Spacer(modifier = Modifier.height(10.dp))
                 RectangleButton(
                     onClick = {
-                        groupCodeButtonOnClick(warningState, mContext)
+                        gameLobbyCodeButtonOnClick(warningState, mContext)
                     }
-                    , description = getString(R.string.join_group_button_text)
-                    , testTag = "JoinGroupButton")
+                    , description = getString(R.string.join_game_lobby_button_text)
+                    , testTag = "JoinGameLobbyButton")
                 Text(
                     text = warningState.value,
                     style = MaterialTheme.typography.body2,
@@ -107,16 +112,16 @@ class JoinGroupActivity : ComponentActivity() {
                 .padding(30.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            GroupListButton()
+            GameLobbyListButton()
         }
     }
 
 
     /**
-     * This function returns the TextField where the user prompts their group code.
+     * This function returns the TextField where the user prompts their gameLobby code.
      */
     @Composable
-    fun GroupTextField(maxLength: Int, warningState : MutableState<String>) {
+    fun GameLobbyTextField(maxLength: Int, warningState : MutableState<String>) {
         val focusManager = LocalFocusManager.current
         val mContext = LocalContext.current
         var text by remember { mutableStateOf("") }
@@ -124,20 +129,20 @@ class JoinGroupActivity : ComponentActivity() {
         OutlinedTextField(
             modifier = Modifier
                 .width(200.dp)
-                .testTag("groupCodeField"),
+                .testTag("gameLobbyCodeField"),
             // When user clicks on enter button, the focus is removed and the button is clicked
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
-                groupCodeButtonOnClick(warningState, mContext)
+                gameLobbyCodeButtonOnClick(warningState, mContext)
             }),
             value = text,
-            label = { Text("Enter a group code") },
+            label = { Text("Enter a lobby code") },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
             onValueChange = { newText ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
-                groupCode = text
+                gameLobbyCode = text
             }
 
         )
@@ -146,26 +151,37 @@ class JoinGroupActivity : ComponentActivity() {
 
 
     /**
-     * This function returns the button that lets the user open the groups list.
-     * The groups list is a dialog that shows the public groups that the user can join.
-     * The groups list is refreshed every 5 seconds.
+     * This function returns the button that lets the user open the gameLobbies list.
+     * The gameLobbies list is a dialog that shows the public gameLobbies that the user can join.
+     * The gameLobbies list is refreshed every 5 seconds.
      */
     @Composable
-    fun GroupListButton() {
+    fun GameLobbyListButton() {
         var openList by remember { mutableStateOf(false) }
         var openCardIndex by remember { mutableStateOf(-1) }
 
-        var groups by remember { mutableStateOf(getPublicGroupsFromDB()) }
+        var gameLobbies by remember { mutableStateOf(getPublicGameLobbiesFromDB()) }
 
         val refreshInterval = 5000L
 
-        RectangleButton(
-            onClick = {
-                openList = true
-            },
-            description = "Show Groups",
-            testTag = "showGroupsButton"
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Text(text = "Don't have a lobby code?"
+                , style = MaterialTheme.typography.body2
+                , modifier = Modifier.testTag("noGameLobbyCodeText"))
+            RectangleButton(
+                onClick = {
+                    openList = true
+                },
+                description = "Show GameLobbies",
+                testTag = "showGameLobbiesButton"
+            )
+        }
+
 
         if (openList) {
             Dialog(
@@ -178,9 +194,9 @@ class JoinGroupActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         delay(refreshInterval)
-                        groups = getPublicGroupsFromDB()
-                        Timber.tag("GroupList")
-                            .d("Refreshing groups list")
+                        gameLobbies = getPublicGameLobbiesFromDB()
+                        Timber.tag("GameLobbyList")
+                            .d("Refreshing gameLobbies list")
                     }
                 }
 
@@ -189,23 +205,23 @@ class JoinGroupActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth(0.95f)
                         .fillMaxHeight(0.95f)
-                        .testTag("groupsList"),
+                        .testTag("gameLobbiesList"),
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {
                         item {
                             Text(
-                                text = getString(R.string.group_list_title),
+                                text = getString(R.string.game_lobby_list_title),
                                 style = MaterialTheme.typography.h4,
                             )
                             Spacer(modifier = Modifier.height(20.dp))
                         }
                         items(
-                            items = groups,
+                            items = gameLobbies,
                             itemContent = {
                                     item ->
-                                val index = groups.indexOf(item)
-                                GroupCardComponent(
-                                    group = item,
+                                val index = gameLobbies.indexOf(item)
+                                GameLobbyCardComponent(
+                                    gameLobby = item,
                                     isOpen = index == openCardIndex,
                                     onOpenChange = { open ->
                                         openCardIndex = if (open) index else -1
@@ -224,19 +240,19 @@ class JoinGroupActivity : ComponentActivity() {
 
 
     /**
-     * This function returns the group card. It contains the header and the details of the group.
-     * @param group the game that holds the name and the number of players
+     * This function returns the gameLobby card. It contains the header and the details of the gameLobby.
+     * @param gameLobby the game that holds the name and the number of players
      */
     @Composable
-    fun GroupCardComponent(
-        group: PendingGame,
+    fun GameLobbyCardComponent(
+        gameLobby: GameLobby,
         isOpen: Boolean,
         onOpenChange: (Boolean) -> Unit
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("groupCard"),
+                .testTag("gameLobbyCard"),
             elevation = 10.dp,
             shape = RoundedCornerShape(10.dp),
         ) {
@@ -245,9 +261,9 @@ class JoinGroupActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .clickable { onOpenChange(!isOpen) }
             ) {
-                GroupCardHeader(group)
+                GameLobbyCardHeader(gameLobby)
                 if (isOpen) {
-                    GroupCardDetails(group)
+                    GameLobbyCardDetails(gameLobby)
                 }
             }
         }
@@ -255,32 +271,32 @@ class JoinGroupActivity : ComponentActivity() {
 
 
     /**
-     * This function returns the header of the group card. It contains the name of the group and the number of players.
-     * @param group the game that holds the name and the number of players
+     * This function returns the header of the gameLobby card. It contains the name of the gameLobby and the number of players.
+     * @param gameLobby the game that holds the name and the number of players
      */
     @Composable
-    private fun GroupCardHeader(group: PendingGame) {
+    private fun GameLobbyCardHeader(gameLobby: GameLobby) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .testTag("groupCardHeader"),
+                .testTag("gameLobbyCardHeader"),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = group.name,
+                text = gameLobby.name,
                 style = MaterialTheme.typography.h5
             )
-            GroupCardPlayerCount(group)
+            GameLobbyCardPlayerCount(gameLobby)
         }
     }
 
     /**
-     * This function returns the number of players that are currently in the group.
-     * @param group the game that holds the number of players
+     * This function returns the number of players that are currently in the gameLobby.
+     * @param gameLobby the game that holds the number of players
      */
     @Composable
-    private fun GroupCardPlayerCount(group: PendingGame) {
+    private fun GameLobbyCardPlayerCount(gameLobby: GameLobby) {
         Row() {
             Image(
                 painter = painterResource(id = R.drawable.avatar),
@@ -291,7 +307,7 @@ class JoinGroupActivity : ComponentActivity() {
                     .padding(top = 5.dp)
             )
             Text(
-                text = "${group.usersRegistered.size}/${group.maximumNumberOfPlayers}",
+                text = "${gameLobby.usersRegistered.size}/${gameLobby.maximumNumberOfPlayers}",
                 style = MaterialTheme.typography.h5,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -299,16 +315,16 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     /**
-     * This function returns the hidden content of the group card, that un-rolls when the user clicks on the card.
-     * @param group the game that the card will contain the details of
+     * This function returns the hidden content of the gameLobby card, that un-rolls when the user clicks on the card.
+     * @param gameLobby the game that the card will contain the details of
      */
     @Composable
-    private fun GroupCardDetails(group: PendingGame) {
+    private fun GameLobbyCardDetails(gameLobby: GameLobby) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp)
-                .testTag("groupCardDetails")
+                .testTag("gameLobbyCardDetails")
         ) {
             Divider(
                 modifier = Modifier.padding(bottom = 5.dp),
@@ -323,7 +339,7 @@ class JoinGroupActivity : ComponentActivity() {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            GroupCardPlayerList(group)
+            GameLobbyCardPlayerList(gameLobby)
 
             Divider(
                 modifier = Modifier.padding(vertical = 5.dp),
@@ -331,25 +347,25 @@ class JoinGroupActivity : ComponentActivity() {
                 color = androidx.compose.ui.graphics.Color.Black
             )
 
-            GroupCardRoundDuration(group)
+            GameLobbyCardRoundDuration(gameLobby)
 
             Spacer(modifier = Modifier.height(5.dp))
 
-            GroupCardGameMode(group)
+            GameLobbyCardGameMode(gameLobby)
 
-            GroupCardJoinButton(group.code)
+            GameLobbyCardJoinButton(gameLobby.code)
         }
     }
 
     /**
-     * Creates a button to join the group
-     * @param code the code of the group to join
+     * Creates a button to join the gameLobby
+     * @param code the code of the gameLobby to join
      */
     @Composable
-    private fun GroupCardJoinButton(code: String) {
+    private fun GameLobbyCardJoinButton(code: String) {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
-        groupCode = code
+        gameLobbyCode = code
 
         Column(
             modifier = Modifier
@@ -358,9 +374,9 @@ class JoinGroupActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RectangleButton(
-                onClick = { groupCodeButtonOnClick(warningState,mContext)},
-                description = getString(R.string.join_group_button_text),
-                testTag = "joinGroupButton"
+                onClick = { gameLobbyCodeButtonOnClick(warningState,mContext)},
+                description = getString(R.string.join_game_lobby_button_text),
+                testTag = "joinGameLobbyButton"
             )
             if(warningState.value != "") {
                 Text(
@@ -376,12 +392,12 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     /**
-     * Creates a text that displays the list of players in the group.
-     * @param group the group to display the players of
+     * Creates a text that displays the list of players in the gameLobby.
+     * @param gameLobby the gameLobby to display the players of
      */
     @Composable
-    fun GroupCardPlayerList(group: PendingGame) {
-        for (player in group.usersRegistered) {
+    fun GameLobbyCardPlayerList(gameLobby: GameLobby) {
+        for (player in gameLobby.usersRegistered) {
             Row() {
                 Image(
                     painter = painterResource(id = R.drawable.tmp_happysmile),
@@ -401,10 +417,10 @@ class JoinGroupActivity : ComponentActivity() {
 
     /**
      * Creates a text that displays the round duration of the game.
-     * @param group the group to display the round duration of
+     * @param gameLobby the gameLobby to display the round duration of
      */
     @Composable
-    fun GroupCardRoundDuration(group: PendingGame) {
+    fun GameLobbyCardRoundDuration(gameLobby: GameLobby) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -415,7 +431,7 @@ class JoinGroupActivity : ComponentActivity() {
                 fontSize = 16.sp
             )
             Text(
-                text = "${group.roundDuration}",
+                text = "${gameLobby.roundDuration}",
                 style = MaterialTheme.typography.body1
             )
         }
@@ -423,10 +439,10 @@ class JoinGroupActivity : ComponentActivity() {
 
     /**
      * Creates a text that displays the game mode of the game.
-     * @param group the group to display the game mode of
+     * @param gameLobby the gameLobby to display the game mode of
      */
     @Composable
-    fun GroupCardGameMode(group: PendingGame) {
+    fun GameLobbyCardGameMode(gameLobby: GameLobby) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -437,7 +453,7 @@ class JoinGroupActivity : ComponentActivity() {
                 fontSize = 16.sp
             )
             Text(
-                text = "${group.gameMode}",
+                text = "${gameLobby.gameMode}",
                 style = MaterialTheme.typography.body1
             )
         }
@@ -463,163 +479,91 @@ class JoinGroupActivity : ComponentActivity() {
     }
 
     /**
-     * This function is called when the user clicks on the button to join a group.
-     * If the group code is empty, or the code is not in the DB, or the group is full,
+     * This function is called when the user clicks on the button to join a gameLobby.
+     * If the gameLobby code is empty, or the code is not in the DB, or the gameLobby is full,
      * it displays a warning message.
-     * Otherwise, it calls the function to join the group.
+     * Otherwise, it calls the function to join the gameLobby.
      * @param warningState (MutableState<String>): The state of the warning message
      * @param mContext (Context): The context of the activity
      * @return (String): The warning message to be displayed
      */
-    private fun groupCodeButtonOnClick(warningState: MutableState<String>, mContext: Context) {
-        return if (groupCode.isEmpty()) {
-            warningState.value = getString(R.string.group_code_is_empty)
-        } else if (!dbContainsGroupCode(groupCode)) {
-            warningState.value = getString(R.string.group_does_not_exist)
-        } else if(groupIsFull(groupCode)){
-            warningState.value = getString(R.string.group_is_full)
+    private fun gameLobbyCodeButtonOnClick(warningState: MutableState<String>, mContext: Context) {
+        return if (gameLobbyCode.isEmpty()) {
+            warningState.value = getString(R.string.game_lobby_code_is_empty)
+        } else if (!dbContainsGameLobbyCode(gameLobbyCode)) {
+            warningState.value = getString(R.string.game_lobby_does_not_exist)
+        } else if(gameLobbyIsFull(gameLobbyCode)){
+            warningState.value = getString(R.string.game_lobby_is_full)
         } else {
             warningState.value = ""
-            joinGroupRoom(mContext)
+            joinGameLobbyRoom(mContext)
         }
     }
 
     /**
-     * This function launches the group room activity and passes the group code to it.
+     * This function launches the gameLobby room activity and passes the gameLobby code to it.
      * @param mContext (Context): The context of the activity
      */
-    private fun joinGroupRoom(mContext : Context) {
-        // TODO: link to the group room activity
+    private fun joinGameLobbyRoom(mContext: Context) {
+        //TODO: clean this up when DB is really implemented
+        val gameLobby =  mockDb.getGameLobbyWithCode(gameLobbyCode).get()
+        val newGameLobby = GameLobby(gameLobby.admin, gameLobby.gameMode, gameLobby.minimumNumberOfPlayers, gameLobby.maximumNumberOfPlayers, gameLobby.roundDuration
+            , gameLobby.gameMap, gameLobby.initialPlayerBalance, gameLobby.name, gameLobby.code, gameLobby.private)
+
+        for (player in gameLobby.usersRegistered) {
+            if (player != newGameLobby.admin) {
+                newGameLobby.addUser(player)
+            }
+        }
+        newGameLobby.addUser(authenticated_user)
+        mockDb.updateGameLobby(newGameLobby)
+        // TODO: link to the gameLobby room activity
     }
 
     /**
-     * This function fetches the public groups from the database.
-     * @return (List<PendingGame>): The list of public groups
+     * This function fetches the public gameLobbys from the database.
+     * @return (List<GameLobby>): The list of public gameLobbys
      */
-    private fun getPublicGroupsFromDB(): List<PendingGame> {
-        return mockPendingGames.values.toList().filter { !it.private  && !groupIsFull(it) }
+    private fun getPublicGameLobbiesFromDB(): List<GameLobby> {
+        val gameLobbies = mockDb.getAllGameLobbies().get() ?: return listOf()
+        return gameLobbies.filter { !it.private  && !gameLobbyIsFull(it) }
     }
 
     /**
-     * This function checks if the group code is in the database.
-     * @param groupCode (String): The group code to check
-     * @return (Boolean): True if the group code is in the database, false otherwise
+     * This function checks if the gameLobby code is in the database.
+     * @param gameLobbyCode (String): The gameLobby code to check
+     * @return (Boolean): True if the gameLobby code is in the database, false otherwise
      * TODO: rewrite this function to check the real database
      */
-    private fun dbContainsGroupCode(groupCode: String): Boolean {
-        return mockPendingGames.containsKey(groupCode)
+    private fun dbContainsGameLobbyCode(gameLobbyCode: String): Boolean {
+        return mockDb.getAllGameLobbiesCodes().get()?.contains(gameLobbyCode)?: false
     }
 
     /**
-     * This function checks if the group is full.
-     * @param groupCode (String): The group code to check
-     * @return (Boolean): True if the group is full, false otherwise
+     * This function checks if the gameLobby is full.
+     * @param gameLobbyCode (String): The gameLobby code to check
+     * @return (Boolean): True if the gameLobby is full, false otherwise
      * TODO: rewrite this function to check the real database
      */
-    private fun groupIsFull(groupCode: String): Boolean {
+    private fun gameLobbyIsFull(gameLobbyCode: String): Boolean {
 
-        val pendingGame = mockPendingGames.getOrElse(groupCode) { return false }
-
-        return groupIsFull(pendingGame)
+        val gameLobby = mockDb.getGameLobbyWithCode(gameLobbyCode).get() ?: return false
+        return gameLobbyIsFull(gameLobby)
     }
 
     /**
-     * This function checks if the group is full.
-     * @param group (PendingGame): The group to check
-     * @return (Boolean): True if the group is full, false otherwise
+     * This function checks if the gameLobby is full.
+     * @param gameLobby (GameLobby): The gameLobby to check
+     * @return (Boolean): True if the gameLobby is full, false otherwise
      */
-    private fun groupIsFull(group: PendingGame): Boolean {
-        return group.usersRegistered.size >= group.maximumNumberOfPlayers
-    }
-
-
-    // ------------------- MOCKUP CODE -------------------
-    // This code is only here to show how the group room activity should be called
-    // It will be removed when the group room activity is created and the database is set up
-
-
-    // mock DB
-
-    private val code1 = "1234"
-    private val code2 = "abcd"
-    private val code3 = "123abc"
-    private val code4 = "1234abc"
-    private val code5 = "abc123"
-    private val code6 = "abc1234"
-
-    private val name1 = "Full group"
-    private val name2 = "Joinable 1"
-    private val name3 = "Joinable 2"
-    private val name4 = "Joinable 3"
-    private val name5 = "Private group"
-    private val name6 = "Joinable 4"
-
-    private val emptySkin = Skin(0, 0, 0)
-    private val zeroStats = Stats()
-    private val testUser1 = User(1, "test_user_1", "", emptySkin, zeroStats)
-    private val testUser2 = User(2, "test_user_2", "", emptySkin, zeroStats)
-    private val testUser3 = User(3, "test_user_3", "", emptySkin, zeroStats)
-    private val testUser4 = User(4, "test_user_4", "", emptySkin, zeroStats)
-    private val testUser5 = User(5, "test_user_5", "", emptySkin, zeroStats)
-
-    private val testMinNumberPlayers = 2
-    private val testMaxNumberPlayers = 5
-    private val testDuration = 2.hours
-    private val testInitialBalance = 100
-
-    private val pendingGameFull = PendingGame(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name1, code1
-    )
-    private val pendingGameJoinable1 = PendingGame(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name2, code2
-    )
-    private val pendingGameJoinable2 = PendingGame(
-        testUser1, GameMode.LAST_STANDING, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name3, code3
-    )
-    private val pendingGameJoinable3 = PendingGame(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name4, code4
-    )
-    private val pendingGamePrivate = PendingGame(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name5, code5, true
-    )
-
-    private val pendingGameJoinable4 = PendingGame(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name6, code6
-    )
-
-    private val mockPendingGames :HashMap<String, PendingGame> = hashMapOf(
-        code1 to pendingGameFull,
-        code2 to pendingGameJoinable1,
-        code3 to pendingGameJoinable2,
-        code4 to pendingGameJoinable3,
-        code5 to pendingGamePrivate
-    )
-
-    init {
-        pendingGameFull.addUser(testUser2)
-        pendingGameFull.addUser(testUser3)
-        pendingGameFull.addUser(testUser4)
-        pendingGameFull.addUser(testUser5)
-
-        pendingGameJoinable1.addUser(testUser2)
-        pendingGameJoinable1.addUser(testUser3)
-
-        pendingGameJoinable2.addUser(testUser2)
-        pendingGameJoinable2.addUser(testUser3)
-        pendingGameJoinable2.addUser(testUser4)
-
-        pendingGamePrivate.addUser(testUser2)
-        pendingGamePrivate.addUser(testUser3)
-        pendingGamePrivate.addUser(testUser4)
+    private fun gameLobbyIsFull(gameLobby: GameLobby): Boolean {
+        return gameLobby.usersRegistered.size >= gameLobby.maximumNumberOfPlayers
     }
 
 }
 
+// MOCK DATA
+private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0), Stats())
+private val mockDb = FakeRemoteStorage()
 
 

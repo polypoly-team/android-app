@@ -4,86 +4,86 @@ import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.menu.JoinGroupActivity
+import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class JoinGroupActivityTest {
+class JoinGameLobbyActivityTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<JoinGroupActivity>()
+    val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
 
     @Test
     fun launchActivity_componentsDisplayed() {
         composeTestRule.onNodeWithTag("groupCodeField").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("JoinGroupButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("logo").assertIsDisplayed()
     }
 
     @Test
-    fun inputInvalidGroupCode_displayWarningMessage() {
+    fun inputInvalidGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a group code that is not in the DB once we have the queries set
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput("polypoly")
-        composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
+        composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_does_not_exist)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_does_not_exist)).assertIsDisplayed()
     }
 
     @Test
-    fun inputEmptyGroupCode_displayWarningMessage() {
+    fun inputEmptyGameLobbyCode_displayWarningMessage() {
         // Leave the group code field empty
-        composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
+        composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a warning message is displayed
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_code_is_empty)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_code_is_empty)).assertIsDisplayed()
     }
 
     @Test
-    fun inputValidGroupCode_joinGroupRoom() {
+    fun inputValidGameLobbyCode_joinGameLobbyRoom() {
         //TODO: Check for a valid group code in the DB once we have the queries set
         val groupCode = "abcd"
         composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
-        composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
+        composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
     }
 
     @Test
-    fun inputFullGroupCode_displayWarningMessage() {
+    fun inputFullGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a valid group code that is full in the DB once we have the queries set
         val groupCode = "1234"
-        composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
-        composeTestRule.onNodeWithTag("JoinGroupButton").performClick()
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(groupCode)
+        composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.group_is_full)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_is_full)).assertIsDisplayed()
     }
 
     @Test
-    fun clickOnGroupsListButton_opensGroupsList() {
-        composeTestRule.onNodeWithTag("showGroupsButton").performClick()
+    fun clickOnGameLobbiesListButton_opensGameLobbiesList() {
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
 
-        composeTestRule.onNodeWithTag("groupsList")
+        composeTestRule.onNodeWithTag("lobbiesList")
             .assertIsDisplayed()
     }
 
     @Test
-    fun clickOnGroupHeader_opensGroupInfo() {
+    fun clickOnGameLobbyHeader_opensGameLobbyInfo() {
 
-        composeTestRule.onNodeWithTag("showGroupsButton").performClick()
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
 
         try {
-            val groupHeader = composeTestRule.onAllNodesWithTag("groupCard").onFirst()
+            val groupHeader = composeTestRule.onAllNodesWithTag("lobbyCard").onFirst()
 
             groupHeader.assertIsDisplayed()
             groupHeader.performClick()
 
-            composeTestRule.onAllNodesWithTag("groupCard").onFirst().assertIsDisplayed()
+            composeTestRule.onAllNodesWithTag("lobbyCard").onFirst().assertIsDisplayed()
 
         }catch (AssertionError: AssertionError){
-            Log.d("Test", "No groups to display from DB")
+            Log.d("Test", "No lobbies to display from DB")
         }
 
     }

@@ -21,9 +21,9 @@
 
         <!-- ========================================= MENU ACTIVITIES -->
         <activity
-            android:name=".menu.JoinGroupActivity"
+            android:name=".menu.JoinGameLobbyActivity"
             android:exported="false"
-            android:label="@string/title_activity_join_group"
+            android:label="@string/title_activity_join_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
             android:name=".menu.SettingsActivity"
