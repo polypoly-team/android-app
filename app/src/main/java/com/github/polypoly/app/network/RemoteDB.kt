@@ -42,7 +42,7 @@ open class RemoteDB(
         usersRootRef.get().addOnSuccessListener{ usersRef ->
             val users = ArrayList<User>()
             for (child in usersRef.children) {
-                users.add(child.value as User)
+                users.add(child.getValue<User>()!!)
             }
             usersPromise.complete(users)
         }.addOnFailureListener(usersPromise::completeExceptionally)

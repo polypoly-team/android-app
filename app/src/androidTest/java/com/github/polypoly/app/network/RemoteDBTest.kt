@@ -42,23 +42,34 @@ class RemoteDBTest {
         usersRootRef = rootRef.child(DB_USERS_PROFILES_PATH)
     }
 
+    fun addUsersToDB(users: List<User>): CompletableFuture<Boolean> {
+        val timeouts = List(users.size) {CompletableFuture<Boolean>()}
+
+        for (i in users.indices) {
+            val user = users[i]
+            usersRootRef.child(user.id.toString())
+                .setValue(user)
+                .addOnSuccessListener {
+                    timeouts[i].complete(true)
+                }.addOnFailureListener(timeouts[i]::completeExceptionally)
+        }
+
+        timeouts.map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
+
+        return timeouts.reduce{ future, next ->
+            if (future.isCompletedExceptionally) {
+                future
+            } else {
+                next
+            }
+        }
+    }
+
     @Test
     fun userCanBeRetrievedFromId() {
-        val setTimeout = CompletableFuture<Boolean>()
-        usersRootRef.child(testUser.id.toString())
-            .setValue(testUser)
-            .addOnSuccessListener {
-            setTimeout.complete(true)
-        }.addOnFailureListener(setTimeout::completeExceptionally)
-        setTimeout.get(5, TimeUnit.SECONDS)
-
+        addUsersToDB(listOf(testUser))
         val userFound = remoteDB.getUserWithId(testUser.id).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-
-        assertEquals(testUser.id, userFound.id)
-        assertEquals(testUser.name, userFound.name)
-        assertEquals(testUser.bio, userFound.bio)
-        assertEquals(testUser.skin, userFound.skin)
-        assertEquals(testUser.stats, userFound.stats)
+        assertEquals(testUser, userFound)
     }
 
     @Test
@@ -69,8 +80,24 @@ class RemoteDBTest {
             assertTrue(exception != null)
             assertTrue(exception is IllegalAccessError)
         }
-        assertThrows(ExecutionException::class.java) { failFuture.get(5, TimeUnit.SECONDS) }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
 
+    @Test
+    fun allUsersCanBeRetrievedAtOnce() {
+        val testUser2 = User(123456L,"Harry", "Hi!", Skin(1, 1, 1), Stats())
+        val testUser3 = User(1234567L,"James", "Hey!", Skin(1, 1, 1), Stats())
+        val testUser4 = User(12345678L,"Henri", "Ohh!", Skin(1, 1, 1), Stats())
 
+        val allUsers = listOf(testUser, testUser2, testUser3, testUser4)
+
+        addUsersToDB(allUsers)
+
+        val allUsersFound = remoteDB.getAllUsers().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertEquals(allUsers.size, allUsersFound.size)
+        for (user in allUsers) {
+            assertTrue(allUsersFound.contains(user))
+        }
+    }
 }

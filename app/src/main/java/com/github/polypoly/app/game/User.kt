@@ -38,4 +38,10 @@ class User constructor(
     override fun toString(): String {
         return "User{$id: $name}"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is User &&
+                id == other.id && name == other.name && bio == other.bio &&
+                skin == other.skin && stats == other.stats
+    }
 }
