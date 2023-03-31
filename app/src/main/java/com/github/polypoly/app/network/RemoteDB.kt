@@ -7,6 +7,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.getValue
 import java.util.concurrent.CompletableFuture
 
+/**
+ * Implementation of IRemoteStorage as a Firebase remote DB
+ */
 open class RemoteDB(
     private val db: FirebaseDatabase?,
     private val root: String

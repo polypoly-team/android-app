@@ -3,6 +3,9 @@ package com.github.polypoly.app.game
 import android.os.Build
 import androidx.annotation.RequiresApi
 
+/**
+ * Skin of a player represented as Head/Body/Legs components ids
+ */
 class Skin(
     val idHead: Int = 0,
     val idBody: Int = 0,
@@ -13,6 +16,11 @@ class Skin(
             idHead == other.idHead && idBody == other.idBody && idLegs == other.idLegs
     }
 }
+
+/**
+ * All stats concerning a given player.
+ * This will be further developed in the future.
+ */
 class Stats constructor(
     val accountCreation: Int = 0, //> TODO improve unix-representation to something better
     val lastConnection: Int = 0,

@@ -65,7 +65,7 @@ class MapActivity : ComponentActivity() {
 
         val db = Firebase.database
         try {
-            db.setPersistenceEnabled(false)
+            db.setPersistenceEnabled(false) // disable local caching and do only write-through instead
         } catch(_: java.lang.Exception) { }
         GlobalInstances.remoteDB = RemoteDB(db, "live")
 
