@@ -41,10 +41,10 @@ open class RemoteDB(
         return childrenPromise
     }
 
-    private inline fun <reified T>getData(dataRef: DatabaseReference, error: Throwable): CompletableFuture<T> {
+    private inline fun <reified T>getData(dataRef: DatabaseReference, key: String, error: Throwable): CompletableFuture<T> {
         val future = CompletableFuture<T>()
 
-        dataRef.get().addOnSuccessListener { data ->
+        dataRef.child(key).get().addOnSuccessListener { data ->
             if (data.value == null) {
                 future.completeExceptionally(error)
             } else {
@@ -104,7 +104,7 @@ open class RemoteDB(
     }
 
     override fun getUserWithId(userId: Long): CompletableFuture<User> {
-        return getData(usersRootRef.child(userId.toString()), IllegalAccessError("No user with id $userId"))
+        return getData(usersRootRef, userId.toString(), IllegalAccessError("No user with id $userId"))
     }
 
     override fun getAllUsers(): CompletableFuture<List<User>> {
@@ -124,23 +124,25 @@ open class RemoteDB(
     }
 
     override fun getGameLobbyWithCode(code: String): CompletableFuture<GameLobby> {
-        TODO("Not yet implemented")
+        return getData(gameLobbiesRootRef, code, IllegalAccessError("No game lobby found for code $code"))
     }
 
     override fun getAllGameLobbies(): CompletableFuture<List<GameLobby>> {
-        TODO("Not yet implemented")
+        return getAllChildren(gameLobbiesRootRef)
     }
 
     override fun getAllGameLobbiesCodes(): CompletableFuture<List<String>> {
-        TODO("Not yet implemented")
+        return getAllKeys(gameLobbiesRootRef)
     }
 
     override fun registerGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return registerData(gameLobbiesRootRef, gameLobby.code, gameLobby,
+            IllegalAccessError("You cannot create two game lobbies with the same code"))
     }
 
     override fun updateGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return updateData(gameLobbiesRootRef, gameLobby.code, gameLobby,
+            IllegalAccessError("This game lobby doesn't exist yet so it cannot be updated"))
     }
 
     fun getUnderlyingDB(): FirebaseDatabase{
