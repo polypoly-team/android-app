@@ -35,7 +35,6 @@ import com.google.firebase.ktx.Firebase
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
-    private lateinit var gameMusic: GameMusic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { WelcomeContent() }

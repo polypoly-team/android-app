@@ -25,7 +25,7 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 @Suppress("UNUSED_EXPRESSION")
-class JoinGroupActivity : ComponentActivity() {
+class JoinGroupActivity : MenuActivity("Join Group") {
 
     /**
      * The attributes of the class
@@ -35,29 +35,35 @@ class JoinGroupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                // This is the surface where all the view lies
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Column(modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(100.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.super_cool_logo),
-                            contentDescription = "polypoly logo",
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(200.dp)
-                                .testTag("logo"),
-                            )
-                        Spacer(modifier = Modifier.height(50.dp))
-                        GroupForm()
-                    }
-                }
+            MenuContent {
+                JoinGroupContent()
+            }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun JoinGroupContent() {
+        // This is the surface where all the view lies
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            Column(modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(100.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.super_cool_logo),
+                    contentDescription = "polypoly logo",
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(200.dp)
+                        .testTag("logo"),
+                )
+                Spacer(modifier = Modifier.height(50.dp))
+                GroupForm()
             }
         }
     }
