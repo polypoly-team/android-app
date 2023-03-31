@@ -63,4 +63,12 @@ class GameLobby(
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         return Game.launchFromPendingGame(this)
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is GameLobby &&
+                admin == other.admin && gameMode == other.gameMode && minimumNumberOfPlayers == other.minimumNumberOfPlayers &&
+                maximumNumberOfPlayers == other.maximumNumberOfPlayers && roundDuration == other.roundDuration &&
+                (gameMap.all { zone -> other.gameMap.contains(zone) } && gameMap.size == other.gameMap.size) &&
+                initialPlayerBalance == other.initialPlayerBalance && name == other.name && code == other.code
+    }
 }

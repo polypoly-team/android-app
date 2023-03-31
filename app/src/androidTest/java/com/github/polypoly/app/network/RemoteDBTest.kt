@@ -2,6 +2,7 @@ package com.github.polypoly.app.network
 
 import com.github.polypoly.app.game.*
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -19,13 +20,14 @@ import kotlin.time.Duration.Companion.hours
 @RunWith(JUnit4::class)
 class RemoteDBTest {
     companion object {
-        val TIMEOUT_DURATION = 5L
+        val TIMEOUT_DURATION = 1L
     }
 
     private val underlyingDB: FirebaseDatabase
     private val rootName = "test"
     private val rootRef: DatabaseReference
     private val usersRootRef: DatabaseReference
+    private val gameLobbiesRootRef: DatabaseReference
 
     private val testUser1 = User(1234L,"John", "Hi!", Skin(1, 1, 1), Stats())
     private val testUser2 = User(12345L,"Harry", "Ha!", Skin(1, 1, 1), Stats())
@@ -53,6 +55,7 @@ class RemoteDBTest {
 
         rootRef = underlyingDB.getReference(rootName)
         usersRootRef = rootRef.child(DB_USERS_PROFILES_PATH)
+        gameLobbiesRootRef = rootRef.child(DB_GAME_LOBBIES_PATH)
     }
 
     fun addUsersToDB(users: List<User>) {
@@ -70,9 +73,24 @@ class RemoteDBTest {
         timeouts.map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
-    fun removeAllUsersFromDB() {
+    fun addGameLobbiesToDB(lobbies: List<GameLobby>) {
+        val timeouts = List(lobbies.size) {CompletableFuture<Boolean>()}
+
+        for (i in lobbies.indices) {
+            val lobby = lobbies[i]
+            gameLobbiesRootRef.child(lobby.code)
+                .setValue(lobby)
+                .addOnSuccessListener {
+                    timeouts[i].complete(true)
+                }.addOnFailureListener(timeouts[i]::completeExceptionally)
+        }
+
+        timeouts.map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
+    }
+
+    fun removeAllChildrenFromDB(parent: DatabaseReference) {
         val timeout = CompletableFuture<Boolean>()
-        usersRootRef.removeValue()
+        parent.removeValue()
             .addOnSuccessListener {
                 timeout.complete(true)
             }.addOnFailureListener(timeout::completeExceptionally)
@@ -99,7 +117,7 @@ class RemoteDBTest {
 
     @Test
     fun allUsersCanBeRetrievedAtOnce() {
-        removeAllUsersFromDB()
+        removeAllChildrenFromDB(usersRootRef)
         addUsersToDB(allTestUsers)
 
         val allUsersFound = remoteDB.getAllUsers().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -112,7 +130,7 @@ class RemoteDBTest {
 
     @Test
     fun allUsersIdsCanBeRetrievedAtOnce() {
-        removeAllUsersFromDB()
+        removeAllChildrenFromDB(usersRootRef)
         addUsersToDB(allTestUsers)
 
         val allUsersIds = allTestUsers.map(User::id)
@@ -123,7 +141,7 @@ class RemoteDBTest {
 
     @Test
     fun newUserCanBeRegistered() {
-        removeAllUsersFromDB()
+        removeAllChildrenFromDB(usersRootRef)
         assertTrue(remoteDB.registerUser(testUser1).get(TIMEOUT_DURATION, TimeUnit.SECONDS))
     }
 
@@ -150,9 +168,91 @@ class RemoteDBTest {
     }
 
     @Test
-    fun unergisteredUserCannotBeUpdated() {
-        removeAllUsersFromDB()
+    fun unregisteredUserCannotBeUpdated() {
+        removeAllChildrenFromDB(usersRootRef)
         val failFuture = remoteDB.updateUser(testUser1)
+        failFuture.handle { _, exception ->
+            assertTrue(exception != null)
+            assertTrue(exception is IllegalAccessError)
+        }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+    }
+
+    @Test
+    fun gameLobbyCanBeRetrievedFromCode() {
+        addGameLobbiesToDB(listOf(testGameLobby1))
+        val gameLobbyFound = remoteDB.getGameLobbyWithCode(testGameLobby1.code).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(testGameLobby1, gameLobbyFound)
+    }
+
+    @Test
+    fun gettingGameLobbyOfInvalidCodeFails() {
+        val invalidCode = "I do not exist"
+        val failFuture = remoteDB.getGameLobbyWithCode(invalidCode)
+        failFuture.handle { _, exception ->
+            assertTrue(exception != null)
+            assertTrue(exception is IllegalAccessError)
+        }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+    }
+
+    @Test
+    fun allGameLobbiesCanBeRetrievedAtOnce() {
+        removeAllChildrenFromDB(gameLobbiesRootRef)
+        addGameLobbiesToDB(allGameLobbies)
+
+        val allGameLobbiesFound = remoteDB.getAllGameLobbies().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertEquals(allGameLobbies.size, allGameLobbiesFound.size)
+        for (gameLobby in allGameLobbies) {
+            assertTrue(allGameLobbiesFound.contains(gameLobby))
+        }
+    }
+
+    @Test
+    fun allGameLobbyCodesCanBeRetrievedAtOnce() {
+        removeAllChildrenFromDB(gameLobbiesRootRef)
+        addGameLobbiesToDB(allGameLobbies)
+
+        val allGameLobbiesCodes = allGameLobbies.map(GameLobby::code)
+        val allGameLobbiesCodesFound = remoteDB.getAllGameLobbiesCodes().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertEquals(allGameLobbiesCodes.sorted(), allGameLobbiesCodesFound.sorted())
+    }
+
+    @Test
+    fun newGameLobbyCanBeRegistered() {
+        removeAllChildrenFromDB(gameLobbiesRootRef)
+        assertTrue(remoteDB.registerGameLobby(testGameLobby1).get(TIMEOUT_DURATION, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun registeringAnAlreadyRegisteredGameLobbyFails() {
+        addGameLobbiesToDB(listOf(testGameLobby1))
+        val failFuture = remoteDB.registerGameLobby(testGameLobby1)
+        failFuture.handle { _, exception ->
+            assertTrue(exception != null)
+            assertTrue(exception is IllegalAccessError)
+        }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+    }
+
+    @Test
+    fun gameLobbiesCanBeUpdatedAfterRegistration() {
+        val gameLobbyUpdated = GameLobby(testUser1, GameMode.LAST_STANDING, 2, 5,
+            2.hours, listOf(), 100, "updated_testGameLobby1", "abcd")
+        addGameLobbiesToDB(listOf(testGameLobby1))
+
+        assertTrue(remoteDB.updateGameLobby(gameLobbyUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS))
+
+        val gameLobbyUpdatedFound = remoteDB.getGameLobbyWithCode(testGameLobby1.code).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(gameLobbyUpdated, gameLobbyUpdatedFound)
+    }
+
+    @Test
+    fun unregisteredGameLobbyCannotBeUpdated() {
+        removeAllChildrenFromDB(gameLobbiesRootRef)
+        val failFuture = remoteDB.updateGameLobby(testGameLobby1)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
             assertTrue(exception is IllegalAccessError)
