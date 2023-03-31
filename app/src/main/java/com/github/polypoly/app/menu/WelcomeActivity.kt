@@ -145,8 +145,9 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
+    // TODO: remove after demo
     /**
-     * Launches the map/MapActivity
+     * Launches the map/MapActivity, temporary button for testing purposes
      */
     @Composable
     fun MapButton() {
