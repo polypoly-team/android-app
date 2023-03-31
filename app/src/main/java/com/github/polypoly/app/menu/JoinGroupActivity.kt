@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 
 @Suppress("UNUSED_EXPRESSION")
 class JoinGroupActivity : MenuActivity("Join Group") {
@@ -134,8 +135,8 @@ class JoinGroupActivity : MenuActivity("Join Group") {
             onValueChange = { newText ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
                 groupCode = text
-            }
-
+            },
+            colors = UIElements.outlineTextFieldColors()
         )
 
     }
