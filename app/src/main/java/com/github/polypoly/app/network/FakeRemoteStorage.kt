@@ -66,7 +66,7 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67)
+        stats = Stats(0, 0, 67)
     )
 
     init {
@@ -90,6 +90,10 @@ class FakeRemoteStorage : IRemoteStorage {
 
     override fun getAllUsers(): CompletableFuture<List<User>> {
         return CompletableFuture.completedFuture(listOf<User>(user))
+    }
+
+    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
+        return getAllUsers().thenApply { users -> users.map(User::id) }
     }
 
     override fun registerUser(user: User): CompletableFuture<Boolean> {

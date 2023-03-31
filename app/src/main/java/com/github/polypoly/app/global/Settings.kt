@@ -1,5 +1,8 @@
 package com.github.polypoly.app.global
 
+/**
+ * Global settings shared across the entire app for consistency purpose
+ */
 class Settings {
     companion object {
         val DB_USERS_PROFILES_PATH = "users"

@@ -16,37 +16,45 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.game.User
 import com.github.polypoly.app.game.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import java.util.concurrent.Future
 
-class ProfileActivity : ComponentActivity() {
+class ProfileActivity : MenuActivity("Profile") {
 
     //ONLY TO TEST WITHOUT THE DATABASE
-    val userId: Long = 1
+    private val userId: Long = 1
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    ProfileAndStats()
-                }
+            MenuContent {
+                ProfileContent()
             }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Composable
+    fun ProfileContent() {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            ProfileAndStats()
         }
     }
 
@@ -63,12 +71,16 @@ class ProfileActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(elevation = 8.dp) {
+            Surface(
+                elevation = 8.dp,
+                color = MaterialTheme.colors.background
+            ) {
                 Profile()
             }
             Statistics()
         }
     }
+
 
     /**
      * Display the information of the user's profile and the appearance of player in game
@@ -93,15 +105,22 @@ class ProfileActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp
+                ),
                 onClick = {
                     val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                     profileModifyingIntent.putExtra("userId", userId)
+                    finish()
                     startActivity(profileModifyingIntent)
                 },
                 shape = CircleShape,
-                modifier = Modifier.testTag("modifyProfileButton"),
+                modifier = Modifier
+                    .testTag("modifyProfileButton"),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(red = 240, blue = 240, green = 240))
+                    backgroundColor = MaterialTheme.colors.secondaryVariant)
             ) {
                 Text("Modify profile")
             }
@@ -168,13 +187,13 @@ class ProfileActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(color = if (won) MaterialTheme.colors.primary else Color.DarkGray)
+                .background(color = if (won) MaterialTheme.colors.secondary else
+                    MaterialTheme.colors.onSecondary)
                 .size(50.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(toDisplay,
-                style = MaterialTheme.typography.body1,
-                color = Color.White)
+                style = MaterialTheme.typography.body1)
         }
     }
 
@@ -263,13 +282,8 @@ class ProfileActivity : ComponentActivity() {
     )
     @Composable
     fun ProfilePreview() {
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                ProfileAndStats()
-            }
+        MenuContent {
+            ProfileContent()
         }
     }
 }
