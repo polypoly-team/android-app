@@ -8,7 +8,8 @@ import com.google.firebase.database.ktx.getValue
 import java.util.concurrent.CompletableFuture
 
 open class RemoteDB(
-    private val db: FirebaseDatabase?
+    private val db: FirebaseDatabase?,
+    private val root: String
 ) : IRemoteStorage {
 
     private lateinit var rootRef: DatabaseReference
@@ -16,8 +17,8 @@ open class RemoteDB(
 
     init {
         if (db != null) {
-            rootRef = db.getReference()
-            usersRootRef = db.getReference(DB_USERS_PROFILES_PATH)
+            rootRef = db.getReference(root)
+            usersRootRef = rootRef.child(DB_USERS_PROFILES_PATH)
         }
     }
 
@@ -103,7 +104,7 @@ open class RemoteDB(
         }
     }
 
-    companion object InvalidRemoteDB: RemoteDB(null) {
+    companion object InvalidRemoteDB: RemoteDB(null, "") {
         override fun getUserWithId(userId: Long): CompletableFuture<User> {
             throw IllegalAccessError("This RemoteDB is invalid")
         }

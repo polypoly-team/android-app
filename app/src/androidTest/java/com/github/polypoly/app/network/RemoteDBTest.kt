@@ -5,6 +5,7 @@ import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -22,7 +23,10 @@ class RemoteDBTest {
         val TIMEOUT_DURATION = 5L
     }
 
-    private var underlyingDB: FirebaseDatabase
+    private val underlyingDB: FirebaseDatabase
+    private val rootName = "test"
+    private val rootRef: DatabaseReference
+    private val usersRootRef: DatabaseReference
 
     private val testUser = User(1234L,"John", "Hi!", Skin(1, 1, 1), Stats())
 
@@ -31,15 +35,17 @@ class RemoteDBTest {
         try {
             db.setPersistenceEnabled(false)
         } catch(_: java.lang.Exception) { }
-        remoteDB = RemoteDB(db)
+        remoteDB = RemoteDB(db, rootName)
         underlyingDB = remoteDB.getUnderlyingDB()
+
+        rootRef = underlyingDB.getReference(rootName)
+        usersRootRef = rootRef.child(DB_USERS_PROFILES_PATH)
     }
 
     @Test
     fun userCanBeRetrievedFromId() {
         val setTimeout = CompletableFuture<Boolean>()
-        val usersRoot = underlyingDB.getReference(DB_USERS_PROFILES_PATH)
-        usersRoot.child(testUser.id.toString())
+        usersRootRef.child(testUser.id.toString())
             .setValue(testUser)
             .addOnSuccessListener {
             setTimeout.complete(true)
@@ -65,4 +71,6 @@ class RemoteDBTest {
         }
         assertThrows(ExecutionException::class.java) { failFuture.get(5, TimeUnit.SECONDS) }
     }
+
+
 }
