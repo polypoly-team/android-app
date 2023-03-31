@@ -94,7 +94,7 @@ class PendingGameTest {
     }
 
     @Test
-    fun pendingGameDoesntAcceptInvalidGameCodes() {
+    fun pendingGameDoesNotAcceptInvalidGameCodes() {
         val emptyCode = ""
         val blancCode = "    \n  \t"
 
