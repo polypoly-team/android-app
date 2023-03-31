@@ -17,7 +17,7 @@ class JoinGameLobbyActivityTest {
 
     @Test
     fun launchActivity_componentsDisplayed() {
-        composeTestRule.onNodeWithTag("groupCodeField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("logo").assertIsDisplayed()
     }
@@ -25,7 +25,7 @@ class JoinGameLobbyActivityTest {
     @Test
     fun inputInvalidGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a group code that is not in the DB once we have the queries set
-        composeTestRule.onNodeWithTag("groupCodeField").performTextInput("polypoly")
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("polypoly")
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
 
@@ -45,7 +45,7 @@ class JoinGameLobbyActivityTest {
     fun inputValidGameLobbyCode_joinGameLobbyRoom() {
         //TODO: Check for a valid group code in the DB once we have the queries set
         val groupCode = "abcd"
-        composeTestRule.onNodeWithTag("groupCodeField").performTextInput(groupCode)
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(groupCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
     }
@@ -65,7 +65,7 @@ class JoinGameLobbyActivityTest {
     fun clickOnGameLobbiesListButton_opensGameLobbiesList() {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
 
-        composeTestRule.onNodeWithTag("lobbiesList")
+        composeTestRule.onNodeWithTag("gameLobbiesList")
             .assertIsDisplayed()
     }
 
