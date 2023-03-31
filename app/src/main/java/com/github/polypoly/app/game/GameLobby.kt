@@ -3,7 +3,7 @@ package com.github.polypoly.app.game
 import com.github.polypoly.app.game.user.User
 import kotlin.time.Duration
 
-class PendingGame(
+class GameLobby(
     val admin: User,
     val gameMode: GameMode,
     val minimumNumberOfPlayers: Int,

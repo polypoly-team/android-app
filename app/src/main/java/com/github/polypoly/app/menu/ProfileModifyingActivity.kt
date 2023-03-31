@@ -43,9 +43,11 @@ class ProfileModifyingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra("userId", 0)
-        val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
+
+        val user = FakeRemoteStorage.instance.getUserWithId(id).get()
         nickname = user.name
         description = user.bio
+
         setContent {
             PolypolyTheme {
                 Surface(
@@ -77,10 +79,12 @@ class ProfileModifyingActivity : ComponentActivity() {
             NicknameTextField()
             Spacer(modifier = Modifier.height(10.dp))
             DescriptionTextField()
+
             Spacer(modifier = Modifier.height(40.dp))
             TrophiesSelection(trophiesDisplay, user)
             Spacer(modifier = Modifier.height(40.dp))
             ValidationButton ({ warningText = "You can't have an empty nickname!" }, trophiesDisplay)
+
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 modifier = Modifier.offset(y = 200.dp),
@@ -145,8 +149,8 @@ class ProfileModifyingActivity : ComponentActivity() {
                     onError()
                 } else {
                     val id = intent.getLongExtra("userId", 0)
-                    val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
-                    FakeRemoteStorage.instance.setUserProfileWithId(id, User(
+                    val user = FakeRemoteStorage.instance.getUserWithId(id).get()
+                    FakeRemoteStorage.instance.updateUser(User(
                         id = id,
                         name = nickname,
                         bio = description,
@@ -245,7 +249,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     fun ProfileModifyingPreview() {
         PolypolyTheme {
             val id = intent.getLongExtra("userId", 0)
-            val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
+            val user = FakeRemoteStorage.instance.getUserWithId(id).get()
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background

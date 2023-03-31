@@ -19,28 +19,33 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67, 28, 14),
+        stats = Stats(0, 0, 67),
         trophiesWon = listOf(0, 4, 8, 11, 12, 14),
         trophiesDisplay = mutableListOf(0, 4)
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun getUserProfileWithId(userId: Long): Future<User> {
+    override fun getUserWithId(userId: Long): CompletableFuture<User> {
         return CompletableFuture.completedFuture(user)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun setUserProfileWithId(userId: Long, user: User) {
-        this.user = user;
+    override fun updateUser(user: User): CompletableFuture<Boolean> {
+        this.user = user
+        return CompletableFuture.completedFuture(true)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun getAllUsers(): Future<List<User>> {
+    override fun getAllUsers(): CompletableFuture<List<User>> {
         return CompletableFuture.completedFuture(listOf<User>(user))
     }
 
-    override fun addUser(userId: Long): Future<Boolean> {
+    override fun registerUser(user: User): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(false)
+    }
+
+    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
+        TODO("Not yet implemented")
     }
 
     companion object {

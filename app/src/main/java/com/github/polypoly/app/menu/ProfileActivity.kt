@@ -66,7 +66,7 @@ class ProfileActivity : ComponentActivity() {
     fun ProfileAndStats() {
         val user: User
         when(storageId) {
-            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
+            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserWithId(userId).get()
             StorageType.FIREBASE -> throw NotImplementedError()
         }
 
