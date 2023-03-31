@@ -33,15 +33,15 @@ class Game private constructor(
     }
 
     companion object {
-        fun launchFromPendingGame(pendingGame: PendingGame): Game {
+        fun launchFromPendingGame(gameLobby: GameLobby): Game {
             return Game(
-                pendingGame.admin,
-                pendingGame.usersRegistered,
-                pendingGame.gameMode,
-                pendingGame.gameMap,
-                pendingGame.roundDuration,
-                pendingGame.initialPlayerBalance,
-                pendingGame.name
+                gameLobby.admin,
+                gameLobby.usersRegistered,
+                gameLobby.gameMode,
+                gameLobby.gameMap,
+                gameLobby.roundDuration,
+                gameLobby.initialPlayerBalance,
+                gameLobby.name
             )
         }
     }
