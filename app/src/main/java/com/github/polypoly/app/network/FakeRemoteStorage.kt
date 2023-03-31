@@ -20,7 +20,7 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67)
+        stats = Stats(0, 0, 67)
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -60,6 +60,10 @@ class FakeRemoteStorage : IRemoteStorage {
     }
 
     override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
         TODO("Not yet implemented")
     }
 
