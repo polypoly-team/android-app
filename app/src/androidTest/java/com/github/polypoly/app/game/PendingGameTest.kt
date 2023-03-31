@@ -17,6 +17,10 @@ class PendingGameTest {
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0, 0, 0)
     private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7
     private val testDuration = 2.hours
@@ -110,11 +114,6 @@ class PendingGameTest {
         val pendingGame = PendingGame(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode)
 
-        val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
-
         pendingGame.addUser(u1)
         pendingGame.addUser(u2)
         pendingGame.addUser(u3)
@@ -139,11 +138,6 @@ class PendingGameTest {
     fun canRemoveUsersToPendingGame() {
         val pendingGame = PendingGame(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode)
-
-        val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
-        val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
 
         pendingGame.addUser(u1)
         pendingGame.addUser(u2)

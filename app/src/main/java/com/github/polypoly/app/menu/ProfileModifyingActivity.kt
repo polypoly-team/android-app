@@ -97,17 +97,18 @@ class ProfileModifyingActivity : ComponentActivity() {
      */
     @Composable
     fun TrophiesSelection(trophiesDisplay: MutableList<Int>, user: User) {
+        val maxSelected = 3
         Text("Select displayed trophies", style = MaterialTheme.typography.h5,
             textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(20.dp))
         TrophiesView(
             callBack = { idx ->
                 if(!trophiesDisplay.contains(idx) && user.hasTrophy(idx)) {
-                    if (trophiesDisplay.size >= 3) trophiesDisplay.removeAt(0)
+                    if (trophiesDisplay.size >= maxSelected) trophiesDisplay.removeAt(0)
                     trophiesDisplay.add(idx)
                 }
             },
-            maxSelected = 3,
+            maxSelected = maxSelected,
             selected = trophiesDisplay,
             user= user)
         Spacer(modifier = Modifier.height(20.dp))

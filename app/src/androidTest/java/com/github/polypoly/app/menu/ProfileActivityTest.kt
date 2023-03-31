@@ -37,9 +37,10 @@ class ProfileActivityTest {
     @Test
     fun canSeeTheDescriptionOfAWonTrophy() {
         val statisticsAndTrophies = composeTestRule.onNodeWithTag("statisticsAndTrophies")
-        statisticsAndTrophies.onChildren().filter(hasTestTag("Trophy${user.trophiesWon[1]}"))[0]
+        val lastTrophyWon = user.trophiesWon.last()
+        statisticsAndTrophies.onChildren().filter(hasTestTag("Trophy$lastTrophyWon"))[0]
             .performScrollTo().performClick()
-        composeTestRule.onNodeWithText(allTrophies[user.trophiesWon[1]].toString())
+        composeTestRule.onNodeWithText(allTrophies[lastTrophyWon].toString())
             .assertIsDisplayed()
     }
 
@@ -75,7 +76,7 @@ class ProfileActivityTest {
     fun canSeeTheChosenDisplayedTrophies() {
         user.trophiesDisplay.forEach {
             val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
-            profileSurface.onChildren().filter(hasTestTag("Trophy${it}")).assertCountEquals(1)
+            profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
         }
     }
 

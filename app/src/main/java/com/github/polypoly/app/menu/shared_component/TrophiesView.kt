@@ -58,7 +58,7 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
             .background(
                 color = trophyColor)
             .background(
-                color = Color.White.copy(alpha = if (selected) 0f else 0.6f))
+                color = MaterialTheme.colors.background.copy(alpha = if (selected) 0f else 0.6f))
             .size(TROPHY_SIZE.dp)
             .clickable(onClick = if(disable) {{}} else onClick)
             .testTag("Trophy${trophy.getId()}"),
