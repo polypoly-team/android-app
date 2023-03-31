@@ -9,23 +9,9 @@ import java.util.concurrent.Future
 import kotlin.time.Duration.Companion.hours
 
 /**
- * A fake remote storage to test the functionalities without the database
+ * A fake remote storage to test the functionalities with compatibility for later use of the DB
  */
 class FakeRemoteStorage : IRemoteStorage {
-
-    private val code1 = "1234"
-    private val code2 = "abcd"
-    private val code3 = "123abc"
-    private val code4 = "1234abc"
-    private val code5 = "abc123"
-    private val code6 = "abc1234"
-
-    private val name1 = "Full gameLobby"
-    private val name2 = "Joinable 1"
-    private val name3 = "Joinable 2"
-    private val name4 = "Joinable 3"
-    private val name5 = "Private gameLobby"
-    private val name6 = "Joinable 4"
 
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats()
@@ -42,36 +28,37 @@ class FakeRemoteStorage : IRemoteStorage {
 
     private val gameLobbyFull = GameLobby(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name1, code1
+        testDuration, emptyList(), testInitialBalance, "Full gameLobby", "1234"
     )
     private val gameLobbyJoinable1 = GameLobby(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name2, code2
+        testDuration, emptyList(), testInitialBalance, "Joinable 1", "abcd"
     )
     private val gameLobbyJoinable2 = GameLobby(
         testUser1, GameMode.LAST_STANDING, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name3, code3
+        testDuration, emptyList(), testInitialBalance, "Joinable 2", "123abc"
     )
     private val gameLobbyJoinable3 = GameLobby(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name4, code4
+        testDuration, emptyList(), testInitialBalance, "Joinable 3", "1234abc"
     )
     private val gameLobbyPrivate = GameLobby(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name5, code5, true
+        testDuration, emptyList(), testInitialBalance, "Private gameLobby", "abc123", true
     )
 
     private val gameLobbyJoinable4 = GameLobby(
         testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, name6, code6
+        testDuration, emptyList(), testInitialBalance, "Joinable 4", "abc1234"
     )
 
     private val mockGameLobbies :HashMap<String, GameLobby> = hashMapOf(
-        code1 to gameLobbyFull,
-        code2 to gameLobbyJoinable1,
-        code3 to gameLobbyJoinable2,
-        code4 to gameLobbyJoinable3,
-        code5 to gameLobbyPrivate
+        gameLobbyFull.code to gameLobbyFull,
+        gameLobbyJoinable1.code to gameLobbyJoinable1,
+        gameLobbyJoinable2.code to gameLobbyJoinable2,
+        gameLobbyJoinable3.code to gameLobbyJoinable3,
+        gameLobbyPrivate.code to gameLobbyPrivate,
+        gameLobbyJoinable4.code to gameLobbyJoinable4
     )
 
     var user: User = User(
@@ -83,21 +70,13 @@ class FakeRemoteStorage : IRemoteStorage {
     )
 
     init {
-        gameLobbyFull.addUser(testUser2)
-        gameLobbyFull.addUser(testUser3)
-        gameLobbyFull.addUser(testUser4)
-        gameLobbyFull.addUser(testUser5)
+        gameLobbyFull.addUsers(listOf(testUser2, testUser3, testUser4, testUser5))
 
-        gameLobbyJoinable1.addUser(testUser2)
-        gameLobbyJoinable1.addUser(testUser3)
+        gameLobbyJoinable1.addUsers(listOf(testUser2, testUser3))
 
-        gameLobbyJoinable2.addUser(testUser2)
-        gameLobbyJoinable2.addUser(testUser3)
-        gameLobbyJoinable2.addUser(testUser4)
+        gameLobbyJoinable2.addUsers(listOf(testUser2, testUser3, testUser4))
 
-        gameLobbyPrivate.addUser(testUser2)
-        gameLobbyPrivate.addUser(testUser3)
-        gameLobbyPrivate.addUser(testUser4)
+        gameLobbyJoinable3.addUsers(listOf(testUser2, testUser3, testUser4))
     }
 
     override fun getUserWithId(userId: Long): CompletableFuture<User> {

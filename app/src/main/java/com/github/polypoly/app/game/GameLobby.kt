@@ -44,6 +44,11 @@ class GameLobby(
         currentUsersRegistered.add(user)
     }
 
+    fun addUsers(users: List<User>) {
+        for (user in users)
+            addUser(user)
+    }
+
     fun canStart(): Boolean {
         return currentUsersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
     }

@@ -34,7 +34,7 @@ class JoinGameLobbyActivityTest {
 
     @Test
     fun inputEmptyGameLobbyCode_displayWarningMessage() {
-        // Leave the group code field empty
+        // Leave the game lobby code field empty
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a warning message is displayed
@@ -44,8 +44,8 @@ class JoinGameLobbyActivityTest {
     @Test
     fun inputValidGameLobbyCode_joinGameLobbyRoom() {
         //TODO: Check for a valid group code in the DB once we have the queries set
-        val groupCode = "abcd"
-        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(groupCode)
+        val lobbyCode = "abcd"
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
     }
@@ -53,8 +53,8 @@ class JoinGameLobbyActivityTest {
     @Test
     fun inputFullGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a valid group code that is full in the DB once we have the queries set
-        val groupCode = "1234"
-        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(groupCode)
+        val lobbyCode = "1234"
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
@@ -75,10 +75,10 @@ class JoinGameLobbyActivityTest {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
 
         try {
-            val groupHeader = composeTestRule.onAllNodesWithTag("lobbyCard").onFirst()
+            val lobbyHeader = composeTestRule.onAllNodesWithTag("lobbyCard").onFirst()
 
-            groupHeader.assertIsDisplayed()
-            groupHeader.performClick()
+            lobbyHeader.assertIsDisplayed()
+            lobbyHeader.performClick()
 
             composeTestRule.onAllNodesWithTag("lobbyCard").onFirst().assertIsDisplayed()
 

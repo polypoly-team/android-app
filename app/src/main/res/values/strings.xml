@@ -4,7 +4,7 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_welcome">polypoly</string>
 
-    // GROUPS ==================================================================
+    // LOBBIES ==================================================================
     <string name="title_activity_join_game_lobby">JoinLobby</string>
     <string name="join_game_lobby_button_text">Join</string>
     <string name="game_lobby_does_not_exist">Lobby does not exist</string>
