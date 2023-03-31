@@ -62,8 +62,8 @@ class ProfileModifyingActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ProfileForm() {
-        val mContext = LocalContext.current
         var warningText by remember { mutableStateOf("") }
+        val mContext = LocalContext.current
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -86,10 +86,11 @@ class ProfileModifyingActivity : ComponentActivity() {
                             name = nickname,
                             bio = description,
                             skin = Skin(0,0,0),
-                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45)
+                            stats = Stats(0, 0, 45)
                         ))
-                        val profileIntent = Intent(mContext, ProfileActivity::class.java)
-                        startActivity(profileIntent)
+                        val returnIntent = Intent(mContext, ProfileActivity::class.java)
+                        finish()
+                        startActivity(returnIntent)
                     }
                 }
             ) {
