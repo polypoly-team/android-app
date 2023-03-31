@@ -4,8 +4,10 @@ import com.github.polypoly.app.game.Skin
 import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.junit.Assert.assertEquals
@@ -19,40 +21,36 @@ import java.util.concurrent.TimeUnit
 @RunWith(JUnit4::class)
 class RemoteDBTest {
 
-    private lateinit var underlyingDB: DatabaseReference
+    private var underlyingDB: FirebaseDatabase
 
-    private val testUserId = 1234L
+    private val testUser = User(1234L,"John", "Hi!", Skin(1, 1, 1), Stats())
 
     init {
         val db = Firebase.database
         try {
             db.setPersistenceEnabled(false)
         } catch(_: java.lang.Exception) { }
-        GlobalInstances.remoteDB = RemoteDB(db)
-        underlyingDB = GlobalInstances.remoteDB.getUnderlyingDB().reference
+        remoteDB = RemoteDB(db)
+        underlyingDB = remoteDB.getUnderlyingDB()
     }
 
     @Test
     fun userProfileCanBeRetrievedFromId() {
-        val user = User(testUserId,"John", "Hi!", Skin(1, 1, 1), Stats())
-
         val setTimeout = CompletableFuture<Boolean>()
-        underlyingDB.child(DB_USERS_PROFILES_PATH).child(user.id.toString()).setValue(user).addOnSuccessListener {
+        val usersRoot = underlyingDB.getReference(DB_USERS_PROFILES_PATH)
+        usersRoot.child(testUser.id.toString())
+            .setValue(testUser)
+            .addOnSuccessListener {
             setTimeout.complete(true)
-        }.addOnFailureListener { setTimeout.completeExceptionally(it) }
+        }.addOnFailureListener(setTimeout::completeExceptionally)
         setTimeout.get(5, TimeUnit.SECONDS)
 
-        val retrieveTimeout = GlobalInstances.remoteDB.getUserWithId(testUserId)
-        retrieveTimeout.get(5, TimeUnit.SECONDS)
-        val userFound = retrieveTimeout.get()
+        val userFound = remoteDB.getUserWithId(testUser.id).get(5, TimeUnit.SECONDS)
 
-        assertTrue(retrieveTimeout.isDone && !retrieveTimeout.isCompletedExceptionally)
-        assertEquals(user.id, userFound.id)
-        assertEquals(user.name, userFound.name)
-        assertEquals(user.bio, userFound.bio)
-        assertEquals(user.skin, userFound.skin)
-        assertEquals(user.stats, userFound.stats)
+        assertEquals(testUser.id, userFound.id)
+        assertEquals(testUser.name, userFound.name)
+        assertEquals(testUser.bio, userFound.bio)
+        assertEquals(testUser.skin, userFound.skin)
+        assertEquals(testUser.stats, userFound.stats)
     }
-
-
 }

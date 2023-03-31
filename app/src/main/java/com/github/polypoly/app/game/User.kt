@@ -1,25 +1,34 @@
 package com.github.polypoly.app.game
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import java.time.LocalDateTime
 
 class Skin(
     val idHead: Int = 0,
     val idBody: Int = 0,
     val idLegs: Int = 0
-)
-class Stats @RequiresApi(Build.VERSION_CODES.O) constructor(
-    val accountCreation: LocalDateTime = LocalDateTime.MIN,
-    val lastConnection: LocalDateTime = LocalDateTime.MIN,
+) {
+    override fun equals(other: Any?): Boolean {
+        return other is Skin &&
+            idHead == other.idHead && idBody == other.idBody && idLegs == other.idLegs
+    }
+}
+class Stats constructor(
+    val accountCreation: Int = 0, //> TODO improve unix-representation to something better
+    val lastConnection: Int = 0,
     val numberOfWins: Int = 0
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return other is Stats &&
+                accountCreation == other.accountCreation && lastConnection == other.lastConnection &&
+                numberOfWins == other.numberOfWins
+    }
+}
 
 /**
  * Stub implementation of a User
  */
-class User(
+class User constructor(
     val id: Long = 0,
     val name: String = "no-name",
     val bio: String = "no-bio",
