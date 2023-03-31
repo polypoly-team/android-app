@@ -2,3 +2,9 @@ exclude_patterns:
 - "**/test/"
 - "**/androidTest/"
 - "**test"
+
+checks:
+  argument-count:
+    enabled: true
+    config:
+      threshold: 6
