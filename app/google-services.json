@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "349880221971",
+    "firebase_url": "https://polypoly-db-1ccc6-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "polypoly-db-1ccc6",
+    "storage_bucket": "polypoly-db-1ccc6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349880221971:android:b8d2c655c73396d6cc5ae6",
+        "android_client_info": {
+          "package_name": "com.github.polypoly.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "349880221971-pkjd4m5a9dnhgr4k4q3fdp688nbk5ito.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7Zwc23r8itdTmX_2JI_BmN-Q10THJBj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "349880221971-pkjd4m5a9dnhgr4k4q3fdp688nbk5ito.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

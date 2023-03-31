@@ -25,6 +25,8 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that

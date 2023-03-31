@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.hours
 class PendingGameTest {
 
     private val emptySkin = Skin(0, 0, 0)
-    private val zeroStats = Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0)
+    private val zeroStats = Stats()
     private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats)
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7
