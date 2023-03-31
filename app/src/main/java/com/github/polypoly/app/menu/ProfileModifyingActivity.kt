@@ -23,6 +23,7 @@ import com.github.polypoly.app.game.Stats
 import com.github.polypoly.app.game.User
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import java.time.LocalDateTime
 
 class ProfileModifyingActivity : ComponentActivity() {
@@ -122,7 +123,9 @@ class ProfileModifyingActivity : ComponentActivity() {
             onValueChange = { newText ->
                 text = if (newText.text.length > 15) text else newText
                 nickname = text.text
-            })
+            },
+            colors = UIElements.outlineTextFieldColors()
+        )
     }
 
     /**
@@ -143,7 +146,9 @@ class ProfileModifyingActivity : ComponentActivity() {
             onValueChange = { newText ->
                 text = if (newText.text.length > 130) text else newText
                 description = text.text
-            })
+            },
+            colors = UIElements.outlineTextFieldColors()
+        )
     }
 
 
