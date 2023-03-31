@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.menu.JoinGroupActivity
+import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 
@@ -31,9 +31,12 @@ class WelcomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent { WelcomeContent() }
     }
+
     @Preview(showBackground = true)
     @Composable
-    fun WelcomePreview() { WelcomeContent() }
+    fun WelcomePreview() {
+        WelcomeContent()
+    }
 
     // ===================================================== MAIN CONTENT
     @Composable
@@ -59,7 +62,6 @@ class WelcomeActivity : ComponentActivity() {
             }
         }
     }
-
 
 
     // ===================================================== WELCOME COMPONENTS
@@ -100,7 +102,7 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 // Join button
                 GameButton(onClick = {
-                    val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
+                    val joinGroupIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
