@@ -1,7 +1,6 @@
 package com.github.polypoly.app.menu
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,11 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.menu.kotlin.GameMusic
-import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 /**
  * This activity represents the "settings" menu of the game.
@@ -27,14 +24,15 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  *
  * TODO: edit this when adding more settings
  */
-class SettingsActivity : ComponentActivity() {
+class SettingsActivity : MenuActivity("Settings") {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { SettingsContent() }
+        setContent {
+            MenuContent {
+                SettingsContent()
+            }
+        }
     }
-    @Preview(showBackground = true)
-    @Composable
-    fun SettingsPreview() { SettingsContent() }
 
     // ===================================================== MAIN CONTENT
 
@@ -43,20 +41,16 @@ class SettingsActivity : ComponentActivity() {
      * columns. If the screen isn't big enough to show all information, we make it scrollable
      */
     @Composable
-    fun SettingsContent() {
-        PolypolyTheme {
-            Surface(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Column {
-                        Text(text = "Song settings")
-                        MusicSlider()
-                    }
-
-
+    private fun SettingsContent() {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Column {
+                    Text(text = "Song settings")
+                    MusicSlider()
                 }
             }
         }
@@ -69,11 +63,10 @@ class SettingsActivity : ComponentActivity() {
      * default volume. It remembers the volume even after leaving the activity or being mute.
      */
     @Composable
-    fun MusicSlider() {
+    private fun MusicSlider() {
         var sliderValue by remember { mutableStateOf(GameMusic.getVolume()) }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Slider(
@@ -98,23 +91,23 @@ class SettingsActivity : ComponentActivity() {
      * Due to aesthetic reasons, the "click" animation is disabled on this clickable icon
      */
     @Composable
-    fun MusicMuter() {
-        var isMute by remember { mutableStateOf(false) }
+    private fun MusicMuter() {
+        var isMute by remember { mutableStateOf(GameMusic.getMuteState()) }
         val interactionSource = remember { MutableInteractionSource() }
         Box(
             modifier = Modifier
                 .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    isMute = if(isMute) {
-                        GameMusic.unMute()
-                        false
-                    } else {
-                        GameMusic.mute()
-                        true
-                    }
-                })
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {
+                        isMute = if (isMute) {
+                            GameMusic.unMute()
+                            false
+                        } else {
+                            GameMusic.mute()
+                            true
+                        }
+                    })
                 .testTag("music_muter")
         ) {
             Image(

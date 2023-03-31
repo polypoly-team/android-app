@@ -1,5 +1,8 @@
 package com.github.polypoly.app.game
 
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,7 +15,11 @@ class GameLobbyTest {
 
     private val emptySkin = Skin(0, 0, 0)
     private val zeroStats = Stats()
-    private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats)
+    private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7
     private val testDuration = 2.hours
@@ -27,9 +34,9 @@ class GameLobbyTest {
             testDuration, emptyList(), testInitialBalance, testName, testCode
         )
         for (n in 1L until testMinNumberPlayers)
-            gameLobby.addUser(User( n, "test-$n", "", emptySkin, zeroStats))
+            gameLobby.addUser(User( n, "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
         for (n in testMinNumberPlayers + 1..testMaxNumberPlayers) {
-            gameLobby.addUser(User(n.toLong(), "test-$n", "", emptySkin, zeroStats))
+            gameLobby.addUser(User(n.toLong(), "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
             assertTrue(gameLobby.canStart())
         }
     }
@@ -42,14 +49,14 @@ class GameLobbyTest {
         )
         for (n in 1L until testMinNumberPlayers) {
             assertFalse(gameLobby.canStart())
-            gameLobby.addUser(User(n, "test-$n", "", emptySkin, zeroStats))
+            gameLobby.addUser(User(n, "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
         }
         for (n in testMinNumberPlayers until testMaxNumberPlayers) {
-            gameLobby.addUser(User(n.toLong(), "test-$n", "", emptySkin, zeroStats))
+            gameLobby.addUser(User(n.toLong(), "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
         }
         for (n in 0L..10L)
             assertThrows(IllegalStateException::class.java) {
-                gameLobby.addUser(User((testMaxNumberPlayers.toLong()) + n, "test-$n", "", emptySkin, zeroStats))
+                gameLobby.addUser(User((testMaxNumberPlayers.toLong()) + n, "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
             }
     }
 
@@ -86,7 +93,7 @@ class GameLobbyTest {
     }
 
     @Test
-    fun pendingGameDoesntAcceptInvalidGameCodes() {
+    fun pendingGameDoesNotAcceptInvalidGameCodes() {
         val emptyCode = ""
         val blancCode = "    \n  \t"
 
@@ -105,11 +112,6 @@ class GameLobbyTest {
     fun canAddUsersToPendingGame() {
         val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode)
-
-        val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats)
-        val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats)
-        val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats)
-        val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats)
 
         gameLobby.addUser(u1)
         gameLobby.addUser(u2)
@@ -135,11 +137,6 @@ class GameLobbyTest {
     fun canRemoveUsersToPendingGame() {
         val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode)
-
-        val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats)
-        val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats)
-        val u3 = User(42042045, "test_user3", "", emptySkin, zeroStats)
-        val u4 = User(42042046, "test_user4", "", emptySkin, zeroStats)
 
         gameLobby.addUser(u1)
         gameLobby.addUser(u2)
@@ -170,7 +167,7 @@ class GameLobbyTest {
             testUser, GameMode.RICHEST_PLAYER, 2, testMaxNumberPlayers,
             testDuration, emptyList(), testInitialBalance, testName, testCode
         )
-        gameLobby.addUser(User(42042050, "test_user1", "", emptySkin, zeroStats))
+        gameLobby.addUser(User(42042050, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf()))
 
         val game = gameLobby.start()
         val usersRegistered = gameLobby.usersRegistered

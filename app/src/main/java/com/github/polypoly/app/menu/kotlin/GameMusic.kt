@@ -8,15 +8,26 @@ object GameMusic {
     private lateinit var mediaPlayer: MediaPlayer
     private var volume = 0.8f // default value
     private var isMute = false
+    private var isOn = false
 
     fun setSong(context: Context, songId: Int) {
         mediaPlayer = MediaPlayer.create(context, songId)
     }
 
     fun startSong() {
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
-        setVolume(volume)
+        if(!isOn) {
+            mediaPlayer.isLooping = true
+            mediaPlayer.start()
+            setVolume(volume)
+            isOn = true
+        }
+    }
+
+    fun stopSong() {
+        if(isOn) {
+            mediaPlayer.stop()
+            isOn = false
+        }
     }
 
     /**
@@ -42,5 +53,9 @@ object GameMusic {
     fun unMute() {
         mediaPlayer.setVolume(volume, volume)
         isMute = false
+    }
+
+    fun getMuteState(): Boolean {
+        return isMute
     }
 }
