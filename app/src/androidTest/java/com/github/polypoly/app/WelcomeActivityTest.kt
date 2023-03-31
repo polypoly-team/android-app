@@ -4,7 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.github.polypoly.app.menu.JoinGroupActivity
+import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.ProfileActivity
 import com.github.polypoly.app.menu.SettingsActivity
 import org.junit.After
@@ -108,7 +108,7 @@ class WelcomeActivityTest {
     fun joinGameButtonOpensActivity() {
         // Clicking on button
         buttonJoinGame.performClick()
-        Intents.intended(IntentMatchers.hasComponent(JoinGroupActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasComponent(JoinGameLobbyActivity::class.java.name))
     }
 
     /* TODO: enable when CreateGroupActivity exists
