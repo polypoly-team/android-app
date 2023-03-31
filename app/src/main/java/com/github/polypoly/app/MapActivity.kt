@@ -26,12 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import com.google.android.gms.location.Priority
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -59,6 +63,12 @@ class MapActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val db = Firebase.database
+        try {
+            db.setPersistenceEnabled(false) // disable local caching and do only write-through instead
+        } catch(_: java.lang.Exception) { }
+        GlobalInstances.remoteDB = RemoteDB(db, "live")
+
         setContent {
             PolypolyTheme {
                 Surface(
@@ -82,7 +92,7 @@ class MapActivity : ComponentActivity() {
 
             addMarkerTo(mapView, donutPosition, "Donut")
 
-            val campusTileSource = CampusTileSource(0)
+            val campusTileSource = CampusTileSource(Random.nextInt(2), 0)
             val tileProvider = MapTileProviderBasic(applicationContext, campusTileSource)
             val tilesOverlay = TilesOverlay(tileProvider, applicationContext)
             mapView.overlays.add(tilesOverlay)
@@ -215,11 +225,10 @@ class MapActivity : ComponentActivity() {
         else "${"%.1f".format(distance / 1000)}km"
     }
 
-    class CampusTileSource(private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
+
+    class CampusTileSource(private val serverId: Int, private val floorId: Int) : OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
-            // Randomly select a server to avoid overloading one, servers go from 0 to 2
-            val epflCampusServerCount = 3
-            return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
+            return "https://plan-epfl-tiles$serverId.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}.png"
         }
     }
 

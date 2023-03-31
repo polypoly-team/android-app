@@ -241,7 +241,7 @@ class ProfileActivity : MenuActivity("Profile") {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ProfileInfo() {
-        val user = FakeRemoteStorage.instance.getUserProfileWithId(userId)
+        val user = FakeRemoteStorage.instance.getUserWithId(userId)
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start

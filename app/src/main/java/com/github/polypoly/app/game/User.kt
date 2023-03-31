@@ -1,30 +1,55 @@
 package com.github.polypoly.app.game
 
-import java.time.LocalDateTime
+import android.os.Build
+import androidx.annotation.RequiresApi
 
+/**
+ * Skin of a player represented as Head/Body/Legs components ids
+ */
 class Skin(
-    val idHead: Int,
-    val idBody: Int,
-    val idLegs: Int
-)
+    val idHead: Int = 0,
+    val idBody: Int = 0,
+    val idLegs: Int = 0
+) {
+    override fun equals(other: Any?): Boolean {
+        return other is Skin &&
+            idHead == other.idHead && idBody == other.idBody && idLegs == other.idLegs
+    }
+}
 
-class Stats(
-    val accountCreation: LocalDateTime,
-    val lastConnection: LocalDateTime,
-    val numberOfWins: Int
-)
+/**
+ * All stats concerning a given player.
+ * This will be further developed in the future.
+ */
+class Stats constructor(
+    val accountCreation: Int = 0, //> TODO improve unix-representation to something better
+    val lastConnection: Int = 0,
+    val numberOfWins: Int = 0
+) {
+    override fun equals(other: Any?): Boolean {
+        return other is Stats &&
+                accountCreation == other.accountCreation && lastConnection == other.lastConnection &&
+                numberOfWins == other.numberOfWins
+    }
+}
 
 /**
  * Stub implementation of a User
  */
-class User(
-    val id: Long,
-    val name: String,
-    val bio: String,
-    val skin: Skin,
-    val stats: Stats
+class User constructor(
+    val id: Long = 0,
+    val name: String = "no-name",
+    val bio: String = "no-bio",
+    val skin: Skin = Skin(),
+    val stats: Stats = Stats()
 ){
     override fun toString(): String {
         return "User{$id: $name}"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is User &&
+                id == other.id && name == other.name && bio == other.bio &&
+                skin == other.skin && stats == other.stats
     }
 }

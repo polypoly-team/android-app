@@ -41,7 +41,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra("userId", 0)
-        val user = FakeRemoteStorage.instance.getUserProfileWithId(id)
+        val user = FakeRemoteStorage.instance.getUserWithId(id)
         nickname = user.get().name
         description = user.get().bio
         setContent {
@@ -81,12 +81,12 @@ class ProfileModifyingActivity : ComponentActivity() {
                         warningText = "You can't have an empty nickname!"
                     } else {
                         val id = intent.getLongExtra("userId", 0)
-                        FakeRemoteStorage.instance.setUserProfileWithId(id, User(
+                        FakeRemoteStorage.instance.updateUser(User(
                             id = id,
                             name = nickname,
                             bio = description,
                             skin = Skin(0,0,0),
-                            stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 45)
+                            stats = Stats(0, 0, 45)
                         ))
                         val returnIntent = Intent(mContext, ProfileActivity::class.java)
                         finish()
