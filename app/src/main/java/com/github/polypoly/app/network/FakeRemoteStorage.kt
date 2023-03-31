@@ -43,23 +43,23 @@ class FakeRemoteStorage : IRemoteStorage {
         return CompletableFuture.completedFuture(false)
     }
 
-    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
+    override fun getGameLobbyWithCode(code: String): CompletableFuture<GameLobby> {
         TODO("Not yet implemented")
     }
 
-    override fun getAllGameLobbies(): Future<List<GameLobby>> {
+    override fun getAllGameLobbies(): CompletableFuture<List<GameLobby>> {
         TODO("Not yet implemented")
     }
 
-    override fun getAllGameLobbiesCodes(): Future<List<String>> {
+    override fun getAllGameLobbiesCodes(): CompletableFuture<List<String>> {
         TODO("Not yet implemented")
     }
 
-    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
+    override fun registerGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
+    override fun updateGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 

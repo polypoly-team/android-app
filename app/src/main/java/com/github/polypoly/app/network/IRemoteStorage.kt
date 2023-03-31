@@ -42,31 +42,31 @@ interface IRemoteStorage {
      * @param userId ID of the game lobby requested
      * @return a promise holding the game lobby requested
      */
-    fun getGameLobbyWithCode(code: String): Future<GameLobby>
+    fun getGameLobbyWithCode(code: String): CompletableFuture<GameLobby>
 
     /**
      * Retries all game lobbies existing
      * @return a promise holding the game lobby requested
      */
-    fun getAllGameLobbies(): Future<List<GameLobby>>
+    fun getAllGameLobbies(): CompletableFuture<List<GameLobby>>
 
     /**
      * Retries all game lobbies ids existing
      * @return a promise holding the game lobby requested
      */
-    fun getAllGameLobbiesCodes(): Future<List<String>>
+    fun getAllGameLobbiesCodes(): CompletableFuture<List<String>>
 
     /**
      * Registers a new game lobby
      * @param gameLobby game lobby to register
      * @return a promise holding whether the registration succeeded or not
      */
-    fun registerGameLobby(gameLobby: GameLobby): Future<Boolean>
+    fun registerGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean>
 
     /**
      * Updates an existing game lobby
      * @param gameLobby game lobby to update
      * @return a promise holding whether the update succeeded or not
      */
-    fun updateGameLobby(gameLobby: GameLobby): Future<Boolean>
+    fun updateGameLobby(gameLobby: GameLobby): CompletableFuture<Boolean>
 }
