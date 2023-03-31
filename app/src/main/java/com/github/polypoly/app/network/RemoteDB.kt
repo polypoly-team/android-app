@@ -81,10 +81,6 @@ open class RemoteDB(
         }
     }
 
-    fun getUnderlyingDB(): FirebaseDatabase{
-        return db!!
-    }
-
     override fun updateUser(user: User): CompletableFuture<Boolean> {
         return getAllUsersIds().thenCompose { allIds ->
             val registerPromise = CompletableFuture<Boolean>()
@@ -102,6 +98,10 @@ open class RemoteDB(
 
             registerPromise
         }
+    }
+
+    fun getUnderlyingDB(): FirebaseDatabase{
+        return db!!
     }
 
     companion object InvalidRemoteDB: RemoteDB(null, "") {
