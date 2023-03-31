@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,13 +23,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.polypoly.app.*
 import com.github.polypoly.app.R
+import com.github.polypoly.app.RulesObject
+import com.github.polypoly.app.map.MapActivity
 import com.github.polypoly.app.menu.kotlin.GameMusic
-
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -40,9 +41,12 @@ class WelcomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent { WelcomeContent() }
     }
+
     @Preview(showBackground = true)
     @Composable
-    fun WelcomePreview() { WelcomeContent() }
+    fun WelcomePreview() {
+        WelcomeContent()
+    }
 
     // ===================================================== MAIN CONTENT
     @Composable
@@ -68,7 +72,6 @@ class WelcomeActivity : ComponentActivity() {
             }
         }
     }
-
 
 
     // ===================================================== WELCOME COMPONENTS
@@ -119,13 +122,12 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
-    // TODO: add a usage for button3
     /**
      * Small buttons that appear in the bottom of the welcome screen.
      * Each one represents a specific option, namely (from left to right)
      * - Button 1: Profile
      * - Button 2: Rules
-     * - Button 3:
+     * - Button 3: Map
      * - Button 4: Settings
      */
     @Composable
@@ -138,13 +140,21 @@ class WelcomeActivity : ComponentActivity() {
         ) {
             ProfileOptionButton()
             RulesOptionButton()
-            OptionButton(
-                onClick = { /*TODO*/ },
-                icon_id = R.drawable.tmp_happysmile,
-                description = "optionButton2")
+            MapButton()
             SettingsOptionButton()
         }
+    }
 
+    /**
+     * Launches the map/MapActivity
+     */
+    @Composable
+    fun MapButton() {
+        ActivityOptionButton(
+            activity = MapActivity::class.java,
+            icon_id = R.drawable.tmp_happysmile,
+            description = "Map"
+        )
     }
 
     /**
@@ -162,7 +172,7 @@ class WelcomeActivity : ComponentActivity() {
             description = "Show Rules"
         )
 
-        if(openRules) {
+        if (openRules) {
             Dialog(
                 onDismissRequest = { openRules = false },
             ) {
@@ -229,7 +239,7 @@ class WelcomeActivity : ComponentActivity() {
             description = description
         )
     }
-    
+
     /**
      * Creates a square button with a small image that'll be used to open other pop-ups or activities.
      */
