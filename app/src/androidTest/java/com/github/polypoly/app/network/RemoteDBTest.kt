@@ -1,8 +1,8 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.database.DatabaseReference

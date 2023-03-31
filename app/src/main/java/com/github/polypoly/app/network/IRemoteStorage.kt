@@ -1,7 +1,12 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.User
 import java.util.concurrent.CompletableFuture
+
+enum class StorageType {
+    FIREBASE,
+    TEST
+}
 
 interface IRemoteStorage {
     /**

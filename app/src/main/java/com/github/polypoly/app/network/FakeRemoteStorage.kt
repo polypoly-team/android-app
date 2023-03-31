@@ -2,9 +2,9 @@ package com.github.polypoly.app.network
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
@@ -19,7 +19,9 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(0, 0, 67)
+        stats = Stats(0, 0, 67),
+        trophiesWon = listOf(0, 4, 8, 11, 12, 14),
+        trophiesDisplay = mutableListOf(0, 4)
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
