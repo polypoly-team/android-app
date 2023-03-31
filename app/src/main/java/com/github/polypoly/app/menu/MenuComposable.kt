@@ -133,11 +133,17 @@ object MenuComposable {
 
     @Composable
     private fun RankingsButton() {
-        ActivityOptionButton(
-            destinationActivity = ProfileActivity::class.java,
+        // TODO: delete this OptionButton and uncomment the block below when RankingActivity exists
+        OptionButton(
+            onClick = {},
             iconId = R.drawable.tmp_happysmile,
             description = "Open Rankings"
         )
+        /*ActivityOptionButton(
+            destinationActivity = RankingsActivity::class.java,
+            iconId = R.drawable.tmp_happysmile,
+            description = "Open Rankings"
+        )*/
     }
 
     @Composable

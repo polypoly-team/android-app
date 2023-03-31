@@ -33,7 +33,7 @@ open class MenuActivity(name: String) : ComponentActivity() {
                         }
                     },
                     backgroundColor = MaterialTheme.colors.primary,
-                    contentColor = Color.White,
+                    contentColor = MaterialTheme.colors.background,
                     elevation = 10.dp
                 )
                 Box {
