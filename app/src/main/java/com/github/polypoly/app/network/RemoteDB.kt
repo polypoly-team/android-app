@@ -25,7 +25,11 @@ open class RemoteDB(
         val future = CompletableFuture<User>()
 
         usersRootRef.child(userId.toString()).get().addOnSuccessListener { userRef ->
-            future.complete(userRef.getValue<User>())
+            if (userRef.value == null) {
+                future.completeExceptionally(IllegalAccessError("No user with id $userId"))
+            } else {
+                future.complete(userRef.getValue<User>())
+            }
         }.addOnFailureListener(future::completeExceptionally)
 
         return future
@@ -88,7 +92,9 @@ open class RemoteDB(
                 registerPromise.completeExceptionally(
                     IllegalAccessError("Tries to update a user not registered yet"))
             } else {
-                usersRootRef.child(user.id.toString()).setValue(user).addOnSuccessListener {
+                usersRootRef.updateChildren(mapOf(
+                    user.id.toString() to user
+                )).addOnSuccessListener {
                     registerPromise.complete(true)
                 }.addOnFailureListener(registerPromise::completeExceptionally)
             }
