@@ -1,8 +1,6 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.*
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.database.DatabaseReference
@@ -16,6 +14,7 @@ import org.junit.runners.JUnit4
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.hours
 
 @RunWith(JUnit4::class)
 class RemoteDBTest {
@@ -33,6 +32,16 @@ class RemoteDBTest {
     private val testUser3 = User(123456L,"James", "Hey!", Skin(1, 1, 1), Stats())
     private val testUser4 = User(1234567L,"Henri", "Ohh!", Skin(1, 1, 1), Stats())
     private val allTestUsers = listOf(testUser1, testUser2, testUser3, testUser4)
+
+    private val testGameLobby1 = GameLobby(testUser1, GameMode.RICHEST_PLAYER, 2, 5,
+        2.hours, listOf(), 100, "testGameLobby1", "abcd")
+    private val testGameLobby2 = GameLobby(testUser2, GameMode.LAST_STANDING, 2, 5,
+        2.hours, listOf(), 100, "testGameLobby2", "abcde")
+    private val testGameLobby3 = GameLobby(testUser3, GameMode.RICHEST_PLAYER, 2, 5,
+        2.hours, listOf(), 100, "testGameLobby3", "abcdef")
+    private val testGameLobby4 = GameLobby(testUser4, GameMode.LAST_STANDING, 2, 5,
+        2.hours, listOf(), 100, "testGameLobby4", "abcdefg")
+    private val allGameLobbies = listOf(testGameLobby1, testGameLobby2, testGameLobby3, testGameLobby4)
 
     init {
         val db = Firebase.database

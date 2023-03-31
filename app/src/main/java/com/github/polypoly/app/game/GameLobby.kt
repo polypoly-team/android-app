@@ -1,17 +1,18 @@
 package com.github.polypoly.app.game
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 class GameLobby(
-    val admin: User,
-    val gameMode: GameMode,
-    val minimumNumberOfPlayers: Int,
-    val maximumNumberOfPlayers: Int,
-    val roundDuration: Duration,
-    val gameMap: List<Zone>,
-    val initialPlayerBalance: Int,
-    val name: String,
-    val code: String
+    val admin: User = User(),
+    val gameMode: GameMode = GameMode.LAST_STANDING,
+    val minimumNumberOfPlayers: Int = 2,
+    val maximumNumberOfPlayers: Int = 5,
+    val roundDuration: Duration = 2.hours,
+    val gameMap: List<Zone> = listOf(),
+    val initialPlayerBalance: Int = 100,
+    val name: String = "no-name",
+    val code: String = "no-code"
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
