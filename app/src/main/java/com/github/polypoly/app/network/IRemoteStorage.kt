@@ -18,6 +18,12 @@ interface IRemoteStorage {
     fun getAllUsers(): CompletableFuture<List<User>>
 
     /**
+     * Retries all the user ids currently existing
+     * @return a promise holding the list of all user ids
+     */
+    fun getAllUsersIds(): CompletableFuture<List<Long>>
+
+    /**
      * Adds a new user
      * @return a promise holding whether the insertion succeeded or not
      */

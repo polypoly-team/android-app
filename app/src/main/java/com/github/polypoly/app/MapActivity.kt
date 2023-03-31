@@ -67,7 +67,7 @@ class MapActivity : ComponentActivity() {
         try {
             db.setPersistenceEnabled(false)
         } catch(_: java.lang.Exception) { }
-        GlobalInstances.remoteDB = RemoteDB(db)
+        GlobalInstances.remoteDB = RemoteDB(db, "live")
 
         setContent {
             PolypolyTheme {
