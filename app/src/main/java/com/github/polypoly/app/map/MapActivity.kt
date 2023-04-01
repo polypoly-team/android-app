@@ -322,7 +322,7 @@ class MapActivity : ComponentActivity() {
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         mapView.controller.setZoom(initialZoom)
         mapView.controller.setCenter(startPosition)
-        val campusTileSource = CampusTileSource(Random.nextInt(2), 0) // TODO: fix random
+        val campusTileSource = CampusTileSource( 0)
         val tileProvider = MapTileProviderBasic(context, campusTileSource)
         val tilesOverlay = TilesOverlay(tileProvider, context)
         mapView.overlays.add(tilesOverlay)
@@ -406,10 +406,11 @@ class MapActivity : ComponentActivity() {
     /**
      * Tile source for EPFL campus map.
      */
-    class CampusTileSource(private val serverId: Int, private val floorId: Int) :
+    class CampusTileSource(private val floorId: Int) :
         OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
-            return "https://plan-epfl-tiles$serverId.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
+            val epflCampusServerCount = 3
+            return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
                 MapTileIndex.getZoom(
                     pMapTileIndex
                 )
