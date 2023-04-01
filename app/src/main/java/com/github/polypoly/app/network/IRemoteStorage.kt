@@ -1,7 +1,9 @@
 package com.github.polypoly.app.network
 
+import com.github.polypoly.app.game.GameLobby
 import com.github.polypoly.app.game.User
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 interface IRemoteStorage {
     /**
@@ -34,4 +36,37 @@ interface IRemoteStorage {
      * @return a promise holding whether the update succeeded or not
      */
     fun updateUser(user: User): CompletableFuture<Boolean>
+
+    /**
+     * Retries the game lobby with the given ID
+     * @param userId ID of the game lobby requested
+     * @return a promise holding the game lobby requested
+     */
+    fun getGameLobbyWithCode(code: String): Future<GameLobby>
+
+    /**
+     * Retries all game lobbies existing
+     * @return a promise holding the game lobby requested
+     */
+    fun getAllGameLobbies(): Future<List<GameLobby>>
+
+    /**
+     * Retries all game lobbies ids existing
+     * @return a promise holding the game lobby requested
+     */
+    fun getAllGameLobbiesCodes(): Future<List<String>>
+
+    /**
+     * Registers a new game lobby
+     * @param gameLobby game lobby to register
+     * @return a promise holding whether the registration succeeded or not
+     */
+    fun registerGameLobby(gameLobby: GameLobby): Future<Boolean>
+
+    /**
+     * Updates an existing game lobby
+     * @param gameLobby game lobby to update
+     * @return a promise holding whether the update succeeded or not
+     */
+    fun updateGameLobby(gameLobby: GameLobby): Future<Boolean>
 }

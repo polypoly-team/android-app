@@ -1,8 +1,5 @@
 package com.github.polypoly.app.game
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-
 /**
  * Skin of a player represented as Head/Body/Legs components ids
  */

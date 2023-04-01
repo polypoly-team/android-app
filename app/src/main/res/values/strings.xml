@@ -3,10 +3,14 @@
     <string name="title_activity_greeting" />
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_welcome">polypoly</string>
-    <string name="title_activity_join_group">JoinGroup</string>
-    <string name="join_group_button_text">Join</string>
-    <string name="group_does_not_exist">Group does not exist</string>
-    <string name="group_code_is_empty">Group code is empty</string>
-    <string name="group_is_full">Group is full</string>
-    <string name="joined_group_with_code">Joined group with code: </string>
+
+    // LOBBIES ==================================================================
+    <string name="title_activity_join_game_lobby">JoinLobby</string>
+    <string name="join_game_lobby_button_text">Join</string>
+    <string name="game_lobby_does_not_exist">Lobby does not exist</string>
+    <string name="game_lobby_code_is_empty">Lobby code is empty</string>
+    <string name="game_lobby_is_full">Lobby is full</string>
+    <string name="joined_game_lobby_with_code">Joined lobby with code: </string>
+    <string name="game_lobby_list_title">Join a lobby! </string>
+    // =========================================================================
 </resources>
