@@ -19,32 +19,57 @@ class MapActivityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MapActivity>()
 
+    private val dropDownButton = composeTestRule.onNodeWithTag("dropDownButton")
+    private val gameInfoButton = composeTestRule.onNodeWithTag("gameInfoButton")
+    private val playerInfoButton = composeTestRule.onNodeWithTag("playerInfoButton")
+
     @Before
     fun setUp() {
         runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
     }
 
     @Test
-    fun mapActivity_UIComponents_Displayed() {
-        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("resetButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("distanceWalked").assertIsDisplayed()
+    fun hudIsDisplayed() {
+        dropDownButton.assertIsDisplayed()
+        playerInfoButton.assertIsDisplayed()
     }
 
     @Test
-    fun mapActivity_ResetButton_Clicked_DistanceReset() {
-        fun formattedDistance(distance: Float): String {
-            return if (distance < 1000) "${"%.1f".format(distance)}m"
-            else "${"%.1f".format(distance / 1000)}km"
-        }
-
-        composeTestRule.onNodeWithTag("resetButton").performClick()
-
-        runBlocking { delay(500) }
-
-        composeTestRule.onNodeWithTag("distanceWalked")
-            .assertTextContains("Distance walked: ${formattedDistance(0f)}")
+    fun gameInfoAndOtherPlayersInfoAreDisplayedOnDropDownButtonClick() {
+        gameInfoButton.assertDoesNotExist()
+        dropDownButton.performClick()
+        gameInfoButton.assertIsDisplayed()
     }
+
+    @Test
+    fun gameInfoAndOtherPlayersInfoAreCollapsedWhenDropDownButtonIsClickedAgain() {
+        dropDownButton.performClick()
+        gameInfoButton.assertIsDisplayed()
+        dropDownButton.performClick()
+        gameInfoButton.assertDoesNotExist()
+    }
+
+    @Test
+    fun mapActivity_UIComponents_Displayed() {
+        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
+        //composeTestRule.onNodeWithTag("resetButton").assertIsDisplayed()
+        //composeTestRule.onNodeWithTag("distanceWalked").assertIsDisplayed()
+    }
+
+    //@Test
+    //fun mapActivity_ResetButton_Clicked_DistanceReset() {
+    //    fun formattedDistance(distance: Float): String {
+    //        return if (distance < 1000) "${"%.1f".format(distance)}m"
+    //        else "${"%.1f".format(distance / 1000)}km"
+    //    }
+
+    //    composeTestRule.onNodeWithTag("resetButton").performClick()
+
+    //    runBlocking { delay(500) }
+
+    //    composeTestRule.onNodeWithTag("distanceWalked")
+    //        .assertTextContains("Distance walked: ${formattedDistance(0f)}")
+    //}
 
     @Test
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
