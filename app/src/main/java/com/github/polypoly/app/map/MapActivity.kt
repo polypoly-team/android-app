@@ -409,6 +409,7 @@ class MapActivity : ComponentActivity() {
     class CampusTileSource(private val floorId: Int) :
         OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
         override fun getTileURLString(pMapTileIndex: Long): String {
+            // The EPFL campus map is served from 3 different servers, so we randomly choose one
             val epflCampusServerCount = 3
             return "https://plan-epfl-tiles${Random.nextInt(epflCampusServerCount)}.epfl.ch/1.0.0/batiments/default/20160712/$floorId/3857/${
                 MapTileIndex.getZoom(
