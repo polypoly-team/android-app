@@ -25,6 +25,8 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -33,28 +35,34 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
-    private lateinit var gameMusic: GameMusic
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
-            gameMusic.startSong()
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+        setContent { WelcomeContent() }
+    }
+    @Preview(showBackground = true)
+    @Composable
+    fun WelcomePreview() { WelcomeContent() }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun WelcomeContent() {
+        GameMusic.setSong(LocalContext.current, R.raw.mocksong)
+        GameMusic.startSong()
+        PolypolyTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // The first element is the logo of the game
-                        GameLogo()
-                        Spacer(modifier = Modifier.weight(1f))
-                        // Then the game buttons are in the center of the screen
-                        GameButtons()
-                        Spacer(modifier = Modifier.weight(1f))
-                        RowOptionButtons()
-                    }
+                    // The first element is the logo of the game
+                    GameLogo()
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Then the game buttons are in the center of the screen
+                    GameButtons()
+                    Spacer(modifier = Modifier.weight(1f))
+                    RowOptionButtons()
                 }
             }
         }
@@ -100,8 +108,8 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 // Join button
                 GameButton(onClick = {
-                    val joinGroupIntent = Intent(mContext, JoinGroupActivity::class.java)
-                    startActivity(joinGroupIntent)
+                    val joinGameLobbyIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
+                    startActivity(joinGameLobbyIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
@@ -254,36 +262,6 @@ class WelcomeActivity : ComponentActivity() {
                 .height(70.dp),
         ) {
             Text(text = text)
-        }
-    }
-
-
-
-
-
-    // =================================== PREVIEW ==============
-    @Preview(showBackground = true)
-    @Composable
-    fun WelcomePreview() {
-        gameMusic = GameMusic(LocalContext.current, R.raw.mocksong)
-        gameMusic.startSong()
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // The first element is the logo of the game
-                    GameLogo()
-                    Spacer(modifier = Modifier.weight(1f))
-                    // Then the game buttons are in the center of the screen
-                    GameButtons()
-                    Spacer(modifier = Modifier.weight(1f))
-                    RowOptionButtons()
-                }
-            }
         }
     }
 }

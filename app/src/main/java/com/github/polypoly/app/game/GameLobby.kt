@@ -3,7 +3,7 @@ package com.github.polypoly.app.game
 import com.github.polypoly.app.game.user.User
 import kotlin.time.Duration
 
-class PendingGame(
+class GameLobby(
     val admin: User,
     val gameMode: GameMode,
     val minimumNumberOfPlayers: Int,
@@ -12,7 +12,8 @@ class PendingGame(
     val gameMap: List<Zone>,
     val initialPlayerBalance: Int,
     val name: String,
-    val code: String
+    val code: String,
+    val private: Boolean = false
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -42,6 +43,11 @@ class PendingGame(
         if (currentUsersRegistered.any{u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
         currentUsersRegistered.add(user)
+    }
+
+    fun addUsers(users: List<User>) {
+        for (user in users)
+            addUser(user)
     }
 
     fun canStart(): Boolean {

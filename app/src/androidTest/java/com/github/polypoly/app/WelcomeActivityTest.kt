@@ -4,8 +4,11 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.polypoly.app.menu.JoinGameLobbyActivity
+import com.github.polypoly.app.menu.ProfileActivity
 import com.github.polypoly.app.menu.SettingsActivity
-import com.github.polypoly.app.menu.WelcomeActivity
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -19,11 +22,17 @@ class WelcomeActivityTest {
     private val buttonCreateGame = composeTestRule.onNodeWithText("Create Game?")
 
     private val optionButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
-    private val optionButton2 = composeTestRule.onNodeWithContentDescription("optionButton2")
-    private val optionButtonProfile  = composeTestRule.onNodeWithContentDescription("See Profile")
+    private val optionButtonRankings = composeTestRule.onNodeWithContentDescription("Open Rankings")
+    private val optionButtonProfile = composeTestRule.onNodeWithContentDescription("Open Profile")
     private val optionButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
+
+    @Before
+    fun startIntents() { Intents.init() }
+
+    @After
+    fun releaseIntents() { Intents.release() }
 
     // ========================================================= Display checks
 
@@ -41,7 +50,7 @@ class WelcomeActivityTest {
     @Test
     fun optionButtonsAreDisplayed() {
         optionButtonRules.assertIsDisplayed()
-        optionButton2.assertIsDisplayed()
+        optionButtonRankings.assertIsDisplayed()
         optionButtonProfile.assertIsDisplayed()
         optionButtonSettings.assertIsDisplayed()
     }
@@ -74,13 +83,39 @@ class WelcomeActivityTest {
     // ========================================================================
 
     @Test
-    fun settingsButtonFiresIntentWithSettingsActivity() {
-        Intents.init()
-
+    fun settingsButtonOpensActivity() {
         // Clicking on button
         optionButtonSettings.performClick()
         Intents.intended(IntentMatchers.hasComponent(SettingsActivity::class.java.name))
-
-        Intents.release()
     }
+
+    @Test
+    fun profileButtonOpensActivity() {
+        // Clicking on button
+        optionButtonProfile.performClick()
+        Intents.intended(IntentMatchers.hasComponent(ProfileActivity::class.java.name))
+    }
+
+    /* TODO: enable when RankingsActivity exists
+    @Test
+    fun rankingsButtonOpensActivity() {
+        // Clicking on button
+        optionButtonRankings.performClick()
+        Intents.intended(IntentMatchers.hasComponent(RankingsActivity::class.java.name))
+    }*/
+
+    @Test
+    fun joinGameButtonOpensActivity() {
+        // Clicking on button
+        buttonJoinGame.performClick()
+        Intents.intended(IntentMatchers.hasComponent(JoinGameLobbyActivity::class.java.name))
+    }
+
+    /* TODO: enable when CreateGroupActivity exists
+    @Test
+    fun createGameButtonOpensActivity() {
+        // Clicking on button
+        buttonCreateGame.performClick()
+        Intents.intended(IntentMatchers.hasComponent(CreateGroupActivity::class.java.name))
+    }*/
 }
