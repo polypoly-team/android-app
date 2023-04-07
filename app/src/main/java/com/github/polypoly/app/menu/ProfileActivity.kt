@@ -2,11 +2,8 @@ package com.github.polypoly.app.menu
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -36,13 +33,12 @@ import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.StorageType
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
-class ProfileActivity : ComponentActivity() {
+class ProfileActivity : MenuActivity("Profile") {
 
     //ONLY TO TEST WITHOUT THE DATABASE
     private var userId: Long = 1
     private val storageId = StorageType.TEST
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -61,12 +57,11 @@ class ProfileActivity : ComponentActivity() {
      * Display the user profile with all the statistics of the user, his/her nickname, his/her
      * description and his/her appearance in the game
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ProfileAndStats() {
         val user: User
         when(storageId) {
-            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserProfileWithId(userId).get()
+            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserWithId(userId).get()
             StorageType.FIREBASE -> throw NotImplementedError()
         }
 
@@ -400,7 +395,6 @@ class ProfileActivity : ComponentActivity() {
     }
 
     // =================================== PREVIEW ==============
-    @RequiresApi(Build.VERSION_CODES.O)
     @Preview(
         name = "Light Mode"
     )

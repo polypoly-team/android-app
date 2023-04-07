@@ -2,11 +2,9 @@ package com.github.polypoly.app.menu
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -19,13 +17,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import java.time.LocalDateTime
 
 class ProfileModifyingActivity : ComponentActivity() {
 
@@ -39,11 +34,10 @@ class ProfileModifyingActivity : ComponentActivity() {
      */
     private var description: String = ""
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra("userId", 0)
-        val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
+        val user = FakeRemoteStorage.instance.getUserWithId(id).get()
         nickname = user.name
         description = user.bio
         setContent {
@@ -61,7 +55,6 @@ class ProfileModifyingActivity : ComponentActivity() {
     /**
      * The form where the user can fill his/her profile info
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ProfileForm(user: User) {
         var warningText by remember { mutableStateOf("") }
@@ -133,7 +126,6 @@ class ProfileModifyingActivity : ComponentActivity() {
      * Button to validate the form
      * @param onError call back when an error occur
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ValidationButton(onError: () -> Unit, trophiesDisplay: MutableList<Int>) {
         val mContext = LocalContext.current
@@ -145,8 +137,8 @@ class ProfileModifyingActivity : ComponentActivity() {
                     onError()
                 } else {
                     val id = intent.getLongExtra("userId", 0)
-                    val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
-                    FakeRemoteStorage.instance.setUserProfileWithId(id, User(
+                    val user = FakeRemoteStorage.instance.getUserWithId(id).get()
+                    FakeRemoteStorage.instance.updateUser(User(
                         id = id,
                         name = nickname,
                         bio = description,
@@ -233,7 +225,6 @@ class ProfileModifyingActivity : ComponentActivity() {
 
 
     // =================================== PREVIEW ==============
-    @RequiresApi(Build.VERSION_CODES.O)
     @Preview(
         name = "Light Mode"
     )
@@ -245,7 +236,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     fun ProfileModifyingPreview() {
         PolypolyTheme {
             val id = intent.getLongExtra("userId", 0)
-            val user = FakeRemoteStorage.instance.getUserProfileWithId(id).get()
+            val user = FakeRemoteStorage.instance.getUserWithId(id).get()
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
