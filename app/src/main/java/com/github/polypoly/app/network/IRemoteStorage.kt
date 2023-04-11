@@ -1,7 +1,7 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.User
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 
@@ -69,4 +69,9 @@ interface IRemoteStorage {
      * @return a promise holding whether the update succeeded or not
      */
     fun updateGameLobby(gameLobby: GameLobby): Future<Boolean>
+}
+
+enum class StorageType {
+    FIREBASE,
+    TEST
 }

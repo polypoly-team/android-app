@@ -1,8 +1,8 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.database.DatabaseReference
@@ -13,6 +13,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -28,10 +29,16 @@ class RemoteDBTest {
     private val rootRef: DatabaseReference
     private val usersRootRef: DatabaseReference
 
-    private val testUser1 = User(1234L,"John", "Hi!", Skin(1, 1, 1), Stats())
-    private val testUser2 = User(12345L,"Harry", "Ha!", Skin(1, 1, 1), Stats())
-    private val testUser3 = User(123456L,"James", "Hey!", Skin(1, 1, 1), Stats())
-    private val testUser4 = User(1234567L,"Henri", "Ohh!", Skin(1, 1, 1), Stats())
+    private val zeroStats = Stats(0, 0, 0, 0, 0)
+
+    private val testUser1 = User(1234L,"John", "Hi!", Skin(1, 1, 1),
+        zeroStats, listOf(), mutableListOf())
+    private val testUser2 = User(12345L,"Harry", "Ha!", Skin(1, 1, 1),
+        zeroStats, listOf(), mutableListOf())
+    private val testUser3 = User(123456L,"James", "Hey!", Skin(1, 1, 1),
+        zeroStats, listOf(), mutableListOf())
+    private val testUser4 = User(1234567L,"Henri", "Ohh!", Skin(1, 1, 1),
+        zeroStats, listOf(), mutableListOf())
     private val allTestUsers = listOf(testUser1, testUser2, testUser3, testUser4)
 
     init {
@@ -131,7 +138,8 @@ class RemoteDBTest {
 
     @Test
     fun userCanBeUpdatedAfterRegistration() {
-        val userUpdated = User(testUser1.id, "Cool_name", "I updated my bio!", Skin(), Stats())
+        val userUpdated = User(testUser1.id, "Cool_name", "I updated my bio!", Skin(0,0,0),
+            zeroStats, listOf(), mutableListOf())
         addUsersToDB(listOf(testUser1))
 
         assertTrue(remoteDB.updateUser(userUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS))

@@ -29,13 +29,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.Skin
-import com.github.polypoly.app.game.Stats
-import com.github.polypoly.app.game.User
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
+import java.time.LocalDateTime
 
 /**
  * Activity where the user can join a gameLobby
@@ -563,7 +564,9 @@ class JoinGameLobbyActivity : ComponentActivity() {
 }
 
 // MOCK DATA
-private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0), Stats())
+private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0),
+    Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
+)
 private val mockDb = FakeRemoteStorage()
 
 

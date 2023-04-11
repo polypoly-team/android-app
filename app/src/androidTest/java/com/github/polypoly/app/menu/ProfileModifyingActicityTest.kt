@@ -58,7 +58,7 @@ class ProfileModifyingActivityTest {
     }
 
     @Test
-    fun okButtonGoToTheProfilePage() {
+    fun validateProfileButtonGoToTheProfilePage() {
 
         Intents.init()
 
@@ -77,7 +77,7 @@ class ProfileModifyingActivityTest {
     }
 
     @Test
-    fun okButtonGoToTheProfilePageAndModifyTheName() {
+    fun validateProfileButtonGoToTheProfilePageAndModifyTheName() {
 
         Intents.init()
 
@@ -93,6 +93,26 @@ class ProfileModifyingActivityTest {
         // Clicking on button
         button.performClick()
         nickname.assert(hasText("bigflo"))
+
+        Intents.release()
+    }
+
+    @Test
+    fun cantValidateTheProfileIfThePlayerGiveAnEmptyNickName() {
+
+        Intents.init()
+
+        // An intent with a name is sent to the activity
+        val testIntent =
+            Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
+        testIntent.putExtra("n kqnd", 1)
+        ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
+
+        nicknameText.performTextReplacement("")
+
+        // Clicking on button
+        button.performClick()
+        Intents.intended(IntentMatchers.hasComponent(ProfileModifyingActivity::class.java.name))
 
         Intents.release()
     }

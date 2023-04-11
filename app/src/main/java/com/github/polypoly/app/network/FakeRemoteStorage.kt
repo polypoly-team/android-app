@@ -1,25 +1,28 @@
 package com.github.polypoly.app.network
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.github.polypoly.app.game.*
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import kotlin.time.Duration.Companion.hours
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
 
 /**
- * A fake remote storage to test the functionalities with compatibility for later use of the DB
+ * A fake remote storage to test the functionalities without the database
  */
 class FakeRemoteStorage : IRemoteStorage {
 
     private val emptySkin = Skin(0, 0, 0)
-    private val zeroStats = Stats()
-    private val testUser1 = User(2, "test_user_1", "", emptySkin, zeroStats)
-    private val testUser2 = User(3, "test_user_2", "", emptySkin, zeroStats)
-    private val testUser3 = User(4, "test_user_3", "", emptySkin, zeroStats)
-    private val testUser4 = User(5, "test_user_4", "", emptySkin, zeroStats)
-    private val testUser5 = User(6, "test_user_5", "", emptySkin, zeroStats)
+    private val zeroStats = Stats(0, 0, 0, 0, 0)
+    private val trophiesWon1 = listOf(0, 4, 8, 11, 12, 14)
+    private val trophiesDisplay1 = mutableListOf(0, 4)
+    private val testUser1 = User(2, "test_user_1", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
+    private val testUser2 = User(3, "test_user_2", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
+    private val testUser3 = User(4, "test_user_3", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
+    private val testUser4 = User(5, "test_user_4", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
+    private val testUser5 = User(6, "test_user_5", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
 
     private val testMinNumberPlayers = 2
     private val testMaxNumberPlayers = 5
@@ -66,7 +69,9 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(0, 0, 67)
+        stats = Stats(0, 0, 67, 28, 14),
+        trophiesWon = listOf(0, 4, 8, 11, 12, 14),
+        trophiesDisplay = mutableListOf(0, 4)
     )
 
     init {
@@ -89,7 +94,7 @@ class FakeRemoteStorage : IRemoteStorage {
     }
 
     override fun getAllUsers(): CompletableFuture<List<User>> {
-        return CompletableFuture.completedFuture(listOf<User>(user))
+        return CompletableFuture.completedFuture(listOf(user))
     }
 
     override fun getAllUsersIds(): CompletableFuture<List<Long>> {
