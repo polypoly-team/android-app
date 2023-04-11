@@ -15,7 +15,7 @@ import com.github.polypoly.app.game.user.User
 class FakeRemoteStorage : IRemoteStorage {
 
     private val emptySkin = Skin(0, 0, 0)
-    private val zeroStats = Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0, 0, 0)
+    private val zeroStats = Stats(0, 0, 0, 0, 0)
     private val trophiesWon1 = listOf(0, 4, 8, 11, 12, 14)
     private val trophiesDisplay1 = mutableListOf(0, 4)
     private val testUser1 = User(2, "test_user_1", "", emptySkin, zeroStats, trophiesWon1, trophiesDisplay1)
@@ -69,7 +69,7 @@ class FakeRemoteStorage : IRemoteStorage {
         name = "Tamara",
         bio = "J'ai besoin de beaucoup beaucoup beaucoup de sommeil",
         skin = Skin(0,0,0),
-        stats = Stats(LocalDateTime.MIN, LocalDateTime.MAX, 67, 28, 14),
+        stats = Stats(0, 0, 67, 28, 14),
         trophiesWon = listOf(0, 4, 8, 11, 12, 14),
         trophiesDisplay = mutableListOf(0, 4)
     )

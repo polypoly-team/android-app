@@ -565,7 +565,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
 
 // MOCK DATA
 private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0),
-    Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0, 0, 0), listOf(), mutableListOf()
+    Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
 )
 private val mockDb = FakeRemoteStorage()
 

@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.hours
 class GameLobbyTest {
 
     private val emptySkin = Skin(0, 0, 0)
-    private val zeroStats = Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0, 0, 0)
+    private val zeroStats = Stats(0, 0, 0, 0, 0)
     private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7

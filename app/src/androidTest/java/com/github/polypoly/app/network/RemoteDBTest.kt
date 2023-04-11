@@ -29,7 +29,7 @@ class RemoteDBTest {
     private val rootRef: DatabaseReference
     private val usersRootRef: DatabaseReference
 
-    private val zeroStats = Stats(LocalDateTime.MIN, LocalDateTime.MIN, 0, 0, 0)
+    private val zeroStats = Stats(0, 0, 0, 0, 0)
 
     private val testUser1 = User(1234L,"John", "Hi!", Skin(1, 1, 1),
         zeroStats, listOf(), mutableListOf())
