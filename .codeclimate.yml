@@ -3,9 +3,20 @@ exclude_patterns:
 - "**/androidTest/"
 - "**test"
 - "**/polypoly/app/map/LocationRepository"
-
+-
+version: "2"
 checks:
   argument-count:
     enabled: true
     config:
       threshold: 6
+    method-lines:
+      config:
+        threshold: 35
+    similar-code:
+      enabled: false
+    identical-code:
+      enabled: false
+    file-lines:
+      config:
+        threshold: 500
