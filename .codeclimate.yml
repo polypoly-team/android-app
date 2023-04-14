@@ -2,7 +2,7 @@ exclude_patterns:
 - "**/test/"
 - "**/androidTest/"
 - "**test"
-- "**/polypoly/app/map/LocationRepository"
+- "**/map/LocationRepository.kt"
 
 version: "2"
 checks:
