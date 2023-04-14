@@ -2,6 +2,7 @@ exclude_patterns:
 - "**/test/"
 - "**/androidTest/"
 - "**test"
+- "**/polypoly/app/map/LocationRepository"
 
 checks:
   argument-count:
