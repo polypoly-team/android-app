@@ -2,12 +2,17 @@ package com.github.polypoly.app
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,9 +25,9 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
-
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
+import androidx.activity.ComponentActivity as ComponentActivity1
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -30,25 +35,35 @@ import com.google.firebase.auth.FirebaseAuth
  *
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
-class WelcomeActivity : ComponentActivity() {
+class WelcomeActivity : ComponentActivity1() {
 
     private var firebaseAuth: FirebaseAuth? = null
-    var mAuthListener: FirebaseAuth.AuthStateListener? = null
-    var isSignedIn = false
+    private var mAuthListener: FirebaseAuth.AuthStateListener? = FirebaseAuth.AuthStateListener {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         firebaseAuth = FirebaseAuth.getInstance()
-        mAuthListener = FirebaseAuth.AuthStateListener {
-            val user = FirebaseAuth.getInstance().currentUser
-            isSignedIn = user != null
-        }
-
         setContent { WelcomeContent() }
     }
 
+    override fun onStart() {
+        super.onStart()
+        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        firebaseAuth!!.removeAuthStateListener(mAuthListener!!)
+    }
+
+    /**
+     * This function is called when the sign-in flow is wanted to be started
+     */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
@@ -61,9 +76,10 @@ class WelcomeActivity : ComponentActivity() {
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
-            print("__________________ Signed in successfully _________________")
+            print("\n__________________ Signed in successfully _________________\n")
         } else {
-            print("__________________ Signed in FAILLEUUUUDD _________________")
+            print("\n__________________ Signed in failed _________________\n")
+            print(response?.error?.errorCode)
         }
     }
 
@@ -78,6 +94,14 @@ class WelcomeActivity : ComponentActivity() {
     fun WelcomeContent() {
         GameMusic.setSong(LocalContext.current, R.raw.mocksong)
         GameMusic.startSong()
+
+        val isSignedIn = remember { mutableStateOf(false) }
+        mAuthListener = FirebaseAuth.AuthStateListener {
+            val user = FirebaseAuth.getInstance().currentUser
+            isSignedIn.value = user != null
+            print("\n__________________ Signed in: ${user?.displayName} _________________\n")
+        }
+
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -90,12 +114,12 @@ class WelcomeActivity : ComponentActivity() {
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
                     // Then the game buttons are in the center of the screen
-                    if(isSignedIn) {
+                    if(isSignedIn.value) {
                         GameButtons()
                         Spacer(modifier = Modifier.weight(1f))
                         MenuComposable.RowButtons()
                     } else {
-                        SignInButton()
+                        SignInButton(isSignedIn)
                     }
                 }
             }
@@ -171,7 +195,7 @@ class WelcomeActivity : ComponentActivity() {
      * This button is used to sign in the user, it'll be displayed if the user is not signed in
      */
     @Composable
-    private fun SignInButton() {
+    private fun SignInButton(isSignedIn: MutableState<Boolean>) {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
