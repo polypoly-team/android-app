@@ -121,7 +121,7 @@ class MapActivity : ComponentActivity() {
         AndroidView(factory = { context ->
             Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-            val mapView = initMapView(context, Companion.INITIAL_POSITION)
+            val mapView = initMapView(context, INITIAL_POSITION)
 
             for (zone in getZones())
                 for (location in zone.locations) {
@@ -359,7 +359,7 @@ class MapActivity : ComponentActivity() {
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         mapView.setMultiTouchControls(true)
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        mapView.controller.setZoom(Companion.INITIAL_ZOOM)
+        mapView.controller.setZoom(INITIAL_ZOOM)
         mapView.controller.setCenter(startPosition)
         val campusTileSource = CampusTileSource(0)
         val tileProvider = MapTileProviderBasic(context, campusTileSource)
@@ -399,8 +399,8 @@ class MapActivity : ComponentActivity() {
         val markerIcon = decodeResource(context.resources, R.drawable.location_pin)
         val scaledBitmap = createScaledBitmap(
             markerIcon,
-            Companion.MARKER_SIDE_LENGTH,
-            Companion.MARKER_SIDE_LENGTH, true
+            MARKER_SIDE_LENGTH,
+            MARKER_SIDE_LENGTH, true
         )
         val paint = Paint()
         paint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
@@ -431,7 +431,9 @@ class MapActivity : ComponentActivity() {
         locationOverlay.enableFollowLocation()
         locationOverlay.runOnFirstFix {
             runOnUiThread {
-                updateAllDistancesAndFindClosest(mapView, locationOverlay.myLocation)
+                mapViewModel.setCloseLocation(
+                    updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation))
+                )
                 mapView.controller.animateTo(locationOverlay.myLocation)
                 mapViewModel.resetDistanceWalked()
             }
@@ -471,7 +473,7 @@ class MapActivity : ComponentActivity() {
                 closestLocation = markerLocation
             }
         }
-        if (myLocation.distanceToAsDouble(closestLocation!!.position) > Companion.MAX_CLOSE_LOCATION_DISTANCE)
+        if (myLocation.distanceToAsDouble(closestLocation!!.position) > MAX_CLOSE_LOCATION_DISTANCE)
             closestLocation = null
 
         return closestLocation
@@ -782,8 +784,7 @@ class MapActivity : ComponentActivity() {
         private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
         private const val INITIAL_ZOOM = 18.0
         private const val MARKER_SIDE_LENGTH = 100
-        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0    // meters, used to determine
-                                                                // if the player is close enough to
-                                                                //a location to interact with it
+        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0
+        // meters, used to determine if the player is close enough to a location to interact with it
     }
 }
