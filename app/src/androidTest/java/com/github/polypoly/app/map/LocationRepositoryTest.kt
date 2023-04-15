@@ -6,8 +6,7 @@ import org.junit.Test
 class LocationRepositoryTest {
     @Test
     fun testGetLocalizationsWorks() {
-        assert(LocationRepository.getZones().flatMap { zone -> zone.locations }
-            .isNotEmpty())
+        assert(LocationRepository.getZones().flatMap { it.locations }.isNotEmpty())
     }
 
     @Test

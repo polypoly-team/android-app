@@ -83,11 +83,6 @@ class MapActivity : ComponentActivity() {
 
     // Not public for testing purposes
     val mapViewModel: MapViewModel = MapViewModel()
-    private val initialPosition = GeoPoint(46.518726, 6.566613)
-    private val initialZoom = 18.0
-    private val markerSideLength = 100
-
-    private val maxCloseLocationDistance = 10.0
 
     private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
 
@@ -126,18 +121,13 @@ class MapActivity : ComponentActivity() {
         AndroidView(factory = { context ->
             Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-            val mapView = initMapView(context, initialPosition)
+            val mapView = initMapView(context, Companion.INITIAL_POSITION)
 
             for (zone in getZones())
-                zone.locations
-                    .forEach {
-                        markerToLocation[addMarkerTo(
-                            mapView,
-                            it.position,
-                            it.name,
-                            zone.color
-                        )] = it
-                    }
+                for (location in zone.locations) {
+                    val marker = addMarkerTo(mapView, location.position, location.name, zone.color)
+                    markerToLocation[marker] = location
+                }
 
             val currentLocationOverlay = initLocationOverlay(mapView)
             mapView.overlays.add(currentLocationOverlay)
@@ -369,7 +359,7 @@ class MapActivity : ComponentActivity() {
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         mapView.setMultiTouchControls(true)
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        mapView.controller.setZoom(initialZoom)
+        mapView.controller.setZoom(Companion.INITIAL_ZOOM)
         mapView.controller.setCenter(startPosition)
         val campusTileSource = CampusTileSource(0)
         val tileProvider = MapTileProviderBasic(context, campusTileSource)
@@ -407,7 +397,11 @@ class MapActivity : ComponentActivity() {
      */
     private fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = decodeResource(context.resources, R.drawable.location_pin)
-        val scaledBitmap = createScaledBitmap(markerIcon, markerSideLength, markerSideLength, true)
+        val scaledBitmap = createScaledBitmap(
+            markerIcon,
+            Companion.MARKER_SIDE_LENGTH,
+            Companion.MARKER_SIDE_LENGTH, true
+        )
         val paint = Paint()
         paint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
         val canvas = Canvas(scaledBitmap)
@@ -426,20 +420,18 @@ class MapActivity : ComponentActivity() {
             override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
                 super.onLocationChanged(location, provider)
                 mapViewModel.setCloseLocation(
-                    updateAllDistancesAndClosest(mapView, GeoPoint(location))
+                    updateAllDistancesAndFindClosest(mapView, GeoPoint(location))
                 )
                 mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
                 lastLocation = locationProvider.lastKnownLocation
-                print("location: $location")
             }
         }
 
         locationOverlay.enableMyLocation()
         locationOverlay.enableFollowLocation()
         locationOverlay.runOnFirstFix {
-            print("First fix: ${locationOverlay.myLocation}")
             runOnUiThread {
-                updateAllDistancesAndClosest(mapView, locationOverlay.myLocation)
+                updateAllDistancesAndFindClosest(mapView, locationOverlay.myLocation)
                 mapView.controller.animateTo(locationOverlay.myLocation)
                 mapViewModel.resetDistanceWalked()
             }
@@ -459,7 +451,7 @@ class MapActivity : ComponentActivity() {
      *
      * @return the closest location or null if there are no locations close enough to the player
      */
-    private fun updateAllDistancesAndClosest(
+    private fun updateAllDistancesAndFindClosest(
         mapView: MapView,
         myLocation: GeoPoint
     ): com.github.polypoly.app.game.Location? {
@@ -479,7 +471,7 @@ class MapActivity : ComponentActivity() {
                 closestLocation = markerLocation
             }
         }
-        if (myLocation.distanceToAsDouble(closestLocation!!.position) > maxCloseLocationDistance)
+        if (myLocation.distanceToAsDouble(closestLocation!!.position) > Companion.MAX_CLOSE_LOCATION_DISTANCE)
             closestLocation = null
 
         return closestLocation
@@ -784,5 +776,14 @@ class MapActivity : ComponentActivity() {
                 BuildingInfoUIComponent()
             }
         }
+    }
+
+    companion object {
+        private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
+        private const val INITIAL_ZOOM = 18.0
+        private const val MARKER_SIDE_LENGTH = 100
+        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0    // meters, used to determine
+                                                                // if the player is close enough to
+                                                                //a location to interact with it
     }
 }
