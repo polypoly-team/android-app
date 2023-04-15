@@ -14,11 +14,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -27,9 +31,40 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
+
+    private var firebaseAuth: FirebaseAuth? = null
+    var mAuthListener: FirebaseAuth.AuthStateListener? = null
+    var isSignedIn = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        mAuthListener = FirebaseAuth.AuthStateListener {
+            val user = FirebaseAuth.getInstance().currentUser
+            isSignedIn = user != null
+        }
+
         setContent { WelcomeContent() }
+    }
+
+
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) { res ->
+        this.onSignInResult(res)
+    }
+
+    /**
+     * This function is called when the sign-in flow is completed
+     */
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK) {
+            print("__________________ Signed in successfully _________________")
+        } else {
+            print("__________________ Signed in FAILLEUUUUDD _________________")
+        }
     }
 
     @Preview(showBackground = true)
@@ -55,14 +90,17 @@ class WelcomeActivity : ComponentActivity() {
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
                     // Then the game buttons are in the center of the screen
-                    GameButtons()
-                    Spacer(modifier = Modifier.weight(1f))
-                    MenuComposable.RowButtons()
+                    if(isSignedIn) {
+                        GameButtons()
+                        Spacer(modifier = Modifier.weight(1f))
+                        MenuComposable.RowButtons()
+                    } else {
+                        SignInButton()
+                    }
                 }
             }
         }
     }
-
 
     // ===================================================== WELCOME COMPONENTS
     /**
@@ -126,6 +164,33 @@ class WelcomeActivity : ComponentActivity() {
                 .height(70.dp),
         ) {
             Text(text = text)
+        }
+    }
+
+    /**
+     * This button is used to sign in the user, it'll be displayed if the user is not signed in
+     */
+    @Composable
+    private fun SignInButton() {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(2.dp)
+            ) {
+                GameButton(onClick = {
+                    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+
+                    val signInIntent = AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build()
+                    signInLauncher.launch(signInIntent)
+                }, text = "Sign in to play!")
+            }
         }
     }
 }
