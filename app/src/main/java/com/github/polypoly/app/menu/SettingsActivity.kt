@@ -153,8 +153,7 @@ class SettingsActivity : MenuActivity("Settings") {
                        if (FirebaseAuth.getInstance().currentUser != null){
                            FirebaseAuth.getInstance().signOut()
                        }
-                        val backToWelcome = Intent(mContext, WelcomeActivity::class.java)
-                        startActivity(backToWelcome)
+                        finish()
                     },
                     modifier = Modifier
                         .width(100.dp)
