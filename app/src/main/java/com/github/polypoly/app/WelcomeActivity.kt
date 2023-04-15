@@ -66,22 +66,7 @@ class WelcomeActivity : ComponentActivity1() {
      */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
-    ) { res ->
-        this.onSignInResult(res)
-    }
-
-    /**
-     * This function is called when the sign-in flow is completed
-     */
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            print("\n__________________ Signed in successfully _________________\n")
-        } else {
-            print("\n__________________ Signed in failed _________________\n")
-            print(response?.error?.errorCode)
-        }
-    }
+    ) {}
 
     @Preview(showBackground = true)
     @Composable
@@ -99,7 +84,11 @@ class WelcomeActivity : ComponentActivity1() {
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = FirebaseAuth.getInstance().currentUser
             isSignedIn.value = user != null
-            print("\n__________________ Signed in: ${user?.displayName} _________________\n")
+            if(isSignedIn.value) {
+                print("\n__________________ Signed in: ${user?.displayName} _________________\n")
+            } else {
+                print("\n__________________ No user signed in _________________\n")
+            }
         }
 
         PolypolyTheme {
