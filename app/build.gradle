@@ -59,6 +59,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+    // authentication
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+
     // Open Street Maps
     implementation 'org.osmdroid:osmdroid-android:6.1.11'
 
