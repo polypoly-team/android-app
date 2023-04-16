@@ -33,6 +33,7 @@ data class Skin(
     }
 
     companion object {
+        // TODO: Replace this by a real skin system
         // The number of possible heads, bodies and legs
         const val NB_HEADS = 1
         const val NB_BODIES = 1

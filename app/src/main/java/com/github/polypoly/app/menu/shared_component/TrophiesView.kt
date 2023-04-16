@@ -16,8 +16,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.Trophy
+import com.github.polypoly.app.game.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.game.user.User
-import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.ui.theme.advancedShadow
 import com.github.polypoly.app.util.toDp
 
