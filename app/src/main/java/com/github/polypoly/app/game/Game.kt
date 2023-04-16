@@ -23,8 +23,8 @@ class Game private constructor(
     val dateBegin: Long,
 ) {
 
-    private val playerToGlobalData: HashMap<User, PlayerGlobalData> = HashMap()
-    private val playerToPerTurnData: HashMap<User, PlayerPerRoundData> = HashMap()
+    private val playerToGlobalData: HashMap<Player, PlayerGlobalData> = HashMap()
+    private val playerToPerTurnData: HashMap<Player, PlayerPerRoundData> = HashMap()
     private val locationToOwner: HashMap<Location, User> = HashMap()
 
     init {
@@ -82,7 +82,11 @@ class Game private constructor(
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
             return Game(
                 gameLobby.admin,
-                gameLobby.usersRegistered,
+                gameLobby.usersRegistered.map { Player(
+                    user = it,
+                    balance = gameLobby.initialPlayerBalance,
+                    ownedLocations = listOf(),
+                ) },
                 gameLobby.gameMode,
                 gameLobby.gameMap,
                 gameLobby.roundDuration,
