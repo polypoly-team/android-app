@@ -138,7 +138,7 @@ class ProfileModifyingActivity : ComponentActivity() {
                 if(nickname.isEmpty()) {
                     onError()
                 } else {
-                    val id = intent.getLongExtra("userId", 0)
+                    val id = intent.getLongExtra("userId", 1) // TODO fixme to 0 when real DB is used
                     val user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + id).get()
                     FakeRemoteStorage.instance.updateValue(DB_USERS_PROFILES_PATH + id, User(
                         id = id,
