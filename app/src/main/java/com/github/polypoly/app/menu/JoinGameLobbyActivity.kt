@@ -32,11 +32,13 @@ import com.github.polypoly.app.game.GameLobby
 import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.network.FakeRemoteStorage
+import com.github.polypoly.app.network.getAllValues
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import java.time.LocalDateTime
 
 /**
  * Activity where the user can join a gameLobby
@@ -298,7 +300,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      */
     @Composable
     private fun GameLobbyCardPlayerCount(gameLobby: GameLobby) {
-        Row() {
+        Row {
             Image(
                 painter = painterResource(id = R.drawable.avatar),
                 contentDescription = "people icon",
@@ -399,7 +401,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
     @Composable
     fun GameLobbyCardPlayerList(gameLobby: GameLobby) {
         for (player in gameLobby.usersRegistered) {
-            Row() {
+            Row {
                 Image(
                     painter = painterResource(id = R.drawable.tmp_happysmile),
                     contentDescription = "${player.name} icon",
@@ -506,8 +508,8 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * @param mContext (Context): The context of the activity
      */
     private fun joinGameLobbyRoom(mContext: Context) {
-        //TODO: clean this up when DB is really implemented
-        val gameLobby =  mockDb.getGameLobbyWithCode(gameLobbyCode).get()
+        val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+        val gameLobby =  mockDb.getValue<GameLobby>(currentLobbyKey).get()
         val newGameLobby = GameLobby(gameLobby.admin, gameLobby.gameMode, gameLobby.minimumNumberOfPlayers, gameLobby.maximumNumberOfPlayers, gameLobby.roundDuration
             , gameLobby.gameMap, gameLobby.initialPlayerBalance, gameLobby.name, gameLobby.code, gameLobby.private)
 
@@ -517,7 +519,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
             }
         }
         newGameLobby.addUser(authenticated_user)
-        mockDb.updateGameLobby(newGameLobby)
+        mockDb.updateValue(currentLobbyKey, newGameLobby)
         // TODO: link to the gameLobby room activity
     }
 
@@ -526,7 +528,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * @return (List<GameLobby>): The list of public gameLobbys
      */
     private fun getPublicGameLobbiesFromDB(): List<GameLobby> {
-        val gameLobbies = mockDb.getAllGameLobbies().get() ?: return listOf()
+        val gameLobbies = mockDb.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).get() ?: return listOf()
         return gameLobbies.filter { !it.private  && !gameLobbyIsFull(it) }
     }
 
@@ -534,21 +536,18 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * This function checks if the gameLobby code is in the database.
      * @param gameLobbyCode (String): The gameLobby code to check
      * @return (Boolean): True if the gameLobby code is in the database, false otherwise
-     * TODO: rewrite this function to check the real database
      */
     private fun dbContainsGameLobbyCode(gameLobbyCode: String): Boolean {
-        return mockDb.getAllGameLobbiesCodes().get()?.contains(gameLobbyCode)?: false
+        return mockDb.keyExists(DB_GAME_LOBIES_PATH + gameLobbyCode).get()
     }
 
     /**
      * This function checks if the gameLobby is full.
      * @param gameLobbyCode (String): The gameLobby code to check
      * @return (Boolean): True if the gameLobby is full, false otherwise
-     * TODO: rewrite this function to check the real database
      */
     private fun gameLobbyIsFull(gameLobbyCode: String): Boolean {
-
-        val gameLobby = mockDb.getGameLobbyWithCode(gameLobbyCode).get() ?: return false
+        val gameLobby = mockDb.getValue<GameLobby>(DB_GAME_LOBIES_PATH + gameLobbyCode).get() ?: return false
         return gameLobbyIsFull(gameLobby)
     }
 

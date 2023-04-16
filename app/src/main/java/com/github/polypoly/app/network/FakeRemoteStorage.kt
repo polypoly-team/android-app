@@ -1,16 +1,19 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.game.*
-import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import kotlin.time.Duration.Companion.hours
 import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import kotlin.reflect.KClass
 
 /**
  * A fake remote storage to test the functionalities without the database
+ * Temporary until complete removal to connect with the real DB
  */
 class FakeRemoteStorage : IRemoteStorage {
 
@@ -74,56 +77,68 @@ class FakeRemoteStorage : IRemoteStorage {
         trophiesDisplay = mutableListOf(0, 4)
     )
 
+    private val datas = mutableMapOf<String, Any>()
+
     init {
         gameLobbyFull.addUsers(listOf(testUser2, testUser3, testUser4, testUser5))
-
         gameLobbyJoinable1.addUsers(listOf(testUser2, testUser3))
-
         gameLobbyJoinable2.addUsers(listOf(testUser2, testUser3, testUser4))
-
         gameLobbyJoinable3.addUsers(listOf(testUser2, testUser3, testUser4))
+
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyFull.code, gameLobbyFull)
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable1.code, gameLobbyJoinable1)
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable2.code, gameLobbyJoinable2)
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable3.code, gameLobbyJoinable3)
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable4.code, gameLobbyJoinable4)
+        registerValue(DB_GAME_LOBIES_PATH + gameLobbyPrivate.code, gameLobbyPrivate)
+
+        registerValue(DB_USERS_PROFILES_PATH + "0", user)
+        registerValue(DB_USERS_PROFILES_PATH + user.id, user)
+        registerValue(DB_USERS_PROFILES_PATH + testUser1.id, testUser1)
+        registerValue(DB_USERS_PROFILES_PATH + testUser2.id, testUser2)
+        registerValue(DB_USERS_PROFILES_PATH + testUser3.id, testUser3)
+        registerValue(DB_USERS_PROFILES_PATH + testUser4.id, testUser4)
+        registerValue(DB_USERS_PROFILES_PATH + testUser5.id, testUser5)
     }
 
-    override fun getUserWithId(userId: Long): CompletableFuture<User> {
-        return CompletableFuture.completedFuture(user)
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
+        if (!datas.containsKey(key))
+            return CompletableFuture.completedFuture(listOf())
+        return CompletableFuture.completedFuture(listOf(datas[key] as T))
     }
 
-    override fun updateUser(user: User): CompletableFuture<Boolean> {
-        this.user = user
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
+        return CompletableFuture.completedFuture(datas[key] as T)
+    }
+
+    override fun getAllKeys(key: String): CompletableFuture<List<String>> {
+        return CompletableFuture.completedFuture(listOf())
+    }
+
+    override fun keyExists(key: String): CompletableFuture<Boolean> {
+        return CompletableFuture.completedFuture(datas.keys.contains(key))
+    }
+
+    override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
+        if (value == null)
+            throw java.lang.IllegalArgumentException("null value")
+        datas[key] = value
         return CompletableFuture.completedFuture(true)
     }
 
-    override fun getAllUsers(): CompletableFuture<List<User>> {
-        return CompletableFuture.completedFuture(listOf(user))
-    }
-
-    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-        return getAllUsers().thenApply { users -> users.map(User::id) }
-    }
-
-    override fun registerUser(user: User): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(false)
-    }
-
-    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
-        return CompletableFuture.completedFuture(mockGameLobbies[code])
-    }
-
-    override fun getAllGameLobbies(): Future<List<GameLobby>> {
-        return CompletableFuture.completedFuture(mockGameLobbies.values.toList())
-    }
-
-    override fun getAllGameLobbiesCodes(): Future<List<String>> {
-        return CompletableFuture.completedFuture(mockGameLobbies.keys.toList())
-    }
-
-    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        mockGameLobbies[gameLobby.code] = gameLobby
+    override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
+        if (value == null)
+            throw java.lang.IllegalArgumentException("null value")
+        datas[key] = value
         return CompletableFuture.completedFuture(true)
     }
 
-    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        mockGameLobbies[gameLobby.code] = gameLobby
+    override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
+        if (value == null)
+            throw java.lang.IllegalArgumentException("null value")
+        datas[key] = value
         return CompletableFuture.completedFuture(true)
     }
 

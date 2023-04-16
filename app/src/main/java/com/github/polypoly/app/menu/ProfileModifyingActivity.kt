@@ -18,8 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.network.FakeRemoteStorage
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileModifyingActivity : ComponentActivity() {
@@ -37,7 +39,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val id = intent.getLongExtra("userId", 0)
-        val user = FakeRemoteStorage.instance.getUserWithId(id).get()
+        val user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + id).get()
         nickname = user.name
         description = user.bio
         setContent {
@@ -136,9 +138,9 @@ class ProfileModifyingActivity : ComponentActivity() {
                 if(nickname.isEmpty()) {
                     onError()
                 } else {
-                    val id = intent.getLongExtra("userId", 0)
-                    val user = FakeRemoteStorage.instance.getUserWithId(id).get()
-                    FakeRemoteStorage.instance.updateUser(User(
+                    val id = intent.getLongExtra("userId", 1) // TODO fixme to 0 when real DB is used
+                    val user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + id).get()
+                    FakeRemoteStorage.instance.updateValue(DB_USERS_PROFILES_PATH + id, User(
                         id = id,
                         name = nickname,
                         bio = description,
@@ -146,8 +148,7 @@ class ProfileModifyingActivity : ComponentActivity() {
                         stats = user.stats,
                         trophiesWon = user.trophiesWon,
                         trophiesDisplay = trophiesDisplay
-                    )
-                    )
+                    ))
                     val profileIntent = Intent(mContext, ProfileActivity::class.java)
                     startActivity(profileIntent)
                 }
@@ -236,7 +237,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     fun ProfileModifyingPreview() {
         PolypolyTheme {
             val id = intent.getLongExtra("userId", 0)
-            val user = FakeRemoteStorage.instance.getUserWithId(id).get()
+            val user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + id).get()
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
