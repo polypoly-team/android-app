@@ -34,10 +34,40 @@ class Game private constructor(
         }
     }
 
+    /**
+     * Test if the game is finished
+     * @return true if the game is finished, false otherwise
+     */
+    fun isGameFinished(): Boolean {
+        return when(gameMode) {
+            GameMode.LAST_STANDING -> {
+                // TODO : Test if the number of players alive is 1
+                false
+            }
+            GameMode.RICHEST_PLAYER -> {
+                // TODO : Test if the number of rounds is over
+                false
+            }
+        }
+    }
+
+    /**
+     * Return the ranking of the players
+     * @return a list of players sorted by their ranking
+     */
+    fun ranking(): List<Player> {
+        // TODO : Return the ranking of the players
+        throw NotImplementedError()
+    }
+
+    /**
+     * End the game and return a PastGame object
+     * @return the PastGame object
+     */
     fun endGame(): PastGame {
         return PastGame(
             users = players,
-            usersRank = mapOf(), // TODO: add the real rank
+            usersRank = ranking().mapIndexed { index, player -> player.user.id to index }.toMap(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
