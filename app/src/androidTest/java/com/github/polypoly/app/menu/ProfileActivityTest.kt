@@ -13,6 +13,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.global.Settings
 import com.github.polypoly.app.network.FakeRemoteStorage
 
 @RunWith(AndroidJUnit4::class)
@@ -84,6 +85,7 @@ class ProfileActivityTest {
     fun seeAnEmptySlotIfThePlayerHaveLessThanThreeTrophies() {
         user.trophiesDisplay.clear()
         user.trophiesDisplay.add(allTrophies.first().getId())
+        FakeRemoteStorage.instance.updateValue(Settings.DB_USERS_PROFILES_PATH + user.id, user)
         val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
 
         // check that there is the first trophy displayed in the header
