@@ -14,14 +14,19 @@ data class Player (
     /**
      * The current balance of the money of the player
      */
-    val balance: Int,
+    private var balance: Int,
+
+    /**
+     * The list of the locations owned by the player
+     */
+    val ownedLocations: List<InGameLocation>,
 ) {
     /**
-     * If the player has lost the game
+     * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise
      */
     fun hasLose(): Boolean {
-        return balance <= 0
+        return balance <= 0 && ownedLocations.isEmpty()
     }
 
     /**
@@ -29,7 +34,20 @@ data class Player (
      * @param bonusCard the bonus card to collect
      */
     fun collectBonusCard(bonusCard: InGameBonusCard) {
-        // TODO write in the database that the bonusCard is collected
+        // TODO : write in the database that the bonusCard is collected
+        // TODO : show the card to the player
         bonusCard.bonusCard.applyBonus(this)
+    }
+
+    fun winMoney(amount: Int) {
+        balance += amount
+    }
+
+    fun loseMoney(amount: Int) {
+        if(amount > balance) {
+            balance = 0
+            // TODO : ask the player if he wants to sell his properties
+        }
+        balance -= amount
     }
 }
