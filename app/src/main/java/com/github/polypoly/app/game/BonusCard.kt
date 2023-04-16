@@ -19,6 +19,16 @@ data class BonusCard(
      */
     val description: String,
 ) {
+
+    /**
+     * Apply the bonus of the bonus card to the player
+     * @param player the player to apply the bonus to
+     */
+    fun applyBonus(player: Player) {
+        // TODO: implement this method
+        throw NotImplementedError("Not implemented yet")
+    }
+
     companion object {
         /**
          * The list of all bonus cards possible to collect during a game

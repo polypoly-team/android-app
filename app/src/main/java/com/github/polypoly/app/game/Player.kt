@@ -23,4 +23,13 @@ data class Player (
     fun hasLose(): Boolean {
         return balance <= 0
     }
+
+    /**
+     * Collect a bonus card
+     * @param bonusCard the bonus card to collect
+     */
+    fun collectBonusCard(bonusCard: InGameBonusCard) {
+        // TODO write in the database that the bonusCard is collected
+        bonusCard.bonusCard.applyBonus(this)
+    }
 }
