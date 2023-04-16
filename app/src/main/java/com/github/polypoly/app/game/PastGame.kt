@@ -5,7 +5,7 @@ import com.github.polypoly.app.game.user.User
 /**
  * A class that represent a past game played by users
  */
-class PastGame(
+data class PastGame(
 
     /**
      * The id of the users that played the game

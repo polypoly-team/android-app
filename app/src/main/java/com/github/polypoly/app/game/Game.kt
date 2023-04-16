@@ -53,8 +53,7 @@ class Game private constructor(
                 gameLobby.roundDuration,
                 gameLobby.initialPlayerBalance,
                 gameLobby.name,
-                //gameLobby.dateBegin
-                0 //TODO : implement dateBegin in gameLobby
+                dateBegin = System.currentTimeMillis() / 1000,
             )
         }
     }
