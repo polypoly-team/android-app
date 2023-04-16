@@ -11,12 +11,14 @@ import com.github.polypoly.app.base.user.User
  * @property ownedLocations The list of the [Location]s owned by the [Player]
  * @property roundLost Round the [Player] had lost the [Game] if he/she has lost the [Game],
  * null otherwise
+ * @property game The [Game] where the [Player] play
  */
 data class Player (
     val user: User,
     private var balance: Int,
-    val ownedLocations: List<InGameLocation>,
-    val roundLost: Int? = null,
+    private var ownedLocations: List<InGameLocation>,
+    private var roundLost: Int? = null,
+    private val game: Game
 ) : Comparable<Player> {
 
     /**
@@ -53,7 +55,12 @@ data class Player (
     fun loseMoney(amount: Int) {
         if(amount > balance) {
             balance = 0
-            // TODO : ask the player if he wants to sell his properties
+            if(ownedLocations.isEmpty()) {
+                roundLost = game.currentRound
+                // TODO : tell the player that he lose the game
+            } else {
+                // TODO : ask the player if he wants to sell one of his/her properties
+            }
         }
         balance -= amount
     }
@@ -66,9 +73,33 @@ data class Player (
         return balance
     }
 
+    /**
+     * Get the index of the round when the user had lost the game if the player had lost the game.
+     * @return the round when the user had lost the game or null if the player had not lost.
+     */
+    fun getRoundLost(): Int? {
+        return roundLost
+    }
+
+    /**
+     * Update the state of the player with all the new data
+     * @param newBalance
+     * @param newOwnedLocations
+     * @param newRoundLost
+     */
+    fun updateState(newBalance: Int, newOwnedLocations: List<InGameLocation>, newRoundLost: Int?) {
+        if(balance > 0 && roundLost != null)
+            throw IllegalArgumentException("If the player has lost the game, the balance of the player must be equal to 0")
+        if(ownedLocations.isNotEmpty() && roundLost != null)
+            throw IllegalArgumentException("If the player has lost the game, the player can't owned locations")
+        balance = newBalance
+        ownedLocations = newOwnedLocations
+        roundLost = newRoundLost
+    }
+
     override fun compareTo(other: Player): Int {
         return if (roundLost != null && other.roundLost != null) {
-            roundLost.compareTo(other.roundLost)
+            roundLost!!.compareTo(other.roundLost!!)
         } else {
             balance.compareTo(other.balance)
         }
