@@ -20,7 +20,12 @@ data class Player (
      * The list of the locations owned by the player
      */
     val ownedLocations: List<InGameLocation>,
-) {
+
+    /**
+     * Round the player had lost the game if he/she has lost the game, null otherwise
+     */
+    val roundLost: Int? = null,
+) : Comparable<Player> {
     /**
      * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise
@@ -49,5 +54,13 @@ data class Player (
             // TODO : ask the player if he wants to sell his properties
         }
         balance -= amount
+    }
+
+    override fun compareTo(other: Player): Int {
+        return if (roundLost != null && other.roundLost != null) {
+            roundLost.compareTo(other.roundLost)
+        } else {
+            balance.compareTo(other.balance)
+        }
     }
 }

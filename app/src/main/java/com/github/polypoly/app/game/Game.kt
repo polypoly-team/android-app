@@ -14,7 +14,7 @@ class PlayerPerRoundData {
 
 class Game private constructor(
     val admin: User,
-    val players: List<User>,
+    val players: List<Player>,
     val gameMode: GameMode,
     val gameMap: List<Zone>,
     val roundDuration: Duration,
@@ -55,9 +55,14 @@ class Game private constructor(
      * Return the ranking of the players
      * @return a list of players sorted by their ranking
      */
-    fun ranking(): List<Player> {
-        // TODO : Return the ranking of the players
-        throw NotImplementedError()
+    fun ranking(): Map<Player, Int> {
+        val map = players.sorted().mapIndexed { index, player -> player to index }.toMap().toMutableMap()
+        for(i in 1 until (players.size-1)) {
+            if(players[i].compareTo(players[i-1]) == 0) {
+                map[players[i-1]]?.let{ map[players[i]] = it }
+            }
+        }
+        return map
     }
 
     /**
@@ -66,8 +71,8 @@ class Game private constructor(
      */
     fun endGame(): PastGame {
         return PastGame(
-            users = players,
-            usersRank = ranking().mapIndexed { index, player -> player.user.id to index }.toMap(),
+            users = players.map { it.user },
+            usersRank = ranking().map { it.key.user.id to it.value }.toMap(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
