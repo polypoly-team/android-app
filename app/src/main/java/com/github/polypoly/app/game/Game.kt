@@ -24,7 +24,7 @@ class Game private constructor(
 
     private val playerToGlobalData: HashMap<User, PlayerGlobalData> = HashMap()
     private val playerToPerTurnData: HashMap<User, PlayerPerRoundData> = HashMap()
-    private val localizationToOwner: HashMap<Localization, User> = HashMap()
+    private val locationToOwner: HashMap<Location, User> = HashMap()
 
     init {
         for (player in players) {
