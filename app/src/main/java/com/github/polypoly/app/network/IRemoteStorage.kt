@@ -1,75 +1,78 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.user.User
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
+import kotlin.reflect.KClass
 
+/**
+ * Interface for a remote key-value store kind of storage
+ */
 interface IRemoteStorage {
     /**
-     * Retries the profile of the user with the given ID
-     * @param userId ID of the user requested
-     * @return a promise holding the user requested
+     * Retrieve all values associated to the given key
+     * @param key: key of the values asked
+     * @param clazz: class used to construct the valued retrieved
+     * @return A promise with the values found
      */
-    fun getUserWithId(userId: Long): CompletableFuture<User>
+    fun <T : Any>getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>>
 
     /**
-     * Retries all the users currently existing
-     * @return a promise holding the list of users requested
+     * Retrieve the single value associated to the given key
+     * @param key: key of the value asked
+     * @param clazz: class used to construct the value retrieved
+     * @return A promise with the value found
      */
-    fun getAllUsers(): CompletableFuture<List<User>>
+    fun <T : Any>getValue(key: String, clazz: KClass<T>): CompletableFuture<T>
 
     /**
-     * Retries all the user ids currently existing
-     * @return a promise holding the list of all user ids
+     * Retrieve all child keys of a certain key
+     * @param key: parent key
+     * @return A promise with the keys found
      */
-    fun getAllUsersIds(): CompletableFuture<List<Long>>
+    fun getAllKeys(key: String): CompletableFuture<List<String>>
 
     /**
-     * Adds a new user
-     * @return a promise holding whether the insertion succeeded or not
+     * Check if the given key exists within the storage
+     * @param key: key to check
+     * @return A promise holding true iff the key exists
      */
-    fun registerUser(user: User): CompletableFuture<Boolean>
+    fun keyExists(key: String): CompletableFuture<Boolean>
 
     /**
-     * Updates the user stored
-     * @return a promise holding whether the update succeeded or not
+     * Register a new value in the storage
+     * @param key: key of the value to register
+     * @param value: value to register
+     * @return A promise holding true iff the value was successfully registered
+     * @throws IllegalAccessException if the key already exists in the storage
      */
-    fun updateUser(user: User): CompletableFuture<Boolean>
+    fun <T>registerValue(key: String, value: T): CompletableFuture<Boolean>
 
     /**
-     * Retries the game lobby with the given ID
-     * @param userId ID of the game lobby requested
-     * @return a promise holding the game lobby requested
+     * Update an already existing value in the storage
+     * @param key: key of the value to update
+     * @param value: value to update
+     * @return A promise holding true iff the value was successfully updated
+     * @throws IllegalAccessException if the key doesn't exist yet in the storage
      */
-    fun getGameLobbyWithCode(code: String): Future<GameLobby>
+    fun <T>updateValue(key: String, value: T): CompletableFuture<Boolean>
 
     /**
-     * Retries all game lobbies existing
-     * @return a promise holding the game lobby requested
+     * Set a value in the storage. It doesn't take into account whether the key already exists or not.
+     * @param key: key of the value to set
+     * @param value: value to set
+     * @return A promise holding true iff the value was successfully set
      */
-    fun getAllGameLobbies(): Future<List<GameLobby>>
-
-    /**
-     * Retries all game lobbies ids existing
-     * @return a promise holding the game lobby requested
-     */
-    fun getAllGameLobbiesCodes(): Future<List<String>>
-
-    /**
-     * Registers a new game lobby
-     * @param gameLobby game lobby to register
-     * @return a promise holding whether the registration succeeded or not
-     */
-    fun registerGameLobby(gameLobby: GameLobby): Future<Boolean>
-
-    /**
-     * Updates an existing game lobby
-     * @param gameLobby game lobby to update
-     * @return a promise holding whether the update succeeded or not
-     */
-    fun updateGameLobby(gameLobby: GameLobby): Future<Boolean>
+    fun <T>setValue(key: String, value: T): CompletableFuture<Boolean>
 }
+
+/**
+ * Extension function of IRemoteStorage::getAllValues to enable prettier call of the function
+ */
+inline fun <reified T : Any> IRemoteStorage.getAllValues(key: String) = getAllValues(key, T::class)
+
+/**
+ * Extension function of IRemoteStorage::getAllValues to enable prettier call of the function
+ */
+inline fun <reified T : Any> IRemoteStorage.getValue(key: String) = getValue(key, T::class)
 
 enum class StorageType {
     FIREBASE,

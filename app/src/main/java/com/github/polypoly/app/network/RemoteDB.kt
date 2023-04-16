@@ -1,174 +1,109 @@
 package com.github.polypoly.app.network
 
 
-import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.user.User
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.getValue
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
+import kotlin.reflect.KClass
 
 /**
  * Implementation of IRemoteStorage as a Firebase remote DB
  */
 open class RemoteDB(
-    private val db: FirebaseDatabase?,
-    private val root: String
+    db: FirebaseDatabase?,
+    root: String
 ) : IRemoteStorage {
 
-    private lateinit var rootRef: DatabaseReference
-    private lateinit var usersRootRef: DatabaseReference
+    val rootRef: DatabaseReference
 
     init {
-        if (db != null) {
-            rootRef = db.getReference(root)
-            usersRootRef = rootRef.child(DB_USERS_PROFILES_PATH)
-        }
+        if(db == null)
+            throw java.lang.IllegalArgumentException("Null db provided")
+        rootRef = db.getReference(root)
     }
 
-    override fun getUserWithId(userId: Long): CompletableFuture<User> {
-        val future = CompletableFuture<User>()
-
-        usersRootRef.child(userId.toString()).get().addOnSuccessListener { userRef ->
-            if (userRef.value == null) {
-                future.completeExceptionally(IllegalAccessError("No user with id $userId"))
+    private fun <T> setValueWithCheck(key: String, value: T, shouldExist: Boolean, error: Exception): CompletableFuture<Boolean> {
+        return keyExists(key).thenCompose { exists ->
+            var result = CompletableFuture<Boolean>()
+            if (exists != shouldExist) {
+                result.completeExceptionally(error)
             } else {
-                future.complete(userRef.getValue<User>())
+                result = setValue(key, value)
             }
-        }.addOnFailureListener(future::completeExceptionally)
-
-        return future
+            result
+        }
     }
 
-    override fun getAllUsers(): CompletableFuture<List<User>> {
-        val usersPromise = CompletableFuture<List<User>>()
-
-        usersRootRef.get().addOnSuccessListener{ usersRef ->
-            val users = ArrayList<User>()
-            for (child in usersRef.children) {
-                users.add(child.getValue<User>()!!)
-            }
-            usersPromise.complete(users)
-        }.addOnFailureListener(usersPromise::completeExceptionally)
-
-        return usersPromise
-    }
-
-    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-        val usersIdsPromise = CompletableFuture<List<Long>>()
-
-        usersRootRef.get().addOnSuccessListener{ usersRef ->
-            val ids = ArrayList<Long>()
-            for (child in usersRef.children) {
-                ids.add(child.key?.toLong() ?: -1)
-            }
-            usersIdsPromise.complete(ids)
-        }.addOnFailureListener(usersIdsPromise::completeExceptionally)
-
-        return usersIdsPromise
-    }
-
-    override fun registerUser(user: User): CompletableFuture<Boolean> {
-        return getAllUsersIds().thenCompose { allIds ->
-            val registerPromise = CompletableFuture<Boolean>()
-
-            if (allIds.contains(user.id)) {
-                registerPromise.completeExceptionally(
-                    IllegalAccessError("You cannot register two times a single account"))
+    private fun <T> getValueAndThen(
+        key: String,
+        onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit,
+        onError: (CompletableFuture<T>) -> Unit)
+    : CompletableFuture<T> {
+        val valuePromise = CompletableFuture<T>()
+        rootRef.child(key).get().addOnSuccessListener{ data ->
+            if (!data.exists()) {
+                onError(valuePromise)
             } else {
-                usersRootRef.child(user.id.toString()).setValue(user).addOnSuccessListener {
-                    registerPromise.complete(true)
-                }.addOnFailureListener(registerPromise::completeExceptionally)
+                onSuccess(data, valuePromise)
             }
+        }.addOnFailureListener(valuePromise::completeExceptionally)
+        return valuePromise
+    }
 
-            registerPromise
+    private fun <T> getValueAndThen(key: String, onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit): CompletableFuture<T> {
+        return getValueAndThen(key, onSuccess) { valuePromise ->
+            valuePromise.completeExceptionally(IllegalAccessException("No value found for key <$key>"))
         }
     }
 
-    override fun updateUser(user: User): CompletableFuture<Boolean> {
-        return getAllUsersIds().thenCompose { allIds ->
-            val registerPromise = CompletableFuture<Boolean>()
-
-            if (!allIds.contains(user.id)) {
-                registerPromise.completeExceptionally(
-                    IllegalAccessError("Tries to update a user not registered yet"))
-            } else {
-                usersRootRef.updateChildren(mapOf(
-                    user.id.toString() to user
-                )).addOnSuccessListener {
-                    registerPromise.complete(true)
-                }.addOnFailureListener(registerPromise::completeExceptionally)
+    override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
+        return getValueAndThen(key) { data, valuesPromise ->
+            val users = ArrayList<T>()
+            for (child in data.children) {
+                users.add(child.getValue(clazz.java)!!)
             }
-
-            registerPromise
+            valuesPromise.complete(users)
         }
     }
 
-    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
-        TODO("Not yet implemented")
+    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
+        return getValueAndThen(key) { data, valuePromise ->
+            valuePromise.complete(data.getValue(clazz.java)!!)
+        }
     }
 
-    override fun getAllGameLobbies(): Future<List<GameLobby>> {
-        TODO("Not yet implemented")
+    override fun getAllKeys(key: String): CompletableFuture<List<String>> {
+        return getValueAndThen(key) { data, keysPromise ->
+            val keys = ArrayList<String>()
+            for (child in data.children) {
+                keys.add(child.key!!)
+            }
+            keysPromise.complete(keys)
+        }
     }
 
-    override fun getAllGameLobbiesCodes(): Future<List<String>> {
-        TODO("Not yet implemented")
+    override fun keyExists(key: String): CompletableFuture<Boolean> {
+        return getValueAndThen(
+            key,
+            { _, promise -> promise.complete(true) }, // value found so key exists
+            { promise -> promise.complete(false) }  // value not found so key doesn't exist
+        )
     }
 
-    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        TODO("Not yet implemented")
+    override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
+        return setValueWithCheck(key, value, false, IllegalAccessException("Try to register a value with an already existing key"))
     }
 
-    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        TODO("Not yet implemented")
+    override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
+        return setValueWithCheck(key, value, true, IllegalAccessException("Try to update a value with no existing key"))
     }
 
-    fun getUnderlyingDB(): FirebaseDatabase{
-        return db!!
-    }
-
-    companion object InvalidRemoteDB: RemoteDB(null, "") {
-        override fun getUserWithId(userId: Long): CompletableFuture<User> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun getAllUsers(): CompletableFuture<List<User>> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun registerUser(user: User): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun updateUser(user: User): CompletableFuture<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun getAllGameLobbies(): Future<List<GameLobby>> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun getAllGameLobbiesCodes(): Future<List<String>> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
-
-        override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
-            throw IllegalAccessError("This RemoteDB is invalid")
-        }
+    override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
+        val registerPromise = CompletableFuture<Boolean>()
+        rootRef.child(key).setValue(value).addOnSuccessListener {
+            registerPromise.complete(true)
+        }.addOnFailureListener(registerPromise::completeExceptionally)
+        return registerPromise
     }
 }

@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.menu.shared_component.TrophyView
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.StorageType
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : MenuActivity("Profile") {
@@ -61,7 +63,7 @@ class ProfileActivity : MenuActivity("Profile") {
     fun ProfileAndStats() {
         val user: User
         when(storageId) {
-            StorageType.TEST -> user = FakeRemoteStorage.instance.getUserWithId(userId).get()
+            StorageType.TEST -> user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + userId).get()
             StorageType.FIREBASE -> throw NotImplementedError()
         }
 

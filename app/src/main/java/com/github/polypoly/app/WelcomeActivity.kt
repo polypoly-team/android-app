@@ -14,11 +14,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -27,6 +31,14 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
 class WelcomeActivity : ComponentActivity() {
+    init {
+        val db = Firebase.database
+        try {
+            db.setPersistenceEnabled(false)
+            GlobalInstances.remoteDB = RemoteDB(db, "live")
+        } catch(_: java.lang.Exception) { }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { WelcomeContent() }

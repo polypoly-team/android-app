@@ -1,13 +1,13 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.game.*
-import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import kotlin.time.Duration.Companion.hours
 import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
+import kotlin.reflect.KClass
 
 /**
  * A fake remote storage to test the functionalities without the database
@@ -74,6 +74,9 @@ class FakeRemoteStorage : IRemoteStorage {
         trophiesDisplay = mutableListOf(0, 4)
     )
 
+    private val keys = mutableMapOf<String, List<String>>()
+    private val datas = mutableMapOf<String, List<Any>>()
+
     init {
         gameLobbyFull.addUsers(listOf(testUser2, testUser3, testUser4, testUser5))
 
@@ -84,48 +87,76 @@ class FakeRemoteStorage : IRemoteStorage {
         gameLobbyJoinable3.addUsers(listOf(testUser2, testUser3, testUser4))
     }
 
-    override fun getUserWithId(userId: Long): CompletableFuture<User> {
-        return CompletableFuture.completedFuture(user)
+    override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
+        return CompletableFuture.completedFuture(listOf())
     }
 
-    override fun updateUser(user: User): CompletableFuture<Boolean> {
-        this.user = user
+    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
+        return CompletableFuture.completedFuture(null)
+    }
+
+    override fun getAllKeys(key: String): CompletableFuture<List<String>> {
+        return CompletableFuture.completedFuture(listOf())
+    }
+
+    override fun keyExists(key: String): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(true)
     }
 
-    override fun getAllUsers(): CompletableFuture<List<User>> {
-        return CompletableFuture.completedFuture(listOf(user))
-    }
-
-    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
-        return getAllUsers().thenApply { users -> users.map(User::id) }
-    }
-
-    override fun registerUser(user: User): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(false)
-    }
-
-    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
-        return CompletableFuture.completedFuture(mockGameLobbies[code])
-    }
-
-    override fun getAllGameLobbies(): Future<List<GameLobby>> {
-        return CompletableFuture.completedFuture(mockGameLobbies.values.toList())
-    }
-
-    override fun getAllGameLobbiesCodes(): Future<List<String>> {
-        return CompletableFuture.completedFuture(mockGameLobbies.keys.toList())
-    }
-
-    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        mockGameLobbies[gameLobby.code] = gameLobby
+    override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(true)
     }
 
-    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
-        mockGameLobbies[gameLobby.code] = gameLobby
+    override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
         return CompletableFuture.completedFuture(true)
     }
+
+    override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
+        return CompletableFuture.completedFuture(true)
+    }
+
+//    override fun getUserWithId(userId: Long): CompletableFuture<User> {
+//        return CompletableFuture.completedFuture(user)
+//    }
+//
+//    override fun updateUser(user: User): CompletableFuture<Boolean> {
+//        this.user = user
+//        return CompletableFuture.completedFuture(true)
+//    }
+//
+//    override fun getAllUsers(): CompletableFuture<List<User>> {
+//        return CompletableFuture.completedFuture(listOf(user))
+//    }
+//
+//    override fun getAllUsersIds(): CompletableFuture<List<Long>> {
+//        return getAllUsers().thenApply { users -> users.map(User::id) }
+//    }
+//
+//    override fun registerUser(user: User): CompletableFuture<Boolean> {
+//        return CompletableFuture.completedFuture(false)
+//    }
+//
+//    override fun getGameLobbyWithCode(code: String): Future<GameLobby> {
+//        return CompletableFuture.completedFuture(mockGameLobbies[code])
+//    }
+//
+//    override fun getAllGameLobbies(): Future<List<GameLobby>> {
+//        return CompletableFuture.completedFuture(mockGameLobbies.values.toList())
+//    }
+//
+//    override fun getAllGameLobbiesCodes(): Future<List<String>> {
+//        return CompletableFuture.completedFuture(mockGameLobbies.keys.toList())
+//    }
+//
+//    override fun registerGameLobby(gameLobby: GameLobby): Future<Boolean> {
+//        mockGameLobbies[gameLobby.code] = gameLobby
+//        return CompletableFuture.completedFuture(true)
+//    }
+//
+//    override fun updateGameLobby(gameLobby: GameLobby): Future<Boolean> {
+//        mockGameLobbies[gameLobby.code] = gameLobby
+//        return CompletableFuture.completedFuture(true)
+//    }
 
     companion object {
         val instance: FakeRemoteStorage = FakeRemoteStorage()
