@@ -85,7 +85,7 @@ class ProfileActivityTest {
     fun seeAnEmptySlotIfThePlayerHaveLessThanThreeTrophies() {
         user.trophiesDisplay.clear()
         user.trophiesDisplay.add(allTrophies.first().getId())
-        FakeRemoteStorage.instance.updateValue(Settings.DB_USERS_PROFILES_PATH + user.id, user)
+        FakeRemoteStorage.instance.updateValue(Settings.DB_USERS_PROFILES_PATH + user.id, user) // TODO fixme with deterministic behavior without side effects once connected with real DB
         val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
 
         // check that there is the first trophy displayed in the header

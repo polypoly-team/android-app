@@ -300,7 +300,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      */
     @Composable
     private fun GameLobbyCardPlayerCount(gameLobby: GameLobby) {
-        Row() {
+        Row {
             Image(
                 painter = painterResource(id = R.drawable.avatar),
                 contentDescription = "people icon",
@@ -401,7 +401,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
     @Composable
     fun GameLobbyCardPlayerList(gameLobby: GameLobby) {
         for (player in gameLobby.usersRegistered) {
-            Row() {
+            Row {
                 Image(
                     painter = painterResource(id = R.drawable.tmp_happysmile),
                     contentDescription = "${player.name} icon",
@@ -566,6 +566,6 @@ class JoinGameLobbyActivity : ComponentActivity() {
 private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0),
     Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
 )
-private val mockDb = com.github.polypoly.app.network.FakeRemoteStorage()
+private val mockDb = FakeRemoteStorage()
 
 
