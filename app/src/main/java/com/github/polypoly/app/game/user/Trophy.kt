@@ -1,6 +1,5 @@
 package com.github.polypoly.app.game.user
 
-import android.graphics.drawable.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
@@ -10,26 +9,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 /**
  * A trophy that can be win during a game or at the end of a game to reward a particular
  * success of the player.
+ * @property id The id of the trophy
+ * @property title The title of the trophy
+ * @property description The description of the trophy
+ * @property icon The icon that represents the trophy
  */
 data class Trophy(
-    /**
-     * The id of the trophy
-     */
     private val id: Int,
-
-    /**
-     * The title of the trophy
-     */
     private val title: String,
-
-    /**
-     * The description of the trophy
-     */
     private val description: String,
-
-    /**
-     * The icon that represents the trophy
-     */
     private val icon: ImageVector,
 ) {
     override fun toString(): String {
@@ -37,14 +25,14 @@ data class Trophy(
     }
 
     /**
-     * Get the icon that represents the trophy
+     * Get the icon that represents the [Trophy]
      */
     fun getIcon(): ImageVector {
         return icon
     }
 
     /**
-     * Get the id of the trophy
+     * Get the id of the [Trophy]
      */
     fun getId(): Int {
         return id
@@ -52,7 +40,7 @@ data class Trophy(
 
     companion object {
         /**
-         * The list of all trophies winnable by the play
+         * The list of all trophies winnable by a [User]
          */
         val allTrophies: List<Trophy> = listOf(
             Trophy(0, title = "trophy 0", description = "description 0", icon = Icons.Default.Terminal),

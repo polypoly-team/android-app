@@ -3,29 +3,20 @@ package com.github.polypoly.app.game
 import com.github.polypoly.app.game.user.User
 
 /**
- * A class that represent a player in a game with his/her info which are specific to the game
+ * A class that represent a [Player] in a [Game] with his/her info which are specific to the [Game]
+ * @property user The [User] behind the [Player]
+ * @property balance The current balance of the money of the [Player]
+ * @property ownedLocations The list of the [Location]s owned by the [Player]
+ * @property roundLost Round the [Player] had lost the [Game] if he/she has lost the [Game],
+ * null otherwise
  */
 data class Player (
-    /**
-     * The user behind the player
-     */
     val user: User,
-
-    /**
-     * The current balance of the money of the player
-     */
     private var balance: Int,
-
-    /**
-     * The list of the locations owned by the player
-     */
     val ownedLocations: List<InGameLocation>,
-
-    /**
-     * Round the player had lost the game if he/she has lost the game, null otherwise
-     */
     val roundLost: Int? = null,
 ) : Comparable<Player> {
+
     /**
      * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise
@@ -44,10 +35,19 @@ data class Player (
         bonusCard.bonusCard.applyBonus(this)
     }
 
-    fun winMoney(amount: Int) {
+    /**
+     * Update the balance of the player with the money earned.
+     * @param amount the amount of money earned
+     */
+    fun earnMoney(amount: Int) {
         balance += amount
     }
 
+    /**
+     * Update the balance of the player with the money lost.
+     * If the player has not enough money, he/she has to sell his properties or to lose.
+     * @param amount the amount of money lost
+     */
     fun loseMoney(amount: Int) {
         if(amount > balance) {
             balance = 0

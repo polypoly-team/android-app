@@ -2,32 +2,24 @@ package com.github.polypoly.app.game
 
 /**
  * A class that represent a bonus card
+ * @property id The id of the [BonusCard]
+ * @property title The title of the [BonusCard]
+ * @property description The description of the [BonusCard]
  */
 data class BonusCard(
-    /**
-     * The id of the bonus card
-     */
     val id: Long,
-
-    /**
-     * The title of the bonus card
-     */
     val title: String,
-
-    /**
-     * The description of the bonus card
-     */
     val description: String,
 ) {
 
     /**
-     * Apply the bonus of the bonus card to the player
-     * @param player the player to apply the bonus to
+     * Apply the bonus of the [BonusCard] to the [Player]
+     * @param player the [Player] to apply the bonus to
      */
     fun applyBonus(player: Player) {
         when(id) {
             0L -> {
-                player.winMoney(100)
+                player.earnMoney(100)
             }
             1L -> {
                 player.loseMoney(100)
@@ -38,7 +30,7 @@ data class BonusCard(
 
     companion object {
         /**
-         * The list of all bonus cards possible to collect during a game
+         * The list of all [BonusCard]s possible to collect during a [Game]
          */
         val allBonusCards: List<BonusCard> = listOf(
             BonusCard(0, title = "Teaching assistant payday", description = "You finally got your student assistant salary you've been waiting for after spending hours helping BA1s debug their code. Collect 100CHF!"),

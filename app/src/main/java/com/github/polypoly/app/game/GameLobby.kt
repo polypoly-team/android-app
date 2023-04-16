@@ -1,80 +1,28 @@
 package com.github.polypoly.app.game
 
 import com.github.polypoly.app.game.user.User
-import kotlin.time.Duration
 
 /**
- * Represent a game lobby where users can join and wait for the game to start,
- * and where the admin can decide some rules about the game
+ * Represent a game lobby where [User]s can join and wait for the game to start,
+ * and where the [admin] can decide some [rules] about the [Game]
+ * @property admin The admin of the lobby who have created the [GameLobby]
+ * @property rules The rules of the future [Game]
+ * @property name The name of the [GameLobby]
+ * @property code The (secret) code of the [GameLobby]
+ * @property private If the [GameLobby] is private or not
  */
 class GameLobby(
-    /**
-     * The admin of the lobby who have created the game lobby
-     */
     val admin: User,
-
-    /**
-     * The game mode of the future game
-     */
-    val gameMode: GameMode,
-
-    /**
-     * The minimum number of players needed to start the game
-     */
-    val minimumNumberOfPlayers: Int,
-
-    /**
-     * The maximum number of players that can join the lobby
-     */
-    val maximumNumberOfPlayers: Int,
-
-    /**
-     * The duration of a round in the game
-     */
-    val roundDuration: Duration,
-
-    /**
-     * The maximum number of round before the game end. This settings is available only in
-     * RICHEST_PLAYER mode. Is null if an other game mode is selected.
-     */
-    val maxRound: Int? = null,
-
-    /**
-     * The map of the game whit the different zones available
-     */
-    val gameMap: List<Zone>,
-
-    /**
-     * The initial balance of money of the players
-     */
-    val initialPlayerBalance: Int,
-
-    /**
-     * The name of the lobby
-     */
+    val rules: GameRules,
     val name: String,
-
-    /**
-     * The (secret) code of the lobby
-     */
     val code: String,
-
-    /**
-     * If the lobby is private or not
-     */
-    val private: Boolean = false
+    val private: Boolean = false,
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
 
     init {
-        if (minimumNumberOfPlayers <= 1)
-            throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
-        if (maximumNumberOfPlayers < minimumNumberOfPlayers)
-            throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration.isNegative() || roundDuration.isInfinite())
-            throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
         if (name.isEmpty())
             throw java.lang.IllegalArgumentException("Game name cannot be empty")
         if (name.isBlank())
@@ -93,7 +41,7 @@ class GameLobby(
      * @throws IllegalArgumentException if the user is already registered
      */
     fun addUser(user: User) {
-        if (currentUsersRegistered.size >= maximumNumberOfPlayers)
+        if (currentUsersRegistered.size >= rules.maximumNumberOfPlayers)
             throw IllegalStateException("The game is already full")
         if (currentUsersRegistered.any{u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
@@ -116,7 +64,7 @@ class GameLobby(
      * @return true if the game is ready to start, false otherwise
      */
     fun canStart(): Boolean {
-        return currentUsersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
+        return currentUsersRegistered.size in rules.minimumNumberOfPlayers..rules.maximumNumberOfPlayers
     }
 
     /**

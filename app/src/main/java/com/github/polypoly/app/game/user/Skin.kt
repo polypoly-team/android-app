@@ -2,24 +2,16 @@ package com.github.polypoly.app.game.user
 
 /**
  * A class that determine the skin of the player
+ * @property idHead The id of the head in the skin of the player
+ * Current possible values: [0,0]
+ * @property idBody The id of the body in the skin of the player
+ * Current possible values: [0,0]
+ * @property idLegs The id of the legs in the skin of the player
+ * Current possible values: [0,0]
  */
 data class Skin(
-    /**
-     * The id of the head in the skin of the player
-     * Current possible values: [0,0]
-     */
     val idHead: Int = 0,
-
-    /**
-     * The id of the body in the skin of the player
-     * Current possible values: [0,0]
-     */
     val idBody: Int = 0,
-
-    /**
-     * The id of the legs in the skin of the player
-     * Current possible values: [0,0]
-     */
     val idLegs: Int = 0
 ) {
     init {
@@ -33,7 +25,7 @@ data class Skin(
     }
 
     companion object {
-        // TODO: Replace this by a real skin system
+        // TODO: Replace this by a list of skin parts
         // The number of possible heads, bodies and legs
         const val NB_HEADS = 1
         const val NB_BODIES = 1

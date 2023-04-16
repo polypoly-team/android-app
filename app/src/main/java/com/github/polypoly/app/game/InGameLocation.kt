@@ -2,22 +2,14 @@ package com.github.polypoly.app.game
 
 /**
  * A class that represent an location in a game
+ * @property location The location of the in-game location, that permit to know the static info of
+ * the location as the name, the base price, the base tax price, etc...
+ * @property level The current level of the location that determine the price and the tax price
+ * @property owner The owner of the location, if the location is not owned, the owner is null
  */
 data class InGameLocation (
-    /**
-     * The location of the in-game location, that permit to know the static info of the location
-     * as the name, the base price, the base tax price, etc...
-     */
     var location: Location,
-
-    /**
-     * The current level of the location that determine the price and the tax price
-     */
     var level: LocalizationLevel,
-
-    /**
-     * The owner of the location, if the location is not owned, the owner is null
-     */
     var owner: Player?,
 ) {
 

@@ -1,18 +1,18 @@
 package com.github.polypoly.app.game
 
 import com.github.polypoly.app.game.user.User
-import kotlin.time.Duration
 
+/**
+ * Represent the game and the current state of the game
+ * @property admin the [User] who is the admin of the game
+ * @property players the [Player]s of the game
+ * @property rules the rules of the [Game]
+ */
 class Game private constructor(
     val admin: User,
     val players: List<Player>,
-    val gameMode: GameMode,
-    val gameMap: List<Zone>,
-    val roundDuration: Duration,
-    val maxRound: Int? = null,
-    private val initialPlayerBalance: Int,
+    val rules: GameRules,
     val currentRound: Int = 1,
-    val name: String,
     val dateBegin: Long,
 ) {
 
@@ -33,14 +33,14 @@ class Game private constructor(
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
     fun isGameFinished(): Boolean {
-        return when(gameMode) {
+        return when(rules.gameMode) {
             GameMode.LAST_STANDING -> {
                 players.filter { !it.hasLose() }.size <= 1
             }
             GameMode.RICHEST_PLAYER -> {
-                if(maxRound == null)
+                if(rules.maxRound == null)
                     throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
-                currentRound > maxRound
+                currentRound > rules.maxRound
             }
         }
     }
@@ -85,15 +85,10 @@ class Game private constructor(
                 admin = gameLobby.admin,
                 players = gameLobby.usersRegistered.map { Player(
                     user = it,
-                    balance = gameLobby.initialPlayerBalance,
+                    balance = gameLobby.rules.initialPlayerBalance,
                     ownedLocations = listOf(),
                 ) },
-                gameMode = gameLobby.gameMode,
-                gameMap = gameLobby.gameMap,
-                roundDuration = gameLobby.roundDuration,
-                initialPlayerBalance = gameLobby.initialPlayerBalance,
-                maxRound = gameLobby.maxRound,
-                name = gameLobby.name,
+                rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )
         }
