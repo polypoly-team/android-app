@@ -34,6 +34,12 @@ class GameLobby(
     val roundDuration: Duration,
 
     /**
+     * The maximum number of round before the game end. This settings is available only in
+     * RICHEST_PLAYER mode. Is null if an other game mode is selected.
+     */
+    val maxRound: Int? = null,
+
+    /**
      * The map of the game whit the different zones available
      */
     val gameMap: List<Zone>,
