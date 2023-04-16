@@ -7,7 +7,6 @@ import org.osmdroid.util.GeoPoint
     @property localizations a list of [Location]s that belong to this zone.
     @property color the color used to represent this zone.
  */
-
 class Zone(
     val locations: List<Location>,
     val color: Int //> hexadecimal representation
