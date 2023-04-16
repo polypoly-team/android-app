@@ -1,5 +1,6 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game.rules_and_lobby
 
+import com.github.polypoly.app.base.game.location.Zone
 import kotlin.time.Duration
 
 /**

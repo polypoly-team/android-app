@@ -1,4 +1,4 @@
-package com.github.polypoly.app.game.user
+package com.github.polypoly.app.base.user
 
 /**
  * All the statistics about a player

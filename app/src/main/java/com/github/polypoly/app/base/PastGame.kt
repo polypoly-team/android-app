@@ -1,6 +1,6 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base
 
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.user.User
 
 /**
  * A class that represent a past [Game] played by [User]s

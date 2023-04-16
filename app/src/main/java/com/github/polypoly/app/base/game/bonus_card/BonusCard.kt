@@ -1,4 +1,6 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game.bonus_card
+
+import com.github.polypoly.app.base.game.Player
 
 /**
  * A class that represent a bonus card

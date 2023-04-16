@@ -1,4 +1,4 @@
-package com.github.polypoly.app.game.user
+package com.github.polypoly.app.base.user
 
 /**
  * A class that determine the skin of the player

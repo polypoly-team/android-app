@@ -56,7 +56,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.PlayerGlobalData
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.map.LocationRepository.getZones
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
@@ -84,7 +84,7 @@ class MapActivity : ComponentActivity() {
     // Not public for testing purposes
     val mapViewModel: MapViewModel = MapViewModel()
 
-    private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
+    private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.base.game.location.Location>()
 
     // flag to show the dialog
     val showDialog = mutableStateOf(false)
@@ -456,13 +456,13 @@ class MapActivity : ComponentActivity() {
     private fun updateAllDistancesAndFindClosest(
         mapView: MapView,
         myLocation: GeoPoint
-    ): com.github.polypoly.app.game.Location? {
+    ): com.github.polypoly.app.base.game.location.Location? {
         fun updateDistance(marker: Marker, myLocation: GeoPoint) {
             val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
             marker.snippet = "Distance: ${formattedDistance(distance)}"
         }
 
-        var closestLocation = null as com.github.polypoly.app.game.Location?
+        var closestLocation = null as com.github.polypoly.app.base.game.location.Location?
         for (marker in markersOf(mapView)) {
             updateDistance(marker, myLocation)
             val markerLocation = markerToLocation[marker]!!
@@ -504,7 +504,7 @@ class MapActivity : ComponentActivity() {
      * The heads-up display with player and game stats that is displayed on top of the map
      */
     @Composable
-    fun Hud(playerData: PlayerGlobalData, otherPlayersData: List<PlayerGlobalData>, round: Int) {
+    fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location = mapViewModel.closeLocation.value?.name ?: "")
@@ -531,7 +531,7 @@ class MapActivity : ComponentActivity() {
      * The HUD for the player stats
      */
     @Composable
-    fun HudPlayer(playerData: PlayerGlobalData) {
+    fun HudPlayer(playerData: Player) {
         var openPlayerInfo by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -549,7 +549,7 @@ class MapActivity : ComponentActivity() {
                         description = "See player information"
                     )
                     Column(Modifier.padding(Padding.medium)) {
-                        HudText("playerBalance", "${playerData.balance} $")
+                        HudText("playerBalance", "${playerData.getBalance()} $")
                     }
                 }
             }
@@ -577,7 +577,7 @@ class MapActivity : ComponentActivity() {
      * The HUD that shows the stats for other players and the game
      */
     @Composable
-    fun HudOtherPlayersAndGame(otherPlayersData: List<PlayerGlobalData>, round: Int) {
+    fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
         var isExpanded by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -661,7 +661,7 @@ class MapActivity : ComponentActivity() {
      * The HUD for the stats of other players
      */
     @Composable
-    fun HudOtherPlayer(playerData: PlayerGlobalData) {
+    fun HudOtherPlayer(playerData: Player) {
         var openOtherPlayerInfo by remember { mutableStateOf(false) }
         Row(Modifier.padding(Padding.medium)) {
             HudButton(
@@ -671,7 +671,7 @@ class MapActivity : ComponentActivity() {
                 description = "See other player information"
             )
             Column(Modifier.padding(Padding.medium)) {
-                HudText("playerBalance", "${playerData.balance} $")
+                HudText("playerBalance", "${playerData.getBalance()} $")
             }
         }
 

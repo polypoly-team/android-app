@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.user.Trophy.Companion.allTrophies
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.menu.shared_component.TrophyView
 import com.github.polypoly.app.network.FakeRemoteStorage

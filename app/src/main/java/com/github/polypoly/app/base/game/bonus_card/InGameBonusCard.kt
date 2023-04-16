@@ -1,4 +1,4 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game.bonus_card
 
 import org.osmdroid.util.GeoPoint
 

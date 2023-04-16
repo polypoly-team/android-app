@@ -1,6 +1,6 @@
 package com.github.polypoly.app.map
 
-import com.github.polypoly.app.game.Zone
+import com.github.polypoly.app.base.game.location.Zone
 import org.junit.Test
 
 // These tests are not really useful, but they're here symbolically, this is only a data class

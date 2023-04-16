@@ -1,6 +1,7 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game.rules_and_lobby
 
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.game.Game
+import com.github.polypoly.app.base.user.User
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,

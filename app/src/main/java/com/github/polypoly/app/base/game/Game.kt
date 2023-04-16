@@ -1,6 +1,10 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game
 
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.PastGame
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.user.User
 
 /**
  * Represent the game and the current state of the game

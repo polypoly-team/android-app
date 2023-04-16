@@ -1,4 +1,4 @@
-package com.github.polypoly.app.game.user
+package com.github.polypoly.app.base.user
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album

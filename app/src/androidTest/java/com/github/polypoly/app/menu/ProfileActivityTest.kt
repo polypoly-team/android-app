@@ -12,7 +12,7 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
-import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.base.user.allTrophies
 import com.github.polypoly.app.network.FakeRemoteStorage
 
 @RunWith(AndroidJUnit4::class)

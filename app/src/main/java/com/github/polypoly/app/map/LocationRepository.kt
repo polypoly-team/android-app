@@ -1,7 +1,7 @@
 package com.github.polypoly.app.map
 
-import com.github.polypoly.app.game.Location
-import com.github.polypoly.app.game.Zone
+import com.github.polypoly.app.base.game.location.Location
+import com.github.polypoly.app.base.game.location.Zone
 import org.osmdroid.util.GeoPoint
 
 /**

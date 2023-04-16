@@ -1,6 +1,8 @@
-package com.github.polypoly.app.game
+package com.github.polypoly.app.base.game
 
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
+import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.user.User
 
 /**
  * A class that represent a [Player] in a [Game] with his/her info which are specific to the [Game]
@@ -54,6 +56,14 @@ data class Player (
             // TODO : ask the player if he wants to sell his properties
         }
         balance -= amount
+    }
+
+    /**
+     * Get the current balance of the [Player]
+     * @return the balance
+     */
+    fun getBalance(): Int {
+        return balance
     }
 
     override fun compareTo(other: Player): Int {
