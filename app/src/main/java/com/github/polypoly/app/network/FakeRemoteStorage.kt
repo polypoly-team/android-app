@@ -13,6 +13,7 @@ import kotlin.reflect.KClass
 
 /**
  * A fake remote storage to test the functionalities without the database
+ * Temporary until complete removal to connect with the real DB
  */
 class FakeRemoteStorage : IRemoteStorage {
 
