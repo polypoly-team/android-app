@@ -38,8 +38,8 @@ open class RemoteDB(
     private fun <T> getValueAndThen(
         key: String,
         onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit,
-        onError: (CompletableFuture<T>) -> Unit)
-    : CompletableFuture<T> {
+        onError: (CompletableFuture<T>) -> Unit
+    ) : CompletableFuture<T> {
         val valuePromise = CompletableFuture<T>()
         rootRef.child(key).get().addOnSuccessListener{ data ->
             if (!data.exists()) {
@@ -51,36 +51,35 @@ open class RemoteDB(
         return valuePromise
     }
 
-    private fun <T> getValueAndThen(key: String, onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit): CompletableFuture<T> {
-        return getValueAndThen(key, onSuccess) { valuePromise ->
+    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
+        return getValueAndThen(key, { data, valuePromise ->
+            valuePromise.complete(data.getValue(clazz.java)!!)
+        }, { valuePromise ->
             valuePromise.completeExceptionally(IllegalAccessException("No value found for key <$key>"))
-        }
+        })
     }
 
     override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
-        return getValueAndThen(key) { data, valuesPromise ->
+        return getValueAndThen(key, { data, valuesPromise ->
             val users = ArrayList<T>()
             for (child in data.children) {
                 users.add(child.getValue(clazz.java)!!)
             }
             valuesPromise.complete(users)
-        }
+        }, { promise -> promise.complete(listOf()) })
     }
 
-    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
-        return getValueAndThen(key) { data, valuePromise ->
-            valuePromise.complete(data.getValue(clazz.java)!!)
-        }
-    }
-
-    override fun getAllKeys(key: String): CompletableFuture<List<String>> {
-        return getValueAndThen(key) { data, keysPromise ->
-            val keys = ArrayList<String>()
-            for (child in data.children) {
-                keys.add(child.key!!)
-            }
-            keysPromise.complete(keys)
-        }
+    override fun getAllKeys(parentKey: String): CompletableFuture<List<String>> {
+        return getValueAndThen(
+            parentKey,
+            { data, keysPromise ->
+                val keys = ArrayList<String>()
+                for (child in data.children) {
+                    keys.add(child.key!!)
+                }
+                keysPromise.complete(keys)
+            },
+            { promise -> promise.complete(listOf()) }) // empty list if no parent key
     }
 
     override fun keyExists(key: String): CompletableFuture<Boolean> {

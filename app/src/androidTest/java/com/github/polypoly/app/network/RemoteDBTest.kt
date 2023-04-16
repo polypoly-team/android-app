@@ -104,6 +104,13 @@ class RemoteDBTest {
     }
 
     @Test
+    fun gettingAllDataWithInvalidKeyReturnsEmptyList() {
+        val invalidKey = "invalid"
+        val dataFound = remoteDB.getAllValues<User>(invalidKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(dataFound.isEmpty())
+    }
+
+    @Test
     fun allKeysCanBeRetrievedAtOnce() {
         val rootKey = "root_key/"
         val allUsersKeys = TEST_ALL_USERS.map{user -> user.id.toString()}
@@ -114,10 +121,36 @@ class RemoteDBTest {
     }
 
     @Test
+    fun gettingAllKeysWithInvalidKeyReturnsEmptyList() {
+        val invalidKey = "invalid"
+        val keysFound = remoteDB.getAllKeys(invalidKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(keysFound.isEmpty())
+    }
+
+    @Test
+    fun existingKeyCanBeIdentified() {
+        val existingKey = "I_exist"
+        addDataToDB(listOf(TEST_USER_1), listOf(existingKey))
+        assertTrue(
+            remoteDB.keyExists(existingKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun nonExistingKeyCanBeIdentified() {
+        val nonExistingKey = "I_do_not_exist"
+        assertFalse(
+            remoteDB.keyExists(nonExistingKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
     fun newDataCanBeRegistered() {
         assertTrue(
             remoteDB.registerValue(TEST_USER_1.id.toString(), TEST_USER_1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
+        val userFound = remoteDB.getValue<User>(TEST_USER_1.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(TEST_USER_1, userFound)
     }
 
     @Test
@@ -137,19 +170,30 @@ class RemoteDBTest {
             ZERO_STATS, listOf(), mutableListOf())
         addUsersToDB(listOf(TEST_USER_1))
 
-        assertTrue(remoteDB.updateValue(userUpdated.id.toString(), userUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS))
+        assertTrue(
+            remoteDB.updateValue(userUpdated.id.toString(), userUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
 
         val userUpdatedFound = remoteDB.getValue<User>(userUpdated.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(userUpdated, userUpdatedFound)
     }
 
     @Test
-    fun unergisteredDataCannotBeUpdated() {
+    fun updatingNonExistingDataFails() {
         val failFuture = remoteDB.updateValue(TEST_USER_1.id.toString(), TEST_USER_1)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
             assertTrue(exception is IllegalAccessError)
         }
         assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+    }
+
+    @Test
+    fun dataCanBeSet() {
+        assertTrue(
+            remoteDB.registerValue(TEST_USER_1.id.toString(), TEST_USER_1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+        val userFound = remoteDB.getValue<User>(TEST_USER_1.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(TEST_USER_1, userFound)
     }
 }

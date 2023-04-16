@@ -7,13 +7,6 @@ import kotlin.reflect.KClass
  * Interface for a remote key-value store kind of storage
  */
 interface IRemoteStorage {
-    /**
-     * Retrieve all values associated to the given key
-     * @param key: key of the values asked
-     * @param clazz: class used to construct the valued retrieved
-     * @return A promise with the values found
-     */
-    fun <T : Any>getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>>
 
     /**
      * Retrieve the single value associated to the given key
@@ -24,11 +17,19 @@ interface IRemoteStorage {
     fun <T : Any>getValue(key: String, clazz: KClass<T>): CompletableFuture<T>
 
     /**
+     * Retrieve all values associated to the given key
+     * @param key: key of the values asked
+     * @param clazz: class used to construct the valued retrieved
+     * @return A promise with the values found
+     */
+    fun <T : Any>getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>>
+
+    /**
      * Retrieve all child keys of a certain key
      * @param key: parent key
      * @return A promise with the keys found
      */
-    fun getAllKeys(key: String): CompletableFuture<List<String>>
+    fun getAllKeys(parentKey: String): CompletableFuture<List<String>>
 
     /**
      * Check if the given key exists within the storage
