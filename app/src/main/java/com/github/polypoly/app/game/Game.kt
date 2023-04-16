@@ -19,7 +19,8 @@ class Game private constructor(
     val gameMap: List<Zone>,
     val roundDuration: Duration,
     private val initialPlayerBalance: Int,
-    val name: String
+    val name: String,
+    val dateBegin: Long,
 ) {
 
     private val playerToGlobalData: HashMap<User, PlayerGlobalData> = HashMap()
@@ -33,6 +34,15 @@ class Game private constructor(
         }
     }
 
+    fun endGame(): PastGame {
+        return PastGame(
+            users = players,
+            usersRank = mapOf(), // TODO: add the real rank
+            date = dateBegin,
+            duration = System.currentTimeMillis() / 1000 - dateBegin,
+        )
+    }
+
     companion object {
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
             return Game(
@@ -42,7 +52,9 @@ class Game private constructor(
                 gameLobby.gameMap,
                 gameLobby.roundDuration,
                 gameLobby.initialPlayerBalance,
-                gameLobby.name
+                gameLobby.name,
+                //gameLobby.dateBegin
+                0 //TODO : implement dateBegin in gameLobby
             )
         }
     }

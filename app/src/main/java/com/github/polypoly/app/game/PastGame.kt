@@ -1,22 +1,19 @@
 package com.github.polypoly.app.game
 
+import com.github.polypoly.app.game.user.User
+
 /**
  * A class that represent a past game played by users
  */
 class PastGame(
 
     /**
-     * The id of the past game
-     */
-    val id: Long = 0,
-
-    /**
      * The id of the users that played the game
      */
-    private val users_id: List<Long> = listOf(),
+    private val users: List<User> = listOf(),
 
     /**
-     * The rank of the users in the game
+     * The rank of the users in the game by id
      */
     private val usersRank: Map<Long, Int> = mapOf(),
 
@@ -49,11 +46,11 @@ class PastGame(
     }
 
     /**
-     * get the id of the users that played the game
-     * @return the id of the users that played the game
+     * get the users that played the game
+     * @return a list of the users that played the game
      */
-    fun getUsersId(): List<Long> {
-        return users_id
+    fun getUsers(): List<User> {
+        return users
     }
 
     /**
