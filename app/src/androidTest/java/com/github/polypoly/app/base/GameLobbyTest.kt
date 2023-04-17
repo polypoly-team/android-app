@@ -2,6 +2,7 @@ package com.github.polypoly.app.base
 
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
@@ -28,8 +29,8 @@ class GameLobbyTest {
     @Test
     fun pendingGameCanStartWithEnoughPlayers() {
         val gameLobby = GameLobby(
-            testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-            testDuration, emptyList(), testInitialBalance, testName, testCode
+            testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), testName, testCode
         )
         for (n in 1L until testMinNumberPlayers)
             gameLobby.addUser(User( n, "test-$n", "", emptySkin, zeroStats, listOf(), mutableListOf()))
@@ -42,8 +43,8 @@ class GameLobbyTest {
     @Test
     fun pendingGameCannotStartWithoutCorrectNumberOfPlayers() {
         val gameLobby = GameLobby(
-            testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-            testDuration, emptyList(), testInitialBalance, testName, testCode
+            testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), testName, testCode
         )
         for (n in 1L until testMinNumberPlayers) {
             assertFalse(gameLobby.canStart())
@@ -64,13 +65,13 @@ class GameLobbyTest {
         val negativeRoundDuration = (-2).hours
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                infinitRoundDuration, emptyList(), testInitialBalance, testName, testCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                infinitRoundDuration, null, emptyList(), testInitialBalance), testName, testCode)
         }
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                negativeRoundDuration, emptyList(), testInitialBalance, testName, testCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                negativeRoundDuration, null, emptyList(), testInitialBalance), testName, testCode)
         }
     }
 
@@ -80,13 +81,13 @@ class GameLobbyTest {
         val blancName = "    \n  \t"
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                testDuration, emptyList(), testInitialBalance, emptyName, testCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), emptyName, testCode)
         }
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                testDuration, emptyList(), testInitialBalance, emptyName, testCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), emptyName, testCode)
         }
     }
 
@@ -96,20 +97,20 @@ class GameLobbyTest {
         val blancCode = "    \n  \t"
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                testDuration, emptyList(), testInitialBalance, testName, emptyCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), testName, emptyCode)
         }
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                testDuration, emptyList(), testInitialBalance, testName, blancCode)
+            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), testName, blancCode)
         }
     }
 
     @Test
     fun canAddUsersToPendingGame() {
-        val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-            testDuration, emptyList(), testInitialBalance, testName, testCode)
+        val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), testName, testCode)
 
         val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
         val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
@@ -138,8 +139,8 @@ class GameLobbyTest {
 
     @Test
     fun canRemoveUsersToPendingGame() {
-        val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-            testDuration, emptyList(), testInitialBalance, testName, testCode)
+        val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), testName, testCode)
 
         val u1 = User(42042043, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
         val u2 = User(42042044, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
@@ -172,8 +173,8 @@ class GameLobbyTest {
     @Test
     fun pendingGameCanStartAGameOnDemand() {
         val gameLobby = GameLobby(
-            testUser, GameMode.RICHEST_PLAYER, 2, testMaxNumberPlayers,
-            testDuration, emptyList(), testInitialBalance, testName, testCode
+            testUser, GameRules(GameMode.RICHEST_PLAYER, 2, testMaxNumberPlayers,
+                testDuration, null, emptyList(), testInitialBalance), testName, testCode
         )
         gameLobby.addUser(User(42042050, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf()))
 
@@ -184,6 +185,6 @@ class GameLobbyTest {
             it.id == testUser.id
         }
         assertEquals(game.admin.id, gameLobby.admin.id)
-        assertEquals(game.gameMode, gameLobby.gameMode)
+        assertEquals(game.rules.gameMode, gameLobby.rules.gameMode)
     }
 }

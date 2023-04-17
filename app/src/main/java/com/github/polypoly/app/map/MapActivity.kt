@@ -57,6 +57,9 @@ import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.map.LocationRepository.getZones
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
@@ -104,8 +107,48 @@ class MapActivity : ComponentActivity() {
                     MapView()
                     BuildingInfoUIComponent()
                     Hud(
-                        PlayerGlobalData(false, 420),
-                        listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),
+                        Player(
+                            user = User(
+                                id = 4572,
+                                name = "User test 1",
+                                bio = "",
+                                skin = Skin.default(),
+                                stats = Stats(0,0,0,0,0),
+                                trophiesWon = listOf(),
+                                trophiesDisplay = mutableListOf(),
+                            ),
+                            balance = 420,
+                            ownedLocations = listOf(),
+                            roundLost = null,
+                        ),
+                        listOf(
+                            Player(
+                                user = User(
+                                    id = 4573,
+                                    name = "User test 2",
+                                    bio = "",
+                                    skin = Skin.default(),
+                                    stats = Stats(0,0,0,0,0),
+                                    trophiesWon = listOf(),
+                                    trophiesDisplay = mutableListOf(),
+                                ),
+                                balance = 32,
+                                ownedLocations = listOf(),
+                                roundLost = null,
+                            ), Player(
+                                user = User(
+                                    id = 4574,
+                                    name = "User test 3",
+                                    bio = "",
+                                    skin = Skin.default(),
+                                    stats = Stats(0,0,0,0,0),
+                                    trophiesWon = listOf(),
+                                    trophiesDisplay = mutableListOf(),
+                                ),
+                                balance = 56,
+                                ownedLocations = listOf(),
+                                roundLost = null,
+                            )),
                         16
                     )
                 }

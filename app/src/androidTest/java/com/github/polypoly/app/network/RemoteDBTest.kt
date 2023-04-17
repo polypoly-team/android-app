@@ -1,8 +1,8 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database

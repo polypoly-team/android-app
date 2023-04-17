@@ -8,17 +8,15 @@ import com.github.polypoly.app.base.user.User
  * A class that represent a [Player] in a [Game] with his/her info which are specific to the [Game]
  * @property user The [User] behind the [Player]
  * @property balance The current balance of the money of the [Player]
- * @property ownedLocations The list of the [Location]s owned by the [Player]
+ * @property ownedLocations The list of the [InGameLocation]s owned by the [Player]
  * @property roundLost Round the [Player] had lost the [Game] if he/she has lost the [Game],
  * null otherwise
- * @property game The [Game] where the [Player] play
  */
 data class Player (
     val user: User,
     private var balance: Int,
     private var ownedLocations: List<InGameLocation>,
     private var roundLost: Int? = null,
-    private val game: Game
 ) : Comparable<Player> {
 
     /**
@@ -51,12 +49,15 @@ data class Player (
      * Update the balance of the player with the money lost.
      * If the player has not enough money, he/she has to sell his properties or to lose.
      * @param amount the amount of money lost
+     * @throws IllegalStateException if there is no game in progress
      */
     fun loseMoney(amount: Int) {
+        if(Game.gameInProgress == null)
+            throw IllegalStateException("There are no game in progress")
         if(amount > balance) {
             balance = 0
             if(ownedLocations.isEmpty()) {
-                roundLost = game.currentRound
+                roundLost = Game.gameInProgress?.currentRound
                 // TODO : tell the player that he lose the game
             } else {
                 // TODO : ask the player if he wants to sell one of his/her properties

@@ -14,7 +14,7 @@ import com.github.polypoly.app.base.user.User
  */
 class Game private constructor(
     val admin: User,
-    val players: List<Player>,
+    private var players: List<Player>,
     val rules: GameRules,
     val currentRound: Int = 1,
     val dateBegin: Long,
@@ -85,7 +85,7 @@ class Game private constructor(
          * @return the new game created from the lobby
          */
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
-            return Game(
+            val game = Game(
                 admin = gameLobby.admin,
                 players = gameLobby.usersRegistered.map { Player(
                     user = it,
@@ -95,6 +95,13 @@ class Game private constructor(
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )
+            gameInProgress = game
+            return game
         }
+
+        /**
+         * The game currently in progress
+         */
+        var gameInProgress: Game? = null
     }
 }

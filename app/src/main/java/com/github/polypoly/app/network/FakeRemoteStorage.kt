@@ -1,12 +1,14 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.game.*
+import com.github.polypoly.app.base.*
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
 import kotlin.time.Duration.Companion.hours
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import kotlin.reflect.KClass
@@ -30,32 +32,33 @@ class FakeRemoteStorage : IRemoteStorage {
     private val testMinNumberPlayers = 2
     private val testMaxNumberPlayers = 5
     private val testDuration = 2.hours
+    private val testMaxRound = 10
     private val testInitialBalance = 100
 
     private val gameLobbyFull = GameLobby(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Full gameLobby", "1234"
+        testUser1, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), "Full gameLobby", "1234"
     )
     private val gameLobbyJoinable1 = GameLobby(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Joinable 1", "abcd"
+        testUser1, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), "Joinable 1", "abcd"
     )
     private val gameLobbyJoinable2 = GameLobby(
-        testUser1, GameMode.LAST_STANDING, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Joinable 2", "123abc"
+        testUser1, GameRules(GameMode.LAST_STANDING, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, testMaxRound, emptyList(), testInitialBalance), "Joinable 2", "123abc"
     )
     private val gameLobbyJoinable3 = GameLobby(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Joinable 3", "1234abc"
+        testUser1, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), "Joinable 3", "1234abc"
     )
     private val gameLobbyPrivate = GameLobby(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Private gameLobby", "abc123", true
+        testUser1, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), "Private gameLobby", "abc123", true
     )
 
     private val gameLobbyJoinable4 = GameLobby(
-        testUser1, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-        testDuration, emptyList(), testInitialBalance, "Joinable 4", "abc1234"
+        testUser1, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+            testDuration, null, emptyList(), testInitialBalance), "Joinable 4", "abc1234"
     )
 
     private val mockGameLobbies :HashMap<String, GameLobby> = hashMapOf(
@@ -113,7 +116,7 @@ class FakeRemoteStorage : IRemoteStorage {
         return CompletableFuture.completedFuture(datas[key] as T)
     }
 
-    override fun getAllKeys(key: String): CompletableFuture<List<String>> {
+    override fun getAllKeys(parentKey: String): CompletableFuture<List<String>> {
         return CompletableFuture.completedFuture(listOf())
     }
 
