@@ -9,6 +9,7 @@ package com.github.polypoly.app.base.user
  * @property stats The statistics about the user
  * @property trophiesWon The list of the trophies won by the user
  * @property trophiesDisplay The list of the trophies the user wants to display
+ * @property currentUser If the user is the user currently logged in
  */
 data class User(
     val id: Long = 0,
@@ -18,6 +19,7 @@ data class User(
     val stats: Stats = Stats(),
     val trophiesWon: List<Int> = listOf(),
     val trophiesDisplay: MutableList<Int> = mutableListOf(),
+    val currentUser: Boolean = false,
 ){
     override fun toString(): String {
         return "User{$id: $name}"

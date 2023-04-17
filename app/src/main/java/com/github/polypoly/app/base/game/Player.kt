@@ -54,6 +54,8 @@ data class Player (
     fun loseMoney(amount: Int) {
         if(Game.gameInProgress == null)
             throw IllegalStateException("There are no game in progress")
+        if(Game.gameInProgress?.playInThisGame(user) == false)
+            throw IllegalStateException("The player is not in the game currently in progress")
         if(amount > balance) {
             balance = 0
             if(ownedLocations.isEmpty()) {
@@ -80,6 +82,18 @@ data class Player (
      */
     fun getRoundLost(): Int? {
         return roundLost
+    }
+
+    fun betToBuy(location: InGameLocation, amount: Int) {
+        if(Game.gameInProgress == null)
+            throw IllegalStateException("There are no game in progress")
+        if(Game.gameInProgress?.playInThisGame(user) == false)
+            throw IllegalStateException("The player is not in the game currently in progress")
+        if(location.owner != null)
+            throw IllegalArgumentException("The location is already owned by someone")
+        if(location.currentPrice() > balance)
+            throw IllegalArgumentException("The player has not enough money to buy the location")
+        // TODO : add in the DB the bet
     }
 
     /**

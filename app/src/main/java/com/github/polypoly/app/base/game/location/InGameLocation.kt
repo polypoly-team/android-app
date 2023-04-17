@@ -8,11 +8,13 @@ import com.github.polypoly.app.base.game.Player
  * the location as the name, the base price, the base tax price, etc...
  * @property level The current level of the location that determine the price and the tax price
  * @property owner The owner of the location, if the location is not owned, the owner is null
+ * @property bets The list of the bets made on the location by the players in the previous round
  */
 data class InGameLocation (
     var location: Location,
     var level: LocalizationLevel,
     var owner: Player?,
+    val bets: List<LocationBet> = listOf()
 ) {
 
     /**
@@ -46,5 +48,20 @@ data class InGameLocation (
      */
     fun currentMortgagePrice(): Int {
         return location.baseMortgagePrice * (level.ordinal + 1)
+    }
+
+    /**
+     * Compute the winning bet and set the new owner of the location
+     * @return the winning bet, null if there is no bet on the location
+     * @throws IllegalStateException if the location is already owned by a player
+     */
+    fun computeWinningBet(): LocationBet? {
+        if(owner != null)
+            throw IllegalStateException("The location is already owned by a player")
+        if(bets.isEmpty())
+            return null
+        val winnerBet = bets.maxByOrNull { it.amount }
+        owner = winnerBet?.player
+        return winnerBet
     }
 }

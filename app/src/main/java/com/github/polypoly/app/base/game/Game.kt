@@ -1,6 +1,8 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.PastGame
+import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocalizationLevel
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
@@ -11,11 +13,16 @@ import com.github.polypoly.app.base.user.User
  * @property admin the [User] who is the admin of the game
  * @property players the [Player]s of the game
  * @property rules the rules of the [Game]
+ * @property inGameLocations the [InGameLocation]s of the [Game]
+ * @property currentRound the current round of the [Game]
+ * @property dateBegin the date and time when the [Game] has started in Unix time
+ * (seconds since 1970-01-01T00:00:00Z)
  */
 class Game private constructor(
     val admin: User,
     private var players: List<Player>,
     val rules: GameRules,
+    val inGameLocations: List<InGameLocation>,
     val currentRound: Int = 1,
     val dateBegin: Long,
 ) {
@@ -78,6 +85,31 @@ class Game private constructor(
         )
     }
 
+    /**
+     * Test if the user is playing in this game
+     * @param user the user to test
+     * @return true if the user is playing in this game, false otherwise
+     */
+    fun playInThisGame(user: User): Boolean {
+        return players.any { it.user.id == user.id }
+    }
+
+    /**
+     * Compute the winner of the bets, notify the players and update the balance of the players
+     * and the location owner.
+     */
+    fun computeAllWinnersOfBets() {
+        inGameLocations.forEach {
+            val winningBet = it.computeWinningBet()
+            if(winningBet != null) {
+                val winner = winningBet.player
+                // TODO : notify the player that he has won and the other players in the bets
+                //  that they have lost
+                winner.loseMoney(winningBet.amount)
+            }
+        }
+    }
+
     companion object {
         /**
          * Launch a game from the associated game lobby
@@ -92,6 +124,13 @@ class Game private constructor(
                     balance = gameLobby.rules.initialPlayerBalance,
                     ownedLocations = listOf(),
                 ) },
+                inGameLocations = gameLobby.rules.gameMap.flatMap { it.locations.map { location ->
+                    InGameLocation(
+                        location = location,
+                        owner = null,
+                        level = LocalizationLevel.LEVEL_0,
+                        bets = listOf(),
+                    ) } },
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )
