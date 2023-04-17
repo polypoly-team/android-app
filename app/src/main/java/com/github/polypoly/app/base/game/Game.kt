@@ -103,9 +103,12 @@ class Game private constructor(
             val winningBet = it.computeWinningBet()
             if(winningBet != null) {
                 val winner = winningBet.player
-                // TODO : notify the player that he has won and the other players in the bets
-                //  that they have lost
-                winner.loseMoney(winningBet.amount)
+                if(winner.user.currentUser) {
+                    winner.loseMoney(winningBet.amount)
+                    // TODO : notify the player that he has won and the other players in the bets
+                    //  that they have lost
+                }
+                // TODO : what if a player wins but doesn't open their phone?
             }
         }
     }

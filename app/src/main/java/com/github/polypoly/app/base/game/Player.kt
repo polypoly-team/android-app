@@ -2,7 +2,9 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationBet
 import com.github.polypoly.app.base.user.User
+import kotlin.random.Random
 
 /**
  * A class that represent a [Player] in a [Game] with his/her info which are specific to the [Game]
@@ -93,6 +95,7 @@ data class Player (
             throw IllegalArgumentException("The location is already owned by someone")
         if(location.currentPrice() > balance)
             throw IllegalArgumentException("The player has not enough money to buy the location")
+        LocationBet(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
         // TODO : add in the DB the bet
     }
 

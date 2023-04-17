@@ -60,8 +60,18 @@ data class InGameLocation (
             throw IllegalStateException("The location is already owned by a player")
         if(bets.isEmpty())
             return null
-        val winnerBet = bets.maxByOrNull { it.amount }
-        owner = winnerBet?.player
+        val maxAmount = bets.maxOf { it.amount }
+        // case where two players have bet the same amount
+        val allBetsWithMaxAmount = bets.filter { it.amount == maxAmount }
+        val maxRandomNumber = allBetsWithMaxAmount.maxOf { it.randomNumber }
+        // case where two players have bet the same amount and have the same random number
+        val allBetsWithMaxAmountAndSameRdNb = allBetsWithMaxAmount.filter { it.randomNumber == maxRandomNumber }
+        val minTimeOfTheBet = allBetsWithMaxAmountAndSameRdNb.minOf { it.timeOfTheBet }
+        // case where two players have bet the same amount, have the same random number and have bet in the same time
+        val allBetsWithMaxAmountAndSameRdNbAndSameTime = allBetsWithMaxAmountAndSameRdNb
+            .filter { it.timeOfTheBet == minTimeOfTheBet}
+        val winnerBet = allBetsWithMaxAmountAndSameRdNbAndSameTime.minBy { it.player.user.id }
+        owner = winnerBet.player
         return winnerBet
     }
 }

@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.game.Player
  * @property timeOfTheBet The time of the bet in Unix time (i.e. the number of milliseconds since
  * January 1, 1970, 00:00:00 GMT)
  */
-class LocationBet (
+data class LocationBet (
     val player: Player,
     val amount: Int,
     val randomNumber: Float,
