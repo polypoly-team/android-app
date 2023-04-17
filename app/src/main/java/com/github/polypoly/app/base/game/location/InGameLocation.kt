@@ -70,8 +70,8 @@ data class InGameLocation (
         // case where two players have bet the same amount, have the same random number and have bet in the same time
         val allBetsWithMaxAmountAndSameRdNbAndSameTime = allBetsWithMaxAmountAndSameRdNb
             .filter { it.timeOfTheBet == minTimeOfTheBet}
-        val winnerBet = allBetsWithMaxAmountAndSameRdNbAndSameTime.minBy { it.player.user.id }
-        owner = winnerBet.player
-        return winnerBet
+        val winningBet = allBetsWithMaxAmountAndSameRdNbAndSameTime.minBy { it.player.user.id }
+        owner = winningBet.player
+        return winningBet
     }
 }
