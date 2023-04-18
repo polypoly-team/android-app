@@ -27,7 +27,7 @@ import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
-import androidx.activity.ComponentActivity as ComponentActivity1
+import androidx.activity.ComponentActivity
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -35,14 +35,14 @@ import androidx.activity.ComponentActivity as ComponentActivity1
  *
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
-class WelcomeActivity : ComponentActivity1() {
+class WelcomeActivity (auth :FirebaseAuth? = null) : ComponentActivity(){
 
     private var firebaseAuth: FirebaseAuth? = null
     private var mAuthListener: FirebaseAuth.AuthStateListener? = FirebaseAuth.AuthStateListener {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth = firebaseAuth ?: FirebaseAuth.getInstance()
         setContent { WelcomeContent() }
     }
 
@@ -68,7 +68,6 @@ class WelcomeActivity : ComponentActivity1() {
         FirebaseAuthUIActivityResultContract()
     ) {}
 
-    @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
         WelcomeContent()
