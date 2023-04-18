@@ -1,12 +1,11 @@
 package com.github.polypoly.app.game
 
 import com.github.polypoly.app.game.user.User
-import kotlin.time.Duration
 
 class PlayerGlobalData (
     var hasLost: Boolean,
     var balance: Int,
-) {}
+)
 
 class PlayerPerRoundData {
     // TODO: add specific data for round process
@@ -17,7 +16,7 @@ class Game private constructor(
     val players: List<User>,
     val gameMode: GameMode,
     val gameMap: List<Zone>,
-    val roundDuration: Duration,
+    val roundDuration: Long, //> unix timestamp encoding
     private val initialPlayerBalance: Int,
     val name: String
 ) {

@@ -25,8 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.RulesObject
+import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -37,6 +41,11 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Global initialization of the database
+        val db = Firebase.database
+        GlobalInstances.remoteDB = RemoteDB(db, "live")
+
         setContent { WelcomeContent() }
     }
     @Preview(showBackground = true)
