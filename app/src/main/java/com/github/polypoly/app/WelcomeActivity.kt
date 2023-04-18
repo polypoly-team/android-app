@@ -2,6 +2,7 @@ package com.github.polypoly.app
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -10,24 +11,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.google.firebase.auth.FirebaseAuth
-import androidx.activity.ComponentActivity
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -35,42 +28,35 @@ import androidx.activity.ComponentActivity
  *
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
-class WelcomeActivity (auth :FirebaseAuth? = null) : ComponentActivity(){
+class WelcomeActivity : ComponentActivity(){
 
-    private var firebaseAuth: FirebaseAuth? = null
-    private var mAuthListener: FirebaseAuth.AuthStateListener? = FirebaseAuth.AuthStateListener {}
+    /**
+     * This variable is used to check if the user is logged in or not, if not, the activity is finished
+     */
+    companion object {
+        var isSignedIn = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        firebaseAuth = firebaseAuth ?: FirebaseAuth.getInstance()
         setContent { WelcomeContent() }
     }
 
-    override fun onStart() {
-        super.onStart()
-        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        firebaseAuth!!.removeAuthStateListener(mAuthListener!!)
-    }
-
-    /**
-     * This function is called when the sign-in flow is wanted to be started
-     */
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) {}
-
+    @Preview
     @Composable
     fun WelcomePreview() {
         WelcomeContent()
+    }
+
+    /**
+     * This function is called when the activity is resumed
+     * If no more user are logged in, the activity must finish
+     */
+    override fun onResume() {
+        super.onResume()
+        if (!isSignedIn) {
+            finish()
+        }
     }
 
     // ===================================================== MAIN CONTENT
@@ -78,17 +64,6 @@ class WelcomeActivity (auth :FirebaseAuth? = null) : ComponentActivity(){
     fun WelcomeContent() {
         GameMusic.setSong(LocalContext.current, R.raw.mocksong)
         GameMusic.startSong()
-
-        val isSignedIn = remember { mutableStateOf(false) }
-        mAuthListener = FirebaseAuth.AuthStateListener {
-            val user = FirebaseAuth.getInstance().currentUser
-            isSignedIn.value = user != null
-            if(isSignedIn.value) {
-                print("\n__________________ Signed in: ${user?.displayName} _________________\n")
-            } else {
-                print("\n__________________ No user signed in _________________\n")
-            }
-        }
 
         PolypolyTheme {
             Surface(
@@ -102,13 +77,9 @@ class WelcomeActivity (auth :FirebaseAuth? = null) : ComponentActivity(){
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
                     // Then the game buttons are in the center of the screen
-                    if(isSignedIn.value) {
-                        GameButtons()
-                        Spacer(modifier = Modifier.weight(1f))
-                        MenuComposable.RowButtons()
-                    } else {
-                        SignInButton(isSignedIn)
-                    }
+                    GameButtons()
+                    Spacer(modifier = Modifier.weight(1f))
+                    MenuComposable.RowButtons()
                 }
             }
         }
@@ -176,33 +147,6 @@ class WelcomeActivity (auth :FirebaseAuth? = null) : ComponentActivity(){
                 .height(70.dp),
         ) {
             Text(text = text)
-        }
-    }
-
-    /**
-     * This button is used to sign in the user, it'll be displayed if the user is not signed in
-     */
-    @Composable
-    private fun SignInButton(isSignedIn: MutableState<Boolean>) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(2.dp)
-            ) {
-                GameButton(onClick = {
-                    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
-
-                    val signInIntent = AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build()
-                    signInLauncher.launch(signInIntent)
-                }, text = "Sign in to play!")
-            }
         }
     }
 }

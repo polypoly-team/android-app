@@ -44,6 +44,11 @@
             android:name=".WelcomeActivity"
             android:exported="true"
             android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
+            android:name=".SignInActivity"
+            android:exported="true"
+            android:label="@string/title_activity_sign_in"
             android:theme="@style/Theme.Polypoly">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
+import com.github.polypoly.app.SignInActivity
 import com.github.polypoly.app.WelcomeActivity
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.utils.Padding
@@ -28,12 +29,12 @@ import com.google.firebase.auth.FirebaseAuth
  * TODO: edit this when adding more settings
  */
 class SettingsActivity : MenuActivity("Settings") {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MenuContent {
                 SettingsContent()
-                SignOutButton()
             }
         }
     }
@@ -58,6 +59,7 @@ class SettingsActivity : MenuActivity("Settings") {
                 Column {
                     Text(text = "Song settings")
                     MusicSlider()
+                    SignOutButton()
                 }
             }
         }
@@ -153,7 +155,10 @@ class SettingsActivity : MenuActivity("Settings") {
                        if (FirebaseAuth.getInstance().currentUser != null){
                            FirebaseAuth.getInstance().signOut()
                        }
+                        WelcomeActivity.isSignedIn = false
                         finish()
+                        val backToSignIn = Intent(mContext, SignInActivity::class.java)
+                        startActivity(backToSignIn)
                     },
                     modifier = Modifier
                         .width(100.dp)
