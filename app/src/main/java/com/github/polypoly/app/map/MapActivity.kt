@@ -31,10 +31,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -86,9 +89,12 @@ class MapActivity : ComponentActivity() {
 
     private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
 
-    // flag to show the dialog
+    // flag to show the building info dialog
     val showDialog = mutableStateOf(false)
     lateinit var currentMarker: Marker
+
+    // flag to show the roll dice dialog
+    val showRollDiceDialog = mutableStateOf(false)
 
     // store the map view for testing purposes
     lateinit var mapView: MapView private set
@@ -103,11 +109,13 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     BuildingInfoUIComponent()
+                    RollDiceDialog()
                     Hud(
                         PlayerGlobalData(false, 420),
                         listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),
                         16
                     )
+                    RollDiceButton()
                 }
             }
         }
@@ -134,6 +142,73 @@ class MapActivity : ComponentActivity() {
             this.mapView = mapView
             mapView
         }, modifier = Modifier.testTag("map"))
+    }
+
+    @Composable
+    fun RollDiceButton() {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-80).dp)
+                    .testTag("rollDiceButton"),
+                onClick = {
+                    // Toast.makeText(this@MapActivity, rollDice(), Toast.LENGTH_SHORT).show()
+                    showRollDiceDialog.value = true
+                },
+                shape = CircleShape
+
+            ) {
+                Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
+            }
+        }
+    }
+
+    /**
+     * Dice roll dialog, shows the result of 3 dice rolls in a column.
+     */
+    @Composable
+    fun RollDiceDialog() {
+        if (showRollDiceDialog.value) {
+            Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
+                AlertDialog(
+                    onDismissRequest = { showRollDiceDialog.value = false },
+                    title = { Text("Dice Roll") },
+                    text = {
+                        Column {
+                            // 3 buttons, containing the name of a random location
+                            Button(onClick = { }) {
+                                Text(rollDice().name)
+                            }
+                            Button(onClick = { }) {
+                                Text(rollDice().name)
+                            }
+                            Button(onClick = { }) {
+                                Text(rollDice().name)
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = { showRollDiceDialog.value = false }) {
+                            Text("Quit")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    private fun rollDice(): com.github.polypoly.app.game.Location {
+        val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 1
+
+        // get the 12 closest locations
+        val closestLocations = markerToLocation.entries
+            .filter { it.value.name != mapViewModel.closeLocation.value?.name } // remove the current location
+            .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
+            .take(12)
+
+        return closestLocations[diceRollsSum].value
     }
 
     /**
@@ -784,7 +859,8 @@ class MapActivity : ComponentActivity() {
         private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
         private const val INITIAL_ZOOM = 18.0
         private const val MARKER_SIDE_LENGTH = 100
-        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0
-        // meters, used to determine if the player is close enough to a location to interact with it
+
+        //used to determine if the player is close enough to a location to interact with it
+        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0 // meters
     }
 }
