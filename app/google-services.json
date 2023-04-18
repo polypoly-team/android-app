@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "349880221971-43cqia7rs3mks499ocvag46mbfkd56gb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "100ed1983dfbfa3a68e85c55646a70618aca4cfb"
+          }
+        },
+        {
           "client_id": "349880221971-8u0rqd0cj42aq5mejbqtkhs5i2rl9v73.apps.googleusercontent.com",
           "client_type": 3
         }
