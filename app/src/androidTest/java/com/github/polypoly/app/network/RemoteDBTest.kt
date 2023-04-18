@@ -11,18 +11,25 @@ import org.junit.runners.JUnit4
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
 
 @RunWith(JUnit4::class)
 class RemoteDBTest: PolyPolyTest(true, false) {
+
+    private fun <T : Any> classCanBeStoredInDB(clazz: KClass<T>) {
+        val noArgsKey = "no-args-obj"
+        val noArgsConstructor = clazz.java.getDeclaredConstructor()
+        val noArgsInstance = noArgsConstructor.newInstance()
+        addDataToDB(listOf(noArgsInstance), listOf(noArgsKey))
+        assertEquals(
+            noArgsInstance,
+            remoteDB.getValue(noArgsKey, clazz).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
     @Test
     fun gameLobbyCanBeStoredInDB() {
-        val noArgs = GameLobby::class.java.getDeclaredConstructor()
-        val noArgsLobby = noArgs.newInstance()
-        addGameLobbyToDB(noArgsLobby)
-        assertEquals(
-            noArgsLobby,
-            remoteDB.getValue<GameLobby>(noArgsLobby.code).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        )
+        classCanBeStoredInDB(GameLobby::class)
     }
 
     @Test
