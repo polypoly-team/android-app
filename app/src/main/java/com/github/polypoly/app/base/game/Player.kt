@@ -26,7 +26,7 @@ data class Player (
      * @return true if the player has lost the game, false otherwise
      */
     fun hasLose(): Boolean {
-        return balance <= 0 && ownedLocations.isEmpty()
+        return roundLost != null
     }
 
     /**
