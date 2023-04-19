@@ -1,7 +1,6 @@
 package com.github.polypoly.app.global
 
 import com.github.polypoly.app.network.RemoteDB
-import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**

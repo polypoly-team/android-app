@@ -18,8 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
-import com.github.polypoly.app.network.FakeRemoteStorage
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileModifyingActivity : ComponentActivity() {
@@ -36,17 +38,13 @@ class ProfileModifyingActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val id = intent.getLongExtra("userId", 0)
-        val user = FakeRemoteStorage.instance.getUserWithId(id).get()
-        nickname = user.name
-        description = user.bio
         setContent {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    ProfileForm(user)
+                    ProfileForm()
                 }
             }
         }
@@ -56,9 +54,19 @@ class ProfileModifyingActivity : ComponentActivity() {
      * The form where the user can fill his/her profile info
      */
     @Composable
-    fun ProfileForm(user: User) {
+    fun ProfileForm() {
+        val id = intent.getLongExtra("userId", 0)
+
         var warningText by remember { mutableStateOf("") }
+        var user by remember { mutableStateOf(User()) }
         val trophiesDisplay = remember { user.trophiesDisplay.toMutableStateList() }
+
+        remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + id).thenAccept{userFound ->
+            user = userFound
+            nickname = user.name
+            description = user.bio
+        }
+
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -67,9 +75,9 @@ class ProfileModifyingActivity : ComponentActivity() {
             Text("Write your info", style = MaterialTheme.typography.h5,
                 textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(10.dp))
-            NicknameTextField()
+            NicknameTextField(user)
             Spacer(modifier = Modifier.height(10.dp))
-            DescriptionTextField()
+            DescriptionTextField(user)
             Spacer(modifier = Modifier.height(40.dp))
             TrophiesSelection(trophiesDisplay, user)
             Spacer(modifier = Modifier.height(40.dp))
@@ -121,7 +129,6 @@ class ProfileModifyingActivity : ComponentActivity() {
         }
     }
 
-
     /**
      * Button to validate the form
      * @param onError call back when an error occur
@@ -129,16 +136,14 @@ class ProfileModifyingActivity : ComponentActivity() {
     @Composable
     fun ValidationButton(onError: () -> Unit, trophiesDisplay: MutableList<Int>) {
         val mContext = LocalContext.current
-        Button(
-            shape = CircleShape,
-            modifier = Modifier.testTag("registerInfoButton"),
-            onClick = {
-                if(nickname.isEmpty()) {
-                    onError()
-                } else {
-                    val id = intent.getLongExtra("userId", 0)
-                    val user = FakeRemoteStorage.instance.getUserWithId(id).get()
-                    FakeRemoteStorage.instance.updateUser(User(
+
+        val onButtonClick: () -> Unit = {
+            if(nickname.isEmpty()) {
+                onError()
+            } else {
+                val id = intent.getLongExtra("userId", 0)
+                remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + id).thenCompose { user ->
+                    remoteDB.updateValue(DB_USERS_PROFILES_PATH + id, User(
                         id = id,
                         name = nickname,
                         bio = description,
@@ -146,12 +151,18 @@ class ProfileModifyingActivity : ComponentActivity() {
                         stats = user.stats,
                         trophiesWon = user.trophiesWon,
                         trophiesDisplay = trophiesDisplay
-                    )
-                    )
+                    ))
+                }.thenApply {
                     val profileIntent = Intent(mContext, ProfileActivity::class.java)
                     startActivity(profileIntent)
                 }
             }
+        }
+
+        Button(
+            shape = CircleShape,
+            modifier = Modifier.testTag("registerInfoButton"),
+            onClick = onButtonClick
         ) {
             Text(text = "Validate profile")
         }
@@ -198,10 +209,10 @@ class ProfileModifyingActivity : ComponentActivity() {
      * The field where the player can write his/her nickname
      */
     @Composable
-    fun NicknameTextField() {
+    fun NicknameTextField(user: User) {
         CustomTextField(
             label = "nickname",
-            initialValue = nickname,
+            initialValue = user.name,
             onChanged = {newValue ->  nickname = newValue},
             maxTextLength = 15,
             testTag = "nicknameText",
@@ -212,10 +223,10 @@ class ProfileModifyingActivity : ComponentActivity() {
      * The field where the player can write his/her description
      */
     @Composable
-    fun DescriptionTextField() {
+    fun DescriptionTextField(user: User) {
         CustomTextField(
             label = "description",
-            initialValue = description,
+            initialValue = user.bio,
             onChanged = {newValue ->  description = newValue},
             singleLine = false,
             maxTextLength = 130,
@@ -235,13 +246,11 @@ class ProfileModifyingActivity : ComponentActivity() {
     @Composable
     fun ProfileModifyingPreview() {
         PolypolyTheme {
-            val id = intent.getLongExtra("userId", 0)
-            val user = FakeRemoteStorage.instance.getUserWithId(id).get()
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                ProfileForm(user)
+                ProfileForm()
             }
         }
     }

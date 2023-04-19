@@ -1,18 +1,17 @@
 package com.github.polypoly.app.game
 
 import com.github.polypoly.app.game.user.User
-import kotlin.time.Duration
 
-class GameLobby(
-    val admin: User,
-    val gameMode: GameMode,
-    val minimumNumberOfPlayers: Int,
-    val maximumNumberOfPlayers: Int,
-    val roundDuration: Duration,
-    val gameMap: List<Zone>,
-    val initialPlayerBalance: Int,
-    val name: String,
-    val code: String,
+data class GameLobby(
+    val admin: User = User(),
+    val gameMode: GameMode = GameMode.LAST_STANDING,
+    val minimumNumberOfPlayers: Int = 2,
+    val maximumNumberOfPlayers: Int = Int.MAX_VALUE,
+    val roundDuration: Long = 0, //> unix timestamp encoding
+    val gameMap: List<Zone> = listOf(),
+    val initialPlayerBalance: Int = 0,
+    val name: String = "default-lobby-instance",
+    val code: String = "default-lobby-code",
     val private: Boolean = false
 ) {
 
@@ -24,7 +23,7 @@ class GameLobby(
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration.isNegative() || roundDuration.isInfinite())
+        if (roundDuration < 0)
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
         if (name.isEmpty())
             throw java.lang.IllegalArgumentException("Game name cannot be empty")

@@ -17,11 +17,30 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,9 +56,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.Localization
 import com.github.polypoly.app.game.PlayerGlobalData
-import com.github.polypoly.app.map.LocalizationRepository.getZones
+import com.github.polypoly.app.map.LocationRepository.getZones
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Padding
@@ -65,11 +83,8 @@ class MapActivity : ComponentActivity() {
 
     // Not public for testing purposes
     val mapViewModel: MapViewModel = MapViewModel()
-    private val initialPosition = GeoPoint(46.518726, 6.566613)
-    private val initialZoom = 18.0
-    private val markerSideLength = 100
 
-    private val markerToLocalization = mutableMapOf<Marker, Localization>()
+    private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
 
     // flag to show the dialog
     val showDialog = mutableStateOf(false)
@@ -88,7 +103,11 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     BuildingInfoUIComponent()
-                    Hud(PlayerGlobalData(false, 420), listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),16)
+                    Hud(
+                        PlayerGlobalData(false, 420),
+                        listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),
+                        16
+                    )
                 }
             }
         }
@@ -102,18 +121,13 @@ class MapActivity : ComponentActivity() {
         AndroidView(factory = { context ->
             Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
-            val mapView = initMapView(context, initialPosition)
+            val mapView = initMapView(context, INITIAL_POSITION)
 
             for (zone in getZones())
-                zone.localizations
-                    .forEach {
-                        markerToLocalization[addMarkerTo(
-                            mapView,
-                            it.position,
-                            it.name,
-                            zone.color
-                        )] = it
-                    }
+                for (location in zone.locations) {
+                    val marker = addMarkerTo(mapView, location.position, location.name, zone.color)
+                    markerToLocation[marker] = location
+                }
 
             val currentLocationOverlay = initLocationOverlay(mapView)
             mapView.overlays.add(currentLocationOverlay)
@@ -122,6 +136,9 @@ class MapActivity : ComponentActivity() {
         }, modifier = Modifier.testTag("map"))
     }
 
+    /**
+     * Displays the distance walked and a button to reset it.
+     */
     @Composable
     fun DistanceWalkedUIComponents() {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -155,20 +172,27 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Manage the building info dialog and the bet dialog.
+     */
     @Composable
     fun BuildingInfoUIComponent() {
-        val showBuyDialog = remember { mutableStateOf(false) }
-        if (showDialog.value) BuildingInfoDialog(showBuyDialog)
+        val showBetDialog = remember { mutableStateOf(false) }
+        if (showDialog.value) BuildingInfoDialog(showBetDialog)
 
-        if (showBuyDialog.value) {
+        if (showBetDialog.value) {
             BetDialog(onBuy = { amount ->
-                showBuyDialog.value = false // TODO: Handle the buy action with the entered amount here
+                showBetDialog.value =
+                    false // TODO: Handle the buy action with the entered amount here
             }, onClose = {
-                showBuyDialog.value = false
+                showBetDialog.value = false
             })
         }
     }
 
+    /**
+     * Building Info popup dialog.
+     */
     @Composable
     private fun BuildingInfoDialog(showBuyDialog: MutableState<Boolean>) {
         AlertDialog(
@@ -176,9 +200,9 @@ class MapActivity : ComponentActivity() {
             modifier = Modifier.testTag("buildingInfoDialog"),
             title = {
                 Row {
-                    Text(text = markerToLocalization[currentMarker]?.name ?: "Unknown")
+                    Text(text = markerToLocation[currentMarker]?.name ?: "Unknown")
                     Spacer(modifier = Modifier.weight(0.5f))
-                    Text(text = "Base price: ${markerToLocalization[currentMarker]?.basePrice}")
+                    Text(text = "Base price: ${markerToLocation[currentMarker]?.basePrice}")
                 }
             },
             text = {
@@ -190,6 +214,9 @@ class MapActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Building Info popup dialog buttons.
+     */
     @Composable
     private fun BuildingInfoButtons(showBuyDialog: MutableState<Boolean>) {
         Row(
@@ -213,6 +240,9 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Bet popup dialog
+     */
     @Composable
     fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit) {
         val inputPrice = remember { mutableStateOf("") }
@@ -241,6 +271,9 @@ class MapActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * Body for the bet dialog.
+     */
     @Composable
     private fun BetDialogBody(
         inputPrice: MutableState<String>,
@@ -274,6 +307,9 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The buttons that are shown in the bet dialog.
+     */
     @Composable
     private fun BetDialogButtons(
         onBuy: (Float) -> Unit,
@@ -281,7 +317,7 @@ class MapActivity : ComponentActivity() {
         inputPrice: MutableState<String>,
         showError: MutableState<Boolean>
     ) {
-        val minBet = markerToLocalization[currentMarker]?.basePrice!!
+        val minBet = markerToLocation[currentMarker]?.basePrice!!
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -315,20 +351,26 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Initializes the map view with the given start position.
+     */
     private fun initMapView(context: Context, startPosition: GeoPoint): MapView {
         val mapView = MapView(context)
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         mapView.setMultiTouchControls(true)
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        mapView.controller.setZoom(initialZoom)
+        mapView.controller.setZoom(INITIAL_ZOOM)
         mapView.controller.setCenter(startPosition)
-        val campusTileSource = CampusTileSource( 0)
+        val campusTileSource = CampusTileSource(0)
         val tileProvider = MapTileProviderBasic(context, campusTileSource)
         val tilesOverlay = TilesOverlay(tileProvider, context)
         mapView.overlays.add(tilesOverlay)
         return mapView
     }
 
+    /**
+     * Adds a marker to the given map view.
+     */
     private fun addMarkerTo(
         mapView: MapView,
         position: GeoPoint,
@@ -350,9 +392,16 @@ class MapActivity : ComponentActivity() {
         return marker
     }
 
+    /**
+     * Builds a marker icon with the given color.
+     */
     private fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = decodeResource(context.resources, R.drawable.location_pin)
-        val scaledBitmap = createScaledBitmap(markerIcon, markerSideLength, markerSideLength, true)
+        val scaledBitmap = createScaledBitmap(
+            markerIcon,
+            MARKER_SIDE_LENGTH,
+            MARKER_SIDE_LENGTH, true
+        )
         val paint = Paint()
         paint.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
         val canvas = Canvas(scaledBitmap)
@@ -360,6 +409,9 @@ class MapActivity : ComponentActivity() {
         return BitmapDrawable(context.resources, scaledBitmap)
     }
 
+    /**
+     * Initializes the location overlay and sets the location listener.
+     */
     private fun initLocationOverlay(mapView: MapView): MyLocationNewOverlay {
         val locationProvider = GpsMyLocationProvider(mapView.context)
         var lastLocation = Location("")
@@ -367,7 +419,9 @@ class MapActivity : ComponentActivity() {
         val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
             override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
                 super.onLocationChanged(location, provider)
-                updateAllDistances(mapView, GeoPoint(location))
+                mapViewModel.setCloseLocation(
+                    updateAllDistancesAndFindClosest(mapView, GeoPoint(location))
+                )
                 mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
                 lastLocation = locationProvider.lastKnownLocation
             }
@@ -377,7 +431,9 @@ class MapActivity : ComponentActivity() {
         locationOverlay.enableFollowLocation()
         locationOverlay.runOnFirstFix {
             runOnUiThread {
-                updateAllDistances(mapView, locationOverlay.myLocation)
+                mapViewModel.setCloseLocation(
+                    updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation))
+                )
                 mapView.controller.animateTo(locationOverlay.myLocation)
                 mapViewModel.resetDistanceWalked()
             }
@@ -385,17 +441,42 @@ class MapActivity : ComponentActivity() {
         return locationOverlay
     }
 
+    /**
+     * Returns all markers on the map.
+     */
     private fun markersOf(mapView: MapView): List<Marker> {
         return mapView.overlays.filterIsInstance<Marker>()
     }
 
-    private fun updateAllDistances(mapView: MapView, myLocation: GeoPoint) {
+    /**
+     * Updates the distance of all markers and returns the closest one.
+     *
+     * @return the closest location or null if there are no locations close enough to the player
+     */
+    private fun updateAllDistancesAndFindClosest(
+        mapView: MapView,
+        myLocation: GeoPoint
+    ): com.github.polypoly.app.game.Location? {
         fun updateDistance(marker: Marker, myLocation: GeoPoint) {
             val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
             marker.snippet = "Distance: ${formattedDistance(distance)}"
         }
-        for (marker in markersOf(mapView))
+
+        var closestLocation = null as com.github.polypoly.app.game.Location?
+        for (marker in markersOf(mapView)) {
             updateDistance(marker, myLocation)
+            val markerLocation = markerToLocation[marker]!!
+            if (closestLocation == null ||
+                myLocation.distanceToAsDouble(markerLocation.position)
+                < myLocation.distanceToAsDouble(closestLocation.position)
+            ) {
+                closestLocation = markerLocation
+            }
+        }
+        if (myLocation.distanceToAsDouble(closestLocation!!.position) > MAX_CLOSE_LOCATION_DISTANCE)
+            closestLocation = null
+
+        return closestLocation
     }
 
     private fun formattedDistance(distance: Float): String {
@@ -426,6 +507,24 @@ class MapActivity : ComponentActivity() {
     fun Hud(playerData: PlayerGlobalData, otherPlayersData: List<PlayerGlobalData>, round: Int) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
+        HudLocation(location = mapViewModel.closeLocation.value?.name ?: "")
+    }
+
+    /**
+     * The HUD for the current nearby location (a text at the top of the screen)
+     */
+    @Composable
+    fun HudLocation(location: String) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Padding.medium)
+        ) {
+            Text(
+                text = location,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     }
 
     /**
@@ -633,7 +732,14 @@ class MapActivity : ComponentActivity() {
      * A button whose icon changes depending on a toggle
      */
     @Composable
-    fun ToggleIconButton(name: String, description: String, onClick: () -> Unit, toggle: Boolean, onIcon: Int, offIcon: Int) {
+    fun ToggleIconButton(
+        name: String,
+        description: String,
+        onClick: () -> Unit,
+        toggle: Boolean,
+        onIcon: Int,
+        offIcon: Int
+    ) {
         Button(
             onClick = onClick,
             modifier = Modifier
@@ -672,5 +778,13 @@ class MapActivity : ComponentActivity() {
                 BuildingInfoUIComponent()
             }
         }
+    }
+
+    companion object {
+        private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
+        private const val INITIAL_ZOOM = 18.0
+        private const val MARKER_SIDE_LENGTH = 100
+        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0
+        // meters, used to determine if the player is close enough to a location to interact with it
     }
 }
