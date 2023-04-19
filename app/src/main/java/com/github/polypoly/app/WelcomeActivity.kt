@@ -33,7 +33,6 @@ class WelcomeActivity : ComponentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent { WelcomeContent() }
         if (!isSignedIn) {
             finish()

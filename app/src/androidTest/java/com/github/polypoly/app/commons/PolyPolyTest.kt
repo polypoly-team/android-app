@@ -7,12 +7,19 @@ import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.network.RemoteDB
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -22,7 +29,8 @@ import kotlin.time.DurationUnit
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
     val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
-    val fillWithFakeData: Boolean //> fill remote storage with fake data at the beginning of every test
+    val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
+    val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
     companion object {
         // Global tests constants
@@ -36,6 +44,7 @@ abstract class PolyPolyTest(
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
+        val CURRENT_USER = User(0,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(12,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
@@ -71,6 +80,9 @@ abstract class PolyPolyTest(
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+
+        val firebaseAuthMock = mock(FirebaseAuth::class.java)
+        val currentUserMock = mock(FirebaseUser::class.java)
 
         init {
             val db = Firebase.database
@@ -114,12 +126,25 @@ abstract class PolyPolyTest(
 
     @Before
     fun prepareTest() {
+        if(signFakeUserIn) {
+            `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
+            currentUser = currentUserMock
+            isSignedIn = true
+        } else {
+            currentUser = null
+            isSignedIn = false
+        }
         if (clearRemoteStorage) {
             clearTestDB()
         }
         if (fillWithFakeData) {
             fillWithFakeData()
         }
+    }
+    @After
+    fun cleanUp() {
+        currentUser = null
+        isSignedIn = false
     }
 
     private fun clearTestDB() {
