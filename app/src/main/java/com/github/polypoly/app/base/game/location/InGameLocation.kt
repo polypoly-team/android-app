@@ -12,8 +12,8 @@ import com.github.polypoly.app.base.game.Player
  */
 data class InGameLocation (
     var location: Location,
-    var level: LocalizationLevel,
-    var owner: Player?,
+    var level: LocalizationLevel = LocalizationLevel.LEVEL_0,
+    var owner: Player? = null,
     val bets: List<LocationBet> = listOf()
 ) {
 

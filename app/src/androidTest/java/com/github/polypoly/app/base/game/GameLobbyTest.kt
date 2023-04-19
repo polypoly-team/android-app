@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base
+package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.GameMode

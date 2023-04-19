@@ -41,9 +41,21 @@ data class Player (
 
     /**
      * Update the balance of the player with the money earned.
-     * @param amount the amount of money earned
+     * @param amount the amount of money earned*
+     * @throws IllegalArgumentException if the amount of money earned is negative
+     * @throws IllegalStateException if there is no game in progress
+     * @throws IllegalStateException if the player is not in the game currently in progress
+     * @throws IllegalStateException if the player has already lost the game
      */
     fun earnMoney(amount: Int) {
+        if(amount <= 0)
+            throw IllegalArgumentException("The amount of money earned cannot be negative or zero")
+        if(Game.gameInProgress == null)
+            throw IllegalStateException("There are no game in progress")
+        if(Game.gameInProgress?.playInThisGame(user) == false)
+            throw IllegalStateException("The player is not in the game currently in progress")
+        if(roundLost != null)
+            throw IllegalStateException("The player has already lost the game")
         balance += amount
     }
 
@@ -51,13 +63,20 @@ data class Player (
      * Update the balance of the player with the money lost.
      * If the player has not enough money, he/she has to sell his properties or to lose.
      * @param amount the amount of money lost
+     * @throws IllegalArgumentException if the amount of money lost is negative
      * @throws IllegalStateException if there is no game in progress
+     * @throws IllegalStateException if the player is not in the game currently in progress
+     * @throws IllegalStateException if the player has already lost the game
      */
     fun loseMoney(amount: Int) {
+        if(amount <= 0)
+            throw IllegalArgumentException("The amount of money lost cannot be negative or zero")
         if(Game.gameInProgress == null)
             throw IllegalStateException("There are no game in progress")
         if(Game.gameInProgress?.playInThisGame(user) == false)
             throw IllegalStateException("The player is not in the game currently in progress")
+        if(roundLost != null)
+            throw IllegalStateException("The player has already lost the game")
         if(amount > balance) {
             balance = 0
             if(ownedLocations.isEmpty()) {
@@ -86,7 +105,13 @@ data class Player (
         return roundLost
     }
 
-    fun betToBuy(location: InGameLocation, amount: Int) {
+    /**
+     * The player bet to buy a location
+     * @param location the location the player wants to buy
+     * @param amount the amount of money the player wants to bet
+     * @return the [LocationBet] created
+     */
+    fun betToBuy(location: InGameLocation, amount: Int) : LocationBet {
         if(Game.gameInProgress == null)
             throw IllegalStateException("There are no game in progress")
         if(Game.gameInProgress?.playInThisGame(user) == false)
@@ -95,15 +120,17 @@ data class Player (
             throw IllegalArgumentException("The location is already owned by someone")
         if(location.currentPrice() > balance)
             throw IllegalArgumentException("The player has not enough money to buy the location")
-        LocationBet(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
+        return LocationBet(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
         // TODO : add in the DB the bet
     }
 
     /**
      * Update the state of the player with all the new data
-     * @param newBalance
-     * @param newOwnedLocations
-     * @param newRoundLost
+     * @param newBalance the new balance of the player
+     * @param newOwnedLocations the new list of the owned locations of the player
+     * @param newRoundLost the new round when the player had lost the game if the player has lost the game,
+     * @throws IllegalArgumentException if the player has lost the game and the balance is not equal to 0
+     * @throws IllegalArgumentException if the player has lost the game and the player owns locations
      */
     fun updateState(newBalance: Int, newOwnedLocations: List<InGameLocation>, newRoundLost: Int?) {
         if(balance > 0 && roundLost != null)
