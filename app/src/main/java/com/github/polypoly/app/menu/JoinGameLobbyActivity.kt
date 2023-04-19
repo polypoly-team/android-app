@@ -3,7 +3,6 @@ package com.github.polypoly.app.menu
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -37,7 +36,6 @@ import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.ui.theme.PolypolyTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -45,7 +43,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Activity where the user can join a gameLobby
  */
-class JoinGameLobbyActivity : ComponentActivity() {
+class JoinGameLobbyActivity : MenuActivity("Join a game") {
     companion object {
         const val POLLING_INTERVAL = 5000L
     }
@@ -62,7 +60,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
+            MenuContent{
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -77,7 +75,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
                             contentDescription = "polypoly logo",
                             modifier = Modifier
                                 .testTag("logo"),
-                            )
+                        )
                         Spacer(modifier = Modifier.height(50.dp))
                         GameLobbyForm()
                     }
@@ -139,6 +137,9 @@ class JoinGameLobbyActivity : ComponentActivity() {
         var text by remember { mutableStateOf("") }
 
         OutlinedTextField(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colors.primary,
+                unfocusedBorderColor = MaterialTheme.colors.primary),
             modifier = Modifier
                 .width(200.dp)
                 .testTag("gameLobbyCodeField"),
@@ -202,12 +203,12 @@ class JoinGameLobbyActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        delay(POLLING_INTERVAL)
                         remoteDB.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).thenAccept{lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")
                             .d("Refreshing gameLobbies list")
+                        delay(POLLING_INTERVAL)
                     }
                 }
 
