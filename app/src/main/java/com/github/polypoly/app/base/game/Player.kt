@@ -85,8 +85,9 @@ data class Player (
             } else {
                 // TODO : ask the player if he wants to sell one of his/her properties
             }
+        } else {
+            balance -= amount
         }
-        balance -= amount
     }
 
     /**
@@ -110,6 +111,12 @@ data class Player (
      * @param location the location the player wants to buy
      * @param amount the amount of money the player wants to bet
      * @return the [LocationBet] created
+     * @throws IllegalStateException if there is no game in progress
+     * @throws IllegalStateException if the player is not in the game currently in progress
+     * @throws IllegalArgumentException if the location is already owned by someone
+     * @throws IllegalArgumentException if the amount of money bet is negative or zero
+     * @throws IllegalStateException if the player has already lost the game
+     * @throws IllegalArgumentException if the player has not enough money to buy the location
      */
     fun betToBuy(location: InGameLocation, amount: Int) : LocationBet {
         if(Game.gameInProgress == null)
@@ -118,8 +125,12 @@ data class Player (
             throw IllegalStateException("The player is not in the game currently in progress")
         if(location.owner != null)
             throw IllegalArgumentException("The location is already owned by someone")
+        if(amount <= 0)
+            throw IllegalArgumentException("The amount of money bet cannot be negative or zero")
+        if(roundLost != null)
+            throw IllegalStateException("The player has already lost the game")
         if(location.currentPrice() > balance)
-            throw IllegalArgumentException("The player has not enough money to buy the location")
+            throw IllegalArgumentException("The player has not bet enough money to buy the location")
         return LocationBet(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
         // TODO : add in the DB the bet
     }

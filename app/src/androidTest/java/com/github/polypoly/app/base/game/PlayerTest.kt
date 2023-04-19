@@ -56,7 +56,7 @@ class PlayerTest {
 
     @Test
     fun compareToConsiderEqualThePlayerWithSameMoney() {
-        assertTrue(testPlayer1 == testPlayer3)
+        assertTrue(testPlayer1.compareTo(testPlayer3) == 0)
     }
 
     @Test
@@ -66,7 +66,7 @@ class PlayerTest {
 
     @Test
     fun compareToConsiderEqualThePlayerWhoLostAtTheSameTime() {
-        assertTrue(testPlayer6 == testPlayer5)
+        assertTrue(testPlayer6.compareTo(testPlayer5) == 0)
     }
 
     @Test
@@ -157,6 +157,62 @@ class PlayerTest {
         assertEquals(300, bet.amount)
         assertEquals(42042042, bet.player.user.id)
         assertTrue(bet.randomNumber < 1 && bet.randomNumber >= 0)
+    }
+
+    @Test
+    fun betToBuyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
+        val testPlayer = Player(testUser1, 0, listOf(), 4)
+        try {
+            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 300)
+            fail("Should have thrown an exception")
+        } catch (e: IllegalStateException) {
+            assertEquals("The player has already lost the game", e.message)
+        }
+    }
+
+    @Test
+    fun betToBuyThrowsAnExceptionIfTheAmountIsNegative() {
+        val testPlayer = Player(testUser1, 300, listOf())
+        try {
+            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), -300)
+            fail("Should have thrown an exception")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The amount of money bet cannot be negative or zero", e.message)
+        }
+    }
+
+    @Test
+    fun betToBuyThrowsAnExceptionIfTheAmountIsZero() {
+        val testPlayer = Player(testUser1, 300, listOf())
+        try {
+            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 0)
+            fail("Should have thrown an exception")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The amount of money bet cannot be negative or zero", e.message)
+        }
+    }
+
+    @Test
+    fun betToBuyThrowsAnExceptionIfTheLocationIsAlreadyOwned() {
+        val testPlayer = Player(testUser1, 300, listOf())
+        try {
+            testPlayer.betToBuy(
+                location = InGameLocation(LocationRepository.getZones()[0].locations[0], owner = testPlayer2), 300)
+            fail("Should have thrown an exception")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The location is already owned by someone", e.message)
+        }
+    }
+
+    @Test
+    fun betToBuyThrowsAnExceptionIfTheAmountIsSmallerThanTheLocationPrice() {
+        val testPlayer = Player(testUser1, 100, listOf())
+        try {
+            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 100)
+            fail("Should have thrown an exception")
+        } catch (e: IllegalArgumentException) {
+            assertEquals("The player has not bet enough money to buy the location", e.message)
+        }
     }
 
 }

@@ -20,7 +20,7 @@ import com.github.polypoly.app.base.user.User
  */
 class Game private constructor(
     val admin: User,
-    private var players: List<Player>,
+    var players: List<Player>,
     val rules: GameRules,
     val inGameLocations: List<InGameLocation>,
     val currentRound: Int = 1,
@@ -58,13 +58,14 @@ class Game private constructor(
 
     /**
      * Return the ranking of the players
-     * @return a list of players sorted by their ranking
+     * @return a [Map] of the [Player]s and their rank
      */
     fun ranking(): Map<Player, Int> {
-        val map = players.sorted().mapIndexed { index, player -> player to index }.toMap().toMutableMap()
-        for(i in 1 until (players.size-1)) {
-            if(players[i].compareTo(players[i-1]) == 0) {
-                map[players[i-1]]?.let{ map[players[i]] = it }
+        val playersSorted = players.sorted()
+        val map = playersSorted.mapIndexed { index, player -> player to index+1 }.toMap().toMutableMap()
+        for(i in 1 until (players.size)) {
+            if(playersSorted[i].compareTo(playersSorted[i-1]) == 0) {
+                map[playersSorted[i-1]]?.let{ map[playersSorted[i]] = it }
             }
         }
         return map
