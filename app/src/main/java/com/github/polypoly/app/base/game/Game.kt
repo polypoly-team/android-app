@@ -58,14 +58,14 @@ class Game private constructor(
 
     /**
      * Return the ranking of the players
-     * @return a [Map] of the [Player]s and their rank
+     * @return a [Map] of the [Player]s' [User] id and their rank
      */
-    fun ranking(): Map<Player, Int> {
-        val playersSorted = players.sorted()
-        val map = playersSorted.mapIndexed { index, player -> player to index+1 }.toMap().toMutableMap()
+    fun ranking(): Map<Long, Int> {
+        val playersSorted = players.sortedDescending()
+        val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
         for(i in 1 until (players.size)) {
             if(playersSorted[i].compareTo(playersSorted[i-1]) == 0) {
-                map[playersSorted[i-1]]?.let{ map[playersSorted[i]] = it }
+                map[playersSorted[i-1].user.id]?.let{ map[playersSorted[i].user.id] = it }
             }
         }
         return map
@@ -80,7 +80,7 @@ class Game private constructor(
         if(!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
             users = players.map { it.user },
-            usersRank = ranking().map { it.key.user.id to it.value }.toMap(),
+            usersRank = ranking().map { it.key to it.value }.toMap(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
@@ -93,6 +93,15 @@ class Game private constructor(
      */
     fun playInThisGame(user: User): Boolean {
         return players.any { it.user.id == user.id }
+    }
+
+    /**
+     * Get the player associated to the user id
+     * @param userId the id of the user
+     * @return the player associated to the user id
+     */
+    fun getPlayer(userId: Long): Player? {
+        return players.find { it.user.id == userId }
     }
 
     /**

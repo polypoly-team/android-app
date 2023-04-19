@@ -72,4 +72,22 @@ class GameTest {
             assertEquals(1, rank.value)
         }
     }
+
+    @Test
+    fun rankingRankPlayersCorrectly() {
+        gameLobby.start()
+        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(100)
+        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(200)
+        Game.gameInProgress?.getPlayer(testUser3.id)?.loseMoney(300)
+        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(200)
+        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(300)
+        val ranking = Game.gameInProgress?.ranking()
+        assertEquals(2, ranking?.get(testUser1.id))
+        assertEquals(1, ranking?.get(testUser2.id))
+        assertEquals(5, ranking?.get(testUser3.id))
+        assertEquals(4, ranking?.get(testUser4.id))
+        assertEquals(5, ranking?.get(testUser5.id))
+        assertEquals(3, ranking?.get(testUser6.id))
+
+    }
 }

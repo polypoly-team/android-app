@@ -157,6 +157,10 @@ data class Player (
         return if (roundLost != null && other.roundLost != null) {
             roundLost!!.compareTo(other.roundLost!!)
         } else {
+            if(roundLost != null)
+                return -1
+            if(other.roundLost != null)
+                return 1
             balance.compareTo(other.balance)
         }
     }
