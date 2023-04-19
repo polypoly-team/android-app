@@ -4,6 +4,11 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.ProfileActivity
 import com.github.polypoly.app.menu.SettingsActivity
@@ -29,8 +34,14 @@ class WelcomeActivityTest {
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
 
+
+    init {
+        isSignedIn = true
+    }
     @Before
-    fun startIntents() { Intents.init() }
+    fun startIntents() {
+        Intents.init()
+    }
 
     @After
     fun releaseIntents() { Intents.release() }

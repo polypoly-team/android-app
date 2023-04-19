@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
@@ -30,16 +31,13 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  */
 class WelcomeActivity : ComponentActivity(){
 
-    /**
-     * This variable is used to check if the user is logged in or not, if not, the activity is finished
-     */
-    companion object {
-        var isSignedIn = true
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent { WelcomeContent() }
+        if (!isSignedIn) {
+            finish()
+        }
     }
 
     @Preview

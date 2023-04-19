@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.SignInActivity
 import com.github.polypoly.app.WelcomeActivity
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.utils.Padding
 import com.google.firebase.auth.FirebaseAuth
@@ -155,7 +157,7 @@ class SettingsActivity : MenuActivity("Settings") {
                        if (FirebaseAuth.getInstance().currentUser != null){
                            FirebaseAuth.getInstance().signOut()
                        }
-                        WelcomeActivity.isSignedIn = false
+                        currentUser = null
                         finish()
                         val backToSignIn = Intent(mContext, SignInActivity::class.java)
                         startActivity(backToSignIn)

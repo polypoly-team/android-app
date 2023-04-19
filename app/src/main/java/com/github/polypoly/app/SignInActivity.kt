@@ -19,6 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -31,7 +33,7 @@ class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         firebaseAuth = FirebaseAuth.getInstance()
-        WelcomeActivity.isSignedIn = false
+        isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {
             launchWelcome()
         }
@@ -53,7 +55,7 @@ class SignInActivity : ComponentActivity() {
      */
     private fun launchWelcome(){
         val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
-        WelcomeActivity.isSignedIn = true
+        isSignedIn = true
         startActivity(welcomeActivityIntent)
         finish()
     }
@@ -72,6 +74,7 @@ class SignInActivity : ComponentActivity() {
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = firebaseAuth?.currentUser
             if (user != null) {
+                currentUser = user
                 launchWelcome()
             }
         }
