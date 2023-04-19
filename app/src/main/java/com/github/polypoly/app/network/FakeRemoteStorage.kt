@@ -5,11 +5,10 @@ import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import java.util.concurrent.CompletableFuture
-import kotlin.time.Duration.Companion.hours
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import kotlin.reflect.KClass
 
@@ -88,12 +87,12 @@ class FakeRemoteStorage : IRemoteStorage {
         gameLobbyJoinable2.addUsers(listOf(testUser2, testUser3, testUser4))
         gameLobbyJoinable3.addUsers(listOf(testUser2, testUser3, testUser4))
 
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyFull.code, gameLobbyFull)
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable1.code, gameLobbyJoinable1)
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable2.code, gameLobbyJoinable2)
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable3.code, gameLobbyJoinable3)
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyJoinable4.code, gameLobbyJoinable4)
-        registerValue(DB_GAME_LOBIES_PATH + gameLobbyPrivate.code, gameLobbyPrivate)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyFull.code, gameLobbyFull)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyJoinable1.code, gameLobbyJoinable1)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyJoinable2.code, gameLobbyJoinable2)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyJoinable3.code, gameLobbyJoinable3)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyJoinable4.code, gameLobbyJoinable4)
+        registerValue(DB_GAME_LOBBIES_PATH + gameLobbyPrivate.code, gameLobbyPrivate)
 
         registerValue(DB_USERS_PROFILES_PATH + "0", user)
         registerValue(DB_USERS_PROFILES_PATH + user.id, user)

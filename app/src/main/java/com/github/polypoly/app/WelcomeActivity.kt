@@ -22,12 +22,15 @@ import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import kotlin.time.Duration
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -38,6 +41,9 @@ import kotlin.time.Duration
 class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Global initialization of the database
+        val db = Firebase.database
+        GlobalInstances.remoteDB = RemoteDB(db, "live")
         setContent { WelcomeContent() }
     }
 
@@ -118,23 +124,7 @@ class WelcomeActivity : ComponentActivity() {
                 // Create button
                 GameButton(onClick = {
                     val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-                    /*gameLobbyIntent.putExtra(
-                        "game_lobby",
-                        GameLobby(
-                            User(0, "victor", "no bio"),
-                            GameRules(
-                                GameMode.LAST_STANDING,
-                                1,
-                                3,
-                                1,
-                                null,
-                                LocationRepository.getZones(),
-                                0
-                            ),
-                            "test",
-                            "1"
-                        )
-                    )*/
+                    gameLobbyIntent.putExtra("lobby_code", "1234")
                     startActivity(gameLobbyIntent) // TODO TEMP
                 }, text = "Create Game?")
             }

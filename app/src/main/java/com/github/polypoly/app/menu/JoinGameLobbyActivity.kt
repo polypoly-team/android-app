@@ -33,7 +33,7 @@ import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
@@ -510,7 +510,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
     private fun joinGameLobbyRoom() {
-        val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+        val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
         val gameLobby =  mockDb.getValue<GameLobby>(currentLobbyKey).get()
         val newGameLobby = GameLobby(gameLobby.admin,
             GameRules(gameLobby.rules.gameMode,
@@ -534,7 +534,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * @return (List<GameLobby>): The list of public gameLobbys
      */
     private fun getPublicGameLobbiesFromDB(): List<GameLobby> {
-        val gameLobbies = mockDb.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).get() ?: return listOf()
+        val gameLobbies = mockDb.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).get() ?: return listOf()
         return gameLobbies.filter { !it.private  && !gameLobbyIsFull(it) }
     }
 
@@ -544,7 +544,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * @return (Boolean): True if the gameLobby code is in the database, false otherwise
      */
     private fun dbContainsGameLobbyCode(gameLobbyCode: String): Boolean {
-        return mockDb.keyExists(DB_GAME_LOBIES_PATH + gameLobbyCode).get()
+        return mockDb.keyExists(DB_GAME_LOBBIES_PATH + gameLobbyCode).get()
     }
 
     /**
@@ -553,7 +553,7 @@ class JoinGameLobbyActivity : ComponentActivity() {
      * @return (Boolean): True if the gameLobby is full, false otherwise
      */
     private fun gameLobbyIsFull(gameLobbyCode: String): Boolean {
-        val gameLobby = mockDb.getValue<GameLobby>(DB_GAME_LOBIES_PATH + gameLobbyCode).get() ?: return false
+        val gameLobby = mockDb.getValue<GameLobby>(DB_GAME_LOBBIES_PATH + gameLobbyCode).get() ?: return false
         return gameLobbyIsFull(gameLobby)
     }
 

@@ -2,7 +2,9 @@ package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
-import java.io.Serializable
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -14,12 +16,12 @@ import java.io.Serializable
  * @property private If the [GameLobby] is private or not
  */
 class GameLobby(
-    val admin: User,
-    val rules: GameRules,
-    val name: String,
-    val code: String,
+    val admin: User = User(),
+    val rules: GameRules = GameRules(),
+    val name: String = "default",
+    val code: String = "0",
     val private: Boolean = false,
-): Serializable {
+) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
@@ -34,6 +36,7 @@ class GameLobby(
         if (code.isBlank())
             throw java.lang.IllegalArgumentException("Game code cannot be blank")
         addUser(admin)
+        remoteDB.registerValue(DB_GAME_LOBBIES_PATH + code, this)
     }
 
     /**
@@ -47,7 +50,10 @@ class GameLobby(
             throw IllegalStateException("The game is already full")
         if (currentUsersRegistered.any{u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
+        //if (!remoteDB.keyExists(DB_USERS_PROFILES_PATH + user.id).get()) // TODO: find a way to avoid .get()
+          //  throw java.lang.IllegalArgumentException("User id ${user.id} doesn't exist")
         currentUsersRegistered.add(user)
+        update()
     }
 
     /**
@@ -78,6 +84,7 @@ class GameLobby(
         for (i in 0 until currentUsersRegistered.size) {
             if (currentUsersRegistered[i].id == withId) {
                 currentUsersRegistered.removeAt(i)
+                update()
                 return
             }
         }
@@ -85,13 +92,27 @@ class GameLobby(
     }
 
     /**
-     * Start the game
+     * Starts the game and deletes the lobby from the DB
      * @return the game that has been started
      * @throws IllegalStateException if the game is not ready to start yet
      */
     fun start(): Game {
-        if (!canStart())
+        if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
+        }
+        end()
         return Game.launchFromPendingGame(this)
+    }
+
+    /**
+     * Deletes the lobby from the DB
+     */
+    fun end() {/*TODO*/}
+
+    /**
+     * Updates the lobby in the DB with the current information
+     */
+    private fun update() {
+        remoteDB.updateValue(DB_GAME_LOBBIES_PATH + code, this)
     }
 }

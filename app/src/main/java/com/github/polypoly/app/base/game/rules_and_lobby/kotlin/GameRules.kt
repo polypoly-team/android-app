@@ -1,6 +1,8 @@
 package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.location.Zone
+import com.github.polypoly.app.map.LocationRepository
+import java.io.Serializable
 import kotlin.time.Duration
 
 /**
@@ -15,13 +17,13 @@ import kotlin.time.Duration
  * @property initialPlayerBalance The initial balance of money of the players
  */
 data class GameRules (
-    val gameMode: GameMode,
-    val minimumNumberOfPlayers: Int,
-    val maximumNumberOfPlayers: Int,
-    val roundDuration: Int,
+    val gameMode: GameMode = GameMode.LAST_STANDING,
+    val minimumNumberOfPlayers: Int = 2,
+    val maximumNumberOfPlayers: Int = 2,
+    val roundDuration: Int = 1,
     val maxRound: Int? = null,
-    val gameMap: List<Zone>,
-    val initialPlayerBalance: Int,
+    val gameMap: List<Zone> = LocationRepository.getZones(),
+    val initialPlayerBalance: Int = 0,
 ) {
 
     private val maxRoundHours = 24
