@@ -23,6 +23,7 @@ import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 
 class ProfileModifyingActivity : ComponentActivity() {
 
@@ -150,6 +151,7 @@ class ProfileModifyingActivity : ComponentActivity() {
                         trophiesDisplay = trophiesDisplay
                     ))
                     val profileIntent = Intent(mContext, ProfileActivity::class.java)
+                    finish()
                     startActivity(profileIntent)
                 }
             }
@@ -178,12 +180,7 @@ class ProfileModifyingActivity : ComponentActivity() {
             value = text,
             label = { Text(label) },
             singleLine = singleLine,
-            colors =  TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colors.primary,
-                unfocusedBorderColor = MaterialTheme.colors.onSecondary,
-                focusedLabelColor = MaterialTheme.colors.primary,
-                unfocusedLabelColor = MaterialTheme.colors.onSecondary,
-            ),
+            colors = UIElements.outlineTextFieldColors(),
             maxLines = 5,
             onValueChange = { newText ->
                 text = if (newText.text.length > maxTextLength) text else {
