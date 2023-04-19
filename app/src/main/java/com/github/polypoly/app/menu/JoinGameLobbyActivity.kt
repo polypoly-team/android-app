@@ -37,13 +37,14 @@ import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
 /**
  * Activity where the user can join a gameLobby
  */
-class JoinGameLobbyActivity : ComponentActivity() {
+class JoinGameLobbyActivity : MenuActivity("Join Game") {
 
     /**
      * The attributes of the class
@@ -53,25 +54,33 @@ class JoinGameLobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+            MenuContent {
+                JoinGameLobbyContent()
+            }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun JoinGameLobbyContent() {
+        PolypolyTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                Column(modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(100.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.super_cool_logo),
-                            contentDescription = "polypoly logo",
-                            modifier = Modifier
-                                .testTag("logo"),
-                            )
-                        Spacer(modifier = Modifier.height(50.dp))
-                        GameLobbyForm()
-                    }
+                    Spacer(modifier = Modifier.height(100.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.super_cool_logo),
+                        contentDescription = "polypoly logo",
+                        modifier = Modifier
+                            .testTag("logo"),
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                    GameLobbyForm()
                 }
             }
         }
@@ -146,8 +155,8 @@ class JoinGameLobbyActivity : ComponentActivity() {
             onValueChange = { newText ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
                 gameLobbyCode = text
-            }
-
+            },
+            colors = UIElements.outlineTextFieldColors()
         )
 
     }
