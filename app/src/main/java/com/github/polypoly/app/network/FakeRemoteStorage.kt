@@ -1,9 +1,9 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.base.*
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.hours
 import com.github.polypoly.app.base.user.Skin
@@ -31,7 +31,7 @@ class FakeRemoteStorage : IRemoteStorage {
 
     private val testMinNumberPlayers = 2
     private val testMaxNumberPlayers = 5
-    private val testDuration = 2.hours
+    private val testDuration = 2
     private val testMaxRound = 10
     private val testInitialBalance = 100
 

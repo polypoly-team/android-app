@@ -17,10 +17,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobbyActivity
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import kotlin.time.Duration
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -109,7 +116,27 @@ class WelcomeActivity : ComponentActivity() {
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
-                GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
+                GameButton(onClick = {
+                    val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+                    /*gameLobbyIntent.putExtra(
+                        "game_lobby",
+                        GameLobby(
+                            User(0, "victor", "no bio"),
+                            GameRules(
+                                GameMode.LAST_STANDING,
+                                1,
+                                3,
+                                1,
+                                null,
+                                LocationRepository.getZones(),
+                                0
+                            ),
+                            "test",
+                            "1"
+                        )
+                    )*/
+                    startActivity(gameLobbyIntent) // TODO TEMP
+                }, text = "Create Game?")
             }
         }
     }

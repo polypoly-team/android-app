@@ -1,7 +1,8 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import java.io.Serializable
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -18,7 +19,7 @@ class GameLobby(
     val name: String,
     val code: String,
     val private: Boolean = false,
-) {
+): Serializable {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()

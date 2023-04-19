@@ -12,5 +12,6 @@
     <string name="game_lobby_is_full">Lobby is full</string>
     <string name="joined_game_lobby_with_code">Joined lobby with code: </string>
     <string name="game_lobby_list_title">Join a lobby! </string>
+    <string name="title_activity_game_lobby">GameLobbyActivity</string>
     // =========================================================================
 </resources>

@@ -1,8 +1,8 @@
 package com.github.polypoly.app.base
 
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User

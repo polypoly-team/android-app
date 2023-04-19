@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.location.Zone
 import kotlin.time.Duration
@@ -18,18 +18,20 @@ data class GameRules (
     val gameMode: GameMode,
     val minimumNumberOfPlayers: Int,
     val maximumNumberOfPlayers: Int,
-    val roundDuration: Duration,
+    val roundDuration: Int,
     val maxRound: Int? = null,
     val gameMap: List<Zone>,
     val initialPlayerBalance: Int,
 ) {
+
+    private val maxRoundHours = 24
 
     init {
         if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration.isNegative() || roundDuration.isInfinite())
-            throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
+        if (roundDuration <= 0 || roundDuration >= maxRoundHours)
+            throw java.lang.IllegalArgumentException("Invalid game duration $roundDuration")
     }
 }
