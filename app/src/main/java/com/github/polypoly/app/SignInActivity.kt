@@ -31,6 +31,7 @@ class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         firebaseAuth = FirebaseAuth.getInstance()
+        WelcomeActivity.isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {
             launchWelcome()
         }
@@ -47,6 +48,9 @@ class SignInActivity : ComponentActivity() {
         firebaseAuth!!.removeAuthStateListener(mAuthListener!!)
     }
 
+    /**
+     * starts the WelcomeActivity
+     */
     private fun launchWelcome(){
         val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
         WelcomeActivity.isSignedIn = true
@@ -60,7 +64,6 @@ class SignInActivity : ComponentActivity() {
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) {}
-
 
     @Composable
     fun SignInContent() {
@@ -106,7 +109,7 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
-     * This button is used to sign in the user, it'll be displayed if the user is not signed in
+     * This button is used to launch the sign-in flow
      */
     @Composable
     private fun SignInButton() {
