@@ -62,7 +62,7 @@ abstract class PolyPolyTest(
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(CURRENT_USER, TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
@@ -95,10 +95,15 @@ abstract class PolyPolyTest(
         val firebaseAuthMock = mock(FirebaseAuth::class.java)
         val currentUserMock = mock(FirebaseUser::class.java)
 
+
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
             GlobalInstances.remoteDB = RemoteDB(db, "test-max")
+
+            FirebaseAuth.getInstance().signOut()
+            currentUser = null
+            isSignedIn = false
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
@@ -147,9 +152,6 @@ abstract class PolyPolyTest(
             `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
             currentUser = currentUserMock
             isSignedIn = true
-        } else {
-            currentUser = null
-            isSignedIn = false
         }
         if (clearRemoteStorage) {
             clearTestDB()

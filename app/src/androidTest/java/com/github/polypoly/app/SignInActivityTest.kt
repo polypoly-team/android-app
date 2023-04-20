@@ -15,14 +15,6 @@ class SignInActivityTest : PolyPolyTest(false, false, false){
     @get:Rule
     val composeTestRule = createAndroidComposeRule<SignInActivity>()
 
-    @Before
-    fun startIntents() {
-        Intents.init()
-    }
-
-    @After
-    fun releaseIntents() { Intents.release() }
-
     @Test
     fun mainLogoIsDisplayed() {
         composeTestRule.onNodeWithContentDescription("game_logo").assertIsDisplayed()
