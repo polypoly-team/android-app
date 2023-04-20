@@ -47,13 +47,13 @@ class SignInActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Global initialization of the database
         val db = Firebase.database
         remoteDB = RemoteDB(db, "live")
-        addFakeDataToDB() // < -- uncomment this line to add fake data to the DB
+        //addFakeDataToDB() // < -- uncomment this line to add fake data to the DB
 
         firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
         isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {
             launchWelcome()
@@ -151,7 +151,6 @@ class SignInActivity : ComponentActivity() {
                 Button(
                     onClick = {
                         val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
-
                         val signInIntent = AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setAvailableProviders(providers)
