@@ -15,11 +15,51 @@
       },
       "oauth_client": [
         {
+          "client_id": "349880221971-25i1dd4nevc6pq1uuh5psdnaj1h9c388.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "2e3c850e5f5ef373ad386630d95558cda8024a70"
+          }
+        },
+        {
           "client_id": "349880221971-43cqia7rs3mks499ocvag46mbfkd56gb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.github.polypoly.app",
             "certificate_hash": "100ed1983dfbfa3a68e85c55646a70618aca4cfb"
+          }
+        },
+        {
+          "client_id": "349880221971-b17rpaava711b4gs1235i3tqt8area47.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "7a64150bb02646300b02d95e6ca759b27659866c"
+          }
+        },
+        {
+          "client_id": "349880221971-emvmonf9q3ast350fnbo1r554c9i6ktr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "abec12368d63094a5a5c34d624b2664c159cc2e2"
+          }
+        },
+        {
+          "client_id": "349880221971-m7bui6qm3rndpghpti3r45uru7pn5qon.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "8ba0fcc2f03f312c686185d67a4dc5393ab38590"
+          }
+        },
+        {
+          "client_id": "349880221971-q5qapncd50m0balv718hk37ue2n6jg8e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "efafc7421a78c712cc4f12165bbc64ad70e79a4f"
           }
         },
         {
