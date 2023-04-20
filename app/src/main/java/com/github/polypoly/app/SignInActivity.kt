@@ -29,6 +29,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
+/**
+ * This activity is holds the sign up flow. It will be displayed whenever no user is signed in.
+ */
 class SignInActivity : ComponentActivity() {
 
     private var firebaseAuth: FirebaseAuth? = null
@@ -60,7 +63,7 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
-     * starts the WelcomeActivity
+     * starts the WelcomeActivity and sets the isSignedIn flag to true
      */
     private fun launchWelcome(){
         val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
@@ -70,7 +73,7 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
-     * This function is called when the sign-in flow is wanted to be started
+     * launched when the sign-in flow is wanted to be started
      */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
