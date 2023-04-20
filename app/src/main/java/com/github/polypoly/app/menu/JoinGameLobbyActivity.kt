@@ -36,6 +36,7 @@ import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -137,9 +138,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         var text by remember { mutableStateOf("") }
 
         OutlinedTextField(
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colors.primary,
-                unfocusedBorderColor = MaterialTheme.colors.primary),
+            colors = UIElements.outlineTextFieldColors(),
             modifier = Modifier
                 .width(200.dp)
                 .testTag("gameLobbyCodeField"),

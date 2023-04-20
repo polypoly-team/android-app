@@ -51,7 +51,7 @@ class SignInActivity : ComponentActivity() {
         // Global initialization of the database
         val db = Firebase.database
         remoteDB = RemoteDB(db, "live")
-        addFakeDataToDB() // < -- uncomment this line to add fake data to the DB
+        // addFakeDataToDB() // < -- uncomment this line to add fake data to the DB
 
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
