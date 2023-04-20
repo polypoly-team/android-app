@@ -31,15 +31,19 @@ abstract class PolyPolyTest(
         // Global tests constants
         const val TIMEOUT_DURATION = 5L
 
-        // Ensures only one global initialization even for multithreaded testing
-        var globalInitCompleted = false
-        var initLock = ReentrantLock(true)
-
         // Miscellaneous test data
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val TEST_USER_0 = User(0,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_0 = User(
+            id = 0,
+            name = "John",
+            bio = "Hi, this is my bio :)",
+            skin = Skin(0,0,0),
+            stats = Stats(0, 0, 67, 28, 14),
+            trophiesWon = listOf(0, 4, 8, 11, 12, 14),
+            trophiesDisplay = mutableListOf(0, 4)
+        )
         val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
