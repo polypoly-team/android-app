@@ -17,10 +17,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.game.GameLobby
+import com.github.polypoly.app.game.GameMode
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -31,7 +46,76 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val db = Firebase.database
+        remoteDB = RemoteDB(db, "live")
+
+//        addFakeDataToDB() //> Uncomment this line if you need to refresh the fake data within the DB
+
         setContent { WelcomeContent() }
+    }
+
+    /**
+     * DEBUG function
+     * Add fake data (possibly duplicate from tests' fake data) if the data in DB were corrupted
+     */
+    fun addFakeDataToDB() {
+        // Miscellaneous test data
+        val TIMEOUT_DURATION = 50L
+
+        val ZERO_STATS = Stats(0, 0, 0, 0, 0)
+        val NO_SKIN = Skin(0,0,0)
+
+        val TEST_USER_0 = User(0,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+
+        val TEST_GAME_LOBBY_FULL = GameLobby(
+            TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
+            60, emptyList(), 100, "Full gameLobby", "lobby-1234"
+        )
+        val TEST_GAME_LOBBY_PRIVATE = GameLobby(
+            TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
+            360, emptyList(), 300, "Private gameLobby", "lobby-abc123", true
+        )
+        val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
+            TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
+            600, emptyList(), 1000, "Joinable 1", "lobby-abcd"
+        )
+        val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
+            TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
+            3600, emptyList(), 2000, "Joinable 2", "lobby-123abc"
+        )
+        val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
+            TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
+            720, emptyList(), 3000, "Joinable 3", "lobby-1234abc"
+        )
+        val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
+            TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
+            1080, emptyList(), 4000, "Joinable 4", "lobby-abc1234"
+        )
+
+        val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
+            TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+
+        TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
+        TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
+        TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
+        TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
+        TEST_GAME_LOBBY_AVAILABLE_3.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_4))
+
+        // Helper function
+        fun <T> requestAddDataToDB(data: List<T>, keys: List<String>, root: String): List<CompletableFuture<Boolean>> {
+            return data.zip(keys).map {(data, key) -> remoteDB.setValue(root + key, data) }
+        }
+
+        // Add data to DB
+        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
+        requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBIES_PATH)
     }
 
     @Preview(showBackground = true)

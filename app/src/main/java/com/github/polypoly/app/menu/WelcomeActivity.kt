@@ -41,11 +41,6 @@ import com.google.firebase.ktx.Firebase
 class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Global initialization of the database
-        val db = Firebase.database
-        GlobalInstances.remoteDB = RemoteDB(db, "live")
-
         setContent { WelcomeContent() }
     }
     @Preview(showBackground = true)

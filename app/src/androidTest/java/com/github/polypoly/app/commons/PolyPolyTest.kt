@@ -36,7 +36,7 @@ abstract class PolyPolyTest(
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val TEST_USER_0 = User(12,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_0 = User(0,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
@@ -45,28 +45,28 @@ abstract class PolyPolyTest(
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_1, GameMode.RICHEST_PLAYER, 2, 6,
-            60, emptyList(), 100, "Full gameLobby", "1234"
+            TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
+            60, emptyList(), 100, "Full gameLobby", "lobby-1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
-            360, emptyList(), 300, "Private gameLobby", "abc123", true
+            360, emptyList(), 300, "Private gameLobby", "lobby-abc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
-            600, emptyList(), 1000, "Joinable 1", "abcd"
+            600, emptyList(), 1000, "Joinable 1", "lobby-abcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
-            3600, emptyList(), 2000, "Joinable 2", "123abc"
+            3600, emptyList(), 2000, "Joinable 2", "lobby-123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
-            720, emptyList(), 3000, "Joinable 3", "1234abc"
+            720, emptyList(), 3000, "Joinable 3", "lobby-1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
-            1080, emptyList(), 4000, "Joinable 4", "abc1234"
+            1080, emptyList(), 4000, "Joinable 4", "lobby-abc1234"
         )
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
@@ -75,9 +75,9 @@ abstract class PolyPolyTest(
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
-            GlobalInstances.remoteDB = RemoteDB(db, "test")
+            GlobalInstances.remoteDB = RemoteDB(db, "test-hugo")
 
-            TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
+            TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
             TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
             TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
