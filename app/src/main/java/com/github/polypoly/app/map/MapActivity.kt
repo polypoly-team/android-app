@@ -530,7 +530,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the player stats
+     * The HUD for the player stats, it displays basic information such as their balance,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudPlayer(playerData: PlayerGlobalData) {
@@ -541,7 +542,7 @@ class MapActivity : ComponentActivity() {
                 modifier = Modifier
                     .padding(Padding.medium)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                    .align(Alignment.BottomStart)
+                    .align(Alignment.BottomEnd)
             ) {
                 Row(Modifier.padding(Padding.medium)) {
                     HudButton(
@@ -576,7 +577,9 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD that shows the stats for other players and the game
+     * The HUD that shows the stats for other players and the game, it's a button on the top left
+     * that expands and collapses a tab that contains information about the game and the other
+     * players
      */
     @Composable
     fun HudOtherPlayersAndGame(otherPlayersData: List<PlayerGlobalData>, round: Int) {
@@ -589,17 +592,19 @@ class MapActivity : ComponentActivity() {
                     .align(Alignment.TopStart)
             ) {
                 Column(Modifier.padding(Padding.medium)) {
-                    // A drop down button that expands and collapses the stats for other players and the game
+                    // A drop down button that expands and collapses the stats for other players and
+                    // the game
                     ToggleIconButton(
-                        "dropDownButton",
+                        "otherPlayersAndGameDropDownButton",
                         "Expand or collapse the stats for other players and the game",
                         { isExpanded = !isExpanded },
                         isExpanded,
-                        R.drawable.tmp_happysmile,
+                        R.drawable.tmp_sadsmile,
                         R.drawable.tmp_happysmile
                     )
 
-                    // The stats for other players and the game slide in and out when the drop down button is pressed
+                    // The stats for other players and the game slide in and out when the drop down
+                    // button is pressed
                     AnimatedVisibility(
                         visible = isExpanded,
                     ) {
@@ -623,7 +628,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the game stats
+     * The HUD for the game stats, it displays basic information such as the current round,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudGame(round: Int) {
@@ -660,7 +666,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the stats of other players
+     * The HUD for the stats of other players, it displays basic information such as their balance,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudOtherPlayer(playerData: PlayerGlobalData) {
