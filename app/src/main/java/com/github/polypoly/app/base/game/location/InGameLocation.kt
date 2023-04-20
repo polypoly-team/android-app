@@ -14,8 +14,9 @@ data class InGameLocation (
     var location: Location,
     var level: LocalizationLevel = LocalizationLevel.LEVEL_0,
     var owner: Player? = null,
-    val bets: List<LocationBet> = listOf()
 ) {
+
+    private val bets: List<LocationBet> = listOf()
 
     /**
      * Tell if the location is owned by the player

@@ -10,8 +10,7 @@ import kotlin.time.Duration.Companion.hours
  * @property gameMode The game mode of the future game
  * @property minimumNumberOfPlayers The minimum number of players needed to start the game
  * @property maximumNumberOfPlayers The maximum number of players that can join the lobby
- * @property roundDuration The duration of a round in the Unix time (i.e. the number of milliseconds
- * since January 1, 1970, 00:00:00 GMT)
+ * @property roundDuration The duration of a round in seconds
  * @property maxRound The maximum number of round before the game end. This settings is available
  * only in RICHEST_PLAYER mode. Is null if an other game mode is selected.
  * @property gameMap The map of the game whit the different zones available
@@ -21,7 +20,7 @@ data class GameRules (
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
-    val roundDuration: Int = 2.hours,
+    val roundDuration: Int = 0,
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationRepository.getZones(),
     val initialPlayerBalance: Int = 500,
@@ -32,7 +31,7 @@ data class GameRules (
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration.isNegative() || roundDuration.isInfinite())
+        if (roundDuration < 0)
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }
