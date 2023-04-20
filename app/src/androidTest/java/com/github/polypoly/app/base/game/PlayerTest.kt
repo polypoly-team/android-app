@@ -1,5 +1,7 @@
 package com.github.polypoly.app.base.game
 
+import com.github.polypoly.app.base.game.bonus_card.BonusCard
+import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
@@ -13,6 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.osmdroid.util.GeoPoint
 import kotlin.time.Duration.Companion.hours
 
 @RunWith(JUnit4::class)
@@ -213,6 +216,22 @@ class PlayerTest {
         } catch (e: IllegalArgumentException) {
             assertEquals("The player has not bet enough money to buy the location", e.message)
         }
+    }
+
+    @Test
+    fun collectTuitionFeesToPayCardDecreaseThePlayerBalance() {
+        val testPlayer = Player(testUser1, 500, listOf())
+        val inGameBonusCard = InGameBonusCard(BonusCard.TUITION_FEES_TO_PAY, GeoPoint(0.0, 0.0))
+        testPlayer.collectBonusCard(inGameBonusCard)
+        assertEquals(400, testPlayer.getBalance())
+    }
+
+    @Test
+    fun collectTeachingAssistantPayDayCardIncreaseThePlayerBalance() {
+        val testPlayer = Player(testUser1, 500, listOf())
+        val inGameBonusCard = InGameBonusCard(BonusCard.TEACHING_ASSISTANT_PAYDAY, GeoPoint(0.0, 0.0))
+        testPlayer.collectBonusCard(inGameBonusCard)
+        assertEquals(600, testPlayer.getBalance())
     }
 
 }
