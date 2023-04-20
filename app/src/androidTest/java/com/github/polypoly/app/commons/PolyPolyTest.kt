@@ -107,15 +107,19 @@ abstract class PolyPolyTest(
         requestAddDataToDB(data, keys, root).map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
-    fun addUsersToDB(users: List<User>, root: String = "") = addDataToDB(users,
-        users.map{user ->  user.id.toString()}, root + DB_USERS_PROFILES_PATH)
+    fun <T> addDataToDB(data: T, key: String) {
+        addDataToDB(listOf(data), listOf(key))
+    }
 
-    fun addUserToDB(users: User, root: String = "") = addUsersToDB(listOf(users), root)
+    fun addUsersToDB(users: List<User>) = addDataToDB(users,
+        users.map{user ->  user.id.toString()}, DB_USERS_PROFILES_PATH)
 
-    fun addGameLobbiesToDB(gameLobby: List<GameLobby>, root: String = "") = addDataToDB(gameLobby,
-        gameLobby.map(GameLobby::code), root + Settings.DB_GAME_LOBIES_PATH)
+    fun addUserToDB(users: User) = addUsersToDB(listOf(users))
 
-    fun addGameLobbyToDB(gameLobby: GameLobby, root: String = "") = addGameLobbiesToDB(listOf(gameLobby), root)
+    fun addGameLobbiesToDB(gameLobby: List<GameLobby>) = addDataToDB(gameLobby,
+        gameLobby.map(GameLobby::code), DB_GAME_LOBIES_PATH)
+
+    fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
     @Before
     fun prepareTest() {

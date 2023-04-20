@@ -34,14 +34,16 @@ class RemoteDBTest: PolyPolyTest(true, false) {
 
     @Test
     fun dataCanBeRetrievedFromKey() {
-        addUserToDB(TEST_USER_1)
-        val userFound = remoteDB.getValue<User>(TEST_USER_1.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(TEST_USER_1, userFound)
+        val key = "some_key"
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+        val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(data, dataFound)
     }
 
     @Test
     fun gettingDataWithInvalidKeyFails() {
-        val invalidKey = "invalid"
+        val invalidKey = "invalid_key"
         val failFuture = remoteDB.getValue<User>(invalidKey)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
@@ -52,32 +54,37 @@ class RemoteDBTest: PolyPolyTest(true, false) {
 
     @Test
     fun allDataWithSameKeyCanBeRetrievedAtOnce() {
-        val sharedKey = "all_users/"
-        addUsersToDB(ALL_TEST_USERS, sharedKey)
-        val allUsersFound = remoteDB.getAllValues<User>(sharedKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(ALL_TEST_USERS.sortedBy(User::id), allUsersFound.sortedBy(User::id))
+        val sharedKey = "some_parent_key/"
+        val allData = ALL_TEST_USERS
+        val allKeys = ALL_TEST_USERS.map { user -> user.id.toString() }
+
+        addDataToDB(allData, allKeys, sharedKey)
+        val allDataFound = remoteDB.getAllValues<User>(sharedKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertEquals(allData.sortedBy(User::id), allDataFound.sortedBy(User::id))
     }
 
     @Test
     fun gettingAllDataWithInvalidKeyReturnsEmptyList() {
-        val invalidKey = "invalid"
+        val invalidKey = "invalid_key"
         val dataFound = remoteDB.getAllValues<User>(invalidKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertTrue(dataFound.isEmpty())
     }
 
     @Test
     fun allKeysCanBeRetrievedAtOnce() {
-        val rootKey = "root_key/"
-        val allUsersKeys = ALL_TEST_USERS.map{ user -> user.id.toString()}
+        val sharedKey = "some_root_key/"
+        val allData = ALL_TEST_USERS
+        val allDataKeys = ALL_TEST_USERS.indices.map(Int::toString)
+        addDataToDB(allData, allDataKeys, sharedKey)
 
-        addUsersToDB(ALL_TEST_USERS, rootKey)
-        val allUsersKeysFound = remoteDB.getAllKeys(rootKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(allUsersKeys.sorted(), allUsersKeysFound.sorted())
+        val allUsersKeysFound = remoteDB.getAllKeys(sharedKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(allDataKeys.sorted(), allUsersKeysFound.sorted())
     }
 
     @Test
     fun gettingAllKeysWithInvalidKeyReturnsEmptyList() {
-        val invalidKey = "invalid"
+        val invalidKey = "invalid_key"
         val keysFound = remoteDB.getAllKeys(invalidKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertTrue(keysFound.isEmpty())
     }
@@ -85,7 +92,8 @@ class RemoteDBTest: PolyPolyTest(true, false) {
     @Test
     fun existingKeyCanBeIdentified() {
         val existingKey = "I_exist"
-        addDataToDB(listOf(TEST_USER_1), listOf(existingKey))
+        val value = TEST_USER_1
+        addDataToDB(value, existingKey)
         assertTrue(
             remoteDB.keyExists(existingKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
@@ -101,41 +109,52 @@ class RemoteDBTest: PolyPolyTest(true, false) {
 
     @Test
     fun newDataCanBeRegistered() {
+        val data = TEST_USER_1
+        val key = "some_key"
         assertTrue(
-            remoteDB.registerValue(TEST_USER_1.id.toString(), TEST_USER_1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            remoteDB.registerValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
-        val userFound = remoteDB.getValue<User>(TEST_USER_1.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(TEST_USER_1, userFound)
+        val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(data, dataFound)
     }
 
     @Test
     fun registeringAnAlreadyRegisteredDataFails() {
-        addUserToDB(TEST_USER_1)
-        val failFuture = remoteDB.registerValue(TEST_USER_1.id.toString(), TEST_USER_1)
+        val key = "some_key"
+        val data = TEST_USER_1
+        val dataBis = TEST_USER_2
+
+        addDataToDB(data, key)
+        val failFuture = remoteDB.registerValue(key, dataBis)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
             assertTrue(exception is IllegalAccessError)
         }
+
         assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
 
     @Test
     fun dataCanBeUpdatedAfterRegistration() {
-        val userUpdated = User(TEST_USER_1.id, "Cool_name", "I updated my bio!", NO_SKIN,
-            ZERO_STATS, listOf(), mutableListOf())
-        addUserToDB(TEST_USER_1)
+        val key = "some_key"
+        val data = TEST_USER_1
+        val dataUpdated = TEST_USER_2
+
+        addDataToDB(data, key)
 
         assertTrue(
-            remoteDB.updateValue(userUpdated.id.toString(), userUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            remoteDB.updateValue(key, dataUpdated).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
 
-        val userUpdatedFound = remoteDB.getValue<User>(userUpdated.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(userUpdated, userUpdatedFound)
+        val dataUpdatedFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(dataUpdated, dataUpdatedFound)
     }
 
     @Test
     fun updatingNonExistingDataFails() {
-        val failFuture = remoteDB.updateValue(TEST_USER_1.id.toString(), TEST_USER_1)
+        val key = "some_key"
+        val data = TEST_USER_1
+        val failFuture = remoteDB.updateValue(key, data)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
             assertTrue(exception is IllegalAccessError)
@@ -145,10 +164,12 @@ class RemoteDBTest: PolyPolyTest(true, false) {
 
     @Test
     fun dataCanBeSet() {
+        val key = "some_key"
+        val data = TEST_USER_1
         assertTrue(
-            remoteDB.registerValue(TEST_USER_1.id.toString(), TEST_USER_1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            remoteDB.registerValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
-        val userFound = remoteDB.getValue<User>(TEST_USER_1.id.toString()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(TEST_USER_1, userFound)
+        val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(data, dataFound)
     }
 }
