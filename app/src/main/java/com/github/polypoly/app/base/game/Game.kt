@@ -19,13 +19,20 @@ import com.github.polypoly.app.base.user.User
  * (seconds since 1970-01-01T00:00:00Z)
  */
 class Game private constructor(
-    val admin: User,
-    var players: List<Player>,
-    val rules: GameRules,
-    val inGameLocations: List<InGameLocation>,
-    val currentRound: Int = 1,
-    val dateBegin: Long,
+    val admin: User = User(),
+    var players: List<Player> = listOf(),
+    val rules: GameRules = GameRules(),
+    val dateBegin: Long = System.currentTimeMillis(),
 ) {
+
+    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { it.locations.map { location ->
+        InGameLocation(
+            location = location,
+            owner = null,
+            level = LocalizationLevel.LEVEL_0,
+            bets = listOf(),
+        ) } }
+    val currentRound: Int = 1
 
     /**
      * Go to the next turn
@@ -43,7 +50,7 @@ class Game private constructor(
      * @return true if the game is finished, false otherwise
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
-    fun isGameFinished(): Boolean {
+    private fun isGameFinished(): Boolean {
         return when(rules.gameMode) {
             GameMode.LAST_STANDING -> {
                 players.filter { !it.hasLose() }.size <= 1
@@ -137,13 +144,6 @@ class Game private constructor(
                     balance = gameLobby.rules.initialPlayerBalance,
                     ownedLocations = listOf(),
                 ) },
-                inGameLocations = gameLobby.rules.gameMap.flatMap { it.locations.map { location ->
-                    InGameLocation(
-                        location = location,
-                        owner = null,
-                        level = LocalizationLevel.LEVEL_0,
-                        bets = listOf(),
-                    ) } },
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )

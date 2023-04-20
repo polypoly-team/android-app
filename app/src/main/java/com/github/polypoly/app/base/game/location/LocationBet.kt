@@ -1,6 +1,7 @@
 package com.github.polypoly.app.base.game.location
 
 import com.github.polypoly.app.base.game.Player
+import kotlin.random.Random
 
 /**
  * A class that represent a bet on a location
@@ -12,8 +13,8 @@ import com.github.polypoly.app.base.game.Player
  * January 1, 1970, 00:00:00 GMT)
  */
 data class LocationBet (
-    val player: Player,
-    val amount: Int,
-    val randomNumber: Float,
-    val timeOfTheBet: Long,
+    val player: Player = Player(),
+    val amount: Int = 100,
+    val randomNumber: Float = Random.nextFloat(),
+    val timeOfTheBet: Long = System.currentTimeMillis(),
 ) {}

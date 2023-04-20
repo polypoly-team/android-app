@@ -15,9 +15,9 @@ import kotlin.random.Random
  * null otherwise
  */
 data class Player (
-    val user: User,
-    private var balance: Int,
-    private var ownedLocations: List<InGameLocation>,
+    val user: User = User(),
+    private var balance: Int = 0,
+    private var ownedLocations: List<InGameLocation> = listOf(),
     private var roundLost: Int? = null,
 ) : Comparable<Player> {
 

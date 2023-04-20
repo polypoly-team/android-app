@@ -2,6 +2,7 @@ package com.github.polypoly.app.base.game.rules_and_lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -13,10 +14,10 @@ import com.github.polypoly.app.base.user.User
  * @property private If the [GameLobby] is private or not
  */
 class GameLobby(
-    val admin: User,
-    val rules: GameRules,
-    val name: String,
-    val code: String,
+    val admin: User = User(),
+    val rules: GameRules = GameRules(),
+    val name: String = "",
+    val code: String = "",
     val private: Boolean = false,
 ) {
 

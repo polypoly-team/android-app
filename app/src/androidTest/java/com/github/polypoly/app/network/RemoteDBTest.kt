@@ -25,13 +25,13 @@ class RemoteDBTest {
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val TEST_USER_1 = User(1234L,"John", "Hi!", Skin(1, 1, 1),
+        val TEST_USER_1 = User(1234L,"John", "Hi!", Skin.default(),
             ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2 = User(12345L,"Harry", "Ha!", Skin(1, 1, 1),
+        val TEST_USER_2 = User(12345L,"Harry", "Ha!", Skin.default(),
             ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_3 = User(123456L,"James", "Hey!", Skin(1, 1, 1),
+        val TEST_USER_3 = User(123456L,"James", "Hey!", Skin.default(),
             ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_4 = User(1234567L,"Henri", "Ohh!", Skin(1, 1, 1),
+        val TEST_USER_4 = User(1234567L,"Henri", "Ohh!", Skin.default(),
             ZERO_STATS, listOf(), mutableListOf())
 
         val TEST_ALL_USERS = listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4)
