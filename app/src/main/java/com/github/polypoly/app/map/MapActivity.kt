@@ -58,6 +58,7 @@ import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
 import com.github.polypoly.app.game.PlayerGlobalData
 import com.github.polypoly.app.map.LocationRepository.getZones
+import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Padding
@@ -508,6 +509,7 @@ class MapActivity : ComponentActivity() {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location = mapViewModel.closeLocation.value?.name ?: "")
+        HudGameMenu()
     }
 
     /**
@@ -688,6 +690,47 @@ class MapActivity : ComponentActivity() {
                 ) {
                     // TODO: Add information about other players
                     Text(text = "Other player info")
+                }
+            }
+        }
+    }
+
+    /**
+     * The HUD for the game menu, which is a button on the bottom left that expands and collapses
+     * the menu
+     */
+    @Composable
+    fun HudGameMenu() {
+        var openGameMenu by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .align(Alignment.BottomStart)
+            ) {
+                Column(Modifier.padding(Padding.medium)) {
+                    // The game menu slides in and out when the game menu button is pressed
+                    AnimatedVisibility(
+                        visible = openGameMenu,
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colors.background,
+                            shape = Shapes.medium,
+                            modifier = Modifier
+                                .padding(Padding.medium)
+                        ) {
+                            MenuComposable.RowButtons()
+                        }
+                    }
+
+                    // The drop down button that expands and collapses the game menu
+                    HudButton(
+                        name = "gameMenuDropDownButton",
+                        onClick = { openGameMenu = !openGameMenu },
+                        icon_id = R.drawable.tmp_happysmile,
+                        description = "Expand or collapse the game menu"
+                    )
                 }
             }
         }
