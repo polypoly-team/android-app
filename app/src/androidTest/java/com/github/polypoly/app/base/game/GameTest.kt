@@ -25,7 +25,7 @@ class GameTest {
     private val testUser4 = User(42042045, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testUser5 = User(42042046, "test_user5", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testUser6 = User(42042047, "test_user6", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testDuration = 2.hours
+    private val testDuration = 2
     private val gameRules = GameRules(GameMode.RICHEST_PLAYER, 3, 7,
         testDuration, 10, LocationRepository.getZones(), 200)
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)

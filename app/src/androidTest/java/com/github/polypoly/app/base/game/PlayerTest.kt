@@ -35,7 +35,7 @@ class PlayerTest {
     private val testPlayer4 = Player(testUser4, 0, listOf(), 4)
     private val testPlayer5 = Player(testUser5, 0, listOf(), 5)
     private val testPlayer6 = Player(testUser6, 0, listOf(), 5)
-    private val testDuration = 2.hours
+    private val testDuration = 2
     private val gameRules = GameRules(GameMode.RICHEST_PLAYER, 3, 7,
         testDuration, 10, LocationRepository.getZones(), 200)
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
