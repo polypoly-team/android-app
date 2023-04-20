@@ -82,7 +82,7 @@ abstract class PolyPolyTest(
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
-            GlobalInstances.remoteDB = RemoteDB(db, "test-hugo")
+            GlobalInstances.remoteDB = RemoteDB(db, "test-github")
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
