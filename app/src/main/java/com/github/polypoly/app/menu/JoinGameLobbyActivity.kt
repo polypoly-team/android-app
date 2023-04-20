@@ -38,6 +38,7 @@ import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -45,7 +46,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Activity where the user can join a gameLobby
  */
-class JoinGameLobbyActivity : ComponentActivity() {
+class JoinGameLobbyActivity : MenuActivity("Join Game") {
     companion object {
         const val POLLING_INTERVAL = 5000L
     }
@@ -62,25 +63,33 @@ class JoinGameLobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+            MenuContent {
+                JoinGameLobbyContent()
+            }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun JoinGameLobbyContent() {
+        PolypolyTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                Column(modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(100.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.super_cool_logo),
-                            contentDescription = "polypoly logo",
-                            modifier = Modifier
-                                .testTag("logo"),
-                            )
-                        Spacer(modifier = Modifier.height(50.dp))
-                        GameLobbyForm()
-                    }
+                    Spacer(modifier = Modifier.height(100.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.super_cool_logo),
+                        contentDescription = "polypoly logo",
+                        modifier = Modifier
+                            .testTag("logo"),
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                    GameLobbyForm()
                 }
             }
         }
@@ -155,8 +164,8 @@ class JoinGameLobbyActivity : ComponentActivity() {
             onValueChange = { newText ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
                 gameLobbyCode = text
-            }
-
+            },
+            colors = UIElements.outlineTextFieldColors()
         )
 
     }
