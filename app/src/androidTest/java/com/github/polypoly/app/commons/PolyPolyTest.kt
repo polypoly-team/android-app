@@ -7,6 +7,9 @@ import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -46,27 +49,27 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
-            60, emptyList(), 100, "Full gameLobby", "lobby-1234"
+            60, emptyList(), 100, "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
-            360, emptyList(), 300, "Private gameLobby", "lobby-abc123", true
+            360, emptyList(), 300, "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
-            600, emptyList(), 1000, "Joinable 1", "lobby-abcd"
+            600, emptyList(), 1000, "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
-            3600, emptyList(), 2000, "Joinable 2", "lobby-123abc"
+            3600, emptyList(), 2000, "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
-            720, emptyList(), 3000, "Joinable 3", "lobby-1234abc"
+            720, emptyList(), 3000, "Joinable 3", "lobby1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
-            1080, emptyList(), 4000, "Joinable 4", "lobby-abc1234"
+            1080, emptyList(), 4000, "Joinable 4", "lobbyabc1234"
         )
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
@@ -87,11 +90,11 @@ abstract class PolyPolyTest(
 
     private val dbRootRef: DatabaseReference = GlobalInstances.remoteDB.rootRef
 
-    private fun <T> requestAddDataToDB(data: List<T>, keys: List<String>): List<CompletableFuture<Boolean>> {
+    private fun <T> requestAddDataToDB(data: List<T>, keys: List<String>, root: String): List<CompletableFuture<Boolean>> {
         val timeouts = List(data.size) {CompletableFuture<Boolean>()}
         for (i in data.indices) {
             val user = data[i]
-            dbRootRef.child(keys[i])
+            dbRootRef.child(root).child(keys[i])
                 .setValue(user)
                 .addOnSuccessListener {
                     timeouts[i].complete(true)
@@ -100,15 +103,17 @@ abstract class PolyPolyTest(
         return timeouts
     }
 
-    fun <T> addDataToDB(data: List<T>, keys: List<String>) {
-        requestAddDataToDB(data, keys).map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
+    fun <T> addDataToDB(data: List<T>, keys: List<String>, root: String = "") {
+        requestAddDataToDB(data, keys, root).map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
-    fun addUsersToDB(users: List<User>, root: String = "") = addDataToDB(users, users.map{user ->  root + user.id})
+    fun addUsersToDB(users: List<User>, root: String = "") = addDataToDB(users,
+        users.map{user ->  user.id.toString()}, root + DB_USERS_PROFILES_PATH)
 
     fun addUserToDB(users: User, root: String = "") = addUsersToDB(listOf(users), root)
 
-    fun addGameLobbiesToDB(gameLobby: List<GameLobby>, root: String = "") = addDataToDB(gameLobby, gameLobby.map(GameLobby::code))
+    fun addGameLobbiesToDB(gameLobby: List<GameLobby>, root: String = "") = addDataToDB(gameLobby,
+        gameLobby.map(GameLobby::code), root + Settings.DB_GAME_LOBIES_PATH)
 
     fun addGameLobbyToDB(gameLobby: GameLobby, root: String = "") = addGameLobbiesToDB(listOf(gameLobby), root)
 
@@ -134,10 +139,10 @@ abstract class PolyPolyTest(
     fun fillWithFakeData() {
         val allRequests = mutableListOf<CompletableFuture<Boolean>>()
         allRequests.addAll(
-            requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()})
+            requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
         )
         allRequests.addAll(
-            requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code))
+            requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBIES_PATH)
         )
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }

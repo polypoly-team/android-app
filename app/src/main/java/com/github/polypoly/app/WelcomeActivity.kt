@@ -50,7 +50,7 @@ class WelcomeActivity : ComponentActivity() {
         val db = Firebase.database
         remoteDB = RemoteDB(db, "live")
 
-//        addFakeDataToDB() //> Uncomment this line if you need to refresh the fake data within the DB
+        addFakeDataToDB() //> Uncomment this line if you need to refresh the fake data within the DB
 
         setContent { WelcomeContent() }
     }
@@ -61,8 +61,6 @@ class WelcomeActivity : ComponentActivity() {
      */
     fun addFakeDataToDB() {
         // Miscellaneous test data
-        val TIMEOUT_DURATION = 50L
-
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
@@ -76,27 +74,27 @@ class WelcomeActivity : ComponentActivity() {
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
-            60, emptyList(), 100, "Full gameLobby", "lobby-1234"
+            60, emptyList(), 100, "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
-            360, emptyList(), 300, "Private gameLobby", "lobby-abc123", true
+            360, emptyList(), 300, "Private gameLobby", "abc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
-            600, emptyList(), 1000, "Joinable 1", "lobby-abcd"
+            600, emptyList(), 1000, "Joinable 1", "abcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
-            3600, emptyList(), 2000, "Joinable 2", "lobby-123abc"
+            3600, emptyList(), 2000, "Joinable 2", "123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
-            720, emptyList(), 3000, "Joinable 3", "lobby-1234abc"
+            720, emptyList(), 3000, "Joinable 3", "1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
-            1080, emptyList(), 4000, "Joinable 4", "lobby-abc1234"
+            1080, emptyList(), 4000, "Joinable 4", "abc1234"
         )
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
