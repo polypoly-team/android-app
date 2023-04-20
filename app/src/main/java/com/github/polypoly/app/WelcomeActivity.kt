@@ -18,10 +18,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.game.GameLobby
+import com.github.polypoly.app.game.GameMode
+import com.github.polypoly.app.game.user.Skin
+import com.github.polypoly.app.game.user.Stats
+import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -39,7 +54,7 @@ class WelcomeActivity : ComponentActivity(){
         }
     }
 
-    @Preview
+    @Preview(showBackground = true)
     @Composable
     fun WelcomePreview() {
         WelcomeContent()
@@ -61,7 +76,6 @@ class WelcomeActivity : ComponentActivity(){
     fun WelcomeContent() {
         GameMusic.setSong(LocalContext.current, R.raw.mocksong)
         GameMusic.startSong()
-
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),

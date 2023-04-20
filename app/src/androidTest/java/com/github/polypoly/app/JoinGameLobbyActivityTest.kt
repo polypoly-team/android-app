@@ -4,13 +4,14 @@ import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class JoinGameLobbyActivityTest {
+class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
@@ -44,7 +45,7 @@ class JoinGameLobbyActivityTest {
     @Test
     fun inputValidGameLobbyCode_joinGameLobbyRoom() {
         //TODO: Check for a valid group code in the DB once we have the queries set
-        val lobbyCode = "abcd"
+        val lobbyCode = TEST_GAME_LOBBY_AVAILABLE_1.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
@@ -53,7 +54,7 @@ class JoinGameLobbyActivityTest {
     @Test
     fun inputFullGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a valid group code that is full in the DB once we have the queries set
-        val lobbyCode = "1234"
+        val lobbyCode = TEST_GAME_LOBBY_FULL.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 

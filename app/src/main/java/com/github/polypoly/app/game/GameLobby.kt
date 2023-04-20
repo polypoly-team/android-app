@@ -15,8 +15,7 @@ data class GameLobby(
     val private: Boolean = false
 ) {
 
-    private val currentUsersRegistered: ArrayList<User> = ArrayList()
-    val usersRegistered: List<User> get() = currentUsersRegistered.toList()
+    val usersRegistered: ArrayList<User> = ArrayList()
 
     init {
         if (minimumNumberOfPlayers <= 1)
@@ -37,11 +36,11 @@ data class GameLobby(
     }
 
     fun addUser(user: User) {
-        if (currentUsersRegistered.size >= maximumNumberOfPlayers)
+        if (usersRegistered.size >= maximumNumberOfPlayers)
             throw IllegalStateException("The game is already full")
-        if (currentUsersRegistered.any{u -> u.id == user.id})
+        if (usersRegistered.any{ u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
-        currentUsersRegistered.add(user)
+        usersRegistered.add(user)
     }
 
     fun addUsers(users: List<User>) {
@@ -50,13 +49,13 @@ data class GameLobby(
     }
 
     fun canStart(): Boolean {
-        return currentUsersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
+        return usersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
     }
 
     fun removeUser(withId: Long) {
-        for (i in 0 until currentUsersRegistered.size) {
-            if (currentUsersRegistered[i].id == withId) {
-                currentUsersRegistered.removeAt(i)
+        for (i in 0 until usersRegistered.size) {
+            if (usersRegistered[i].id == withId) {
+                usersRegistered.removeAt(i)
                 return
             }
         }
