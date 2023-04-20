@@ -21,9 +21,13 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class SignInActivity : ComponentActivity() {
 
@@ -32,6 +36,11 @@ class SignInActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Global initialization of the database
+        val db = Firebase.database
+        remoteDB = RemoteDB(db, "live")
+
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {
