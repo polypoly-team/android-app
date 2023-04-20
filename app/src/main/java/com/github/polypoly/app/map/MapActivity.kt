@@ -144,6 +144,9 @@ class MapActivity : ComponentActivity() {
         }, modifier = Modifier.testTag("map"))
     }
 
+    /**
+     * Button for rolling the dice.
+     */
     @Composable
     fun RollDiceButton() {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -177,16 +180,12 @@ class MapActivity : ComponentActivity() {
                     title = { Text("Dice Roll") },
                     text = {
                         Column {
+                            val rollDice = rollDiceLocations()
                             // 3 buttons, containing the name of a random location
-                            Button(onClick = { }) {
-                                Text(rollDice().name)
-                            }
-                            Button(onClick = { }) {
-                                Text(rollDice().name)
-                            }
-                            Button(onClick = { }) {
-                                Text(rollDice().name)
-                            }
+                            for (i in 0..2)
+                                Button(onClick = { }) {
+                                    Text(rollDice[i].name)
+                                }
                         }
                     },
                     confirmButton = {
@@ -199,16 +198,25 @@ class MapActivity : ComponentActivity() {
         }
     }
 
-    private fun rollDice(): com.github.polypoly.app.game.Location {
-        val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 1
+    /**
+     * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
+     * ensuring that the player does not visit the same location twice.
+     */
+    private fun rollDiceLocations(): List<com.github.polypoly.app.game.Location> {
+        val locationsNotToVisitName = mutableListOf(mapViewModel.closeLocation.value?.name)
 
-        // get the 12 closest locations
-        val closestLocations = markerToLocation.entries
-            .filter { it.value.name != mapViewModel.closeLocation.value?.name } // remove the current location
-            .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
-            .take(12)
+        val locationsToVisit = mutableListOf<com.github.polypoly.app.game.Location>()
+        for (i in 1..3) {
+            val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
+            val closestLocations = markerToLocation.entries
+                .filter { !locationsNotToVisitName.contains(it.value.name) }
+                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
+                .take(11)
 
-        return closestLocations[diceRollsSum].value
+            locationsToVisit.add(closestLocations[diceRollsSum].value)
+            locationsNotToVisitName.add(closestLocations[diceRollsSum].value.name)
+        }
+        return locationsToVisit
     }
 
     /**
