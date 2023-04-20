@@ -24,6 +24,7 @@ class GameLobby(
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
+    private var isInDB: Boolean = false
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
 
     init {
@@ -36,11 +37,18 @@ class GameLobby(
         if (code.isBlank())
             throw java.lang.IllegalArgumentException("Game code cannot be blank")
         addUser(admin)
-        remoteDB.registerValue(DB_GAME_LOBBIES_PATH + code, this)
     }
 
     /**
-     * Add a user to the lobby
+     * Call it whenever the lobby is ready to be in the DB
+     */
+    fun openLobby() {
+        remoteDB.registerValue(DB_GAME_LOBBIES_PATH + code, this)
+        isInDB = true
+    }
+
+    /**
+     * Add a user to the lobby, only if the user is in the DB
      * @param user the user to add
      * @throws IllegalStateException if the game is already full
      * @throws IllegalArgumentException if the user is already registered
@@ -50,10 +58,14 @@ class GameLobby(
             throw IllegalStateException("The game is already full")
         if (currentUsersRegistered.any{u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
-        //if (!remoteDB.keyExists(DB_USERS_PROFILES_PATH + user.id).get()) // TODO: find a way to avoid .get()
-          //  throw java.lang.IllegalArgumentException("User id ${user.id} doesn't exist")
-        currentUsersRegistered.add(user)
-        update()
+        remoteDB.keyExists(DB_USERS_PROFILES_PATH + user.id).thenAccept { exists ->
+            if(exists) {
+                currentUsersRegistered.add(user)
+                update()
+            } else {
+                throw java.lang.IllegalArgumentException("User id ${user.id} doesn't exist")
+            }
+        }
     }
 
     /**
@@ -113,6 +125,8 @@ class GameLobby(
      * Updates the lobby in the DB with the current information
      */
     private fun update() {
-        remoteDB.updateValue(DB_GAME_LOBBIES_PATH + code, this)
+        if(isInDB) {
+            remoteDB.updateValue(DB_GAME_LOBBIES_PATH + code, this)
+        }
     }
 }

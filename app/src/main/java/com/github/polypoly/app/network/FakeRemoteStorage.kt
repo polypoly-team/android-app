@@ -10,6 +10,7 @@ import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.google.firebase.database.DataSnapshot
 import kotlin.reflect.KClass
 
 /**
@@ -113,6 +114,10 @@ class FakeRemoteStorage : IRemoteStorage {
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
         return CompletableFuture.completedFuture(datas[key] as T)
+    }
+
+    override fun getSnapshot(key: String): CompletableFuture<DataSnapshot> {
+        return CompletableFuture.completedFuture(null)
     }
 
     override fun getAllKeys(parentKey: String): CompletableFuture<List<String>> {

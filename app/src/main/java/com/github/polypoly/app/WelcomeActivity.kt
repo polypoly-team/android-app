@@ -124,8 +124,8 @@ class WelcomeActivity : ComponentActivity() {
                 // Create button
                 GameButton(onClick = {
                     val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-                    gameLobbyIntent.putExtra("lobby_code", "1234")
-                    startActivity(gameLobbyIntent) // TODO TEMP
+                    gameLobbyIntent.putExtra("lobby_code", "1234abc")
+                    startActivity(gameLobbyIntent) // TODO: TEMP
                 }, text = "Create Game?")
             }
         }

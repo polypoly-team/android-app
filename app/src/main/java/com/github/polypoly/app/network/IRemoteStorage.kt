@@ -1,5 +1,6 @@
 package com.github.polypoly.app.network
 
+import com.google.firebase.database.DataSnapshot
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -7,6 +8,13 @@ import kotlin.reflect.KClass
  * Interface for a remote key-value store kind of storage
  */
 interface IRemoteStorage {
+
+    /**
+     * Retrieve the single data snapshot associated to the given key
+     * @param key: key of the value asked
+     * @return A promise with the value found
+     */
+    fun getSnapshot(key: String): CompletableFuture<DataSnapshot>
 
     /**
      * Retrieve the single value associated to the given key

@@ -51,6 +51,14 @@ open class RemoteDB(
         return valuePromise
     }
 
+    override fun getSnapshot(key: String): CompletableFuture<DataSnapshot> {
+        return getValueAndThen(key, { data, valuePromise ->
+            valuePromise.complete(data)
+        }, { valuePromise ->
+            valuePromise.completeExceptionally(IllegalAccessException("No value found for key <$key>"))
+        })
+    }
+
     override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
         return getValueAndThen(key, { data, valuePromise ->
             valuePromise.complete(data.getValue(clazz.java)!!)
