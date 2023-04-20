@@ -49,6 +49,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         const val POLLING_INTERVAL = 5000L
     }
 
+
     /**
      * The attributes of the class
      */
@@ -61,6 +62,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MenuContent{
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -80,6 +82,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                         Spacer(modifier = Modifier.height(50.dp))
                         GameLobbyForm()
                     }
+
                 }
             }
         }
@@ -155,8 +158,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             onValueChange = { newText ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
                 gameLobbyCode = text
-            }
-
+            },
+            colors = UIElements.outlineTextFieldColors()
         )
 
     }
