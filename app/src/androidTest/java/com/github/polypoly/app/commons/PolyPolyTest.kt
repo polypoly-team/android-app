@@ -24,8 +24,8 @@ import kotlin.time.DurationUnit
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
-    val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
-    val fillWithFakeData: Boolean //> fill remote storage with fake data at the beginning of every test
+    private val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
+    private val fillWithFakeData: Boolean //> fill remote storage with fake data at the beginning of every test
 ) {
     companion object {
         // Global tests constants

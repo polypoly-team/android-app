@@ -8,7 +8,7 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.commons.LoggedInTest
 import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
@@ -18,13 +18,11 @@ import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class ProfileActivityTest: PolyPolyTest(true, true) {
+class ProfileActivityTest: LoggedInTest(true, true) {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ProfileActivity>()
 
     private val button = composeTestRule.onNodeWithTag("modifyProfileButton")
-
-    private val userLoggedIn = TEST_USER_0 // TODO: effectively log in the user before any test
 
     @Test
     fun modifyButtonGoToTheModifyingPage() {

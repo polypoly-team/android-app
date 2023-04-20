@@ -23,6 +23,7 @@ import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import java.util.concurrent.CompletableFuture
 
 class ProfileModifyingActivity : ComponentActivity() {
 
@@ -57,27 +58,35 @@ class ProfileModifyingActivity : ComponentActivity() {
     fun ProfileForm() {
         val id = intent.getLongExtra("userId", 0)
 
-        var warningText by remember { mutableStateOf("") }
         var user by remember { mutableStateOf(User()) }
-        val trophiesDisplay = remember { user.trophiesDisplay.toMutableStateList() }
 
         remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + id).thenAccept{userFound ->
-            user = userFound
             nickname = user.name
             description = user.bio
+            user = userFound
         }
+
+        ProfileFormOfUser(user)
+    }
+
+    @Composable
+    fun ProfileFormOfUser(
+        user: User
+    ) {
+        var warningText by remember { mutableStateOf("") }
+        val trophiesDisplay = remember { user.trophiesDisplay.toMutableStateList() }
 
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("Write your info", style = MaterialTheme.typography.h5,
                 textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(10.dp))
-            NicknameTextField(user)
+            NicknameTextField(user.name)
             Spacer(modifier = Modifier.height(10.dp))
-            DescriptionTextField(user)
+            DescriptionTextField(user.bio)
             Spacer(modifier = Modifier.height(40.dp))
             TrophiesSelection(trophiesDisplay, user)
             Spacer(modifier = Modifier.height(40.dp))
@@ -181,6 +190,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     fun CustomTextField(label: String, initialValue: String, onChanged: (newValue: String) -> Unit,
                         singleLine: Boolean = true, maxTextLength: Int, testTag: String) {
         var text by remember { mutableStateOf(TextFieldValue(initialValue))}
+
         OutlinedTextField(
             modifier = Modifier
                 .width(300.dp)
@@ -209,10 +219,10 @@ class ProfileModifyingActivity : ComponentActivity() {
      * The field where the player can write his/her nickname
      */
     @Composable
-    fun NicknameTextField(user: User) {
+    fun NicknameTextField(initialName: String) {
         CustomTextField(
-            label = "nickname",
-            initialValue = user.name,
+            label = "new nickname",
+            initialValue = initialName,
             onChanged = {newValue ->  nickname = newValue},
             maxTextLength = 15,
             testTag = "nicknameText",
@@ -223,10 +233,10 @@ class ProfileModifyingActivity : ComponentActivity() {
      * The field where the player can write his/her description
      */
     @Composable
-    fun DescriptionTextField(user: User) {
+    fun DescriptionTextField(initialDescription: String) {
         CustomTextField(
-            label = "description",
-            initialValue = user.bio,
+            label = "new description",
+            initialValue = initialDescription,
             onChanged = {newValue ->  description = newValue},
             singleLine = false,
             maxTextLength = 130,
