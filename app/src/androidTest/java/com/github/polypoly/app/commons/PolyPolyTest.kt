@@ -48,7 +48,6 @@ abstract class PolyPolyTest(
         val NO_SKIN = Skin(0,0,0)
 
         val CURRENT_USER = User(0,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_0 = User(12,"John", "Hi!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(
             id = 0,
             name = "John",
@@ -99,7 +98,7 @@ abstract class PolyPolyTest(
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
-            GlobalInstances.remoteDB = RemoteDB(db, "test-hugo")
+            GlobalInstances.remoteDB = RemoteDB(db, "test-max")
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
