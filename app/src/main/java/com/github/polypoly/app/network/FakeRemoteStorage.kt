@@ -31,7 +31,7 @@ class FakeRemoteStorage : IRemoteStorage {
 
     private val testMinNumberPlayers = 2
     private val testMaxNumberPlayers = 5
-    private val testDuration = 2.hours
+    private val testDuration = 2
     private val testMaxRound = 10
     private val testInitialBalance = 100
 

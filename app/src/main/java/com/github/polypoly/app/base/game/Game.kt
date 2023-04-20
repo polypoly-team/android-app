@@ -30,7 +30,6 @@ class Game private constructor(
             location = location,
             owner = null,
             level = LocalizationLevel.LEVEL_0,
-            bets = listOf(),
         ) } }
     val currentRound: Int = 1
 
