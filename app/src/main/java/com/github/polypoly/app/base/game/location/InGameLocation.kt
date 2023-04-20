@@ -62,15 +62,15 @@ data class InGameLocation (
             return null
         val maxAmount = bets.maxOf { it.amount }
         // case where two players have bet the same amount
-        val allBetsWithMaxAmount = bets.filter { it.amount == maxAmount }
-        val maxRandomNumber = allBetsWithMaxAmount.maxOf { it.randomNumber }
+        val betsSameAmount = bets.filter { it.amount == maxAmount }
+        val maxRandomNumber = betsSameAmount.maxOf { it.randomNumber }
         // case where two players have bet the same amount and have the same random number
-        val allBetsWithMaxAmountAndSameRdNb = allBetsWithMaxAmount.filter { it.randomNumber == maxRandomNumber }
-        val minTimeOfTheBet = allBetsWithMaxAmountAndSameRdNb.minOf { it.timeOfTheBet }
+        val betsSameAmountRdNumber = betsSameAmount.filter { it.randomNumber == maxRandomNumber }
+        val minTimeOfTheBet = betsSameAmountRdNumber.minOf { it.timeOfTheBet }
         // case where two players have bet the same amount, have the same random number and have bet in the same time
-        val allBetsWithMaxAmountAndSameRdNbAndSameTime = allBetsWithMaxAmountAndSameRdNb
+        val betsSameAmountRdNumberAndTime = betsSameAmountRdNumber
             .filter { it.timeOfTheBet == minTimeOfTheBet}
-        val winningBet = allBetsWithMaxAmountAndSameRdNbAndSameTime.minBy { it.player.user.id }
+        val winningBet = betsSameAmountRdNumberAndTime.minBy { it.player.user.id }
         owner = winningBet.player
         return winningBet
     }
