@@ -1,30 +1,28 @@
 package com.github.polypoly.app.game
 
 import com.github.polypoly.app.game.user.User
-import kotlin.time.Duration
 
-class GameLobby(
-    val admin: User,
-    val gameMode: GameMode,
-    val minimumNumberOfPlayers: Int,
-    val maximumNumberOfPlayers: Int,
-    val roundDuration: Duration,
-    val gameMap: List<Zone>,
-    val initialPlayerBalance: Int,
-    val name: String,
-    val code: String,
+data class GameLobby(
+    val admin: User = User(),
+    val gameMode: GameMode = GameMode.LAST_STANDING,
+    val minimumNumberOfPlayers: Int = 2,
+    val maximumNumberOfPlayers: Int = Int.MAX_VALUE,
+    val roundDuration: Long = 0, //> unix timestamp encoding
+    val gameMap: List<Zone> = listOf(),
+    val initialPlayerBalance: Int = 0,
+    val name: String = "default-lobby-instance",
+    val code: String = "default-lobby-code",
     val private: Boolean = false
 ) {
 
-    private val currentUsersRegistered: ArrayList<User> = ArrayList()
-    val usersRegistered: List<User> get() = currentUsersRegistered.toList()
+    val usersRegistered: ArrayList<User> = ArrayList()
 
     init {
         if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration.isNegative() || roundDuration.isInfinite())
+        if (roundDuration < 0)
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
         if (name.isEmpty())
             throw java.lang.IllegalArgumentException("Game name cannot be empty")
@@ -38,11 +36,11 @@ class GameLobby(
     }
 
     fun addUser(user: User) {
-        if (currentUsersRegistered.size >= maximumNumberOfPlayers)
+        if (usersRegistered.size >= maximumNumberOfPlayers)
             throw IllegalStateException("The game is already full")
-        if (currentUsersRegistered.any{u -> u.id == user.id})
+        if (usersRegistered.any{ u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
-        currentUsersRegistered.add(user)
+        usersRegistered.add(user)
     }
 
     fun addUsers(users: List<User>) {
@@ -51,13 +49,13 @@ class GameLobby(
     }
 
     fun canStart(): Boolean {
-        return currentUsersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
+        return usersRegistered.size in minimumNumberOfPlayers..maximumNumberOfPlayers
     }
 
     fun removeUser(withId: Long) {
-        for (i in 0 until currentUsersRegistered.size) {
-            if (currentUsersRegistered[i].id == withId) {
-                currentUsersRegistered.removeAt(i)
+        for (i in 0 until usersRegistered.size) {
+            if (usersRegistered[i].id == withId) {
+                usersRegistered.removeAt(i)
                 return
             }
         }

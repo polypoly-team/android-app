@@ -27,19 +27,17 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.game.user.User
 import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
 import com.github.polypoly.app.menu.shared_component.TrophyView
-import com.github.polypoly.app.network.FakeRemoteStorage
-import com.github.polypoly.app.network.StorageType
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : MenuActivity("Profile") {
 
-    //ONLY TO TEST WITHOUT THE DATABASE
-    private var userId: Long = 1
-    private val storageId = StorageType.TEST
+    //TODO fixme with logged-in user's id
+    private var userId: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,13 +65,14 @@ class ProfileActivity : MenuActivity("Profile") {
      */
     @Composable
     fun ProfileAndStats() {
-        val user: User
-        when(storageId) {
-            StorageType.TEST -> user = FakeRemoteStorage.instance.getValue<User>(DB_USERS_PROFILES_PATH + userId).get()
-            StorageType.FIREBASE -> throw NotImplementedError()
-        }
 
         var profileHeight by remember { mutableStateOf(340.dp) }
+
+        var user by remember { mutableStateOf(User()) }
+        remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + userId).thenAccept{userFound ->
+            user = userFound
+        }
+
         val localDensity = LocalDensity.current
 
         // In order for the shadow of the surface elevation to be displayed on the bottom of the

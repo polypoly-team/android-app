@@ -10,6 +10,7 @@ import org.junit.runners.JUnit4
 import java.time.LocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.DurationUnit
 
 @RunWith(JUnit4::class)
 class GameLobbyTest {
@@ -19,7 +20,7 @@ class GameLobbyTest {
     private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7
-    private val testDuration = 2.hours
+    private val testDuration = 2.hours.toLong(DurationUnit.SECONDS)
     private val testInitialBalance = 100
     private val testName = "Unit Test Game"
     private val testCode = "007"
@@ -59,17 +60,10 @@ class GameLobbyTest {
 
     @Test
     fun pendingGameDoesntAcceptInvalidDurations() {
-        val infinitRoundDuration = Duration.INFINITE
-        val negativeRoundDuration = (-2).hours
-
+        val negValue: Long = -2
         assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                infinitRoundDuration, emptyList(), testInitialBalance, testName, testCode)
-        }
-
-        assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                negativeRoundDuration, emptyList(), testInitialBalance, testName, testCode)
+            GameLobby(testUser, GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
+                negValue, emptyList(), testInitialBalance, testName, testCode)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.github.polypoly.app.menu
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,24 +33,32 @@ import com.github.polypoly.app.game.GameLobby
 import com.github.polypoly.app.game.user.Skin
 import com.github.polypoly.app.game.user.Stats
 import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
-import com.github.polypoly.app.network.FakeRemoteStorage
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
+import java.util.concurrent.CompletableFuture
 
 /**
  * Activity where the user can join a gameLobby
  */
 class JoinGameLobbyActivity : MenuActivity("Join Game") {
+    companion object {
+        const val POLLING_INTERVAL = 5000L
+    }
 
     /**
      * The attributes of the class
      */
     private var gameLobbyCode: String = ""
+
+    private val fakeAuthenticatedUser = User(7, "fake_user", "I am fake until google authentication is setup", Skin(0, 0, 0),
+        Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,10 +180,7 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
     fun GameLobbyListButton() {
         var openList by remember { mutableStateOf(false) }
         var openCardIndex by remember { mutableStateOf(-1) }
-
-        var gameLobbies by remember { mutableStateOf(getPublicGameLobbiesFromDB()) }
-
-        val refreshInterval = 5000L
+        var gameLobbies by remember { mutableStateOf(listOf<GameLobby>()) }
 
         Column(
             modifier = Modifier
@@ -194,7 +200,6 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
             )
         }
 
-
         if (openList) {
             Dialog(
                 onDismissRequest = {
@@ -205,8 +210,11 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
 
                 LaunchedEffect(Unit) {
                     while (openList) {
-                        delay(refreshInterval)
-                        gameLobbies = getPublicGameLobbiesFromDB()
+                        // TODO: only to this once and then subscribe to events instead of polling
+                        delay(POLLING_INTERVAL)
+                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).thenAccept{lobbies ->
+                            gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
+                        }
                         Timber.tag("GameLobbyList")
                             .d("Refreshing gameLobbies list")
                     }
@@ -491,24 +499,34 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
     }
 
     /**
-     * This function is called when the user clicks on the button to join a gameLobby.
+     * This function changes the warning state according to the game lobby code input by the user
      * If the gameLobby code is empty, or the code is not in the DB, or the gameLobby is full,
      * it displays a warning message.
      * Otherwise, it calls the function to join the gameLobby.
      * @param warningState (MutableState<String>): The state of the warning message
      * @param mContext (Context): The context of the activity
-     * @return (String): The warning message to be displayed
      */
+    @SuppressLint("NewApi")
     private fun gameLobbyCodeButtonOnClick(warningState: MutableState<String>, mContext: Context) {
-        return if (gameLobbyCode.isEmpty()) {
+        if (gameLobbyCode.isEmpty()) {
             warningState.value = getString(R.string.game_lobby_code_is_empty)
-        } else if (!dbContainsGameLobbyCode(gameLobbyCode)) {
-            warningState.value = getString(R.string.game_lobby_does_not_exist)
-        } else if(gameLobbyIsFull(gameLobbyCode)){
-            warningState.value = getString(R.string.game_lobby_is_full)
         } else {
-            warningState.value = ""
-            joinGameLobbyRoom(mContext)
+            val lobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+            remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
+                if (!keyExists) {
+                    warningState.value = getString(R.string.game_lobby_does_not_exist)
+                    CompletableFuture.failedFuture(IllegalAccessException())
+                } else {
+                    remoteDB.getValue<GameLobby>(lobbyKey)
+                }
+            }.thenAccept { gameLobby ->
+                if(gameLobbyIsFull(gameLobby)){
+                    warningState.value = getString(R.string.game_lobby_is_full)
+                } else {
+                    warningState.value = ""
+                    joinGameLobbyRoom()
+                }
+            }
         }
     }
 
@@ -516,48 +534,14 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      * @param mContext (Context): The context of the activity
      */
-    private fun joinGameLobbyRoom(mContext: Context) {
+    private fun joinGameLobbyRoom() {
         val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
-        val gameLobby =  mockDb.getValue<GameLobby>(currentLobbyKey).get()
-        val newGameLobby = GameLobby(gameLobby.admin, gameLobby.gameMode, gameLobby.minimumNumberOfPlayers, gameLobby.maximumNumberOfPlayers, gameLobby.roundDuration
-            , gameLobby.gameMap, gameLobby.initialPlayerBalance, gameLobby.name, gameLobby.code, gameLobby.private)
+        remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
+            gameLobby.addUser(fakeAuthenticatedUser)
+            remoteDB.updateValue(currentLobbyKey, gameLobby)
 
-        for (player in gameLobby.usersRegistered) {
-            if (player != newGameLobby.admin) {
-                newGameLobby.addUser(player)
-            }
+            // TODO: link to the gameLobby room activity
         }
-        newGameLobby.addUser(authenticated_user)
-        mockDb.updateValue(currentLobbyKey, newGameLobby)
-        // TODO: link to the gameLobby room activity
-    }
-
-    /**
-     * This function fetches the public gameLobbys from the database.
-     * @return (List<GameLobby>): The list of public gameLobbys
-     */
-    private fun getPublicGameLobbiesFromDB(): List<GameLobby> {
-        val gameLobbies = mockDb.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).get() ?: return listOf()
-        return gameLobbies.filter { !it.private  && !gameLobbyIsFull(it) }
-    }
-
-    /**
-     * This function checks if the gameLobby code is in the database.
-     * @param gameLobbyCode (String): The gameLobby code to check
-     * @return (Boolean): True if the gameLobby code is in the database, false otherwise
-     */
-    private fun dbContainsGameLobbyCode(gameLobbyCode: String): Boolean {
-        return mockDb.keyExists(DB_GAME_LOBIES_PATH + gameLobbyCode).get()
-    }
-
-    /**
-     * This function checks if the gameLobby is full.
-     * @param gameLobbyCode (String): The gameLobby code to check
-     * @return (Boolean): True if the gameLobby is full, false otherwise
-     */
-    private fun gameLobbyIsFull(gameLobbyCode: String): Boolean {
-        val gameLobby = mockDb.getValue<GameLobby>(DB_GAME_LOBIES_PATH + gameLobbyCode).get() ?: return false
-        return gameLobbyIsFull(gameLobby)
     }
 
     /**
@@ -570,11 +554,3 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
     }
 
 }
-
-// MOCK DATA
-private val authenticated_user = User(7, "current_user", "", Skin(0, 0, 0),
-    Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
-)
-private val mockDb = FakeRemoteStorage()
-
-
