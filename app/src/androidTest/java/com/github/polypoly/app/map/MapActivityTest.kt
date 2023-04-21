@@ -3,10 +3,16 @@ package com.github.polypoly.app.map
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.RulesObject
+import com.github.polypoly.app.menu.ProfileActivity
+import com.github.polypoly.app.menu.SettingsActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,34 +25,88 @@ class MapActivityTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MapActivity>()
 
-    private val dropDownButton = composeTestRule.onNodeWithTag("dropDownButton")
+    private val otherPlayersAndGameDropDownButton = composeTestRule.onNodeWithTag("otherPlayersAndGameDropDownButton")
     private val gameInfoButton = composeTestRule.onNodeWithTag("gameInfoButton")
     private val playerInfoButton = composeTestRule.onNodeWithTag("playerInfoButton")
+    private val gameMenuDropDownButton = composeTestRule.onNodeWithTag("gameMenuDropDownButton")
+
+    private val menuButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
+    private val menuButtonRankings = composeTestRule.onNodeWithContentDescription("Open Rankings")
+    private val menuButtonProfile = composeTestRule.onNodeWithContentDescription("Open Profile")
+    private val menuButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
+
+    private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
 
     @Before
     fun setUp() {
         runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
     }
 
+    @Before
+    fun startIntents() { Intents.init() }
+
+    @After
+    fun releaseIntents() { Intents.release() }
+
     @Test
     fun hudIsDisplayed() {
-        dropDownButton.assertIsDisplayed()
+        otherPlayersAndGameDropDownButton.assertIsDisplayed()
         playerInfoButton.assertIsDisplayed()
+        gameMenuDropDownButton.assertIsDisplayed()
     }
 
     @Test
     fun gameInfoAndOtherPlayersInfoAreDisplayedOnDropDownButtonClick() {
         gameInfoButton.assertDoesNotExist()
-        dropDownButton.performClick()
+        otherPlayersAndGameDropDownButton.performClick()
         gameInfoButton.assertIsDisplayed()
     }
 
     @Test
     fun gameInfoAndOtherPlayersInfoAreCollapsedWhenDropDownButtonIsClickedAgain() {
-        dropDownButton.performClick()
+        otherPlayersAndGameDropDownButton.performClick()
         gameInfoButton.assertIsDisplayed()
-        dropDownButton.performClick()
+        otherPlayersAndGameDropDownButton.performClick()
         gameInfoButton.assertDoesNotExist()
+    }
+
+    @Test
+    fun gameMenuIsDisplayedOnDropDownButtonClick() {
+        gameMenuDropDownButton.performClick()
+        menuButtonRules.assertIsDisplayed()
+        menuButtonRankings.assertIsDisplayed()
+        menuButtonProfile.assertIsDisplayed()
+        menuButtonSettings.assertIsDisplayed()
+    }
+
+    @Test
+    fun gameMenuRulesButtonDisplaysRules() {
+        gameMenuDropDownButton.performClick()
+        menuButtonRules.performClick()
+        rules.assertIsDisplayed()
+    }
+
+    @Test
+    fun gameMenuRulesDismissOnOutsideClick() {
+        gameMenuDropDownButton.performClick()
+        menuButtonRules.performClick()
+        rules.assertIsDisplayed()
+        gameMenuDropDownButton.performClick()
+        rules.assertDoesNotExist()
+    }
+
+    @Test
+    fun gameMenuProfileButtonDisplaysActivity() {
+        gameMenuDropDownButton.performClick()
+        menuButtonProfile.performClick()
+        Intents.intended(IntentMatchers.hasComponent(ProfileActivity::class.java.name))
+    }
+
+    @Test
+    fun gameMenuSettingsButtonDisplaysActivity() {
+        gameMenuDropDownButton.performClick()
+        menuButtonSettings.performClick()
+        Intents.intended(IntentMatchers.hasComponent(SettingsActivity::class.java.name))
     }
 
     @Test
