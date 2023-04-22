@@ -151,6 +151,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 focusManager.clearFocus()
                 gameLobbyCodeButtonOnClick(warningState, mContext)
             }),
+            label = { Text("Enter a lobby code") },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
             onValueChange = { newText : String ->
@@ -529,20 +530,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     private fun joinGameLobbyRoom() {
         val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-            val newGameLobby = GameLobby(
-                gameLobby.admin,
-                gameLobby.gameMode,
-                gameLobby.minimumNumberOfPlayers, gameLobby.maximumNumberOfPlayers, gameLobby.roundDuration
-                , gameLobby.gameMap, gameLobby.initialPlayerBalance, gameLobby.name, gameLobby.code, gameLobby.private)
-
-            for (player in gameLobby.usersRegistered) {
-                if (player != newGameLobby.admin) {
-                    newGameLobby.addUser(player)
-                }
-            }
-
-            newGameLobby.addUser(fakeAuthenticatedUser)
-            remoteDB.updateValue(currentLobbyKey, newGameLobby)
+            gameLobby.addUser(fakeAuthenticatedUser)
+            remoteDB.updateValue(currentLobbyKey, gameLobby)
 
             // TODO: link to the gameLobby room activity
         }

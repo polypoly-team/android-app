@@ -31,8 +31,8 @@ import kotlin.time.DurationUnit
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
-    val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
-    val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
+    private val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
+    private val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
     val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
     companion object {
@@ -47,7 +47,7 @@ abstract class PolyPolyTest(
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val CURRENT_USER = User(0,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val CURRENT_USER = User(1000,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(
             id = 0,
             name = "John",
@@ -99,7 +99,7 @@ abstract class PolyPolyTest(
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
-            GlobalInstances.remoteDB = RemoteDB(db, "test-max")
+            GlobalInstances.remoteDB = RemoteDB(db, "test-github")
 
             FirebaseAuth.getInstance().signOut()
             currentUser = null
