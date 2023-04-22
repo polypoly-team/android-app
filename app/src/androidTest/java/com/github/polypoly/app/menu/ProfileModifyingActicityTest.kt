@@ -52,7 +52,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
     fun validateProfileButtonUpdatesUserName() {
         Intents.init()
 
-        val newName = "bigflo"
+        val newName = "John"
 
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
