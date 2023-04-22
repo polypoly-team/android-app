@@ -36,7 +36,6 @@ class SettingsActivity : MenuActivity("Settings") {
     }
 
     // ===================================================== MAIN CONTENT
-
     /**
      * Displays all the contents of the settings. The different part are separated in
      * columns. If the screen isn't big enough to show all information, we make it scrollable
