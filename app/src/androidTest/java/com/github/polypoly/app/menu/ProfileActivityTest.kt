@@ -42,7 +42,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         val secondTrophyWon = userLoggedIn.trophiesWon[1]
         statisticsAndTrophies.onChildren().filter(hasTestTag("Trophy$secondTrophyWon"))[0]
             .performScrollTo().performClick()
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText(allTrophies[secondTrophyWon].toString())
             .assertIsDisplayed()
     }
@@ -52,31 +52,31 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         val notWonTrophy = allTrophies.first { !userLoggedIn.hasTrophy(it.getId()) }
         composeTestRule.onNodeWithTag("Trophy${notWonTrophy.getId()}").performScrollTo()
             .performClick()
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText("???").assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectGamePlayedOfThePlayer() {
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText(userLoggedIn.stats.numberOfGames.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectGameWonOfThePlayer() {
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText(userLoggedIn.stats.numberOfWins.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectKilometersTraveledOfThePlayer() {
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText(userLoggedIn.stats.kilometersTraveled.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectNumberOfTrophiesWon() {
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
         composeTestRule.onNodeWithText(userLoggedIn.trophiesWon.size.toString()).performScrollTo().assertIsDisplayed()
     }
 
@@ -84,7 +84,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
     fun canSeeTheChosenDisplayedTrophies() {
         userLoggedIn.trophiesDisplay.forEach {
             val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
-            composeTestRule.waitForIdle()
+            Thread.sleep(1000)
             profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
         }
     }
@@ -97,7 +97,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         remoteDB.updateValue(DB_USERS_PROFILES_PATH + userLoggedIn.id, userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
-        composeTestRule.waitForIdle()
+        Thread.sleep(1000)
 
         // check that there is the first trophy displayed in the header
         profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
