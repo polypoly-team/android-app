@@ -94,6 +94,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
             val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
             Thread.sleep(1000)
             profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
+            Thread.sleep(1000)
         }
     }
 
