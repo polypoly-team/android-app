@@ -42,6 +42,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         val secondTrophyWon = userLoggedIn.trophiesWon[1]
         statisticsAndTrophies.onChildren().filter(hasTestTag("Trophy$secondTrophyWon"))[0]
             .performScrollTo().performClick()
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(allTrophies[secondTrophyWon].toString())
             .assertIsDisplayed()
     }
@@ -51,26 +52,31 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         val notWonTrophy = allTrophies.first { !userLoggedIn.hasTrophy(it.getId()) }
         composeTestRule.onNodeWithTag("Trophy${notWonTrophy.getId()}").performScrollTo()
             .performClick()
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("???").assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectGamePlayedOfThePlayer() {
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(userLoggedIn.stats.numberOfGames.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectGameWonOfThePlayer() {
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(userLoggedIn.stats.numberOfWins.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectKilometersTraveledOfThePlayer() {
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(userLoggedIn.stats.kilometersTraveled.toString()).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun canSeeTheCorrectNumberOfTrophiesWon() {
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(userLoggedIn.trophiesWon.size.toString()).performScrollTo().assertIsDisplayed()
     }
 
@@ -78,6 +84,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
     fun canSeeTheChosenDisplayedTrophies() {
         userLoggedIn.trophiesDisplay.forEach {
             val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
+            composeTestRule.waitForIdle()
             profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
         }
     }
@@ -95,6 +102,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
 
         // check that there is the empty slots in the header
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("emptySlot1").assertExists()
         composeTestRule.onNodeWithTag("emptySlot2").assertExists()
     }

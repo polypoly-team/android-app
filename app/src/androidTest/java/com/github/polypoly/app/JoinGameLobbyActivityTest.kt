@@ -20,6 +20,8 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
     fun launchActivity_componentsDisplayed() {
         composeTestRule.onNodeWithTag("gameLobbyCodeField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
+
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("logo").assertIsDisplayed()
     }
 
@@ -29,7 +31,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("polypoly")
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
-
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_does_not_exist)).assertIsDisplayed()
     }
 
@@ -37,8 +39,8 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
     fun inputEmptyGameLobbyCode_displayWarningMessage() {
         // Leave the game lobby code field empty
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
-
         // Check that a warning message is displayed
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_code_is_empty)).assertIsDisplayed()
     }
 
@@ -48,6 +50,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         val lobbyCode = TEST_GAME_LOBBY_AVAILABLE_1.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
+        composeTestRule.onNodeWithTag("warningMessage").assertTextContains("")
 
     }
 
@@ -59,6 +62,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_is_full)).assertIsDisplayed()
     }
 
@@ -66,6 +70,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
     fun clickOnGameLobbiesListButton_opensGameLobbiesList() {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("gameLobbiesList")
             .assertIsDisplayed()
     }
@@ -81,10 +86,12 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
             lobbyHeader.assertIsDisplayed()
             lobbyHeader.performClick()
 
+            composeTestRule.waitForIdle()
             composeTestRule.onAllNodesWithTag("lobbyCard").onFirst().assertIsDisplayed()
 
         }catch (AssertionError: AssertionError){
             Log.d("Test", "No lobbies to display from DB")
+            //TODO: no need the try catch : fix in next task (maxime talking to future maxime)
         }
 
     }

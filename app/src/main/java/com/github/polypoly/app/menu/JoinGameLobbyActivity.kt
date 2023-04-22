@@ -141,7 +141,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         var text by remember { mutableStateOf("") }
 
         OutlinedTextField(
-            colors = UIElements.outlineTextFieldColors(),
+            value = text,
             modifier = Modifier
                 .width(200.dp)
                 .testTag("gameLobbyCodeField"),
@@ -151,11 +151,9 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 focusManager.clearFocus()
                 gameLobbyCodeButtonOnClick(warningState, mContext)
             }),
-            value = text,
-            label = { Text("Enter a lobby code") },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
-            onValueChange = { newText ->
+            onValueChange = { newText : String ->
                 text = if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= maxLength) newText else text
                 gameLobbyCode = text
             },
