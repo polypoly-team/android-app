@@ -12,6 +12,7 @@ import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.game.user.allTrophies
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,13 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
     private val button = composeTestRule.onNodeWithTag("modifyProfileButton")
 
     private val userLoggedIn = TEST_USER_0 // TODO: effectively log in the user before any test
+
+    @Before
+    fun setUp() {
+        userLoggedIn.trophiesDisplay.clear()
+        userLoggedIn.trophiesDisplay.add(0)
+        userLoggedIn.trophiesDisplay.add(4)
+    }
 
     @Test
     fun modifyButtonGoToTheModifyingPage() {
