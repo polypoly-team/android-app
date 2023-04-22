@@ -97,12 +97,12 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         remoteDB.updateValue(DB_USERS_PROFILES_PATH + userLoggedIn.id, userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
+        composeTestRule.waitForIdle()
 
         // check that there is the first trophy displayed in the header
         profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
 
         // check that there is the empty slots in the header
-        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("emptySlot1").assertExists()
         composeTestRule.onNodeWithTag("emptySlot2").assertExists()
     }

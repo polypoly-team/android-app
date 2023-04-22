@@ -28,7 +28,8 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
     @Test
     fun inputInvalidGameLobbyCode_displayWarningMessage() {
         //TODO: Check for a group code that is not in the DB once we have the queries set
-        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("polypoly")
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("polpolu")
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         composeTestRule.waitForIdle()
@@ -49,6 +50,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         //TODO: Check for a valid group code in the DB once we have the queries set
         val lobbyCode = TEST_GAME_LOBBY_AVAILABLE_1.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
         composeTestRule.onNodeWithTag("warningMessage").assertTextContains("")
 
@@ -59,6 +61,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         //TODO: Check for a valid group code that is full in the DB once we have the queries set
         val lobbyCode = TEST_GAME_LOBBY_FULL.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
