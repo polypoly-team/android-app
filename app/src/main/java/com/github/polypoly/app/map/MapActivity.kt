@@ -31,10 +31,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -87,9 +90,12 @@ class MapActivity : ComponentActivity() {
 
     private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
 
-    // flag to show the dialog
+    // flag to show the building info dialog
     val showDialog = mutableStateOf(false)
     lateinit var currentMarker: Marker
+
+    // flag to show the roll dice dialog
+    val showRollDiceDialog = mutableStateOf(false)
 
     // store the map view for testing purposes
     lateinit var mapView: MapView private set
@@ -104,11 +110,13 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     BuildingInfoUIComponent()
+                    RollDiceDialog()
                     Hud(
                         PlayerGlobalData(false, 420),
                         listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),
                         16
                     )
+                    RollDiceButton()
                 }
             }
         }
@@ -135,6 +143,81 @@ class MapActivity : ComponentActivity() {
             this.mapView = mapView
             mapView
         }, modifier = Modifier.testTag("map"))
+    }
+
+    /**
+     * Button for rolling the dice.
+     */
+    @Composable
+    fun RollDiceButton() {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-80).dp)
+                    .testTag("rollDiceButton"),
+                onClick = {
+                    // Toast.makeText(this@MapActivity, rollDice(), Toast.LENGTH_SHORT).show()
+                    showRollDiceDialog.value = true
+                },
+                shape = CircleShape
+
+            ) {
+                Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
+            }
+        }
+    }
+
+    /**
+     * Dice roll dialog, shows the result of 3 dice rolls in a column.
+     */
+    @Composable
+    fun RollDiceDialog() {
+        if (showRollDiceDialog.value) {
+            Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
+                AlertDialog(
+                    onDismissRequest = { showRollDiceDialog.value = false },
+                    title = { Text("Dice Roll") },
+                    text = {
+                        Column {
+                            val rollDice = rollDiceLocations()
+                            // 3 buttons, containing the name of a random location
+                            for (i in 0..2)
+                                Button(onClick = { }) {
+                                    Text(rollDice[i].name)
+                                }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = { showRollDiceDialog.value = false }) {
+                            Text("Quit")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    /**
+     * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
+     * ensuring that the player does not visit the same location twice.
+     */
+    private fun rollDiceLocations(): List<com.github.polypoly.app.game.Location> {
+        val locationsNotToVisitName = mutableListOf(mapViewModel.closeLocation.value?.name)
+
+        val locationsToVisit = mutableListOf<com.github.polypoly.app.game.Location>()
+        for (i in 1..3) {
+            val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
+            val closestLocations = markerToLocation.entries
+                .filter { !locationsNotToVisitName.contains(it.value.name) }
+                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
+                .take(11)
+
+            locationsToVisit.add(closestLocations[diceRollsSum].value)
+            locationsNotToVisitName.add(closestLocations[diceRollsSum].value.name)
+        }
+        return locationsToVisit
     }
 
     /**
