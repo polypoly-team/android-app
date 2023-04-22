@@ -246,10 +246,10 @@ class MapActivity : ComponentActivity() {
      * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
      * ensuring that the player does not visit the same location twice.
      */
-    private fun rollDiceLocations(): List<com.github.polypoly.app.game.Location> {
+    private fun rollDiceLocations(): List<com.github.polypoly.app.base.game.location.Location> {
         val locationsNotToVisitName = mutableListOf(mapViewModel.closeLocation.value?.name)
 
-        val locationsToVisit = mutableListOf<com.github.polypoly.app.game.Location>()
+        val locationsToVisit = mutableListOf<com.github.polypoly.app.base.game.location.Location>()
         for (i in 1..3) {
             val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
             val closestLocations = markerToLocation.entries

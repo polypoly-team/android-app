@@ -17,14 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.GameMode
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
-import com.github.polypoly.app.game.user.User
-import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
@@ -35,7 +34,6 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -59,12 +57,12 @@ class WelcomeActivity : ComponentActivity() {
      * DEBUG function
      * Add fake data (possibly duplicate from tests' fake data) if the data in DB were corrupted
      */
-    fun addFakeDataToDB() {
+    private fun addFakeDataToDB() {
         // Miscellaneous test data
-        val ZERO_STATS = Stats(0, 0, 0, 0, 0)
-        val NO_SKIN = Skin(0,0,0)
+        val zeroStats = Stats(0, 0, 0, 0, 0)
+        val defaultSkin = Skin.default()
 
-        val TEST_USER_0 = User(
+        val testUser0 = User(
             id = 0,
             name = "John",
             bio = "Hi, this is my bio :)",
@@ -73,46 +71,46 @@ class WelcomeActivity : ComponentActivity() {
             trophiesWon = listOf(0, 4, 8, 11, 12, 14),
             trophiesDisplay = mutableListOf(0, 4)
         )
-        val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val testUser1 = User(12,"Carter", "Not me!", defaultSkin, zeroStats, listOf(), mutableListOf())
+        val testUser2 = User(123,"Harry", "Ha!", defaultSkin, zeroStats, listOf(), mutableListOf())
+        val testUser3 = User(1234,"James", "Hey!", defaultSkin, zeroStats, listOf(), mutableListOf())
+        val testUser4 = User(12345,"Henri", "Ohh!", defaultSkin, zeroStats, listOf(), mutableListOf())
+        val testUser5 = User(123456, "test_user_5", "", defaultSkin, zeroStats, listOf(), mutableListOf())
+        val allTestUsers = listOf(testUser0, testUser1, testUser2, testUser3, testUser4, testUser5)
 
-        val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
-            60, emptyList(), 100, "Full gameLobby", "1234"
+        val testGameLobbyFull = GameLobby(
+            testUser0, GameRules(GameMode.RICHEST_PLAYER, 2, 6,
+                60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
-        val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
-            360, emptyList(), 300, "Private gameLobby", "abc123", true
+        val testGameLobbyPrivate = GameLobby(
+            testUser1, GameRules(GameMode.RICHEST_PLAYER, 4, 6,
+                360, 20, emptyList(), 300), "Private gameLobby", "abc123", true
         )
-        val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
-            600, emptyList(), 1000, "Joinable 1", "abcd"
+        val testGameLobbyAvailable1 = GameLobby(
+            testUser1, GameRules(GameMode.LAST_STANDING, 3, 8,
+            600, null, emptyList(), 1000), "Joinable 1", "abcd"
         )
-        val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
-            3600, emptyList(), 2000, "Joinable 2", "123abc"
+        val testGameLobbyAvailable2 = GameLobby(
+            testUser2, GameRules(GameMode.RICHEST_PLAYER, 10, 25,
+            3600, 20, emptyList(), 2000), "Joinable 2", "123abc"
         )
-        val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
-            720, emptyList(), 3000, "Joinable 3", "1234abc"
+        val testGameLobbyAvailable3 = GameLobby(
+            testUser3, GameRules(GameMode.RICHEST_PLAYER, 7, 77,
+            720, 20, emptyList(), 3000), "Joinable 3", "1234abc"
         )
-        val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
-            TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
-            1080, emptyList(), 4000, "Joinable 4", "abc1234"
+        val testGameLobbyAvailable4 = GameLobby(
+            testUser4, GameRules(GameMode.RICHEST_PLAYER, 2, 4,
+            1080, 20, emptyList(), 4000), "Joinable 4", "abc1234"
         )
 
-        val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
-            TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+        val allTestGameLobbies = listOf(testGameLobbyFull, testGameLobbyPrivate, testGameLobbyAvailable1,
+            testGameLobbyAvailable2, testGameLobbyAvailable3, testGameLobbyAvailable4)
 
-        TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
-        TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
-        TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
-        TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
-        TEST_GAME_LOBBY_AVAILABLE_3.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_4))
+        testGameLobbyFull.addUsers(listOf(testUser1, testUser2, testUser3, testUser4, testUser5))
+        testGameLobbyPrivate.addUsers(listOf(testUser2))
+        testGameLobbyAvailable1.addUsers(listOf(testUser2, testUser3))
+        testGameLobbyAvailable2.addUsers(listOf(testUser1, testUser4))
+        testGameLobbyAvailable3.addUsers(listOf(testUser1, testUser2, testUser4))
 
         // Helper function
         fun <T> requestAddDataToDB(data: List<T>, keys: List<String>, root: String): List<CompletableFuture<Boolean>> {
@@ -120,8 +118,8 @@ class WelcomeActivity : ComponentActivity() {
         }
 
         // Add data to DB
-        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
-        requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBIES_PATH)
+        requestAddDataToDB(allTestUsers, allTestUsers.map{ user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
+        requestAddDataToDB(allTestGameLobbies, allTestGameLobbies.map(GameLobby::code), DB_GAME_LOBIES_PATH)
     }
 
     @Preview(showBackground = true)

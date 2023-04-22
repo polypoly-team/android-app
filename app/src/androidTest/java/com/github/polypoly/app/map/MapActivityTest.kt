@@ -7,9 +7,9 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.RulesObject
 import com.github.polypoly.app.menu.ProfileActivity
 import com.github.polypoly.app.menu.SettingsActivity
+import com.github.polypoly.app.menu.kotlin.RulesObject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
