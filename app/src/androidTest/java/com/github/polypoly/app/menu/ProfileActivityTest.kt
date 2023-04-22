@@ -32,6 +32,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         userLoggedIn.trophiesDisplay.clear()
         userLoggedIn.trophiesDisplay.add(0)
         userLoggedIn.trophiesDisplay.add(4)
+        Thread.sleep(1000)
     }
 
     @Test
@@ -88,32 +89,32 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithText(userLoggedIn.trophiesWon.size.toString()).performScrollTo().assertIsDisplayed()
     }
 
-    //@Test
-    //fun canSeeTheChosenDisplayedTrophies() {
-    //    userLoggedIn.trophiesDisplay.forEach {
-    //        val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
-    //        Thread.sleep(1000)
-    //        profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
-    //        Thread.sleep(1000)
-    //    }
-    //}
-//
-    //@Test
-    //fun seeAnEmptySlotIfThePlayerHaveLessThanThreeTrophies() {
-    //    userLoggedIn.trophiesDisplay.clear()
-    //    userLoggedIn.trophiesDisplay.add(allTrophies.first().getId())
-//
-    //    remoteDB.updateValue(DB_USERS_PROFILES_PATH + userLoggedIn.id, userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-//
-    //    val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
-    //    Thread.sleep(1000)
-//
-    //    // check that there is the first trophy displayed in the header
-    //    profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
-//
-    //    // check that there is the empty slots in the header
-    //    composeTestRule.onNodeWithTag("emptySlot1").assertExists()
-    //    composeTestRule.onNodeWithTag("emptySlot2").assertExists()
-    //}
+    @Test
+    fun canSeeTheChosenDisplayedTrophies() {
+        userLoggedIn.trophiesDisplay.forEach {
+            val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
+            Thread.sleep(1000)
+            profileSurface.onChildren().filter(hasTestTag("Trophy$it")).assertCountEquals(1)
+            Thread.sleep(1000)
+        }
+    }
+
+    @Test
+    fun seeAnEmptySlotIfThePlayerHaveLessThanThreeTrophies() {
+        userLoggedIn.trophiesDisplay.clear()
+        userLoggedIn.trophiesDisplay.add(allTrophies.first().getId())
+
+        remoteDB.updateValue(DB_USERS_PROFILES_PATH + userLoggedIn.id, userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
+        Thread.sleep(1000)
+
+        // check that there is the first trophy displayed in the header
+        profileSurface.onChildren().filter(hasTestTag("Trophy${allTrophies.first().getId()}")).assertCountEquals(1)
+
+        // check that there is the empty slots in the header
+        composeTestRule.onNodeWithTag("emptySlot1").assertExists()
+        composeTestRule.onNodeWithTag("emptySlot2").assertExists()
+    }
 
 }
