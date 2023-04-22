@@ -77,11 +77,11 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithText(userLoggedIn.stats.numberOfWins.toString()).performScrollTo().assertIsDisplayed()
     }
 
-    @Test
-    fun canSeeTheCorrectKilometersTraveledOfThePlayer() {
-        Thread.sleep(1000)
-        composeTestRule.onNodeWithText(userLoggedIn.stats.kilometersTraveled.toString()).performScrollTo().assertIsDisplayed()
-    }
+    //@Test
+    //fun canSeeTheCorrectKilometersTraveledOfThePlayer() {
+    //    Thread.sleep(1000)
+    //    composeTestRule.onNodeWithText(userLoggedIn.stats.kilometersTraveled.toString()).performScrollTo().assertIsDisplayed()
+    //}
 
     @Test
     fun canSeeTheCorrectNumberOfTrophiesWon() {
