@@ -29,10 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.network.getAllValues
@@ -327,7 +327,7 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
                     .padding(top = 5.dp)
             )
             Text(
-                text = "${gameLobby.usersRegistered.size}/${gameLobby.maximumNumberOfPlayers}",
+                text = "${gameLobby.usersRegistered.size}/${gameLobby.rules.maximumNumberOfPlayers}",
                 style = MaterialTheme.typography.h5,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -451,7 +451,7 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
                 fontSize = 16.sp
             )
             Text(
-                text = "${gameLobby.roundDuration}",
+                text = "${gameLobby.rules.roundDuration}",
                 style = MaterialTheme.typography.body1
             )
         }
@@ -473,7 +473,7 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
                 fontSize = 16.sp
             )
             Text(
-                text = "${gameLobby.gameMode}",
+                text = "${gameLobby.rules.gameMode}",
                 style = MaterialTheme.typography.body1
             )
         }
@@ -550,7 +550,7 @@ class JoinGameLobbyActivity : MenuActivity("Join Game") {
      * @return (Boolean): True if the gameLobby is full, false otherwise
      */
     private fun gameLobbyIsFull(gameLobby: GameLobby): Boolean {
-        return gameLobby.usersRegistered.size >= gameLobby.maximumNumberOfPlayers
+        return gameLobby.usersRegistered.size >= gameLobby.rules.maximumNumberOfPlayers
     }
 
 }

@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.LoggedInTest
-import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import org.junit.Rule

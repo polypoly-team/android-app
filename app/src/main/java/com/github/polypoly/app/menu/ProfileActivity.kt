@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.user.User
-import com.github.polypoly.app.game.user.allTrophies
+import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.menu.shared_component.TrophiesView
@@ -36,26 +36,20 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : MenuActivity("Profile") {
 
-    //TODO fixme with logged-in user's id
+    //ONLY TO TEST WITHOUT THE DATABASE
     private var userId: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MenuContent {
-                ProfileContent()
+            PolypolyTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    ProfileAndStats()
+                }
             }
-        }
-    }
-
-    // ===================================================== MAIN CONTENT
-    @Composable
-    private fun ProfileContent() {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background
-        ) {
-            ProfileAndStats()
         }
     }
 
@@ -66,13 +60,13 @@ class ProfileActivity : MenuActivity("Profile") {
     @Composable
     fun ProfileAndStats() {
 
-        var profileHeight by remember { mutableStateOf(340.dp) }
-
         var user by remember { mutableStateOf(User()) }
         remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + userId).thenAccept{userFound ->
             user = userFound
         }
 
+
+        var profileHeight by remember { mutableStateOf(340.dp) }
         val localDensity = LocalDensity.current
 
         // In order for the shadow of the surface elevation to be displayed on the bottom of the
@@ -88,10 +82,8 @@ class ProfileActivity : MenuActivity("Profile") {
                 StatisticsAndTrophies(user)
             }
             Surface(
-                modifier = Modifier
-                    .onGloballyPositioned { coordinates ->
-                        profileHeight = with(localDensity) { coordinates.size.height.toDp() }
-                    }
+                modifier = Modifier.onGloballyPositioned { coordinates ->
+                    profileHeight = with(localDensity) { coordinates.size.height.toDp() } }
                     .testTag("profileSurface"),
                 elevation = 8.dp,
                 color = MaterialTheme.colors.background
@@ -141,7 +133,6 @@ class ProfileActivity : MenuActivity("Profile") {
             onClick = {
                 val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                 profileModifyingIntent.putExtra("userId", userId)
-                finish()
                 startActivity(profileModifyingIntent)
             },
             shape = CircleShape,

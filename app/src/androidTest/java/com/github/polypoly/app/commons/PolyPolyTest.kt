@@ -1,15 +1,18 @@
 package com.github.polypoly.app.commons
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.game.GameLobby
-import com.github.polypoly.app.game.GameMode
-import com.github.polypoly.app.game.user.Skin
-import com.github.polypoly.app.game.user.Stats
-import com.github.polypoly.app.game.user.User
+import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.global.Settings
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -52,29 +55,38 @@ abstract class PolyPolyTest(
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameMode.RICHEST_PLAYER, 2, 6,
-            60, emptyList(), 100, "Full gameLobby", "lobby1234"
+            TEST_USER_0, GameRules(GameMode.RICHEST_PLAYER, 2, 6,
+            60, 20, emptyList(), 100), "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameMode.RICHEST_PLAYER, 4, 6,
-            360, emptyList(), 300, "Private gameLobby", "lobbyabc123", true
+            TEST_USER_1, GameRules(GameMode.RICHEST_PLAYER, 4, 6,
+            360, 20, emptyList(), 300), "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameMode.LAST_STANDING, 3, 8,
-            600, emptyList(), 1000, "Joinable 1", "lobbyabcd"
+            TEST_USER_1, GameRules(GameMode.LAST_STANDING, 3, 8,
+            600, null, emptyList(), 1000), "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameMode.RICHEST_PLAYER, 10, 25,
-            3600, emptyList(), 2000, "Joinable 2", "lobby123abc"
+            TEST_USER_2, GameRules(GameMode.RICHEST_PLAYER, 10, 25,
+            3600, 20, emptyList(), 2000), "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameMode.RICHEST_PLAYER, 7, 77,
-            720, emptyList(), 3000, "Joinable 3", "lobby1234abc"
+            TEST_USER_3, GameRules(GameMode.RICHEST_PLAYER, 7, 77,
+            720, 20, emptyList(), 3000), "Joinable 3", "lobby1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
-            TEST_USER_4, GameMode.RICHEST_PLAYER, 2, 4,
-            1080, emptyList(), 4000, "Joinable 4", "lobbyabc1234"
+            TEST_USER_4, GameRules(GameMode.RICHEST_PLAYER, 2, 4,
+            1080, 20, emptyList(), 4000), "Joinable 4", "lobbyabc1234"
         )
+
+        val testPlayer1 = Player(TEST_USER_1, 100, listOf())
+        val testPlayer2 = Player(TEST_USER_2, 200, listOf())
+        val testPlayer3 = Player(TEST_USER_3, 100, listOf())
+        val testPlayer4 = Player(TEST_USER_4, 0, listOf(), 4)
+        val testPlayer5 = Player(TEST_USER_5, 0, listOf(), 5)
+        val testPlayer6 = Player(TEST_USER_0, 0, listOf(), 5)
+        val gameRulesDefault = GameRules(GameMode.RICHEST_PLAYER, 3, 7,
+            2, 10, LocationRepository.getZones(), 200)
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
