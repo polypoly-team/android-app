@@ -16,8 +16,8 @@ import kotlin.time.Duration.Companion.hours
 class GameLobby(
     val admin: User = User(),
     val rules: GameRules = GameRules(),
-    val name: String = "default",
-    val code: String = "default",
+    val name: String = "defaultName",
+    val code: String = "defaultCode",
     val private: Boolean = false,
 ) {
 

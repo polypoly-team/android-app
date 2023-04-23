@@ -20,7 +20,7 @@ data class GameRules (
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
-    val roundDuration: Int = 0,
+    val roundDuration: Int = 360,
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationRepository.getZones(),
     val initialPlayerBalance: Int = 500,

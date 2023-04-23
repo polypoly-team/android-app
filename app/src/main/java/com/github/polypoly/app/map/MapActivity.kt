@@ -177,7 +177,7 @@ class MapActivity : ComponentActivity() {
 
             for (zone in getZones())
                 for (location in zone.locations) {
-                    val marker = addMarkerTo(mapView, location.position, location.name, zone.color)
+                    val marker = addMarkerTo(mapView, location.position(), location.name, zone.color)
                     markerToLocation[marker] = location
                 }
 
@@ -254,7 +254,7 @@ class MapActivity : ComponentActivity() {
             val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
             val closestLocations = markerToLocation.entries
                 .filter { !locationsNotToVisitName.contains(it.value.name) }
-                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
+                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position()) }
                 .take(11)
 
             locationsToVisit.add(closestLocations[diceRollsSum].value)
@@ -594,13 +594,13 @@ class MapActivity : ComponentActivity() {
             updateDistance(marker, myLocation)
             val markerLocation = markerToLocation[marker]!!
             if (closestLocation == null ||
-                myLocation.distanceToAsDouble(markerLocation.position)
-                < myLocation.distanceToAsDouble(closestLocation.position)
+                myLocation.distanceToAsDouble(markerLocation.position())
+                < myLocation.distanceToAsDouble(closestLocation.position())
             ) {
                 closestLocation = markerLocation
             }
         }
-        if (myLocation.distanceToAsDouble(closestLocation!!.position) > MAX_CLOSE_LOCATION_DISTANCE)
+        if (myLocation.distanceToAsDouble(closestLocation!!.position()) > MAX_CLOSE_LOCATION_DISTANCE)
             closestLocation = null
 
         return closestLocation

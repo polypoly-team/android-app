@@ -8,8 +8,8 @@ import org.osmdroid.util.GeoPoint
     @property color the color used to represent this zone.
  */
 class Zone(
-    val locations: List<Location>,
-    val color: Int //> hexadecimal representation
+    val locations: List<Location> = listOf(),
+    val color: Int = 0xFFFFFFF //> hexadecimal representation
 )
 
 /**
@@ -25,12 +25,20 @@ enum class LocalizationLevel {
     @property basePrice the initial price of the [Location].
     @property baseTaxPrice the tax price of the [Location] when it is owned.
     @property baseMortgagePrice the mortgage price of the [Location] when it is mortgaged.
-    @property position the geographical position of the [Location] on the map.
+    @property latitude the latitude of the [Location] on the map.
+    @property longitude the longitude of the [Location] on the map.
  */
 class Location(
-    val name: String,
-    val basePrice: Int,
-    val baseTaxPrice: Int,
-    val baseMortgagePrice: Int,
-    val position: GeoPoint
-)
+    val name: String = "Default",
+    val basePrice: Int = 0,
+    val baseTaxPrice: Int = 0,
+    val baseMortgagePrice: Int = 0,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+) {
+    /**
+     *   The position of the [Location] on the map.
+     *   @return the [GeoPoint] representing the position of the [Location] on the map.
+     */
+    fun position(): GeoPoint = GeoPoint(latitude, longitude)
+}
