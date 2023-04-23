@@ -113,7 +113,7 @@ class PlayerTest {
         val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
         testPlayer.loseMoney(150)
         assertTrue(testPlayer.getBalance() == 0)
-        assertTrue(testPlayer.hasLose())
+        assertTrue(testPlayer.hasLost())
         assertTrue(testPlayer.getRoundLost() == 1)
     }
 
@@ -122,7 +122,7 @@ class PlayerTest {
         val playerMoney = 100
         val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
         testPlayer.loseMoney(playerMoney)
-        assertFalse(testPlayer.hasLose())
+        assertFalse(testPlayer.hasLost())
         assertTrue(testPlayer.getRoundLost() == null)
     }
 
@@ -152,7 +152,7 @@ class PlayerTest {
     fun betToBuyCreatesALocationBetWithTheCorrectArguments() {
         val amountOfTheBet = 300
         val testPlayer = Player(TEST_USER_0, 300, listOf())
-        val bet = testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), amountOfTheBet)
+        val bet = testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), amountOfTheBet)
         assertEquals(amountOfTheBet, bet.amount)
         assertEquals(TEST_USER_0.id, bet.player.user.id)
         assertTrue(bet.randomNumber < 1 && bet.randomNumber >= 0)
@@ -162,7 +162,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
         val testPlayer = Player(TEST_USER_0, 0, listOf(), 4)
         val thrown = assertThrows(IllegalStateException::class.java) {
-            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 300)
+            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 300)
         }
         assertNotNull(thrown.message)
         val message = thrown.message
@@ -175,7 +175,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsNegative() {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), -300)
+            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), -300)
         }
         assertNotNull(thrown.message)
         val message = thrown.message
@@ -188,7 +188,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsZero() {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 0)
+            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 0)
         }
         assertNotNull(thrown.message)
         val message = thrown.message
@@ -201,7 +201,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheLocationIsAlreadyOwned() {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.betToBuy(
+            testPlayer.bidToBuy(
                 location = InGameLocation(LocationRepository.getZones()[0].locations[0], owner = PolyPolyTest.testPlayer2), 300)
         }
         assertNotNull(thrown.message)
@@ -215,7 +215,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsSmallerThanTheLocationPrice() {
         val testPlayer = Player(TEST_USER_0, 100, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.betToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 100)
+            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 100)
         }
         assertNotNull(thrown.message)
         val message = thrown.message

@@ -2,7 +2,7 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.game.location.LocationBet
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.user.User
 import kotlin.random.Random
 
@@ -25,7 +25,7 @@ data class Player (
      * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise
      */
-    fun hasLose(): Boolean {
+    fun hasLost(): Boolean {
         return roundLost != null
     }
 
@@ -36,7 +36,7 @@ data class Player (
     fun collectBonusCard(bonusCard: InGameBonusCard) {
         // TODO : write in the database that the bonusCard is collected
         // TODO : show the card to the player
-        bonusCard.bonusCard.applyBonus(this)
+        bonusCard.bonusCard.effect(this)
     }
 
     /**
@@ -107,10 +107,10 @@ data class Player (
     }
 
     /**
-     * The player bet to buy a location
+     * The player bid to buy a location
      * @param location the location the player wants to buy
-     * @param amount the amount of money the player wants to bet
-     * @return the [LocationBet] created
+     * @param amount the amount of money the player wants to bid
+     * @return the [LocationBid] created
      * @throws IllegalStateException if there is no game in progress
      * @throws IllegalStateException if the player is not in the game currently in progress
      * @throws IllegalArgumentException if the location is already owned by someone
@@ -118,7 +118,7 @@ data class Player (
      * @throws IllegalStateException if the player has already lost the game
      * @throws IllegalArgumentException if the player has not enough money to buy the location
      */
-    fun betToBuy(location: InGameLocation, amount: Int) : LocationBet {
+    fun bidToBuy(location: InGameLocation, amount: Int) : LocationBid {
         if(Game.gameInProgress == null)
             throw IllegalStateException("There are no game in progress")
         if(Game.gameInProgress?.playInThisGame(user) == false)
@@ -131,7 +131,7 @@ data class Player (
             throw IllegalStateException("The player has already lost the game")
         if(location.currentPrice() > balance)
             throw IllegalArgumentException("The player has not bet enough money to buy the location")
-        return LocationBet(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
+        return LocationBid(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
         // TODO : add in the DB the bet
     }
 

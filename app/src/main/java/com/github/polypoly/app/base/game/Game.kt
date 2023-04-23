@@ -52,7 +52,7 @@ class Game private constructor(
     private fun isGameFinished(): Boolean {
         return when(rules.gameMode) {
             GameMode.LAST_STANDING -> {
-                players.filter { !it.hasLose() }.size <= 1
+                players.filter { !it.hasLost() }.size <= 1
             }
             GameMode.RICHEST_PLAYER -> {
                 if(rules.maxRound == null)
@@ -118,7 +118,7 @@ class Game private constructor(
      */
     fun computeAllWinnersOfBets() {
         inGameLocations.forEach {
-            val winningBet = it.computeWinningBet()
+            val winningBet = it.computeWinningBid()
             if(winningBet != null) {
                 val winner = winningBet.player
                 if(winner.user.currentUser) {
