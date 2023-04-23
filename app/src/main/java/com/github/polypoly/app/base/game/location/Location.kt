@@ -7,7 +7,7 @@ import org.osmdroid.util.GeoPoint
     @property localizations a list of [Location]s that belong to this zone.
     @property color the color used to represent this zone.
  */
-class Zone(
+data class Zone(
     val locations: List<Location> = listOf(),
     val color: Int = 0xFFFFFFF //> hexadecimal representation
 )
@@ -28,7 +28,7 @@ enum class LocalizationLevel {
     @property latitude the latitude of the [Location] on the map.
     @property longitude the longitude of the [Location] on the map.
  */
-class Location(
+data class Location(
     val name: String = "Default",
     val basePrice: Int = 0,
     val baseTaxPrice: Int = 0,

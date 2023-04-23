@@ -28,7 +28,7 @@ class RemoteDBTest: PolyPolyTest(true, false) {
     }
 
     @Test
-    fun gameLobbyCanBeStoredInDB() {
+    fun gameLobbyCanBççeStoredInDB() {
         classCanBeStoredInDB(GameLobby::class)
     }
 

@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.hours
  * @property code The (secret) code of the [GameLobby]
  * @property private If the [GameLobby] is private or not
  */
-class GameLobby(
+data class GameLobby(
     val admin: User = User(),
     val rules: GameRules = GameRules(),
     val name: String = "defaultName",
