@@ -25,7 +25,7 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
 ) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { it.locations.map { location ->
+    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locations.map { location ->
         InGameLocation(
             location = location,
             owner = null,
@@ -70,8 +70,10 @@ class Game private constructor(
         val playersSorted = players.sortedDescending()
         val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
         for(i in 1 until (players.size)) {
-            if(playersSorted[i].compareTo(playersSorted[i-1]) == 0) {
-                map[playersSorted[i-1].user.id]?.let{ map[playersSorted[i].user.id] = it }
+            val currentPlayer = playersSorted[i]
+            val previousPlayer = playersSorted[i-1]
+            if(currentPlayer.compareTo(previousPlayer) == 0) {
+                map[previousPlayer.user.id]?.let{ map[currentPlayer.user.id] = it }
             }
         }
         return map
@@ -85,7 +87,7 @@ class Game private constructor(
     fun endGame(): PastGame {
         if(!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
-            users = players.map { it.user },
+            users = players.map(Player::user),
             usersRank = ranking().map { it.key to it.value }.toMap(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,

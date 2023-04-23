@@ -1,6 +1,7 @@
 package com.github.polypoly.app.commons
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
@@ -11,6 +12,7 @@ import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.global.Settings
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -76,6 +78,15 @@ abstract class PolyPolyTest(
             TEST_USER_4, GameRules(GameMode.RICHEST_PLAYER, 2, 4,
             1080, 20, emptyList(), 4000), "Joinable 4", "lobbyabc1234"
         )
+
+        val testPlayer1 = Player(TEST_USER_1, 100, listOf())
+        val testPlayer2 = Player(TEST_USER_2, 200, listOf())
+        val testPlayer3 = Player(TEST_USER_3, 100, listOf())
+        val testPlayer4 = Player(TEST_USER_4, 0, listOf(), 4)
+        val testPlayer5 = Player(TEST_USER_5, 0, listOf(), 5)
+        val testPlayer6 = Player(TEST_USER_0, 0, listOf(), 5)
+        val gameRulesDefault = GameRules(GameMode.RICHEST_PLAYER, 3, 7,
+            2, 10, LocationRepository.getZones(), 200)
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
