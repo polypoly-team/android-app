@@ -97,7 +97,7 @@ class PlayerTest {
     @Test
     fun loseMoneyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
         val testPlayer = Player(TEST_USER_0, 0, listOf(), 3)
-        val thrown = assertThrows(IllegalStateException::class.java) {
+        val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.loseMoney(0)
         }
         assertNotNull(thrown.message)

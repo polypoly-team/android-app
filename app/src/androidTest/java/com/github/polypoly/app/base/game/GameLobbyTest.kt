@@ -60,7 +60,7 @@ class GameLobbyTest {
     }
 
     @Test
-    fun pendingGameDoesntAcceptInvalidDurations() {
+    fun pendingGameDoesNotAcceptInvalidDurations() {
         val negativeRoundDuration = -2
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
