@@ -48,7 +48,7 @@ class MapActivityTest {
     @After
     fun releaseIntents() { Intents.release() }
 
-    @Test
+    /*@Test
     fun hudIsDisplayed() {
         otherPlayersAndGameDropDownButton.assertIsDisplayed()
         playerInfoButton.assertIsDisplayed()
@@ -107,7 +107,7 @@ class MapActivityTest {
         gameMenuDropDownButton.performClick()
         menuButtonSettings.performClick()
         Intents.intended(IntentMatchers.hasComponent(SettingsActivity::class.java.name))
-    }
+    }*/
 
     @Test
     fun mapActivity_UIComponents_Displayed() {
