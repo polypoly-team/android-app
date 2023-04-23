@@ -26,7 +26,7 @@ interface IRemoteStorage {
 
     /**
      * Retrieve all child keys of a certain key
-     * @param key: parent key
+     * @param parentKey: parent key
      * @return A promise with the keys found
      */
     fun getAllKeys(parentKey: String): CompletableFuture<List<String>>

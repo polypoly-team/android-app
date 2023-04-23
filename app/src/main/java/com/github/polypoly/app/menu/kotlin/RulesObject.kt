@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.menu.kotlin
 
 /**
  * This object stores all the rules of the game.

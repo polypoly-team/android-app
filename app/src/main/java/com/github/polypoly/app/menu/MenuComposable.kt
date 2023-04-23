@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import com.github.polypoly.app.R
-import com.github.polypoly.app.RulesObject
+import com.github.polypoly.app.menu.kotlin.RulesObject
 
 object MenuComposable {
     /**

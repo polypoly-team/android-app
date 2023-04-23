@@ -59,7 +59,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.R
-import com.github.polypoly.app.game.PlayerGlobalData
+import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.map.LocationRepository.getZones
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -88,7 +91,7 @@ class MapActivity : ComponentActivity() {
     // Not public for testing purposes
     val mapViewModel: MapViewModel = MapViewModel()
 
-    private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.game.Location>()
+    private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.base.game.location.Location>()
 
     // flag to show the building info dialog
     val showDialog = mutableStateOf(false)
@@ -112,8 +115,48 @@ class MapActivity : ComponentActivity() {
                     BuildingInfoUIComponent()
                     RollDiceDialog()
                     Hud(
-                        PlayerGlobalData(false, 420),
-                        listOf(PlayerGlobalData(false, 32), PlayerGlobalData(false, 56)),
+                        Player(
+                            user = User(
+                                id = 4572,
+                                name = "User test 1",
+                                bio = "",
+                                skin = Skin.default(),
+                                stats = Stats(0,0,0,0,0),
+                                trophiesWon = listOf(),
+                                trophiesDisplay = mutableListOf(),
+                            ),
+                            balance = 420,
+                            ownedLocations = listOf(),
+                            roundLost = null,
+                        ),
+                        listOf(
+                            Player(
+                                user = User(
+                                    id = 4573,
+                                    name = "User test 2",
+                                    bio = "",
+                                    skin = Skin.default(),
+                                    stats = Stats(0,0,0,0,0),
+                                    trophiesWon = listOf(),
+                                    trophiesDisplay = mutableListOf(),
+                                ),
+                                balance = 32,
+                                ownedLocations = listOf(),
+                                roundLost = null,
+                            ), Player(
+                                user = User(
+                                    id = 4574,
+                                    name = "User test 3",
+                                    bio = "",
+                                    skin = Skin.default(),
+                                    stats = Stats(0,0,0,0,0),
+                                    trophiesWon = listOf(),
+                                    trophiesDisplay = mutableListOf(),
+                                ),
+                                balance = 56,
+                                ownedLocations = listOf(),
+                                roundLost = null,
+                            )),
                         16
                     )
                     RollDiceButton()
@@ -134,7 +177,7 @@ class MapActivity : ComponentActivity() {
 
             for (zone in getZones())
                 for (location in zone.locations) {
-                    val marker = addMarkerTo(mapView, location.position, location.name, zone.color)
+                    val marker = addMarkerTo(mapView, location.position(), location.name, zone.color)
                     markerToLocation[marker] = location
                 }
 
@@ -203,15 +246,15 @@ class MapActivity : ComponentActivity() {
      * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
      * ensuring that the player does not visit the same location twice.
      */
-    private fun rollDiceLocations(): List<com.github.polypoly.app.game.Location> {
+    private fun rollDiceLocations(): List<com.github.polypoly.app.base.game.location.Location> {
         val locationsNotToVisitName = mutableListOf(mapViewModel.closeLocation.value?.name)
 
-        val locationsToVisit = mutableListOf<com.github.polypoly.app.game.Location>()
+        val locationsToVisit = mutableListOf<com.github.polypoly.app.base.game.location.Location>()
         for (i in 1..3) {
             val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
             val closestLocations = markerToLocation.entries
                 .filter { !locationsNotToVisitName.contains(it.value.name) }
-                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position) }
+                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position()) }
                 .take(11)
 
             locationsToVisit.add(closestLocations[diceRollsSum].value)
@@ -540,24 +583,24 @@ class MapActivity : ComponentActivity() {
     private fun updateAllDistancesAndFindClosest(
         mapView: MapView,
         myLocation: GeoPoint
-    ): com.github.polypoly.app.game.Location? {
+    ): com.github.polypoly.app.base.game.location.Location? {
         fun updateDistance(marker: Marker, myLocation: GeoPoint) {
             val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
             marker.snippet = "Distance: ${formattedDistance(distance)}"
         }
 
-        var closestLocation = null as com.github.polypoly.app.game.Location?
+        var closestLocation = null as com.github.polypoly.app.base.game.location.Location?
         for (marker in markersOf(mapView)) {
             updateDistance(marker, myLocation)
             val markerLocation = markerToLocation[marker]!!
             if (closestLocation == null ||
-                myLocation.distanceToAsDouble(markerLocation.position)
-                < myLocation.distanceToAsDouble(closestLocation.position)
+                myLocation.distanceToAsDouble(markerLocation.position())
+                < myLocation.distanceToAsDouble(closestLocation.position())
             ) {
                 closestLocation = markerLocation
             }
         }
-        if (myLocation.distanceToAsDouble(closestLocation!!.position) > MAX_CLOSE_LOCATION_DISTANCE)
+        if (myLocation.distanceToAsDouble(closestLocation!!.position()) > MAX_CLOSE_LOCATION_DISTANCE)
             closestLocation = null
 
         return closestLocation
@@ -588,7 +631,7 @@ class MapActivity : ComponentActivity() {
      * The heads-up display with player and game stats that is displayed on top of the map
      */
     @Composable
-    fun Hud(playerData: PlayerGlobalData, otherPlayersData: List<PlayerGlobalData>, round: Int) {
+    fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location = mapViewModel.closeLocation.value?.name ?: "")
@@ -617,7 +660,7 @@ class MapActivity : ComponentActivity() {
      * and a button shows complete information on click
      */
     @Composable
-    fun HudPlayer(playerData: PlayerGlobalData) {
+    fun HudPlayer(playerData: Player) {
         var openPlayerInfo by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -635,7 +678,7 @@ class MapActivity : ComponentActivity() {
                         description = "See player information"
                     )
                     Column(Modifier.padding(Padding.medium)) {
-                        HudText("playerBalance", "${playerData.balance} $")
+                        HudText("playerBalance", "${playerData.getBalance()} $")
                     }
                 }
             }
@@ -665,7 +708,7 @@ class MapActivity : ComponentActivity() {
      * players
      */
     @Composable
-    fun HudOtherPlayersAndGame(otherPlayersData: List<PlayerGlobalData>, round: Int) {
+    fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
         var isExpanded by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -753,7 +796,7 @@ class MapActivity : ComponentActivity() {
      * and a button shows complete information on click
      */
     @Composable
-    fun HudOtherPlayer(playerData: PlayerGlobalData) {
+    fun HudOtherPlayer(playerData: Player) {
         var openOtherPlayerInfo by remember { mutableStateOf(false) }
         Row(Modifier.padding(Padding.medium)) {
             HudButton(
@@ -763,7 +806,7 @@ class MapActivity : ComponentActivity() {
                 description = "See other player information"
             )
             Column(Modifier.padding(Padding.medium)) {
-                HudText("playerBalance", "${playerData.balance} $")
+                HudText("playerBalance", "${playerData.getBalance()} $")
             }
         }
 
