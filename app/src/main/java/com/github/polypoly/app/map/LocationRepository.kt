@@ -2,7 +2,6 @@ package com.github.polypoly.app.map
 
 import com.github.polypoly.app.base.game.location.Location
 import com.github.polypoly.app.base.game.location.Zone
-import org.osmdroid.util.GeoPoint
 
 /**
  * Repository for providing the zones and localizations on the map.

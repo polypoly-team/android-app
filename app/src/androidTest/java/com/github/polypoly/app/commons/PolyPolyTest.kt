@@ -9,16 +9,23 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.global.Settings
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.network.RemoteDB
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -28,16 +35,22 @@ import kotlin.time.DurationUnit
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
     private val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
-    private val fillWithFakeData: Boolean //> fill remote storage with fake data at the beginning of every test
+    private val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
+    val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
     companion object {
         // Global tests constants
         const val TIMEOUT_DURATION = 5L
 
+        // Ensures only one global initialization even for multithreaded testing
+        var globalInitCompleted = false
+        var initLock = ReentrantLock(true)
+
         // Miscellaneous test data
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
+        val CURRENT_USER = User(1000,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(
             id = 0,
             name = "John",
@@ -91,10 +104,18 @@ abstract class PolyPolyTest(
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
 
+        val firebaseAuthMock = mock(FirebaseAuth::class.java)
+        val currentUserMock = mock(FirebaseUser::class.java)
+
+
         init {
             val db = Firebase.database
             db.setPersistenceEnabled(false)
             GlobalInstances.remoteDB = RemoteDB(db, "test-github")
+
+            FirebaseAuth.getInstance().signOut()
+            currentUser = null
+            isSignedIn = false
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
@@ -139,12 +160,22 @@ abstract class PolyPolyTest(
 
     @Before
     fun prepareTest() {
+        if(signFakeUserIn) {
+            `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
+            currentUser = currentUserMock
+            isSignedIn = true
+        }
         if (clearRemoteStorage) {
             clearTestDB()
         }
         if (fillWithFakeData) {
             fillWithFakeData()
         }
+    }
+    @After
+    fun cleanUp() {
+        currentUser = null
+        isSignedIn = false
     }
 
     private fun clearTestDB() {

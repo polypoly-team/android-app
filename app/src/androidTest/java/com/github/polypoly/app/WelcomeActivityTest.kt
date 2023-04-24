@@ -4,6 +4,8 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.ProfileActivity
 import com.github.polypoly.app.menu.SettingsActivity
@@ -13,7 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class WelcomeActivityTest {
+class WelcomeActivityTest : PolyPolyTest(false, false, true) {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<WelcomeActivity>()
 
@@ -29,8 +31,14 @@ class WelcomeActivityTest {
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
 
+    init {
+        isSignedIn = true
+    }
+
     @Before
-    fun startIntents() { Intents.init() }
+    fun startIntents() {
+        Intents.init()
+    }
 
     @After
     fun releaseIntents() { Intents.release() }
