@@ -24,16 +24,14 @@ data class GameRules (
     val initialPlayerBalance: Int = 500,
 ) {
 
-    private val maxRoundHours = 24
+    private val maxRoundHours = Int.MAX_VALUE
 
     init {
         if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration < 0)
-            throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
         if (roundDuration <= 0 || roundDuration >= maxRoundHours)
-            throw java.lang.IllegalArgumentException("Invalid game duration $roundDuration")
+            throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }
