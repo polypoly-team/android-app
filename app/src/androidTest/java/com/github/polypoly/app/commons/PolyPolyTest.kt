@@ -8,19 +8,15 @@ import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.map.LocationRepository
-import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -29,8 +25,6 @@ import org.mockito.Mockito.`when`
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.DurationUnit
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
@@ -107,11 +101,13 @@ abstract class PolyPolyTest(
         val firebaseAuthMock = mock(FirebaseAuth::class.java)
         val currentUserMock = mock(FirebaseUser::class.java)
 
+        private val mockDB = MockDB()
 
         init {
-            val db = Firebase.database
-            db.setPersistenceEnabled(false)
-            GlobalInstances.remoteDB = RemoteDB(db, "test-github")
+            if (!remoteDBInitialized) {
+                remoteDB = mockDB
+                remoteDBInitialized = true
+            }
 
             FirebaseAuth.getInstance().signOut()
             currentUser = null
@@ -125,17 +121,10 @@ abstract class PolyPolyTest(
         }
     }
 
-    private val dbRootRef: DatabaseReference = GlobalInstances.remoteDB.rootRef
-
     private fun <T> requestAddDataToDB(data: List<T>, keys: List<String>, root: String): List<CompletableFuture<Boolean>> {
-        val timeouts = List(data.size) {CompletableFuture<Boolean>()}
+        val timeouts = mutableListOf<CompletableFuture<Boolean>>()
         for (i in data.indices) {
-            val user = data[i]
-            dbRootRef.child(root).child(keys[i])
-                .setValue(user)
-                .addOnSuccessListener {
-                    timeouts[i].complete(true)
-                }.addOnFailureListener(timeouts[i]::completeExceptionally)
+            timeouts.add(remoteDB.setValue(root + keys[i], data[i]))
         }
         return timeouts
     }
@@ -158,6 +147,11 @@ abstract class PolyPolyTest(
 
     fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
+    /**
+     * Function always called after the preparation of the test is completed
+     */
+    open fun _prepareTest() {}
+
     @Before
     fun prepareTest() {
         if(signFakeUserIn) {
@@ -166,11 +160,12 @@ abstract class PolyPolyTest(
             isSignedIn = true
         }
         if (clearRemoteStorage) {
-            clearTestDB()
+            clearMockDB()
         }
         if (fillWithFakeData) {
             fillWithFakeData()
         }
+        _prepareTest()
     }
     @After
     fun cleanUp() {
@@ -178,13 +173,8 @@ abstract class PolyPolyTest(
         isSignedIn = false
     }
 
-    private fun clearTestDB() {
-        val timeout = CompletableFuture<Boolean>()
-        dbRootRef.removeValue()
-            .addOnSuccessListener {
-                timeout.complete(true)
-            }.addOnFailureListener(timeout::completeExceptionally)
-        timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+    private fun clearMockDB() {
+        mockDB.clear()
     }
 
     fun fillWithFakeData() {
