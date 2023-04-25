@@ -42,13 +42,19 @@ class ProfileActivity : MenuActivity("Profile") {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PolypolyTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    ProfileAndStats()
-                }
+           MenuContent { ProfileContent() }
+        }
+    }
+
+    // ===================================================== MAIN CONTENT
+    @Composable
+    fun ProfileContent() {
+        PolypolyTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                ProfileAndStats()
             }
         }
     }
@@ -82,8 +88,10 @@ class ProfileActivity : MenuActivity("Profile") {
                 StatisticsAndTrophies(user)
             }
             Surface(
-                modifier = Modifier.onGloballyPositioned { coordinates ->
-                    profileHeight = with(localDensity) { coordinates.size.height.toDp() } }
+                modifier = Modifier
+                    .onGloballyPositioned { coordinates ->
+                        profileHeight = with(localDensity) { coordinates.size.height.toDp() }
+                    }
                     .testTag("profileSurface"),
                 elevation = 8.dp,
                 color = MaterialTheme.colors.background
@@ -133,6 +141,7 @@ class ProfileActivity : MenuActivity("Profile") {
             onClick = {
                 val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                 profileModifyingIntent.putExtra("userId", userId)
+                finish()
                 startActivity(profileModifyingIntent)
             },
             shape = CircleShape,

@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 
     implementation("org.mockito:mockito-android:5.2.0")
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.3'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.3.0'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.3'
     implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.4'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'

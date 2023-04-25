@@ -91,8 +91,6 @@ class SignInActivity : ComponentActivity() {
 
     @Composable
     fun SignInContent() {
-        GameMusic.setSong(LocalContext.current, R.raw.mocksong)
-        GameMusic.startSong()
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = firebaseAuth?.currentUser
             if (user != null) {
