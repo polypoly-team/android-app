@@ -2,7 +2,7 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.bonus_card.BonusCard
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.Location
 import com.github.polypoly.app.commons.PolyPolyTest

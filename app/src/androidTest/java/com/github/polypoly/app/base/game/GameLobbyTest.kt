@@ -10,8 +10,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 
 @RunWith(JUnit4::class)
 class GameLobbyTest {
