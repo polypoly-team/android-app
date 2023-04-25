@@ -82,8 +82,3 @@ inline fun <reified T : Any> IRemoteStorage.getAllValues(key: String) = getAllVa
  * Extension function of IRemoteStorage::getAllValues to enable prettier call of the function
  */
 inline fun <reified T : Any> IRemoteStorage.getValue(key: String) = getValue(key, T::class)
-
-enum class StorageType {
-    FIREBASE,
-    TEST
-}

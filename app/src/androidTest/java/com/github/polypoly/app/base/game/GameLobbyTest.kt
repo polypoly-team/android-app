@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base
+package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
@@ -21,7 +21,7 @@ class GameLobbyTest {
     private val testUser = User(42042042, "test_user", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testMinNumberPlayers = 3
     private val testMaxNumberPlayers = 7
-    private val testDuration = 2.hours
+    private val testDuration = 2
     private val testInitialBalance = 100
     private val testName = "Unit Test Game"
     private val testCode = "007"
@@ -60,14 +60,8 @@ class GameLobbyTest {
     }
 
     @Test
-    fun pendingGameDoesntAcceptInvalidDurations() {
-        val infinitRoundDuration = Duration.INFINITE
-        val negativeRoundDuration = (-2).hours
-
-        assertThrows(java.lang.IllegalArgumentException::class.java) {
-            val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,
-                infinitRoundDuration, null, emptyList(), testInitialBalance), testName, testCode)
-        }
+    fun pendingGameDoesNotAcceptInvalidDurations() {
+        val negativeRoundDuration = -2
 
         assertThrows(java.lang.IllegalArgumentException::class.java) {
             val gameLobby = GameLobby(testUser, GameRules(GameMode.RICHEST_PLAYER, testMinNumberPlayers, testMaxNumberPlayers,

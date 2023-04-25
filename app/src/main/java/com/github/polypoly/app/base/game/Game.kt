@@ -19,13 +19,19 @@ import com.github.polypoly.app.base.user.User
  * (seconds since 1970-01-01T00:00:00Z)
  */
 class Game private constructor(
-    val admin: User,
-    private var players: List<Player>,
-    val rules: GameRules,
-    val inGameLocations: List<InGameLocation>,
-    val currentRound: Int = 1,
-    val dateBegin: Long,
+    val admin: User = User(),
+    var players: List<Player> = listOf(),
+    val rules: GameRules = GameRules(),
+    val dateBegin: Long = System.currentTimeMillis(),
 ) {
+
+    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locations.map { location ->
+        InGameLocation(
+            location = location,
+            owner = null,
+            level = LocalizationLevel.LEVEL_0,
+        ) } }
+    val currentRound: Int = 1
 
     /**
      * Go to the next turn
@@ -43,10 +49,10 @@ class Game private constructor(
      * @return true if the game is finished, false otherwise
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
-    fun isGameFinished(): Boolean {
+    private fun isGameFinished(): Boolean {
         return when(rules.gameMode) {
             GameMode.LAST_STANDING -> {
-                players.filter { !it.hasLose() }.size <= 1
+                players.filter { !it.hasLost() }.size <= 1
             }
             GameMode.RICHEST_PLAYER -> {
                 if(rules.maxRound == null)
@@ -58,13 +64,16 @@ class Game private constructor(
 
     /**
      * Return the ranking of the players
-     * @return a list of players sorted by their ranking
+     * @return a [Map] of the [Player]s' [User] id and their rank
      */
-    fun ranking(): Map<Player, Int> {
-        val map = players.sorted().mapIndexed { index, player -> player to index }.toMap().toMutableMap()
-        for(i in 1 until (players.size-1)) {
-            if(players[i].compareTo(players[i-1]) == 0) {
-                map[players[i-1]]?.let{ map[players[i]] = it }
+    fun ranking(): Map<Long, Int> {
+        val playersSorted = players.sortedDescending()
+        val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
+        for(i in 1 until (players.size)) {
+            val currentPlayer = playersSorted[i]
+            val previousPlayer = playersSorted[i-1]
+            if(currentPlayer.compareTo(previousPlayer) == 0) {
+                map[previousPlayer.user.id]?.let{ map[currentPlayer.user.id] = it }
             }
         }
         return map
@@ -78,8 +87,8 @@ class Game private constructor(
     fun endGame(): PastGame {
         if(!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
-            users = players.map { it.user },
-            usersRank = ranking().map { it.key.user.id to it.value }.toMap(),
+            users = players.map(Player::user),
+            usersRank = ranking().map { it.key to it.value }.toMap(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
@@ -95,12 +104,21 @@ class Game private constructor(
     }
 
     /**
+     * Get the player associated to the user id
+     * @param userId the id of the user
+     * @return the player associated to the user id
+     */
+    fun getPlayer(userId: Long): Player? {
+        return players.find { it.user.id == userId }
+    }
+
+    /**
      * Compute the winner of the bets, notify the players and update the balance of the players
      * and the location owner.
      */
     fun computeAllWinnersOfBets() {
         inGameLocations.forEach {
-            val winningBet = it.computeWinningBet()
+            val winningBet = it.computeWinningBid()
             if(winningBet != null) {
                 val winner = winningBet.player
                 if(winner.user.currentUser) {
@@ -127,13 +145,6 @@ class Game private constructor(
                     balance = gameLobby.rules.initialPlayerBalance,
                     ownedLocations = listOf(),
                 ) },
-                inGameLocations = gameLobby.rules.gameMap.flatMap { it.locations.map { location ->
-                    InGameLocation(
-                        location = location,
-                        owner = null,
-                        level = LocalizationLevel.LEVEL_0,
-                        bets = listOf(),
-                    ) } },
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )

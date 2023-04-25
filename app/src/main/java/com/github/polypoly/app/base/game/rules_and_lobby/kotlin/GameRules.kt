@@ -1,9 +1,9 @@
-package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
+package com.github.polypoly.app.base.game.rules_and_lobby
 
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.map.LocationRepository
-import java.io.Serializable
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 /**
  * A class that represent the rules of a [Game]
@@ -17,13 +17,13 @@ import kotlin.time.Duration
  * @property initialPlayerBalance The initial balance of money of the players
  */
 data class GameRules (
-    val gameMode: GameMode = GameMode.LAST_STANDING,
-    val minimumNumberOfPlayers: Int = 2,
-    val maximumNumberOfPlayers: Int = 2,
-    val roundDuration: Int = 1,
+    val gameMode: GameMode = GameMode.RICHEST_PLAYER,
+    val minimumNumberOfPlayers: Int = 3,
+    val maximumNumberOfPlayers: Int = 7,
+    val roundDuration: Int = 360,
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationRepository.getZones(),
-    val initialPlayerBalance: Int = 0,
+    val initialPlayerBalance: Int = 500,
 ) {
 
     private val maxRoundHours = 24
@@ -33,6 +33,8 @@ data class GameRules (
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
+        if (roundDuration < 0)
+            throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
         if (roundDuration <= 0 || roundDuration >= maxRoundHours)
             throw java.lang.IllegalArgumentException("Invalid game duration $roundDuration")
     }

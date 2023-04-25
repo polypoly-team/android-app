@@ -53,6 +53,17 @@ class WelcomeActivity : ComponentActivity() {
         WelcomeContent()
     }
 
+    /**
+     * This function is called when the activity is resumed
+     * If no more user are logged in, the activity must finish
+     */
+    override fun onResume() {
+        super.onResume()
+        if (!isSignedIn) {
+            finish()
+        }
+    }
+
     // ===================================================== MAIN CONTENT
     @Composable
     fun WelcomeContent() {
@@ -77,7 +88,6 @@ class WelcomeActivity : ComponentActivity() {
             }
         }
     }
-
 
     // ===================================================== WELCOME COMPONENTS
     /**

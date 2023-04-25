@@ -31,10 +31,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -61,6 +64,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.map.LocationRepository.getZones
+import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Padding
@@ -89,9 +93,12 @@ class MapActivity : ComponentActivity() {
 
     private val markerToLocation = mutableMapOf<Marker, com.github.polypoly.app.base.game.location.Location>()
 
-    // flag to show the dialog
+    // flag to show the building info dialog
     val showDialog = mutableStateOf(false)
     lateinit var currentMarker: Marker
+
+    // flag to show the roll dice dialog
+    val showRollDiceDialog = mutableStateOf(false)
 
     // store the map view for testing purposes
     lateinit var mapView: MapView private set
@@ -106,6 +113,7 @@ class MapActivity : ComponentActivity() {
                 ) {
                     MapView()
                     BuildingInfoUIComponent()
+                    RollDiceDialog()
                     Hud(
                         Player(
                             user = User(
@@ -151,6 +159,7 @@ class MapActivity : ComponentActivity() {
                             )),
                         16
                     )
+                    RollDiceButton()
                 }
             }
         }
@@ -168,7 +177,7 @@ class MapActivity : ComponentActivity() {
 
             for (zone in getZones())
                 for (location in zone.locations) {
-                    val marker = addMarkerTo(mapView, location.position, location.name, zone.color)
+                    val marker = addMarkerTo(mapView, location.position(), location.name, zone.color)
                     markerToLocation[marker] = location
                 }
 
@@ -177,6 +186,81 @@ class MapActivity : ComponentActivity() {
             this.mapView = mapView
             mapView
         }, modifier = Modifier.testTag("map"))
+    }
+
+    /**
+     * Button for rolling the dice.
+     */
+    @Composable
+    fun RollDiceButton() {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-80).dp)
+                    .testTag("rollDiceButton"),
+                onClick = {
+                    // Toast.makeText(this@MapActivity, rollDice(), Toast.LENGTH_SHORT).show()
+                    showRollDiceDialog.value = true
+                },
+                shape = CircleShape
+
+            ) {
+                Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
+            }
+        }
+    }
+
+    /**
+     * Dice roll dialog, shows the result of 3 dice rolls in a column.
+     */
+    @Composable
+    fun RollDiceDialog() {
+        if (showRollDiceDialog.value) {
+            Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
+                AlertDialog(
+                    onDismissRequest = { showRollDiceDialog.value = false },
+                    title = { Text("Dice Roll") },
+                    text = {
+                        Column {
+                            val rollDice = rollDiceLocations()
+                            // 3 buttons, containing the name of a random location
+                            for (i in 0..2)
+                                Button(onClick = { }) {
+                                    Text(rollDice[i].name)
+                                }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = { showRollDiceDialog.value = false }) {
+                            Text("Quit")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    /**
+     * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
+     * ensuring that the player does not visit the same location twice.
+     */
+    private fun rollDiceLocations(): List<com.github.polypoly.app.base.game.location.Location> {
+        val locationsNotToVisitName = mutableListOf(mapViewModel.closeLocation.value?.name)
+
+        val locationsToVisit = mutableListOf<com.github.polypoly.app.base.game.location.Location>()
+        for (i in 1..3) {
+            val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
+            val closestLocations = markerToLocation.entries
+                .filter { !locationsNotToVisitName.contains(it.value.name) }
+                .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.closeLocation.value!!.position()) }
+                .take(11)
+
+            locationsToVisit.add(closestLocations[diceRollsSum].value)
+            locationsNotToVisitName.add(closestLocations[diceRollsSum].value.name)
+        }
+        return locationsToVisit
     }
 
     /**
@@ -510,13 +594,13 @@ class MapActivity : ComponentActivity() {
             updateDistance(marker, myLocation)
             val markerLocation = markerToLocation[marker]!!
             if (closestLocation == null ||
-                myLocation.distanceToAsDouble(markerLocation.position)
-                < myLocation.distanceToAsDouble(closestLocation.position)
+                myLocation.distanceToAsDouble(markerLocation.position())
+                < myLocation.distanceToAsDouble(closestLocation.position())
             ) {
                 closestLocation = markerLocation
             }
         }
-        if (myLocation.distanceToAsDouble(closestLocation!!.position) > MAX_CLOSE_LOCATION_DISTANCE)
+        if (myLocation.distanceToAsDouble(closestLocation!!.position()) > MAX_CLOSE_LOCATION_DISTANCE)
             closestLocation = null
 
         return closestLocation
@@ -551,6 +635,7 @@ class MapActivity : ComponentActivity() {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location = mapViewModel.closeLocation.value?.name ?: "")
+        HudGameMenu()
     }
 
     /**
@@ -571,7 +656,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the player stats
+     * The HUD for the player stats, it displays basic information such as their balance,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudPlayer(playerData: Player) {
@@ -582,7 +668,7 @@ class MapActivity : ComponentActivity() {
                 modifier = Modifier
                     .padding(Padding.medium)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                    .align(Alignment.BottomStart)
+                    .align(Alignment.BottomEnd)
             ) {
                 Row(Modifier.padding(Padding.medium)) {
                     HudButton(
@@ -617,7 +703,9 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD that shows the stats for other players and the game
+     * The HUD that shows the stats for other players and the game, it's a button on the top left
+     * that expands and collapses a tab that contains information about the game and the other
+     * players
      */
     @Composable
     fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
@@ -630,17 +718,19 @@ class MapActivity : ComponentActivity() {
                     .align(Alignment.TopStart)
             ) {
                 Column(Modifier.padding(Padding.medium)) {
-                    // A drop down button that expands and collapses the stats for other players and the game
+                    // A drop down button that expands and collapses the stats for other players and
+                    // the game
                     ToggleIconButton(
-                        "dropDownButton",
+                        "otherPlayersAndGameDropDownButton",
                         "Expand or collapse the stats for other players and the game",
                         { isExpanded = !isExpanded },
                         isExpanded,
-                        R.drawable.tmp_happysmile,
+                        R.drawable.tmp_sadsmile,
                         R.drawable.tmp_happysmile
                     )
 
-                    // The stats for other players and the game slide in and out when the drop down button is pressed
+                    // The stats for other players and the game slide in and out when the drop down
+                    // button is pressed
                     AnimatedVisibility(
                         visible = isExpanded,
                     ) {
@@ -664,7 +754,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the game stats
+     * The HUD for the game stats, it displays basic information such as the current round,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudGame(round: Int) {
@@ -701,7 +792,8 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
-     * The HUD for the stats of other players
+     * The HUD for the stats of other players, it displays basic information such as their balance,
+     * and a button shows complete information on click
      */
     @Composable
     fun HudOtherPlayer(playerData: Player) {
@@ -731,6 +823,47 @@ class MapActivity : ComponentActivity() {
                 ) {
                     // TODO: Add information about other players
                     Text(text = "Other player info")
+                }
+            }
+        }
+    }
+
+    /**
+     * The HUD for the game menu, which is a button on the bottom left that expands and collapses
+     * the menu
+     */
+    @Composable
+    fun HudGameMenu() {
+        var openGameMenu by remember { mutableStateOf(false) }
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .align(Alignment.BottomStart)
+            ) {
+                Column(Modifier.padding(Padding.medium)) {
+                    // The game menu slides in and out when the game menu button is pressed
+                    AnimatedVisibility(
+                        visible = openGameMenu,
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colors.background,
+                            shape = Shapes.medium,
+                            modifier = Modifier
+                                .padding(Padding.medium)
+                        ) {
+                            MenuComposable.RowButtons()
+                        }
+                    }
+
+                    // The drop down button that expands and collapses the game menu
+                    HudButton(
+                        name = "gameMenuDropDownButton",
+                        onClick = { openGameMenu = !openGameMenu },
+                        icon_id = R.drawable.tmp_happysmile,
+                        description = "Expand or collapse the game menu"
+                    )
                 }
             }
         }
@@ -827,7 +960,8 @@ class MapActivity : ComponentActivity() {
         private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
         private const val INITIAL_ZOOM = 18.0
         private const val MARKER_SIDE_LENGTH = 100
-        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0
-        // meters, used to determine if the player is close enough to a location to interact with it
+
+        //used to determine if the player is close enough to a location to interact with it
+        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0 // meters
     }
 }

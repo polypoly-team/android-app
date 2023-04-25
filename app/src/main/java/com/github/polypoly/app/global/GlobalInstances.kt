@@ -1,7 +1,7 @@
 package com.github.polypoly.app.global
 
 import com.github.polypoly.app.network.RemoteDB
-import java.util.concurrent.atomic.AtomicBoolean
+import com.google.firebase.auth.FirebaseUser
 
 /**
  * Instances shared across the entire app for consistency purpose. This consist in:
@@ -11,5 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 class GlobalInstances {
     companion object {
         lateinit var remoteDB: RemoteDB
+
+        var currentUser : FirebaseUser? = null
+        var isSignedIn = false
     }
 }

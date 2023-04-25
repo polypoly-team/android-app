@@ -1,23 +1,28 @@
 package com.github.polypoly.app.menu
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
+import com.github.polypoly.app.SignInActivity
+import com.github.polypoly.app.WelcomeActivity
+import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.utils.Padding
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * This activity represents the "settings" menu of the game.
@@ -26,6 +31,7 @@ import com.github.polypoly.app.menu.kotlin.GameMusic
  * TODO: edit this when adding more settings
  */
 class SettingsActivity : MenuActivity("Settings") {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,7 +42,6 @@ class SettingsActivity : MenuActivity("Settings") {
     }
 
     // ===================================================== MAIN CONTENT
-
     /**
      * Displays all the contents of the settings. The different part are separated in
      * columns. If the screen isn't big enough to show all information, we make it scrollable
@@ -55,6 +60,7 @@ class SettingsActivity : MenuActivity("Settings") {
                 Column {
                     Text(text = "Song settings")
                     MusicSlider()
+                    SignOutButton()
                 }
             }
         }
@@ -128,4 +134,41 @@ class SettingsActivity : MenuActivity("Settings") {
         }
 
     }
+
+
+    /**
+     * Signs the user out of the app and returns to the welcome screen
+     */
+    @Composable
+    private fun SignOutButton(){
+        val mContext = LocalContext.current
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(Padding.large)
+            ) {
+                Button(
+                    onClick = {
+                       if (FirebaseAuth.getInstance().currentUser != null){
+                           FirebaseAuth.getInstance().signOut()
+                       }
+                        currentUser = null
+                        finish()
+                        val backToSignIn = Intent(mContext, SignInActivity::class.java)
+                        startActivity(backToSignIn)
+                    },
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(50.dp),
+                ) {
+                    Text(text = "Sign out")
+                }
+            }
+        }
+    }
+
 }

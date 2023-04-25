@@ -1,7 +1,8 @@
-package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
+package com.github.polypoly.app.base.game.rules_and_lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import kotlin.time.Duration.Companion.hours
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
@@ -15,11 +16,11 @@ import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
  * @property code The (secret) code of the [GameLobby]
  * @property private If the [GameLobby] is private or not
  */
-class GameLobby(
+data class GameLobby(
     val admin: User = User(),
     val rules: GameRules = GameRules(),
-    val name: String = "default",
-    val code: String = "0",
+    val name: String = "defaultName",
+    val code: String = "defaultCode",
     val private: Boolean = false,
 ) {
 

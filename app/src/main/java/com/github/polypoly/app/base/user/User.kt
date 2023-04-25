@@ -15,7 +15,7 @@ import java.io.Serializable
  */
 data class User(
     val id: Long = 0,
-    val name: String = "",
+    val name: String = "default",
     val bio: String = "",
     val skin: Skin = Skin(),
     val stats: Stats = Stats(),

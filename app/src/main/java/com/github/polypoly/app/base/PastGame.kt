@@ -21,7 +21,7 @@ data class PastGame(
      * @param userId the id of the [User]
      * @return true if the user has won the [Game], false otherwise
      */
-    fun hasWin(userId: Long): Boolean {
+    fun hasWon(userId: Long): Boolean {
         return usersRank[userId] == 1
     }
 
@@ -44,10 +44,11 @@ data class PastGame(
     /**
      * get the rank of the [User]
      * @param userId the id of the [User]
-     * @return the rank of the [User] or 0 if the [User] is not in the [PastGame]
+     * @return the rank of the [User]
+     * @throws IllegalArgumentException if the [User] is not in the [Game]
      */
     fun getRank(userId: Long): Int {
-        return usersRank[userId] ?: 0
+        return usersRank[userId] ?: throw IllegalArgumentException("User not in game")
     }
 
     /**
