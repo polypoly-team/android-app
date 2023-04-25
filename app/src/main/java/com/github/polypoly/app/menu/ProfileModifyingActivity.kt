@@ -25,8 +25,6 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
 
-//TODO: FIX TESTS FOR CI
-/*
 class ProfileModifyingActivity : ComponentActivity() {
 
     /**
@@ -262,4 +260,4 @@ class ProfileModifyingActivity : ComponentActivity() {
             }
         }
     }
-}*/
+}
