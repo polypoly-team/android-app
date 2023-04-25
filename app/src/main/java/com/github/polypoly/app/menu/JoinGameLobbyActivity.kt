@@ -1,5 +1,6 @@
 package com.github.polypoly.app.menu
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -27,19 +28,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
-//import com.github.polypoly.app.network.getAllValues
-//import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
+import java.util.concurrent.CompletableFuture
 
 /**
  * Activity where the user can join a gameLobby
@@ -78,7 +78,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                             contentDescription = "polypoly logo",
                             modifier = Modifier
                                 .testTag("logo"),
-                            )
+                        )
                         Spacer(modifier = Modifier.height(50.dp))
                         GameLobbyForm()
                     }
@@ -151,7 +151,6 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 focusManager.clearFocus()
                 gameLobbyCodeButtonOnClick(warningState, mContext)
             }),
-            value = text,
             label = { Text("Enter a lobby code") },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
@@ -194,7 +193,6 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             )
         }
 
-
         if (openList) {
             Dialog(
                 onDismissRequest = {
@@ -206,7 +204,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).thenAccept{lobbies ->
+                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")
@@ -506,7 +504,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         if (gameLobbyCode.isEmpty()) {
             warningState.value = getString(R.string.game_lobby_code_is_empty)
         } else {
-            val lobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+            val lobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
             remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
                 if (!keyExists) {
                     warningState.value = getString(R.string.game_lobby_does_not_exist)
@@ -527,31 +525,15 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
-     * @param mContext (Context): The context of the activity
      */
     private fun joinGameLobbyRoom() {
-        val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+        val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
             gameLobby.addUser(fakeAuthenticatedUser)
             remoteDB.updateValue(currentLobbyKey, gameLobby)
 
-        for (player in gameLobby.usersRegistered) {
-            if (player != newGameLobby.admin) {
-                newGameLobby.addUser(player)
-            }
+            // TODO: link to the gameLobby room activity
         }
-        newGameLobby.addUser(authenticated_user)
-        mockDb.updateValue(currentLobbyKey, newGameLobby)
-        // TODO: link to the gameLobby room activity
-    }
-
-    /**
-     * This function fetches the public gameLobbys from the database.
-     * @return (List<GameLobby>): The list of public gameLobbys
-     */
-    private fun getPublicGameLobbiesFromDB(): List<GameLobby> {
-        val gameLobbies = mockDb.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).get() ?: return listOf()
-        return gameLobbies.filter { !it.private  && !gameLobbyIsFull(it) }
     }
 
     /**

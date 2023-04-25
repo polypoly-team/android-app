@@ -1,7 +1,7 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import org.junit.Assert.*
@@ -28,7 +28,7 @@ class RemoteDBTest: PolyPolyTest(true, false) {
     }
 
     @Test
-    fun gameLobbyCanBççeStoredInDB() {
+    fun gameLobbyCanBeStoredInDB() {
         classCanBeStoredInDB(GameLobby::class)
     }
 

@@ -1,9 +1,7 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.map.LocationRepository
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 
 /**
  * A class that represent the rules of a [Game]

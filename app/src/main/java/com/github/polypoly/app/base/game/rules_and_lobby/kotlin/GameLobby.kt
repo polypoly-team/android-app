@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
@@ -25,7 +25,6 @@ data class GameLobby(
 ) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
-    private var isInDB: Boolean = false
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
 
     init {
@@ -41,14 +40,8 @@ data class GameLobby(
     }
 
     /**
-     * Call it whenever the lobby is ready to be in the DB
-     */
-    fun openLobby() {
-        remoteDB.registerValue(DB_GAME_LOBBIES_PATH + code, this)
-        isInDB = true
-    }
-
-    /**
+     * TODO: only add if user is in DB
+     *
      * Add a user to the lobby, only if the user is in the DB
      * @param user the user to add
      * @throws IllegalStateException if the game is already full
@@ -59,14 +52,7 @@ data class GameLobby(
             throw IllegalStateException("The game is already full")
         if (currentUsersRegistered.any{u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
-        remoteDB.keyExists(DB_USERS_PROFILES_PATH + user.id).thenAccept { exists ->
-            if(exists) {
-                currentUsersRegistered.add(user)
-                update()
-            } else {
-                throw java.lang.IllegalArgumentException("User id ${user.id} doesn't exist")
-            }
-        }
+        currentUsersRegistered.add(user)
     }
 
     /**
@@ -97,7 +83,6 @@ data class GameLobby(
         for (i in 0 until currentUsersRegistered.size) {
             if (currentUsersRegistered[i].id == withId) {
                 currentUsersRegistered.removeAt(i)
-                update()
                 return
             }
         }
@@ -113,21 +98,6 @@ data class GameLobby(
         if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
-        end()
         return Game.launchFromPendingGame(this)
-    }
-
-    /**
-     * Deletes the lobby from the DB
-     */
-    fun end() {/*TODO*/}
-
-    /**
-     * Updates the lobby in the DB with the current information
-     */
-    private fun update() {
-        if(isInDB) {
-            remoteDB.updateValue(DB_GAME_LOBBIES_PATH + code, this)
-        }
     }
 }

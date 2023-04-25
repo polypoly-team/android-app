@@ -1,5 +1,6 @@
 package com.github.polypoly.app.base.game.rules_and_lobby
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,12 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.map.MapActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.utils.Padding
 import com.google.firebase.database.DataSnapshot
@@ -148,12 +151,19 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * TODO: dummy button that redirects to MapActivity
+     */
     @Composable
     private fun GoButton() {
+        val mContext = LocalContext.current
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                val gameIntent = Intent(mContext, MapActivity::class.java)
+                startActivity(gameIntent)
+            }) {
                 Text(text = "GO!")
             }
             Text(text = "${gameLobby.value.usersRegistered.size} / ${gameLobby.value.rules.minimumNumberOfPlayers}")
@@ -168,7 +178,7 @@ class GameLobbyActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun receiveGameLobby() {
         val lobbyCode = intent.getStringExtra("lobby_code")
-        remoteDB.getSnapshot(DB_GAME_LOBBIES_PATH + lobbyCode).thenAccept { data ->
+        /*remoteDB.getSnapshot(DB_GAME_LOBBIES_PATH + lobbyCode).thenAccept { data ->
             run {
                 gameLobby.value = data.getValue(GameLobby::class.java)!!
                 data.ref.addValueEventListener(object : ValueEventListener {
@@ -178,6 +188,6 @@ class GameLobbyActivity : ComponentActivity() {
                     override fun onCancelled(databaseError: DatabaseError) {}
                 })
             }
-        }
+        }*/ // TODO: react to DB in real time
     }
 }

@@ -23,6 +23,7 @@ import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances
+import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
@@ -42,8 +43,6 @@ class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Global initialization of the database
-        val db = Firebase.database
-        GlobalInstances.remoteDB = RemoteDB(db, "live")
         setContent { WelcomeContent() }
     }
 
@@ -133,9 +132,11 @@ class WelcomeActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
                 GameButton(onClick = {
-                    val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+                    // TODO: dummy button that sends to GameLobbyActivity, temporary
+                    GameRules()
+                    /*val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
                     gameLobbyIntent.putExtra("lobby_code", "1234abc")
-                    startActivity(gameLobbyIntent) // TODO: TEMP
+                    startActivity(gameLobbyIntent)*/
                 }, text = "Create Game?")
             }
         }
