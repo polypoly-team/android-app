@@ -1,5 +1,6 @@
 package com.github.polypoly.app.global
 
+import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.RemoteDB
 import com.google.firebase.auth.FirebaseUser
 
@@ -10,7 +11,8 @@ import com.google.firebase.auth.FirebaseUser
  */
 class GlobalInstances {
     companion object {
-        lateinit var remoteDB: RemoteDB
+        lateinit var remoteDB: IRemoteStorage
+        var remoteDBInitialized = false
 
         var currentUser : FirebaseUser? = null
         var isSignedIn = false

@@ -65,9 +65,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
-        // TODO : fix this test
-        //Thread.sleep(1000)
-        //composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_is_full)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_is_full)).assertIsDisplayed()
     }
 
     @Test

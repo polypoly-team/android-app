@@ -3,18 +3,51 @@ package com.github.polypoly.app.network
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 @RunWith(JUnit4::class)
-class RemoteDBTest: PolyPolyTest(true, false) {
+class RemoteDBTest: PolyPolyTest(false, false) {
+
+    private val rootTests = "test-hugo"
+    var dbRootRef: DatabaseReference
+
+    init {
+        val db = Firebase.database
+        try {
+            db.setPersistenceEnabled(false)
+        } catch (_: Exception) {}
+        remoteDB = RemoteDB(db, rootTests)
+        remoteDBInitialized = true
+
+        dbRootRef = db.reference.child(rootTests)
+    }
+
+    override fun _prepareTest() {
+        clearRealDB()
+    }
+
+    private fun clearRealDB() {
+        val timeout = CompletableFuture<Boolean>()
+        dbRootRef.removeValue()
+            .addOnSuccessListener {
+                timeout.complete(true)
+            }.addOnFailureListener(timeout::completeExceptionally)
+        timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+    }
 
     private fun <T : Any> classCanBeStoredInDB(clazz: KClass<T>) {
         val noArgsKey = "no-args-obj"
