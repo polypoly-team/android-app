@@ -24,6 +24,7 @@ data class GameRules (
     val initialPlayerBalance: Int = 500,
 ) {
 
+    // TODO: define real value as this is useless
     private val maxRoundHours = Int.MAX_VALUE
 
     init {
