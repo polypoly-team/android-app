@@ -1,6 +1,5 @@
 package com.github.polypoly.app.base.game
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -9,7 +8,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.rules_and_lobby.GameLobbyActivity
 import com.github.polypoly.app.map.MapActivity
-import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
