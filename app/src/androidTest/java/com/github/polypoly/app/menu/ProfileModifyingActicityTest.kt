@@ -1,4 +1,4 @@
-/*package com.github.polypoly.app.menu
+package com.github.polypoly.app.menu
 
 import android.content.Intent
 import androidx.compose.ui.test.*
@@ -123,4 +123,4 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
 
         Intents.release()
     }
-}*/
+}
