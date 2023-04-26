@@ -27,29 +27,36 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.map.MapActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.utils.Padding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.github.polypoly.app.util.toDp
 
+val PLAYER_ICON_SIZE = IntSize(50, 60)
+
+/**
+ * A game lobby is the place the user sees before beginning a game. One is able to see the players
+ * that join the game in real time.
+ *
+ * When there are enough players as specified in [GameRules], the admin (the one who created the game)
+ * can start the game.
+ */
 class GameLobbyActivity : ComponentActivity() {
     private lateinit var gameLobby: MutableState<GameLobby>
 
-    private val playerPerRow = 3
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +70,10 @@ class GameLobbyActivity : ComponentActivity() {
     private fun GameLobbyPreview() { GameLobbyContent() }
 
     // ===================================================== MAIN CONTENT
+
+    /**
+     * Displays all the UI of the GameLobby
+     */
     @Composable
     private fun GameLobbyContent() {
         gameLobby = remember { mutableStateOf(GameLobby()) }
@@ -88,46 +99,74 @@ class GameLobbyActivity : ComponentActivity() {
 
     // ===================================================== GAME LOBBY COMPONENTS
 
+    /**
+     * Creates the grid of players that is updated in real time.
+     * Depending on the screen size, a constant number of users per row will be displayed,
+     * if the row hasn't enough players to fill, "blank" players are displayed
+     */
     @Composable
     private fun PlayerGrid() {
+        val sidePadding = 50
+        val interPadding = 10
+
         val numberOfPlayers = gameLobby.value.usersRegistered.size
-        val numberOfRows: Int = numberOfPlayers / playerPerRow
+        var playersPerRow by remember { mutableStateOf(3)}
+        var numberOfRows by remember { mutableStateOf(1) }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.LightGray)
-                .height(400.dp),
+                .height(400.dp)
+                .onGloballyPositioned { coordinates ->
+                    val width = coordinates.size.width.toDp
+                    while (
+                        playersPerRow > 1 &&
+                        width < (PLAYER_ICON_SIZE.width*playersPerRow + 2*sidePadding + (playersPerRow + 1)*interPadding)
+                    ) {
+                        playersPerRow--
+                    }
+                    numberOfRows = (numberOfPlayers + (numberOfPlayers%playersPerRow)) / playersPerRow
+                },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Spacer(modifier = Modifier.width(sidePadding.dp))
             Column(
                 modifier = Modifier
-                    .padding(Padding.large)
-                    .fillMaxWidth(),
+                    .padding(interPadding.dp)
+                    .fillMaxWidth()
+                    .background(Color.DarkGray),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for(i in 0 until numberOfRows) {
+                var playerIdx = 0
+                repeat(numberOfRows) { itRow ->
                     Row {
-                        for (j in 0 until playerPerRow) {
-                            val index = i * playerPerRow + j
-                            if (index >= numberOfPlayers) {
+                        repeat(playersPerRow) { itCol ->
+                            if (playerIdx >= numberOfPlayers) {
                                 PlayerIcon(user = null)
                             } else {
-                                PlayerIcon(user = gameLobby.value.usersRegistered[index])
+                                PlayerIcon(user = gameLobby.value.usersRegistered[playerIdx])
                             }
-                            if(j != playerPerRow - 1) {
-                                Spacer(modifier = Modifier.width(Padding.medium))
+                            playerIdx++
+                            if(itCol != playersPerRow - 1) {
+                                Spacer(modifier = Modifier.width(interPadding.dp))
                             }
                         }
                     }
-                    if(i != numberOfRows - 1) {
-                        Spacer(modifier = Modifier.height(Padding.medium))
+                    if(itRow != numberOfRows - 1) {
+                        Spacer(modifier = Modifier.height(interPadding.dp))
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(sidePadding.dp))
         }
     }
 
+    /**
+     * As icon composed with the profile picture of the user and their name. The icon size is constant
+     * so that it can be nicely displayed in the grid
+     */
     @Composable
     private fun PlayerIcon(user: User?) {
         Column(
@@ -152,7 +191,10 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     /**
-     * TODO: dummy button that redirects to MapActivity
+     * If there are enough players in the game, launches it, else it displays an error message.
+     * Note that this button is only visible to the admin user
+     *
+     * TODO: so far a dummy button that redirects to MapActivity, handle real behavior as checking if there are enough players
      */
     @Composable
     private fun GoButton() {
@@ -171,6 +213,7 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     // ===================================================== GAME LOBBY HELPERS
+
     /**
      * This function gets the corresponding GameLobby from the DB and updates our variable each time
      * it is changed in the DB
