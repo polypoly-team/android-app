@@ -4,6 +4,9 @@ import com.github.polypoly.app.network.IRemoteStorage
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
+/**
+ * Mock version of RemoteDB for testing purpose
+ */
 class MockDB: IRemoteStorage {
 
     private val keysHierarchy: MutableMap<String, MutableList<String>> = mutableMapOf()
@@ -58,15 +61,16 @@ class MockDB: IRemoteStorage {
         for (index in 0 until hierarchy.size - 1) {
             val parent = hierarchy[index]
             val child = hierarchy[index + 1]
-            if (!keysHierarchy.containsKey(parent)) {
-                keysHierarchy[parent] = mutableListOf()
-            }
+            keysHierarchy.putIfAbsent(parent, mutableListOf())
             keysHierarchy[parent]!!.add(child)
         }
         data[keyCleaned] = value as Any
         return CompletableFuture.completedFuture(true)
     }
 
+    /**
+     * Clears all value in the mock database
+     */
     fun clear() {
         data.clear()
         keysHierarchy.clear()
