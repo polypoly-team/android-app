@@ -1,4 +1,4 @@
-/*package com.github.polypoly.app.menu
+package com.github.polypoly.app.menu
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -118,4 +118,4 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithTag("emptySlot2").assertExists()
     }
 
-}*/
+}
