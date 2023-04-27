@@ -17,11 +17,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.rules_and_lobby.GameLobbyActivity
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.global.GlobalInstances
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.map.LocationRepository
 import com.github.polypoly.app.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.menu.MenuComposable
 import com.github.polypoly.app.menu.kotlin.GameMusic
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -29,10 +39,10 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  *
  * These actions may be: creating a game, joining a game, logging in, settings, rules, leaderboards etc.
  */
-class WelcomeActivity : ComponentActivity(){
-
+class WelcomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Global initialization of the database
         setContent { WelcomeContent() }
     }
 
@@ -121,7 +131,12 @@ class WelcomeActivity : ComponentActivity(){
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
-                GameButton(onClick = { /*TODO*/ }, text = "Create Game?")
+                GameButton(onClick = {
+                    // TODO: dummy button that sends to GameLobbyActivity, temporary
+                    val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+                    gameLobbyIntent.putExtra("lobby_code", "1234abc")
+                    startActivity(gameLobbyIntent)
+                }, text = "Create Game?")
             }
         }
     }

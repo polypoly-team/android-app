@@ -1,5 +1,7 @@
 package com.github.polypoly.app.base.user
 
+import java.io.Serializable
+
 /**
  * Implementation of a User
  * @property id The id of the user, must be unique for each user
@@ -20,7 +22,7 @@ data class User(
     val trophiesWon: List<Int> = listOf(),
     val trophiesDisplay: MutableList<Int> = mutableListOf(),
     val currentUser: Boolean = false,
-){
+) {
     override fun toString(): String {
         return "User{$id: $name}"
     }

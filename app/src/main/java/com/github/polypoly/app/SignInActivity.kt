@@ -13,25 +13,23 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.menu.kotlin.GameMusic
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -236,7 +234,7 @@ class SignInActivity : ComponentActivity() {
 
         // Add data to DB
         requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
-        requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBIES_PATH)
+        requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
     }
 
 }

@@ -28,12 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.UIElements
@@ -204,7 +204,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBIES_PATH).thenAccept{lobbies ->
+                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")
@@ -504,7 +504,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         if (gameLobbyCode.isEmpty()) {
             warningState.value = getString(R.string.game_lobby_code_is_empty)
         } else {
-            val lobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+            val lobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
             remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
                 if (!keyExists) {
                     warningState.value = getString(R.string.game_lobby_does_not_exist)
@@ -525,10 +525,9 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
-     * @param mContext (Context): The context of the activity
      */
     private fun joinGameLobbyRoom() {
-        val currentLobbyKey = DB_GAME_LOBIES_PATH + gameLobbyCode
+        val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
             gameLobby.addUser(fakeAuthenticatedUser)
             remoteDB.updateValue(currentLobbyKey, gameLobby)

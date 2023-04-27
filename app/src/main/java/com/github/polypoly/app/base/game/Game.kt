@@ -3,9 +3,9 @@ package com.github.polypoly.app.base.game
 import com.github.polypoly.app.base.PastGame
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocalizationLevel
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.User
 
 /**

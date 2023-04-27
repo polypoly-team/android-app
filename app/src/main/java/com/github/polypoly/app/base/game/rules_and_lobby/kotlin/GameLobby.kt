@@ -1,8 +1,11 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
 import kotlin.time.Duration.Companion.hours
+import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -37,7 +40,9 @@ data class GameLobby(
     }
 
     /**
-     * Add a user to the lobby
+     * TODO: only add if user is in DB
+     *
+     * Add a user to the lobby, only if the user is in the DB
      * @param user the user to add
      * @throws IllegalStateException if the game is already full
      * @throws IllegalArgumentException if the user is already registered
@@ -85,13 +90,14 @@ data class GameLobby(
     }
 
     /**
-     * Start the game
+     * Starts the game and deletes the lobby from the DB
      * @return the game that has been started
      * @throws IllegalStateException if the game is not ready to start yet
      */
     fun start(): Game {
-        if (!canStart())
+        if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
+        }
         return Game.launchFromPendingGame(this)
     }
 }

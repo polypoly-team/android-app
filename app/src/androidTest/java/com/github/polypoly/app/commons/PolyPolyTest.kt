@@ -2,17 +2,18 @@ package com.github.polypoly.app.commons
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.GameRules
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
+import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBIES_PATH
 import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.map.LocationRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -143,7 +144,7 @@ abstract class PolyPolyTest(
     fun addUserToDB(users: User) = addUsersToDB(listOf(users))
 
     fun addGameLobbiesToDB(gameLobby: List<GameLobby>) = addDataToDB(gameLobby,
-        gameLobby.map(GameLobby::code), DB_GAME_LOBIES_PATH)
+        gameLobby.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
 
     fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
@@ -183,7 +184,7 @@ abstract class PolyPolyTest(
             requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
         )
         allRequests.addAll(
-            requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBIES_PATH)
+            requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
         )
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
