@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.menu.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User

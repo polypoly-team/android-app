@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base.menu.rules_and_lobby
+package com.github.polypoly.app.base.menu.lobby
 
 /**
  * Represent the different game modes

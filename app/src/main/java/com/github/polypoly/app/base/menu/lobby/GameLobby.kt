@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base.menu.rules_and_lobby
+package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
@@ -14,7 +14,7 @@ import com.github.polypoly.app.base.user.User
  */
 data class GameLobby(
     val admin: User = User(),
-    val rules: GameRules = GameRules(),
+    val rules: GameParameters = GameParameters(),
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
