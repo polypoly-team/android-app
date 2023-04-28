@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
+import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 /**

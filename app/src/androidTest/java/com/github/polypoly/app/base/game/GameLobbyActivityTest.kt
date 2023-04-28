@@ -7,7 +7,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.ui.game.MapActivity
-import com.github.polypoly.app.ui.menu.GameLobbyActivity
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

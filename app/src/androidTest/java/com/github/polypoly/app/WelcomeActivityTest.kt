@@ -7,9 +7,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.ui.menu.JoinGameLobbyActivity
-import com.github.polypoly.app.ui.menu.ProfileActivity
-import com.github.polypoly.app.ui.menu.SettingsActivity
+import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
+import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.ui.menu.settings.SettingsActivity
 import com.github.polypoly.app.base.RulesObject
 import org.junit.After
 import org.junit.Before

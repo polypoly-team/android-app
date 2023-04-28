@@ -19,7 +19,7 @@
         android:theme="@style/Theme.Polypoly"
         tools:targetApi="31">
         <activity
-            android:name=".ui.menu.GameLobbyActivity"
+            android:name=".ui.menu.lobby.GameLobbyActivity"
             android:exported="false"
             android:label="@string/title_activity_game_lobby"
             android:theme="@style/Theme.Polypoly" />
@@ -27,22 +27,22 @@
             android:name=".ui.game.MapActivity"
             android:exported="true" /> <!-- ========================================= MENU ACTIVITIES -->
         <activity
-            android:name=".ui.menu.JoinGameLobbyActivity"
+            android:name=".ui.menu.lobby.JoinGameLobbyActivity"
             android:exported="false"
             android:label="@string/title_activity_join_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.menu.SettingsActivity"
+            android:name=".ui.menu.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.menu.ProfileModifyingActivity"
+            android:name=".ui.menu.profile.ProfileModifyingActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.menu.ProfileActivity"
+            android:name=".ui.menu.profile.ProfileActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />

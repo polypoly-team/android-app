@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.menu
+package com.github.polypoly.app.ui.menu.settings
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.ui.menu.MenuActivity
+import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.google.firebase.auth.FirebaseAuth
 

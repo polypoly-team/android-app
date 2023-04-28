@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu.shared_component
+package com.github.polypoly.app.ui.menu.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -102,7 +102,7 @@ fun TrophiesView(callBack: (input: Int) -> Unit, maxSelected: Int, selected: Lis
                 val size = coordinates.size
                 val widthInDP = size.width.toDp
                 // to adapt the layout
-                while (widthInDP < maxPerRow*TROPHY_SIZE + (maxPerRow-1)*PADDING_TROPHIES
+                while (widthInDP < maxPerRow* TROPHY_SIZE + (maxPerRow-1)* PADDING_TROPHIES
                     && maxPerRow > 0) {
                     --maxPerRow
                 }

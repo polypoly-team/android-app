@@ -2,7 +2,7 @@ package com.github.polypoly.app
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import com.github.polypoly.app.ui.menu.SettingsActivity
+import com.github.polypoly.app.ui.menu.settings.SettingsActivity
 import org.junit.Rule
 import org.junit.Test
 

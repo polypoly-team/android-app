@@ -22,6 +22,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.ui.menu.settings.SettingsActivity
 
 object MenuComposable {
     /**

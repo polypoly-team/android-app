@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.menu
+package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -36,6 +36,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
