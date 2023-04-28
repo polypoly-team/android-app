@@ -1,11 +1,7 @@
-package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
+package com.github.polypoly.app.base.menu.rules_and_lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
-import kotlin.time.Duration.Companion.hours
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,

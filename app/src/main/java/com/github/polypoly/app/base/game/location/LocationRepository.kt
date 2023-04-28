@@ -1,7 +1,4 @@
-package com.github.polypoly.app.map
-
-import com.github.polypoly.app.base.game.location.Location
-import com.github.polypoly.app.base.game.location.Zone
+package com.github.polypoly.app.base.game.location
 
 /**
  * Repository for providing the zones and localizations on the map.

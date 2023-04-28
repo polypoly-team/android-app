@@ -24,35 +24,35 @@
             android:label="@string/title_activity_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".map.MapActivity"
+            android:name=".ui.map.MapActivity"
             android:exported="true" /> <!-- ========================================= MENU ACTIVITIES -->
         <activity
-            android:name=".menu.JoinGameLobbyActivity"
+            android:name=".ui.menu.JoinGameLobbyActivity"
             android:exported="false"
             android:label="@string/title_activity_join_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".menu.SettingsActivity"
+            android:name=".ui.menu.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".menu.ProfileModifyingActivity"
+            android:name=".ui.menu.ProfileModifyingActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".menu.ProfileActivity"
+            android:name=".ui.menu.ProfileActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".ui.WelcomeActivity"
             android:exported="true"
             android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".SignInActivity"
+            android:name=".ui.SignInActivity"
             android:exported="true"
             android:label="@string/title_activity_sign_in"
             android:theme="@style/Theme.Polypoly">

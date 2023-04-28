@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,18 +18,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.R
+import com.github.polypoly.app.base.menu.rules_and_lobby.GameLobby
+import com.github.polypoly.app.base.menu.rules_and_lobby.GameMode
+import com.github.polypoly.app.base.menu.rules_and_lobby.GameRules
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
-import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth

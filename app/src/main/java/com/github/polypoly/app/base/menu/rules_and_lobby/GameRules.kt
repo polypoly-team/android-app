@@ -1,7 +1,7 @@
-package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
+package com.github.polypoly.app.base.menu.rules_and_lobby
 
 import com.github.polypoly.app.base.game.location.Zone
-import com.github.polypoly.app.map.LocationRepository
+import com.github.polypoly.app.base.game.location.LocationRepository
 
 /**
  * A class that represent the rules of a [Game]

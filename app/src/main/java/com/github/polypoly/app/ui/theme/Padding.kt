@@ -1,4 +1,4 @@
-package com.github.polypoly.app.utils
+package com.github.polypoly.app.ui.theme
 
 import androidx.compose.ui.unit.dp
 

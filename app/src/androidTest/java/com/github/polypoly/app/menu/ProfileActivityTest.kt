@@ -10,8 +10,10 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.ui.menu.ProfileActivity
+import com.github.polypoly.app.ui.menu.ProfileModifyingActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

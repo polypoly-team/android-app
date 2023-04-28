@@ -1,10 +1,10 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.menu.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
