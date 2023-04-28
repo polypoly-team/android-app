@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base.game.rules_and_lobby
+package com.github.polypoly.app.ui.menu.lobby
 
 import android.content.Intent
 import android.os.Build
@@ -19,9 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -39,9 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.map.MapActivity
+import com.github.polypoly.app.ui.game.MapActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.util.toDp
 

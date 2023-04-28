@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu
+package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import androidx.compose.foundation.Image
@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
 import com.github.polypoly.app.R
-import com.github.polypoly.app.menu.kotlin.RulesObject
+import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.ui.menu.settings.SettingsActivity
 
 object MenuComposable {
     /**

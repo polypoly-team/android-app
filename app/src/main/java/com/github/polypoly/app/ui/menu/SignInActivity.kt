@@ -1,4 +1,4 @@
-package com.github.polypoly.app
+package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,18 +18,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.R
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.currentUser
-import com.github.polypoly.app.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -194,27 +195,27 @@ class SignInActivity : ComponentActivity() {
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameRules(GameMode.RICHEST_PLAYER, 2, 6,
+            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
             60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameRules(GameMode.RICHEST_PLAYER, 4, 6,
+            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
             360, 20, emptyList(), 300), "Private gameLobby", "abc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameRules(GameMode.LAST_STANDING, 3, 8,
+            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
             600, null, emptyList(), 1000), "Joinable 1", "abcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameRules(GameMode.RICHEST_PLAYER, 10, 25,
+            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 10, 25,
             3600, 20, emptyList(), 2000), "Joinable 2", "123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameRules(GameMode.RICHEST_PLAYER, 7, 77,
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
             720, 20, emptyList(), 3000), "Joinable 3", "1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
-            TEST_USER_4, GameRules(GameMode.RICHEST_PLAYER, 2, 4,
+            TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
             1080, 20, emptyList(), 4000), "Joinable 4", "abc1234"
         )
 

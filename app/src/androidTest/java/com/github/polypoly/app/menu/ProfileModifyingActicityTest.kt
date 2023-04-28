@@ -10,9 +10,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.LoggedInTest
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

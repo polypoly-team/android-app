@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu
+package com.github.polypoly.app.ui.menu
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*

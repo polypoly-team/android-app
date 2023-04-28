@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.ui.game
 
 import android.content.Context
 import android.graphics.Bitmap.createScaledBitmap
@@ -63,11 +63,11 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.map.LocationRepository.getZones
-import com.github.polypoly.app.menu.MenuComposable
+import com.github.polypoly.app.base.game.location.LocationRepository.getZones
+import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.Shapes
-import com.github.polypoly.app.utils.Padding
+import com.github.polypoly.app.ui.theme.Padding
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase

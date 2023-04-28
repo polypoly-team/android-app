@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu
+package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,14 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -204,7 +205,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{lobbies ->
+                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{ lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")

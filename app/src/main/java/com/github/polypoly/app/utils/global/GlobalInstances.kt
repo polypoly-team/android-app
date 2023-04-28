@@ -1,4 +1,4 @@
-package com.github.polypoly.app.global
+package com.github.polypoly.app.utils.global
 
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.RemoteDB

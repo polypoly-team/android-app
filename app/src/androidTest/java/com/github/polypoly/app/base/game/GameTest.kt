@@ -1,12 +1,12 @@
 package com.github.polypoly.app.base.game
 
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.map.LocationRepository
+import com.github.polypoly.app.base.game.location.LocationRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +24,7 @@ class GameTest {
     private val testUser5 = User(42042046, "test_user5", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testUser6 = User(42042047, "test_user6", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testDuration = 2
-    private val gameRules = GameRules(GameMode.RICHEST_PLAYER, 3, 7,
+    private val gameRules = GameParameters(GameMode.RICHEST_PLAYER, 3, 7,
         testDuration, 10, LocationRepository.getZones(), 200)
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 

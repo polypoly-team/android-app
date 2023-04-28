@@ -1,4 +1,4 @@
-package com.github.polypoly.app.base
+package com.github.polypoly.app.base.menu
 
 import com.github.polypoly.app.base.user.User
 

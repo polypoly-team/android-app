@@ -1,11 +1,11 @@
 package com.github.polypoly.app.base.game
 
-import com.github.polypoly.app.base.PastGame
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocalizationLevel
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameLobby
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameMode
-import com.github.polypoly.app.base.game.rules_and_lobby.kotlin.GameRules
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.user.User
 
 /**
@@ -21,7 +21,7 @@ import com.github.polypoly.app.base.user.User
 class Game private constructor(
     val admin: User = User(),
     var players: List<Player> = listOf(),
-    val rules: GameRules = GameRules(),
+    val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
 ) {
 

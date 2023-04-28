@@ -1,10 +1,10 @@
-package com.github.polypoly.app.base.game.rules_and_lobby.kotlin
+package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.location.Zone
-import com.github.polypoly.app.map.LocationRepository
+import com.github.polypoly.app.base.game.location.LocationRepository
 
 /**
- * A class that represent the rules of a [Game]
+ * A class that represent the parameters of a [Game]
  * @property gameMode The game mode of the future game
  * @property minimumNumberOfPlayers The minimum number of players needed to start the game
  * @property maximumNumberOfPlayers The maximum number of players that can join the lobby
@@ -14,7 +14,7 @@ import com.github.polypoly.app.map.LocationRepository
  * @property gameMap The map of the game whit the different zones available
  * @property initialPlayerBalance The initial balance of money of the players
  */
-data class GameRules (
+data class GameParameters (
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,

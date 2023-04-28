@@ -1,4 +1,4 @@
-package com.github.polypoly.app.global
+package com.github.polypoly.app.utils.global
 
 /**
  * Global settings shared across the entire app for consistency purpose

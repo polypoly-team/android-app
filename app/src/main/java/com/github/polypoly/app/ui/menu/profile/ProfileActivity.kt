@@ -1,4 +1,4 @@
-package com.github.polypoly.app.menu
+package com.github.polypoly.app.ui.menu.profile
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -27,11 +27,10 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.menu.shared_component.TrophiesView
-import com.github.polypoly.app.menu.shared_component.TrophyView
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 class ProfileActivity : MenuActivity("Profile") {

@@ -4,10 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.test.espresso.intent.Intents
 import com.github.polypoly.app.commons.PolyPolyTest
-import org.junit.After
-import org.junit.Before
+import com.github.polypoly.app.ui.menu.SignInActivity
 import org.junit.Rule
 import org.junit.Test
 
