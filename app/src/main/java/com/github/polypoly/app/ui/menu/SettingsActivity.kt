@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.ui.SignInActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.theme.Padding

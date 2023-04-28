@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui
+package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle

@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.ui.WelcomeActivity
+import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.ui.menu.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.menu.ProfileActivity

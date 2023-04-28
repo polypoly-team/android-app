@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui
+package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,10 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.rules_and_lobby.GameLobbyActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.ui.menu.JoinGameLobbyActivity
-import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 

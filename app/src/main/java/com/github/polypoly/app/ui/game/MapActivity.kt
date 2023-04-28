@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.map
+package com.github.polypoly.app.ui.game
 
 import android.content.Context
 import android.graphics.Bitmap.createScaledBitmap

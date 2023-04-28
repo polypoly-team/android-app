@@ -37,8 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.menu.rules_and_lobby.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.ui.map.MapActivity
+import com.github.polypoly.app.ui.game.MapActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.util.toDp
 

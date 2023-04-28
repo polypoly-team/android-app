@@ -24,7 +24,7 @@
             android:label="@string/title_activity_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.map.MapActivity"
+            android:name=".ui.game.MapActivity"
             android:exported="true" /> <!-- ========================================= MENU ACTIVITIES -->
         <activity
             android:name=".ui.menu.JoinGameLobbyActivity"
@@ -47,12 +47,12 @@
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.WelcomeActivity"
+            android:name=".ui.menu.WelcomeActivity"
             android:exported="true"
             android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.SignInActivity"
+            android:name=".ui.menu.SignInActivity"
             android:exported="true"
             android:label="@string/title_activity_sign_in"
             android:theme="@style/Theme.Polypoly">

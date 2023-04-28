@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.map
+package com.github.polypoly.app.ui.game
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf

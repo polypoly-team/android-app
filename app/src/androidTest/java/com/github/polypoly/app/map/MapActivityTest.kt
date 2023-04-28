@@ -6,7 +6,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.ui.map.MapActivity
+import com.github.polypoly.app.ui.game.MapActivity
 import com.github.polypoly.app.base.RulesObject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
