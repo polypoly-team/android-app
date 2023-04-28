@@ -19,7 +19,7 @@
         android:theme="@style/Theme.Polypoly"
         tools:targetApi="31">
         <activity
-            android:name=".base.game.rules_and_lobby.GameLobbyActivity"
+            android:name=".ui.menu.GameLobbyActivity"
             android:exported="false"
             android:label="@string/title_activity_game_lobby"
             android:theme="@style/Theme.Polypoly" />
