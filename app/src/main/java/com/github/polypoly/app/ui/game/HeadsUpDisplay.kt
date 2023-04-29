@@ -28,24 +28,34 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
+import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 
 /**
- * The heads-up display with player and game stats that is displayed on top of the map
+ * The heads-up display with [Player] and [Game] stats that is displayed on top of the map
+ *
+ * @param playerData the [Player] data of the user
+ * @param otherPlayersData the [Player] data of the other players
+ * @param round the current round
+ * @param location the current location
  */
 @Composable
 fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String) {
     HudPlayer(playerData)
-    HudOtherPlayersAndGame(otherPlayersData, round)
+    HudGameAndOtherPlayers(otherPlayersData, round)
     HudLocation(location)
     HudGameMenu()
 }
 
 /**
  * The HUD for the current nearby location (a text at the top of the screen)
+ *
+ * @param location the current location
+ *
+ * @see Hud
  */
 @Composable
 fun HudLocation(location: String) {
@@ -62,8 +72,12 @@ fun HudLocation(location: String) {
 }
 
 /**
- * The HUD for the player stats, it displays basic information such as their balance,
- * and a button shows complete information on click
+ * The HUD for the [Player] stats, displaying basic information such as their balance,
+ * with a button showing complete information on click
+ *
+ * @param playerData the [Player] data of the user
+ *
+ * @see Hud
  */
 @Composable
 fun HudPlayer(playerData: Player) {
@@ -109,12 +123,17 @@ fun HudPlayer(playerData: Player) {
 }
 
 /**
- * The HUD that shows the stats for other players and the game, it's a button on the top left
- * that expands and collapses a tab that contains information about the game and the other
- * players
+ * The HUD that shows the stats for other [Player]s and the [Game], it's a button on the top left
+ * that expands and collapses a tab that contains information about the [Game] and the other
+ * [Player]s
+ *
+ * @param otherPlayersData the [Player] data of the other players
+ * @param round the current round
+ *
+ * @see Hud
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
+fun HudGameAndOtherPlayers(otherPlayersData: List<Player>, round: Int) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -160,8 +179,12 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
 }
 
 /**
- * The HUD for the game stats, it displays basic information such as the current round,
+ * The HUD for the [Game] stats, it displays basic information such as the current round,
  * and a button shows complete information on click
+ *
+ * @param round the current round
+ *
+ * @see HudGameAndOtherPlayers
  */
 @Composable
 fun HudGame(round: Int) {
@@ -198,8 +221,12 @@ fun HudGame(round: Int) {
 }
 
 /**
- * The HUD for the stats of other players, it displays basic information such as their balance,
+ * The HUD for the stats of other [Player]s, it displays basic information such as their balance,
  * and a button shows complete information on click
+ *
+ * @param playerData the [Player] data of the other player
+ *
+ * @see HudGameAndOtherPlayers
  */
 @Composable
 fun HudOtherPlayer(playerData: Player) {
@@ -235,8 +262,10 @@ fun HudOtherPlayer(playerData: Player) {
 }
 
 /**
- * The HUD for the game menu, which is a button on the bottom left that expands and collapses
+ * The HUD for the [Game] menu, which is a button on the bottom left that expands and collapses
  * the menu
+ *
+ * @see Hud
  */
 @Composable
 fun HudGameMenu() {
@@ -277,6 +306,13 @@ fun HudGameMenu() {
 
 /**
  * A button that is used in the HUD
+ *
+ * @param name the name of the button
+ * @param onClick the action to perform when the button is clicked
+ * @param icon_id the id of the icon to display
+ * @param description the description of the button
+ *
+ * @see Hud
  */
 @Composable
 fun HudButton(name: String, onClick: () -> Unit, icon_id: Int, description: String) {
@@ -297,6 +333,11 @@ fun HudButton(name: String, onClick: () -> Unit, icon_id: Int, description: Stri
 
 /**
  * A text that is used in the HUD
+ *
+ * @param name the name of the text
+ * @param text the text to display
+ *
+ * @see Hud
  */
 @Composable
 fun HudText(name: String, text: String) {
@@ -312,6 +353,15 @@ fun HudText(name: String, text: String) {
 
 /**
  * A button whose icon changes depending on a toggle
+ *
+ * @param name the name of the button
+ * @param description the description of the button
+ * @param onClick the action to perform when the button is clicked
+ * @param toggle the toggle that determines which icon to display
+ * @param onIcon the id of the icon to display when the toggle is true
+ * @param offIcon the id of the icon to display when the toggle is false
+ *
+ * @see Hud
  */
 @Composable
 fun ToggleIconButton(
