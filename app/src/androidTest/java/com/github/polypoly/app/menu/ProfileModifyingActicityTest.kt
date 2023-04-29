@@ -9,15 +9,18 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.LoggedInTest
-import com.github.polypoly.app.game.user.User
-import com.github.polypoly.app.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.global.Settings
+import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
+
+//TODO: FIX TESTS FOR CI
 
 @RunWith(AndroidJUnit4::class)
 class ProfileModifyingActivityTest: LoggedInTest(true, true) {
@@ -52,7 +55,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
     fun validateProfileButtonUpdatesUserName() {
         Intents.init()
 
-        val newName = "bigflo"
+        val newName = "John"
 
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
