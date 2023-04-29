@@ -2,6 +2,7 @@ package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,15 +30,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -50,15 +49,10 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         const val POLLING_INTERVAL = 5000L
     }
 
-
     /**
      * The attributes of the class
      */
     private var gameLobbyCode: String = ""
-
-    private val fakeAuthenticatedUser = User(7, "fake_user", "I am fake until google authentication is setup", Skin(0, 0, 0),
-        Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -518,7 +512,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     warningState.value = getString(R.string.game_lobby_is_full)
                 } else {
                     warningState.value = ""
-                    joinGameLobbyRoom()
+                    joinGameLobbyRoom(mContext)
                 }
             }
         }
@@ -527,13 +521,17 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
-    private fun joinGameLobbyRoom() {
+    private fun joinGameLobbyRoom(mContext: Context) {
         val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-            gameLobby.addUser(fakeAuthenticatedUser)
-            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            gameLobby.addUser(currentUser)
 
-            // TODO: link to the gameLobby room activity
+            //launch the gameLobby room activity
+            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+            gameLobbyIntent.putExtra("lobby_code", gameLobbyCode)
+            startActivity(gameLobbyIntent)
+            finish()
         }
     }
 
