@@ -55,7 +55,7 @@ open class RemoteDB(
         return getValueAndThen(key, { data, valuePromise ->
             valuePromise.complete(data.getValue(clazz.java)!!)
         }, { valuePromise ->
-            valuePromise.completeExceptionally(IllegalAccessException("No value found for key <$key>"))
+            valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
         })
     }
 
@@ -95,7 +95,7 @@ open class RemoteDB(
     }
 
     override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(key, value, true, IllegalAccessException("Try to update a value with no existing key"))
+        return setValueWithCheck(key, value, true, NoSuchElementException("Try to update a value with no existing key"))
     }
 
     override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
