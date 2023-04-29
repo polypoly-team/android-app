@@ -114,6 +114,7 @@ class MapActivity : ComponentActivity() {
                     MapView()
                     BuildingInfoUIComponent()
                     RollDiceDialog()
+                    RollDiceButton()
                     Hud(
                         Player(
                             user = User(
@@ -159,7 +160,6 @@ class MapActivity : ComponentActivity() {
                             )),
                         16
                     )
-                    RollDiceButton()
                 }
             }
         }
