@@ -342,7 +342,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             Text(
                 text = "Players:",
                 style = MaterialTheme.typography.h6,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier.testTag("players_title")
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -416,6 +417,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
+                    modifier = Modifier.testTag("player_name"),
                     text = player.name,
                     style = MaterialTheme.typography.body1
                 )
