@@ -6,7 +6,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.ui.game.MapActivity
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.base.RulesObject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -18,10 +18,10 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class MapActivityTest {
+class GameActivityTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MapActivity>()
+    val composeTestRule = createAndroidComposeRule<GameActivity>()
 
     private val otherPlayersAndGameDropDownButton = composeTestRule.onNodeWithTag("otherPlayersAndGameDropDownButton")
     private val gameInfoButton = composeTestRule.onNodeWithTag("gameInfoButton")
@@ -174,8 +174,6 @@ class MapActivityTest {
     }
 
     private fun forceOpenMarkerDialog() {
-        composeTestRule.activity.showDialog.value = true
-        composeTestRule.activity.currentMarker = getRandomMarker()
-        runBlocking { delay(500) }
+
     }
 }

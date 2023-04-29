@@ -5,10 +5,10 @@ import com.github.polypoly.app.base.game.location.LocationRepository
 import org.junit.Test
 
 // These tests are not really useful, but they're here symbolically, this is only a data class
-class LocationRepositoryTest {
+class LocationPropertyRepositoryTest {
     @Test
     fun testGetLocalizationsWorks() {
-        assert(LocationRepository.getZones().flatMap(Zone::locations).isNotEmpty())
+        assert(LocationRepository.getZones().flatMap(Zone::locationProperties).isNotEmpty())
     }
 
     @Test
