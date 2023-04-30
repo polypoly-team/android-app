@@ -33,6 +33,7 @@ import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_P
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.RemoteDB
+import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
@@ -86,12 +87,25 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
+     * starts the Create Profile and sets the isSignedIn flag
+     */
+    private fun launchCreateProfile(signIn: Boolean) {
+        val createProfileIntent = Intent(this, CreateProfileActivity::class.java)
+        isSignedIn = signIn
+        startActivity(createProfileIntent)
+        finish()
+    }
+
+    /**
      * launched when the sign-in flow is wanted to be started
      */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) {}
 
+    /**
+     * The content of the SignInActivity
+     */
     @Composable
     fun SignInContent() {
         mAuthListener = FirebaseAuth.AuthStateListener {
@@ -119,6 +133,9 @@ class SignInActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The logo of polypoly
+     */
     @Composable
     fun GameLogo() {
         Row(
@@ -182,12 +199,20 @@ class SignInActivity : ComponentActivity() {
     @Composable
     private fun GuestButton() {
         SignOrGuestButton(
-            onClick = {},
+            onClick = {
+                launchCreateProfile(false)
+            },
             text = "Play as guest",
             tag = "guest_button"
         )
     }
 
+    /**
+     * Button format for the sign-in and guest buttons
+     * @param onClick the action to do when the button is clicked
+     * @param text the text to display on the button
+     * @param tag the tag to use for testing
+     */
     @Composable
     private fun SignOrGuestButton(onClick: () -> Unit, text: String, tag: String) {
         Button(
