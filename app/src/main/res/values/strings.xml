@@ -14,5 +14,6 @@
     <string name="joined_game_lobby_with_code">Joined lobby with code: </string>
     <string name="game_lobby_list_title">Join a lobby! </string>
     <string name="title_activity_game_lobby">GameLobbyActivity</string>
+    <string name="title_activity_rankings">Rankings</string>
     // =========================================================================
 </resources>
