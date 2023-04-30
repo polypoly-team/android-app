@@ -81,7 +81,7 @@ object MenuComposable {
      * The dialog box is closed when clicking outside of it
      */
     @Composable
-    private fun RulesButton() {
+    fun RulesButton() {
         var openRules by remember { mutableStateOf(false) }
         OptionButton(
             onClick = { openRules = true },
@@ -149,7 +149,7 @@ object MenuComposable {
     }
 
     @Composable
-    private fun SettingsButton() {
+    fun SettingsButton() {
         ActivityOptionButton(
             destinationActivity = SettingsActivity::class.java,
             iconId = R.drawable.tmp_happysmile,
