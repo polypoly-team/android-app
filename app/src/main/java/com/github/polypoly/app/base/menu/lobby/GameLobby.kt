@@ -20,7 +20,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-): StorableObject<GameLobbyDB>("", code, GameLobbyDB::class) {
+) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()

@@ -113,12 +113,13 @@ open class RemoteDB(
         return CompletableFuture() /*TODO: implement*/
     }
 
-    override fun addListener(key: String, eventListener: ValueEventListener): CompletableFuture<ValueEventListener> {
-        return getValueAndThen(key, { data, valuePromise ->
-            valuePromise.complete(data.ref.addValueEventListener(eventListener))
-        }, { valuePromise ->
-            valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
-        })
+    override fun addListener(key: String, eventListener: ValueEventListener): CompletableFuture<Boolean> {
+        val promise = CompletableFuture<Boolean>()
+        rootRef.child(key).get().addOnSuccessListener { data ->
+            data.ref.addValueEventListener(eventListener)
+            promise.complete(true)
+        }.addOnFailureListener(promise::completeExceptionally)
+        return promise
     }
 
 
