@@ -21,6 +21,7 @@ import com.github.polypoly.app.ui.menu.MenuComposable.SettingsButton
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.DiscreetButton
+import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 
 /**
  * Represent a simplified version of the menu when the user is a guest
@@ -70,8 +71,6 @@ class GuestMenuActivity : ComponentActivity()  {
                 style = MaterialTheme.typography.body1,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            ReturnToSignInButton()
         }
     }
 
@@ -89,7 +88,8 @@ class GuestMenuActivity : ComponentActivity()  {
                 finish()
                 startActivity(signInIntent) },
             testTag = "return_sign_in_button",
-            text = "Return to sign in"
+            text = "Return to sign in",
+            width = 180,
         )
     }
 
@@ -98,15 +98,12 @@ class GuestMenuActivity : ComponentActivity()  {
      */
     @Composable
     private fun DiscoverTheMapButton() {
-        Button(
+        MainActionButton(
             onClick = { /*TODO*/ },
-            shape = CircleShape,
-            modifier = Modifier
-                .height(50.dp)
-                .width(200.dp)
-        ) {
-            Text(text = "Discover the map")
-        }
+            testTag = "discover_map_button",
+            text = "Discover the map",
+            enabled = true,
+        )
     }
 
     /**
@@ -120,8 +117,8 @@ class GuestMenuActivity : ComponentActivity()  {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RulesButton()
-            Spacer(modifier = Modifier.width(20.dp))
             SettingsButton()
+            ReturnToSignInButton()
         }
     }
 

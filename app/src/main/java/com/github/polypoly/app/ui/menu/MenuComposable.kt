@@ -10,9 +10,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -24,6 +27,7 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
+import com.github.polypoly.app.ui.theme.UIElements.IconRoundButton
 
 object MenuComposable {
     /**
@@ -83,10 +87,11 @@ object MenuComposable {
     @Composable
     fun RulesButton() {
         var openRules by remember { mutableStateOf(false) }
-        OptionButton(
+        IconRoundButton(
             onClick = { openRules = true },
-            iconId = R.drawable.tmp_happysmile,
-            description = "Show Rules"
+            icon = Icons.Default.ReceiptLong,
+            iconDescription = "Show Rules",
+            testTag = "rules_button"
         )
 
         if(openRules) {
@@ -128,8 +133,9 @@ object MenuComposable {
     private fun ProfileButton() {
         ActivityOptionButton(
             destinationActivity = ProfileActivity::class.java,
-            iconId = R.drawable.tmp_happysmile,
-            description = "Open Profile"
+            icon = Icons.Default.Person,
+            description = "Open Profile",
+            testTag = "profile_button"
         )
     }
 
@@ -140,6 +146,12 @@ object MenuComposable {
             onClick = {},
             iconId = R.drawable.tmp_happysmile,
             description = "Open Rankings"
+        )
+        IconRoundButton(
+            onClick = { /*TODO*/ },
+            icon = Icons.Default.Star,
+            iconDescription = "Open Rankings",
+            testTag = "rankings_button"
         )
         /*ActivityOptionButton(
             destinationActivity = RankingsActivity::class.java,
@@ -152,8 +164,9 @@ object MenuComposable {
     fun SettingsButton() {
         ActivityOptionButton(
             destinationActivity = SettingsActivity::class.java,
-            iconId = R.drawable.tmp_happysmile,
-            description = "Open Settings"
+            icon = Icons.Default.Settings,
+            description = "Open Settings",
+            testTag = "settings_button"
         )
     }
 
@@ -181,16 +194,22 @@ object MenuComposable {
     }
 
     /**
-     * An OptionButton that launches a given activity, giving the sender class name in an intent
+     * An [IconRoundButton] that launches a given activity, giving the sender class name in an intent
+     * @param destinationActivity the activity to launch
+     * @param icon the icon to display
+     * @param description the description of the icon
+     * @param testTag the test tag of the button
      */
     @Composable
-    private fun ActivityOptionButton(destinationActivity: Class<out MenuActivity>, iconId: Int, description: String) {
+    private fun ActivityOptionButton(destinationActivity: Class<out MenuActivity>, icon: ImageVector,
+                                     description: String, testTag: String) {
         val mContext = LocalContext.current
         val activityIntent = Intent(mContext, destinationActivity)
-        OptionButton(
+        IconRoundButton(
             onClick = { startActivity(mContext, activityIntent, null) },
-            iconId = iconId,
-            description = description
+            icon = icon,
+            iconDescription = description,
+            testTag = testTag
         )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding.large
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.ui.theme.grey1
 import com.github.polypoly.app.ui.theme.grey2
 
@@ -117,22 +118,13 @@ class CreateProfileActivity : ComponentActivity() {
      */
     @Composable
     private fun ValidateButton() {
-        remember { nickname }
-        Button(
+        MainActionButton(
             onClick = {},
-            shape = CircleShape,
-            modifier = Modifier
-                .height(50.dp)
-                .width(300.dp)
-                .testTag("guest_button"),
+            text = "Let's go with this nickname!",
             enabled = nickname.value.isNotEmpty(),
-            colors = ButtonDefaults.buttonColors(
-                disabledBackgroundColor = if (isSystemInDarkTheme()) grey2 else grey1,
-                disabledContentColor = if (isSystemInDarkTheme()) grey1 else grey2,
-            )
-        ) {
-            Text(text = "Let's go with this nickname!")
-        }
+            testTag = "guest_button",
+            width = 300,
+        )
     }
 
 }
