@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -112,7 +113,7 @@ class SignInActivity : ComponentActivity() {
                     // The first element is the logo of the game
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
-                    SignInButton()
+                    SignOrGuestButtons()
                 }
             }
         }
@@ -134,10 +135,10 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
-     * This button is used to launch the sign-in flow
+     * The sign-in button and the guest button to access the menu with or without an account
      */
     @Composable
-    private fun SignInButton() {
+    private fun SignOrGuestButtons() {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
@@ -147,25 +148,57 @@ class SignInActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(2.dp)
-                    .testTag("sign_in_button")
             ) {
-                Button(
-                    onClick = {
-                        val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
-
-                        val signInIntent = AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .build()
-                        signInLauncher.launch(signInIntent)
-                    },
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(70.dp),
-                ) {
-                    Text(text = "Sign in to play!")
-                }
+                SignInButton()
+                Spacer(modifier = Modifier.height(30.dp))
+                GuestButton()
             }
+        }
+    }
+
+    /**
+     * This button is used to launch the sign-in flow
+     */
+    @Composable
+    private fun SignInButton() {
+        SignOrGuestButton(
+            onClick = {
+                val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+
+                val signInIntent = AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(providers)
+                    .build()
+                signInLauncher.launch(signInIntent)
+            },
+            text = "Sign in to play!",
+            tag = "sign_in_button"
+        )
+    }
+
+    /**
+     * This button is used to not sign in and play as a guest
+     */
+    @Composable
+    private fun GuestButton() {
+        SignOrGuestButton(
+            onClick = {},
+            text = "Play as guest",
+            tag = "guest_button"
+        )
+    }
+
+    @Composable
+    private fun SignOrGuestButton(onClick: () -> Unit, text: String, tag: String) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .width(200.dp)
+                .height(60.dp)
+                .testTag(tag),
+            shape = CircleShape,
+        ) {
+            Text(text = text)
         }
     }
 
