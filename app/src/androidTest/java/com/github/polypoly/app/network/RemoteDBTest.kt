@@ -212,6 +212,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
     @Test
     fun unregisteredDataCantBeRemoved() {}*/
 
+    // ========================================================= ADD LISTENER
     @Test
     fun addingListenerToUnregisteredDataFails() {
         val key = "some_key"
@@ -236,6 +237,8 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertTrue(
             remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
+
+        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
     }
 
     @Test
@@ -250,6 +253,8 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertTrue(boolean)
+
+        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
     }
 
     @Test
@@ -262,6 +267,62 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         addDataToDB(data, key)
 
         remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertFalse(boolean)
+
+        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
+    }
+
+    // ========================================================= REMOVE LISTENER
+    @Test
+    fun removingListenerFromUnregisteredDataFails() {
+        val key = "some_key"
+
+        val failFuture = remoteDB.removeListener(key)
+        failFuture.handle { _, exception ->
+            assertTrue(exception != null)
+            assertTrue(exception is IllegalAccessError)
+        }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+    }
+
+    @Test
+    fun removingListenerFromNotListenedDataReturnsFalse() {
+        val key = "some_key"
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        assertFalse(
+            remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun removingListenerFromListenedDataReturnsTrue() {
+        val key = "some_key"
+        val action = { _: User -> }
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(
+            remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun listenerIsNotExecutedWhenRemoved() {
+        val key = "some_key"
+        var boolean = false
+        val action = { _: User -> boolean = true}
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        //remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        //remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertFalse(boolean)
     }
 

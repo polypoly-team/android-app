@@ -79,6 +79,13 @@ interface IRemoteStorage {
      * @return A promise holding true iff the listener was successfully set
      */
     fun <T : Any>addListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
+
+    /**
+     * Removes (if any) the listener associated to data corresponding to the given key
+     * @param key: key of the data to stop listening
+     * @return A promise holding true iff the listener was successfully removed
+     */
+    fun removeListener(key: String): CompletableFuture<Boolean>
 }
 
 /**

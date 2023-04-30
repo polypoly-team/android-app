@@ -91,11 +91,20 @@ class MockDB: IRemoteStorage {
         return CompletableFuture.completedFuture(true)
     }
 
+    override fun removeListener(key: String): CompletableFuture<Boolean> {
+        if(actions.containsKey(key)) {
+            actions.remove(key)
+            return CompletableFuture.completedFuture(true)
+        }
+        return CompletableFuture.completedFuture(false)
+    }
+
     /**
      * Clears all value in the mock database
      */
     fun clear() {
         data.clear()
         keysHierarchy.clear()
+        actions.clear()
     }
 }
