@@ -4,10 +4,10 @@ import com.github.polypoly.app.base.game.bonus_card.BonusCard
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.game.location.Location
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.commons.PolyPolyTest.Companion.TEST_USER_0
-import com.github.polypoly.app.base.game.location.LocationRepository
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -148,7 +148,7 @@ class PlayerTest {
     fun betToBuyCreatesALocationBetWithTheCorrectArguments() {
         val amountOfTheBet = 300
         val testPlayer = Player(TEST_USER_0, 300, listOf())
-        val bet = testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), amountOfTheBet)
+        val bet = testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), amountOfTheBet)
         assertEquals(amountOfTheBet, bet.amount)
         assertEquals(TEST_USER_0.id, bet.player.user.id)
         assertTrue(bet.randomNumber < 1 && bet.randomNumber >= 0)
@@ -158,7 +158,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
         val testPlayer = Player(TEST_USER_0, 0, listOf(), 4)
         val thrown = assertThrows(IllegalStateException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 300)
+            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 300)
         }
         assertNotNull(thrown.message)
          assertEquals("The player has already lost the game", thrown.message)
@@ -168,7 +168,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsNegative() {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), -300)
+            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), -300)
         }
         assertNotNull(thrown.message)
         val message = thrown.message
@@ -179,7 +179,7 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsZero() {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationRepository.getZones()[0].locations[0]), 0)
+            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 0)
         }
         assertNotNull(thrown.message)
         assertEquals("The amount of money bet cannot be negative or zero", thrown.message)
@@ -190,7 +190,7 @@ class PlayerTest {
         val testPlayer = Player(TEST_USER_0, 300, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.bidToBuy(
-                location = InGameLocation(LocationRepository.getZones()[0].locations[0], owner = PolyPolyTest.testPlayer2), 300)
+                location = InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0], owner = PolyPolyTest.testPlayer2), 300)
         }
         assertNotNull(thrown.message)
         assertEquals("The location is already owned by someone", thrown.message)
@@ -200,8 +200,8 @@ class PlayerTest {
     fun betToBuyThrowsAnExceptionIfTheAmountIsSmallerThanTheLocationPrice() {
         val testPlayer = Player(TEST_USER_0, 100, listOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
-            val location = Location("Test", 300, 30, 60, 0.0, 0.0)
-            testPlayer.bidToBuy(InGameLocation(location), 100)
+            val locationProperty = LocationProperty("Test", 300, 30, 60, 0.0, 0.0)
+            testPlayer.bidToBuy(InGameLocation(locationProperty), 100)
         }
         assertNotNull(thrown.message)
         assertEquals("The player has not bet enough money to buy the location", thrown.message)
