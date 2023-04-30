@@ -205,8 +205,64 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertEquals(data, dataFound)
     }
 
+    /* TODO: implement tests when removeValue() is
     @Test
-    fun dataCanBeRemoved() {
-        TODO("Not yet implemented")
+    fun dataCanBeRemoved() {}
+
+    @Test
+    fun unregisteredDataCantBeRemoved() {}*/
+
+    @Test
+    fun addingListenerToUnregisteredDataFails() {
+        val key = "some_key"
+        val action = { _: User -> }
+
+        val failFuture = remoteDB.addListener(key, action, User::class)
+        failFuture.handle { _, exception ->
+            assertTrue(exception != null)
+            assertTrue(exception is IllegalAccessError)
+        }
+        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
+
+    @Test
+    fun addingListenerToRegisteredDataWorks() {
+        val key = "some_key"
+        val action = { _: User -> }
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        assertTrue(
+            remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun listenerIsExecutedAtUpdate() {
+        val key = "some_key"
+        var boolean = false
+        val action = { _: User -> boolean = true}
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(boolean)
+    }
+
+    @Test
+    fun listenerIsNotExecutedAtRest() {
+        val key = "some_key"
+        var boolean = false
+        val action = { _: User -> boolean = true}
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertFalse(boolean)
+    }
+
 }

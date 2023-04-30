@@ -87,7 +87,7 @@ class MockDB: IRemoteStorage {
         if (!data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(IllegalAccessException("Adds a listener to an unregistered value"))
         }
-        data[keyCleaned] = action
+        actions[keyCleaned] = action as (Any) -> Unit
         return CompletableFuture.completedFuture(true)
     }
 
