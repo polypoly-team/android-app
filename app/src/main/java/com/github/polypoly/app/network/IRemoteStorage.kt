@@ -1,5 +1,6 @@
 package com.github.polypoly.app.network
 
+import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -63,6 +64,11 @@ interface IRemoteStorage {
      * @return A promise holding true iff the value was successfully set
      */
     fun <T>setValue(key: String, value: T): CompletableFuture<Boolean>
+
+    fun removeElement(key: String): CompletableFuture<Boolean>
+
+    
+    fun addListener(key: String, eventListener: ValueEventListener): CompletableFuture<ValueEventListener>
 }
 
 /**

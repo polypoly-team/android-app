@@ -1,9 +1,12 @@
 package com.github.polypoly.app.network
 
 
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -105,4 +108,18 @@ open class RemoteDB(
         }.addOnFailureListener(registerPromise::completeExceptionally)
         return registerPromise
     }
+
+    override fun removeElement(key: String): CompletableFuture<Boolean> {
+        return CompletableFuture() /*TODO: implement*/
+    }
+
+    override fun addListener(key: String, eventListener: ValueEventListener): CompletableFuture<ValueEventListener> {
+        return getValueAndThen(key, { data, valuePromise ->
+            valuePromise.complete(data.ref.addValueEventListener(eventListener))
+        }, { valuePromise ->
+            valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
+        })
+    }
+
+
 }

@@ -2,6 +2,8 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.storable.GameLobbyDB
+import com.github.polypoly.app.network.storable.StorableObject
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -18,7 +20,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-) {
+): StorableObject<GameLobbyDB>("", code, GameLobbyDB::class) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
