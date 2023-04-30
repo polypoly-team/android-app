@@ -16,7 +16,7 @@ class GlobalInstances {
         lateinit var remoteDB: IRemoteStorage
         var remoteDBInitialized = false
 
-        var currentUser : User = User(7, "fake_user", "I am fake until google db is fully setup", Skin(0, 0, 0),
+        var currentUser : User = User(7, "fake_user", "I am fake until google db is fully setup", Skin.default(),
             Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
         )
         var currentFBUser : FirebaseUser? = null

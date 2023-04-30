@@ -86,6 +86,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
         for(lobby in ALL_JOINABLE_LOBBIES){
             composeTestRule.onNodeWithText(lobby.name).assertIsDisplayed()
+            composeTestRule.onNodeWithTag("${lobby.name}/peopleIcon", useUnmergedTree = true).assertIsDisplayed()
         }
     }
 
@@ -96,19 +97,19 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             lobbyHeader.performClick()
             composeTestRule.waitForIdle()
-            composeTestRule.onAllNodesWithTag("gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(1)
-            composeTestRule.onAllNodesWithTag("players_title", useUnmergedTree = true).assertCountEquals(1)
-            composeTestRule.onAllNodesWithTag("player_name", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
-            composeTestRule.onAllNodesWithTag("playerIcon", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(1)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/players_title", useUnmergedTree = true).assertCountEquals(1)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/player_name", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/playerIcon", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
             for (player in lobby.usersRegistered) {
                 composeTestRule.onNodeWithText(player.name).assertIsDisplayed()
-                composeTestRule.onNodeWithContentDescription("${player.name} icon").assertIsDisplayed()
+                composeTestRule.onNodeWithContentDescription("${lobby.name}/${player.name} icon").assertIsDisplayed()
             }
             composeTestRule.onNodeWithText("Round duration: ", useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText(lobby.rules.roundDuration.toString(), useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText("Game mode: ", useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText(lobby.rules.gameMode.toString(), useUnmergedTree = true).assertIsDisplayed()
-            composeTestRule.onNodeWithTag("joinGameLobbyButton", useUnmergedTree = true).assertIsDisplayed().assertHasClickAction()
+            composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).assertIsDisplayed().assertHasClickAction()
         }
 
     }
@@ -119,7 +120,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         val lobby = ALL_JOINABLE_LOBBIES[1]
         val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
         lobbyHeader.performClick()
-        composeTestRule.onNodeWithTag("joinGameLobbyButton", useUnmergedTree = true).performClick()
+        composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).performClick()
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
         Intents.intended(IntentMatchers.hasExtra("lobby_code", lobby.code))
     }
@@ -130,7 +131,14 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         for(lobby in ALL_JOINABLE_LOBBIES){
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             lobbyHeader.performClick()
-            composeTestRule.onAllNodesWithTag("gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(1)
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.waitForIdle()
+            for(otherLobby in ALL_JOINABLE_LOBBIES){
+                if(otherLobby != lobby){
+                    composeTestRule.onNodeWithTag("${otherLobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
+                }
+            }
         }
     }
 
@@ -139,11 +147,11 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
         for(lobby in ALL_JOINABLE_LOBBIES){
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
-            composeTestRule.onAllNodesWithTag("gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(0)
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
             lobbyHeader.performClick()
-            composeTestRule.onAllNodesWithTag("gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(1)
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertIsDisplayed()
             lobbyHeader.performClick()
-            composeTestRule.onAllNodesWithTag("gameLobbyCardDetails", useUnmergedTree = true).assertCountEquals(0)
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
         }
     }
 

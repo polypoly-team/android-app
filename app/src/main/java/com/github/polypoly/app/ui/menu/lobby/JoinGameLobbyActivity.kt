@@ -260,7 +260,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("gameLobbyCard"),
+                .testTag("${gameLobby.name}/gameLobbyCard"),
             elevation = 10.dp,
             shape = RoundedCornerShape(10.dp),
         ) {
@@ -288,7 +288,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .testTag("gameLobbyCardHeader"),
+                .testTag("${gameLobby.name}/gameLobbyCardHeader"),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -311,7 +311,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 contentDescription = "people icon",
                 modifier = Modifier
                     .size(30.dp)
-                    .testTag("peopleIcon")
+                    .testTag("${gameLobby.name}/peopleIcon")
                     .padding(top = 5.dp)
             )
             Text(
@@ -332,7 +332,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp)
-                .testTag("gameLobbyCardDetails")
+                .testTag("${gameLobby.name}/gameLobbyCardDetails")
         ) {
             Divider(
                 modifier = Modifier.padding(bottom = 5.dp),
@@ -343,7 +343,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 text = "Players:",
                 style = MaterialTheme.typography.h6,
                 fontSize = 16.sp,
-                modifier = Modifier.testTag("players_title")
+                modifier = Modifier.testTag("${gameLobby.name}/players_title")
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -362,7 +362,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
             GameLobbyCardGameMode(gameLobby)
 
-            GameLobbyCardJoinButton(gameLobby.code)
+            GameLobbyCardJoinButton(gameLobby.code, gameLobby)
         }
     }
 
@@ -371,7 +371,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * @param code the code of the gameLobby to join
      */
     @Composable
-    private fun GameLobbyCardJoinButton(code: String) {
+    private fun GameLobbyCardJoinButton(code: String, gameLobby: GameLobby) {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
         gameLobbyCode = code
@@ -385,7 +385,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             RectangleButton(
                 onClick = { gameLobbyCodeButtonOnClick(warningState,mContext)},
                 description = getString(R.string.join_game_lobby_button_text),
-                testTag = "joinGameLobbyButton"
+                testTag = "${gameLobby.name}/joinGameLobbyButton"
             )
             if(warningState.value != "") {
                 Text(
@@ -410,14 +410,14 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             Row {
                 Image(
                     painter = painterResource(id = R.drawable.tmp_happysmile),
-                    contentDescription = "${player.name} icon",
+                    contentDescription = "${gameLobby.name}/${player.name} icon",
                     modifier = Modifier
                         .size(20.dp)
-                        .testTag("playerIcon")
+                        .testTag("${gameLobby.name}/playerIcon")
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    modifier = Modifier.testTag("player_name"),
+                    modifier = Modifier.testTag("${gameLobby.name}/player_name"),
                     text = player.name,
                     style = MaterialTheme.typography.body1
                 )
