@@ -4,24 +4,29 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.polypoly.app.base.game.location.Location
+import com.github.polypoly.app.base.game.location.LocationProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.osmdroid.views.overlay.Marker
 
 /**
  * ViewModel for the Map screen that stores the distance walked by the user, as well as
  * the closest location to the user.
  */
-class MapViewModel(
+class GameViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
 
     private var _distanceWalked = mutableStateOf(0f)
     val distanceWalked: State<Float> get() = _distanceWalked
 
-    private var _closeLocation = mutableStateOf(null as Location?)
-    val closeLocation: State<Location?> get() = _closeLocation
+    private var _interactableProperty = mutableStateOf(null as LocationProperty?)
+    val interactableProperty: State<LocationProperty?> get() = _interactableProperty
+
+    lateinit var selectedMarker: Marker
+
+    val markerToLocationProperty = mutableMapOf<Marker, LocationProperty>()
 
     /**
      * Updates the distance walked by the user by adding the given value to the current value.
@@ -46,11 +51,11 @@ class MapViewModel(
     /**
      * Sets the closest location to the given location.
      *
-     * @param location The location to set as the closest location.
+     * @param locationProperty The location to set as the closest location.
      */
-    fun setCloseLocation(location: Location?) {
+    fun setCloseLocation(locationProperty: LocationProperty?) {
         viewModelScope.launch(dispatcher) {
-            _closeLocation.value = location
+            _interactableProperty.value = locationProperty
         }
     }
 }

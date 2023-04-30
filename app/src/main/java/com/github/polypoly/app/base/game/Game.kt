@@ -1,7 +1,7 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.game.location.LocalizationLevel
+import com.github.polypoly.app.base.game.location.PropertyLevel
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -25,11 +25,11 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
 ) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locations.map { location ->
+    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locationProperties.map { location ->
         InGameLocation(
-            location = location,
+            locationProperty = location,
             owner = null,
-            level = LocalizationLevel.LEVEL_0,
+            level = PropertyLevel.LEVEL_0,
         ) } }
     val currentRound: Int = 1
 

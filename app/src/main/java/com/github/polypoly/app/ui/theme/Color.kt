@@ -9,3 +9,6 @@ val purpleLight = Color(0xFFCCAFDB)
 val purpleMid = Color(0xFF6D4B7D)
 val purpleDark = Color(0xFF4B3C52)
 val purpleVeryDark = Color(0xFF262427)
+
+val grey1 = Color(0xFFAFAFAF)
+val grey2 = Color(0xFF727272)
