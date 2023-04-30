@@ -332,10 +332,10 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp)
+                .testTag("${gameLobby.name}/gameLobbyCardDetails")
         ) {
             Divider(
-                modifier = Modifier.padding(bottom = 5.dp)
-                    .testTag("${gameLobby.name}/gameLobbyCardDetails"),
+                modifier = Modifier.padding(bottom = 5.dp),
                 thickness = 1.dp,
                 color = androidx.compose.ui.graphics.Color.Black
             )

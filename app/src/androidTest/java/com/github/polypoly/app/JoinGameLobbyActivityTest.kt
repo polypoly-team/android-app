@@ -4,7 +4,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
@@ -12,9 +11,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
 
     @get:Rule
