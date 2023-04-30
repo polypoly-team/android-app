@@ -127,7 +127,7 @@ class SignInActivity : ComponentActivity() {
                     // The first element is the logo of the game
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
-                    SignOrGuestButtons()
+                    SignInOrGuestButtons()
                 }
             }
         }
@@ -155,7 +155,7 @@ class SignInActivity : ComponentActivity() {
      * The sign-in button and the guest button to access the menu with or without an account
      */
     @Composable
-    private fun SignOrGuestButtons() {
+    private fun SignInOrGuestButtons() {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
