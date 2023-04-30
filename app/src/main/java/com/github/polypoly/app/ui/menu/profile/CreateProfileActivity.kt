@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.menu.SignInActivity
+import com.github.polypoly.app.ui.theme.Padding.large
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.grey1
 import com.github.polypoly.app.ui.theme.grey2
@@ -87,8 +89,8 @@ class CreateProfileActivity : ComponentActivity() {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Return Arrow",
-                tint = MaterialTheme.colors.onSecondary,
-                modifier = Modifier.padding(10.dp)
+                tint = MaterialTheme.colors.secondary,
+                modifier = Modifier.padding(large)
                     .size(60.dp)
             )
         }
