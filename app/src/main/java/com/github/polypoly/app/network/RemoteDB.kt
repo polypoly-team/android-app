@@ -1,7 +1,6 @@
 package com.github.polypoly.app.network
 
 
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -109,14 +108,19 @@ open class RemoteDB(
         return registerPromise
     }
 
-    override fun removeElement(key: String): CompletableFuture<Boolean> {
-        return CompletableFuture() /*TODO: implement*/
+    override fun removeValue(key: String): CompletableFuture<Boolean> {
+        TODO("Not implemented yet") // Hint: set value to null
     }
 
-    override fun addListener(key: String, eventListener: ValueEventListener): CompletableFuture<Boolean> {
+    override fun <T: Any> addListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
         val promise = CompletableFuture<Boolean>()
         rootRef.child(key).get().addOnSuccessListener { data ->
-            data.ref.addValueEventListener(eventListener)
+            data.ref.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(data: DataSnapshot) {
+                    action(data.getValue(clazz.java)!!)
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
             promise.complete(true)
         }.addOnFailureListener(promise::completeExceptionally)
         return promise

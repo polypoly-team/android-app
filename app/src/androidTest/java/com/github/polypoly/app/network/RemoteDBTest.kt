@@ -204,4 +204,9 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(data, dataFound)
     }
+
+    @Test
+    fun dataCanBeRemoved() {
+        TODO("Not yet implemented")
+    }
 }

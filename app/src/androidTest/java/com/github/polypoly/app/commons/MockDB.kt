@@ -1,6 +1,7 @@
 package com.github.polypoly.app.commons
 
 import com.github.polypoly.app.network.IRemoteStorage
+import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -11,6 +12,7 @@ class MockDB: IRemoteStorage {
 
     private val keysHierarchy: MutableMap<String, MutableList<String>> = mutableMapOf()
     private val data: MutableMap<String, Any> = mutableMapOf()
+    private val actions: MutableMap<String, (Any) -> Unit> = mutableMapOf()
 
     private fun cleanKey(key: String): String {
         return key.removePrefix("/").removeSuffix("/")
@@ -50,8 +52,12 @@ class MockDB: IRemoteStorage {
 
     override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
         val keyCleaned = cleanKey(key)
-        if (!data.containsKey(keyCleaned))
+        if (!data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(IllegalAccessException("Update a value not already registered"))
+        }
+        if(actions.containsKey(key)) {
+            actions[key]?.invoke(value as Any)
+        }
         return setValue(keyCleaned, value)
     }
 
@@ -65,6 +71,23 @@ class MockDB: IRemoteStorage {
             keysHierarchy[parent]!!.add(child)
         }
         data[keyCleaned] = value as Any
+        return CompletableFuture.completedFuture(true)
+    }
+
+    override fun removeValue(key: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : Any> addListener(
+        key: String,
+        action: (newObj: T) -> Unit,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+        val keyCleaned = cleanKey(key)
+        if (!data.containsKey(keyCleaned)) {
+            return CompletableFuture.failedFuture(IllegalAccessException("Adds a listener to an unregistered value"))
+        }
+        data[keyCleaned] = action
         return CompletableFuture.completedFuture(true)
     }
 

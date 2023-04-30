@@ -53,7 +53,7 @@ abstract class StorableObject<T : Any>
      * @return A future with true iff the object was successfully removed
      */
     fun remove(): CompletableFuture<Boolean> {
-        return remoteDB.removeElement(path + key)
+        return remoteDB.removeValue(path + key)
     }
 
     /**
@@ -63,12 +63,7 @@ abstract class StorableObject<T : Any>
      * @return A future with true iff the action was successfully added
      */
     fun onChange(action: (newObj: T) -> Unit): CompletableFuture<Boolean> {
-        return remoteDB.addListener(path + key, object : ValueEventListener {
-            override fun onDataChange(data: DataSnapshot) {
-                action(data.getValue(clazz.java)!!)
-            }
-            override fun onCancelled(error: DatabaseError) {}
-        })
+        return remoteDB.addListener(path + key, action, clazz)
     }
 
     // ================================================== ABSTRACT METHODS
