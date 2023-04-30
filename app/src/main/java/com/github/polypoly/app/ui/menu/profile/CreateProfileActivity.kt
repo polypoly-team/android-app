@@ -9,12 +9,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.grey1
 import com.github.polypoly.app.ui.theme.grey2
@@ -49,10 +49,7 @@ class CreateProfileActivity : ComponentActivity() {
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top,
         ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Return Arrow",
-                tint = MaterialTheme.colors.onSecondary)
+            GoBackButton()
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -68,6 +65,27 @@ class CreateProfileActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(40.dp))
                 ValidateButton()
             }
+        }
+    }
+
+    /**
+     * The button to go back to the previous activity
+     */
+    @Composable
+    private fun GoBackButton() {
+        val navController = rememberNavController()
+        IconButton(
+            onClick = {
+                navController.popBackStack()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Return Arrow",
+                tint = MaterialTheme.colors.onSecondary,
+                modifier = Modifier.padding(10.dp)
+                    .size(60.dp)
+            )
         }
     }
 
