@@ -17,12 +17,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.ui.menu.GuestMenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding.large
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.ui.theme.grey1
 import com.github.polypoly.app.ui.theme.grey2
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 
 /**
  * This activity is used to create a new profile for the user
@@ -118,8 +120,19 @@ class CreateProfileActivity : ComponentActivity() {
      */
     @Composable
     private fun ValidateButton() {
+        val mContext = LocalContext.current
+
         MainActionButton(
-            onClick = {},
+            onClick = {
+                if(isSignedIn) {
+                    // TODO
+                } else {
+                    val guestMenuIntent = Intent(mContext, GuestMenuActivity::class.java)
+                    guestMenuIntent.putExtra("userNickname", nickname.value)
+                    finish()
+                    startActivity(guestMenuIntent)
+                }
+            },
             text = "Let's go with this nickname!",
             enabled = nickname.value.isNotEmpty(),
             testTag = "guest_button",

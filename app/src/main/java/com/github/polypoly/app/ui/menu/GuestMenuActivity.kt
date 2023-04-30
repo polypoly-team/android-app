@@ -16,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
+import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.menu.MenuComposable.RulesButton
 import com.github.polypoly.app.ui.menu.MenuComposable.SettingsButton
 import com.github.polypoly.app.ui.theme.Padding
@@ -38,6 +40,8 @@ class GuestMenuActivity : ComponentActivity()  {
      */
     @Composable
     fun SimpleMenuContent() {
+        GameMusic.setSong(LocalContext.current, R.raw.mocksong)
+        GameMusic.startSong()
         val nickname: String = intent.getStringExtra("userNickname") ?: DEFAULT_NICKNAME
 
         Column (
