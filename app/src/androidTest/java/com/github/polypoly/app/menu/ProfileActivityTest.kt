@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
-//TODO: FIX TESTS FOR CI
 @RunWith(AndroidJUnit4::class)
 class ProfileActivityTest: PolyPolyTest(true, true) {
     @get:Rule

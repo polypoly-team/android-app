@@ -14,9 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding.large
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -80,6 +80,7 @@ class CreateProfileActivity : ComponentActivity() {
         val mContext = LocalContext.current
 
         IconButton(
+            modifier = Modifier.testTag("go_back_button"),
             onClick = {
                 val signInIntent = Intent(mContext, SignInActivity::class.java)
                 finish()
@@ -106,7 +107,7 @@ class CreateProfileActivity : ComponentActivity() {
             initialValue = "",
             onChanged = {newValue ->  nickname.value = newValue},
             maxTextLength = 15,
-            testTag = "nicknameText",
+            testTag = "nickname_text",
         )
     }
 
@@ -122,7 +123,8 @@ class CreateProfileActivity : ComponentActivity() {
             shape = CircleShape,
             modifier = Modifier
                 .height(50.dp)
-                .width(300.dp),
+                .width(300.dp)
+                .testTag("validateButton"),
             enabled = nickname.value.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 disabledBackgroundColor = if (isSystemInDarkTheme()) grey2 else grey1,
