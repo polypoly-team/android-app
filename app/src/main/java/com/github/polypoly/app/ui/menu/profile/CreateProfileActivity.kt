@@ -1,5 +1,6 @@
 package com.github.polypoly.app.ui.menu.profile
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,9 +13,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.grey1
 import com.github.polypoly.app.ui.theme.grey2
@@ -73,10 +75,13 @@ class CreateProfileActivity : ComponentActivity() {
      */
     @Composable
     private fun GoBackButton() {
-        val navController = rememberNavController()
+        val mContext = LocalContext.current
+
         IconButton(
             onClick = {
-                navController.popBackStack()
+                val signInIntent = Intent(mContext, SignInActivity::class.java)
+                finish()
+                startActivity(signInIntent)
             }
         ) {
             Icon(
