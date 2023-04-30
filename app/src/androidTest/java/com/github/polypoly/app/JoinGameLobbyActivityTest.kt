@@ -1,67 +1,70 @@
 package com.github.polypoly.app
 
-import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
-class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
+class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
+    val ALL_JOINABLE_LOBBIES = ALL_TEST_GAME_LOBBIES.filter { !it.private && it.usersRegistered.size < it.rules.maximumNumberOfPlayers && it.name != TEST_GAME_LOBBY_AVAILABLE_4.name}
+
+    @Before
+    fun startIntents() {
+        Intents.init()
+    }
+
+    @After
+    fun releaseIntents() { Intents.release() }
 
     @Test
-    fun launchActivity_componentsDisplayed() {
+    fun launchActivityComponentsDisplayed() {
         composeTestRule.onNodeWithTag("gameLobbyCodeField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
-
-        Thread.sleep(1000)
+        composeTestRule.onNodeWithTag("noGameLobbyCodeText").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("logo").assertIsDisplayed()
     }
 
     @Test
-    fun inputInvalidGameLobbyCode_displayWarningMessage() {
-        //TODO: Check for a group code that is not in the DB once we have the queries set
-        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("polpolu")
-        Thread.sleep(1000)
+    fun inputInvalidGameLobbyCodeDisplaysWarningMessage() {
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("emixam67")
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
-        Thread.sleep(1000)
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_does_not_exist)).assertIsDisplayed()
     }
 
     @Test
-    fun inputEmptyGameLobbyCode_displayWarningMessage() {
+    fun inputEmptyGameLobbyCodeDisplaysWarningMessage() {
         // Leave the game lobby code field empty
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
         // Check that a warning message is displayed
-        Thread.sleep(1000)
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_code_is_empty)).assertIsDisplayed()
     }
 
     @Test
-    fun inputValidGameLobbyCode_joinGameLobbyRoom() {
-        //TODO: Check for a valid group code in the DB once we have the queries set
+    fun inputValidGameLobbyCodeInTextFieldJoinsGameLobbyRoom() {
         val lobbyCode = TEST_GAME_LOBBY_AVAILABLE_1.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
-        Thread.sleep(1000)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
-        composeTestRule.onNodeWithTag("warningMessage").assertTextContains("")
 
+        Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasExtra("lobby_code", lobbyCode))
     }
 
     @Test
-    fun inputFullGameLobbyCode_displayWarningMessage() {
-        //TODO: Check for a valid group code that is full in the DB once we have the queries set
+    fun inputFullGameLobbyCodeDisplayWarningMessage() {
         val lobbyCode = TEST_GAME_LOBBY_FULL.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
-        Thread.sleep(1000)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         // Check that a message that the group is full is displayed
@@ -69,33 +72,81 @@ class JoinGameLobbyActivityTest: PolyPolyTest(false, true) {
     }
 
     @Test
-    fun clickOnGameLobbiesListButton_opensGameLobbiesList() {
+    fun clickOnGameLobbiesListButtonOpensGameLobbiesList() {
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
-
-        Thread.sleep(1000)
         composeTestRule.onNodeWithTag("gameLobbiesList")
             .assertIsDisplayed()
     }
 
     @Test
-    fun clickOnGameLobbyHeader_opensGameLobbyInfo() {
-
+    fun allJoinableGameLobbiesAreDisplayed(){
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
+        for(lobby in ALL_JOINABLE_LOBBIES){
+            composeTestRule.onNodeWithText(lobby.name).assertIsDisplayed()
+            composeTestRule.onNodeWithTag("${lobby.name}/peopleIcon", useUnmergedTree = true).assertIsDisplayed()
+        }
+    }
 
-        try {
-            val lobbyHeader = composeTestRule.onAllNodesWithTag("lobbyCard").onFirst()
-
-            lobbyHeader.assertIsDisplayed()
+    @Test
+    fun clickOnGameLobbyHeaderOpensGameLobbyInfo() {
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
+        for(lobby in ALL_JOINABLE_LOBBIES){
+            val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             lobbyHeader.performClick()
-
-            Thread.sleep(1000)
-            composeTestRule.onAllNodesWithTag("lobbyCard").onFirst().assertIsDisplayed()
-
-        }catch (AssertionError: AssertionError){
-            Log.d("Test", "No lobbies to display from DB")
-            //TODO: no need the try catch : fix in next task (maxime talking to future maxime)
+            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).performScrollTo().assertExists()
+            composeTestRule.onNode(hasTestTag("${lobby.name}/players_title"), useUnmergedTree = true).assertExists()
+            composeTestRule.onAllNodesWithTag("${lobby.name}/player_name", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/playerIcon", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
+            for (player in lobby.usersRegistered) {
+                composeTestRule.onNodeWithText(player.name).assertIsDisplayed()
+                composeTestRule.onNodeWithContentDescription("${lobby.name}/${player.name} icon").assertIsDisplayed()
+            }
+            composeTestRule.onNodeWithText("Round duration: ", useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithText(lobby.rules.roundDuration.toString(), useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithText("Game mode: ", useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithText(lobby.rules.gameMode.toString(), useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).assertIsDisplayed().assertHasClickAction()
         }
 
+    }
+
+    @Test
+    fun clickJoinButtonInLobbyInfoJoinsGameLobby(){
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
+        val lobby = ALL_JOINABLE_LOBBIES[1]
+        val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
+        lobbyHeader.performClick()
+        composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).performClick()
+        Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasExtra("lobby_code", lobby.code))
+    }
+
+    @Test
+    fun onlyOneCardOpenAtATime(){
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
+        for(lobby in ALL_JOINABLE_LOBBIES){
+            val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
+            lobbyHeader.performClick()
+            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).performScrollTo().assertExists()
+            for(otherLobby in ALL_JOINABLE_LOBBIES){
+                if(otherLobby != lobby){
+                    composeTestRule.onNodeWithTag("${otherLobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun clickBackOnCardClosesCard(){
+        composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()
+        for(lobby in ALL_JOINABLE_LOBBIES){
+            val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
+            lobbyHeader.performClick()
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+            lobbyHeader.performClick()
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
+        }
     }
 
 }
