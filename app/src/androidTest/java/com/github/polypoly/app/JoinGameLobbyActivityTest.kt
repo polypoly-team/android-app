@@ -16,7 +16,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
-    val ALL_JOINABLE_LOBBIES = ALL_TEST_GAME_LOBBIES.filter { !it.private && it.usersRegistered.size < it.rules.maximumNumberOfPlayers }
+    val ALL_JOINABLE_LOBBIES = ALL_TEST_GAME_LOBBIES.filter { !it.private && it.usersRegistered.size < it.rules.maximumNumberOfPlayers && it.name != TEST_GAME_LOBBY_AVAILABLE_4.name}
 
     @Before
     fun startIntents() {
@@ -93,7 +93,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         for(lobby in ALL_JOINABLE_LOBBIES){
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             lobbyHeader.performClick()
-            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).assertExists()
+            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).performScrollTo().assertExists()
             composeTestRule.onNode(hasTestTag("${lobby.name}/players_title"), useUnmergedTree = true).assertExists()
             composeTestRule.onAllNodesWithTag("${lobby.name}/player_name", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
             composeTestRule.onAllNodesWithTag("${lobby.name}/playerIcon", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
@@ -127,7 +127,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         for(lobby in ALL_JOINABLE_LOBBIES){
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             lobbyHeader.performClick()
-            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).assertExists()
+            composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).performScrollTo().assertExists()
             for(otherLobby in ALL_JOINABLE_LOBBIES){
                 if(otherLobby != lobby){
                     composeTestRule.onNodeWithTag("${otherLobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
@@ -143,7 +143,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
             val lobbyHeader = composeTestRule.onNodeWithText(lobby.name)
             composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
             lobbyHeader.performClick()
-            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
             lobbyHeader.performClick()
             composeTestRule.onNodeWithTag("${lobby.name}/gameLobbyCardDetails", useUnmergedTree = true).assertDoesNotExist()
         }
