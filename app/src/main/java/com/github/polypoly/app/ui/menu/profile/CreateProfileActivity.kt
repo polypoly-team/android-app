@@ -124,7 +124,7 @@ class CreateProfileActivity : ComponentActivity() {
             modifier = Modifier
                 .height(50.dp)
                 .width(300.dp)
-                .testTag("validateButton"),
+                .testTag("guest_button"),
             enabled = nickname.value.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 disabledBackgroundColor = if (isSystemInDarkTheme()) grey2 else grey1,
