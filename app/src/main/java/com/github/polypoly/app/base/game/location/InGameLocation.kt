@@ -12,7 +12,7 @@ import com.github.polypoly.app.base.game.Player
  */
 data class InGameLocation (
     var locationProperty: LocationProperty,
-    var level: LocalizationLevel = LocalizationLevel.LEVEL_0,
+    var level: PropertyLevel = PropertyLevel.LEVEL_0,
     var owner: Player? = null,
 ) {
 

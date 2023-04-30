@@ -58,7 +58,7 @@ fun HudLocation(location: String) {
         Text(
             text = location,
             modifier = Modifier
-                .align(Alignment.TopCenter).testTag("locationText")
+                .align(Alignment.TopCenter).testTag("location_text")
                 .offset(y = 30.dp)
             ,
             fontSize = MaterialTheme.typography.h6.fontSize
