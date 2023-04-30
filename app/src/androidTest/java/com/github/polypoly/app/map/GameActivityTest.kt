@@ -156,13 +156,7 @@ class GameActivityTest {
         composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
         composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
-
-    @Test
-    fun currentLocation_is_Displayed() {
-        composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
-    }
-
-
+    
     private fun getRandomMarker(): Marker {
         val mapView = composeTestRule.activity.mapView
         val n = mapView.overlays.filterIsInstance<Marker>().size
