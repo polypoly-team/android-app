@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -56,7 +57,11 @@ fun HudLocation(location: String) {
     ) {
         Text(
             text = location,
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier
+                .align(Alignment.TopCenter).testTag("locationText")
+                .offset(y = 30.dp)
+            ,
+            fontSize = MaterialTheme.typography.h6.fontSize
         )
     }
 }

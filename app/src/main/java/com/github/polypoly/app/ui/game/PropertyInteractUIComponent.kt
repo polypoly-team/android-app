@@ -16,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
-
-// flag to show the building info dialog
-val interactingWithProperty = mutableStateOf(false)
+import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 
 /**
  * Manage the building info dialog and the bet dialog.
@@ -49,7 +47,7 @@ private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
         title = {
             Row {
                 val currentProperty =
-                    gameViewModel.markerToLocationProperty[gameViewModel.currentMarker]
+                    gameViewModel.markerToLocationProperty[gameViewModel.selectedMarker]
                 Text(text = currentProperty?.name ?: "Unknown")
                 Spacer(modifier = Modifier.weight(0.5f))
                 Text(text = "Base price: ${currentProperty?.basePrice}")

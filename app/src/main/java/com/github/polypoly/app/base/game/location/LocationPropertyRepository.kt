@@ -3,7 +3,7 @@ package com.github.polypoly.app.base.game.location
 /**
  * Repository for providing the zones and localizations on the map.
  */
-object LocationRepository {
+object LocationPropertyRepository {
     /**
      * Array of different pastel colors used to represent the zones.
      */

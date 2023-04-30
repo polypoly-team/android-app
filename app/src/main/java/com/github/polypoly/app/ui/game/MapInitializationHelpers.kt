@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable
 import android.location.Location
 import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -89,7 +90,7 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
     marker.setOnMarkerClickListener { _, _ ->
-        gameViewModel.currentMarker = marker
+        gameViewModel.selectedMarker = marker
         interactingWithProperty.value = true
         true
     }

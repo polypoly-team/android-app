@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -14,18 +15,15 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.LocationRepository.getZones
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import kotlin.random.Random
 
 /**
  * Activity for displaying the map used in the game.
@@ -98,7 +96,7 @@ class GameActivity : ComponentActivity() {
                         currentPlayer,
                         players,
                         16,
-                        gameViewModel.closeLocationProperty.value?.name ?: ""
+                        gameViewModel.interactableProperty.value?.name ?: ""
                     )
                 }
             }
@@ -144,7 +142,7 @@ class GameActivity : ComponentActivity() {
                 Hud(
                     currentPlayer, players,
                     16,
-                    gameViewModel.closeLocationProperty.value?.name ?: ""
+                    gameViewModel.interactableProperty.value?.name ?: ""
                 )
             }
         }
@@ -153,8 +151,11 @@ class GameActivity : ComponentActivity() {
     companion object {
         val gameViewModel: GameViewModel = GameViewModel()
 
+        // flag to show the building info dialog
+        val interactingWithProperty = mutableStateOf(false)
+
         //used to determine if the player is close enough to a location to interact with it
-        private const val MAX_CLOSE_LOCATION_DISTANCE = 10.0 // meters
+        private const val MAX_INTERACT_DISTANCE = 10.0 // meters
 
         fun formattedDistance(distance: Float): String {
             return if (distance < 1000) "${"%.1f".format(distance)}m"
@@ -190,7 +191,7 @@ class GameActivity : ComponentActivity() {
                     closestLocationProperty = markerLocation
                 }
             }
-            if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_CLOSE_LOCATION_DISTANCE)
+            if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_INTERACT_DISTANCE)
                 closestLocationProperty = null
 
             return closestLocationProperty

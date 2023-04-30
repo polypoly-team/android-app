@@ -38,10 +38,10 @@ fun RollDiceButton() {
                 .offset(y = (-80).dp)
                 .testTag("rollDiceButton"),
             onClick = {
-                showRollDiceDialog.value = true
+                if (gameViewModel.interactableProperty.value != null)
+                    showRollDiceDialog.value = true
             },
             shape = CircleShape
-
         ) {
             Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
         }
@@ -82,14 +82,14 @@ fun RollDiceDialog() {
  * ensuring that the player does not visit the same location twice.
  */
 private fun rollDiceLocations(): List<LocationProperty> {
-    val locationsNotToVisitName = mutableListOf(gameViewModel.closeLocationProperty.value?.name)
+    val locationsNotToVisitName = mutableListOf(gameViewModel.interactableProperty.value?.name)
 
     val locationsToVisit = mutableListOf<LocationProperty>()
     for (i in 1..3) {
         val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
         val closestLocations = gameViewModel.markerToLocationProperty.entries
             .filter { !locationsNotToVisitName.contains(it.value.name) }
-            .sortedBy { it.key.position.distanceToAsDouble(gameViewModel.closeLocationProperty.value!!.position()) }
+            .sortedBy { it.key.position.distanceToAsDouble(gameViewModel.interactableProperty.value!!.position()) }
             .take(11)
 
         locationsToVisit.add(closestLocations[diceRollsSum].value)

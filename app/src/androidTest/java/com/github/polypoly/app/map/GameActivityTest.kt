@@ -1,7 +1,12 @@
 package com.github.polypoly.app.map
 
+import android.content.Context
+import android.location.Location
+import android.location.LocationManager
+import android.os.SystemClock
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.text.TextRange
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -11,11 +16,13 @@ import com.github.polypoly.app.base.RulesObject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
+import org.w3c.dom.Text
 
 @RunWith(AndroidJUnit4::class)
 class GameActivityTest {
@@ -110,24 +117,8 @@ class GameActivityTest {
     @Test
     fun mapActivity_UIComponents_Displayed() {
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
-        //composeTestRule.onNodeWithTag("resetButton").assertIsDisplayed()
         //composeTestRule.onNodeWithTag("distanceWalked").assertIsDisplayed()
     }
-
-    //@Test
-    //fun mapActivity_ResetButton_Clicked_DistanceReset() {
-    //    fun formattedDistance(distance: Float): String {
-    //        return if (distance < 1000) "${"%.1f".format(distance)}m"
-    //        else "${"%.1f".format(distance / 1000)}km"
-    //    }
-
-    //    composeTestRule.onNodeWithTag("resetButton").performClick()
-
-    //    runBlocking { delay(500) }
-
-    //    composeTestRule.onNodeWithTag("distanceWalked")
-    //        .assertTextContains("Distance walked: ${formattedDistance(0f)}")
-    //}
 
     @Test
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
@@ -166,6 +157,12 @@ class GameActivityTest {
         composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
 
+    @Test
+    fun currentLocation_is_Displayed() {
+        composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
+    }
+
+
     private fun getRandomMarker(): Marker {
         val mapView = composeTestRule.activity.mapView
         val n = mapView.overlays.filterIsInstance<Marker>().size
@@ -174,6 +171,8 @@ class GameActivityTest {
     }
 
     private fun forceOpenMarkerDialog() {
-
+        GameActivity.gameViewModel.selectedMarker = getRandomMarker()
+        GameActivity.interactingWithProperty.value = true
+        runBlocking { delay(500) }
     }
 }

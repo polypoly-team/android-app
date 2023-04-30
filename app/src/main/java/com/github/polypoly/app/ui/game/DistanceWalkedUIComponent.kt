@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
  */
 @Composable
 fun DistanceWalkedUIComponents() {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth().offset(y = 80.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

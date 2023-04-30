@@ -21,10 +21,10 @@ class GameViewModel(
     private var _distanceWalked = mutableStateOf(0f)
     val distanceWalked: State<Float> get() = _distanceWalked
 
-    private var _closeLocationProperty = mutableStateOf(null as LocationProperty?)
-    val closeLocationProperty: State<LocationProperty?> get() = _closeLocationProperty
+    private var _interactableProperty = mutableStateOf(null as LocationProperty?)
+    val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    lateinit var currentMarker: Marker
+    lateinit var selectedMarker: Marker
 
     val markerToLocationProperty = mutableMapOf<Marker, LocationProperty>()
 
@@ -55,7 +55,7 @@ class GameViewModel(
      */
     fun setCloseLocation(locationProperty: LocationProperty?) {
         viewModelScope.launch(dispatcher) {
-            _closeLocationProperty.value = locationProperty
+            _interactableProperty.value = locationProperty
         }
     }
 }
