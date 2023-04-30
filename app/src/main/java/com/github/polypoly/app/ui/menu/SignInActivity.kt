@@ -25,7 +25,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
@@ -96,7 +96,7 @@ class SignInActivity : ComponentActivity() {
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = firebaseAuth?.currentUser
             if (user != null) {
-                currentUser = user
+                currentFBUser = user
                 launchWelcome()
             }
         }

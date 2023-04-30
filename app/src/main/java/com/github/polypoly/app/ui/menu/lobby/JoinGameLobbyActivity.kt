@@ -2,6 +2,7 @@ package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,15 +30,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -50,15 +49,10 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         const val POLLING_INTERVAL = 5000L
     }
 
-
     /**
      * The attributes of the class
      */
     private var gameLobbyCode: String = ""
-
-    private val fakeAuthenticatedUser = User(7, "fake_user", "I am fake until google authentication is setup", Skin(0, 0, 0),
-        Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -266,7 +260,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("gameLobbyCard"),
+                .testTag("${gameLobby.name}/gameLobbyCard"),
             elevation = 10.dp,
             shape = RoundedCornerShape(10.dp),
         ) {
@@ -294,7 +288,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .testTag("gameLobbyCardHeader"),
+                .testTag("${gameLobby.name}/gameLobbyCardHeader"),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -317,7 +311,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 contentDescription = "people icon",
                 modifier = Modifier
                     .size(30.dp)
-                    .testTag("peopleIcon")
+                    .testTag("${gameLobby.name}/peopleIcon")
                     .padding(top = 5.dp)
             )
             Text(
@@ -338,7 +332,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 10.dp, end = 10.dp)
-                .testTag("gameLobbyCardDetails")
+                .testTag("${gameLobby.name}/gameLobbyCardDetails")
         ) {
             Divider(
                 modifier = Modifier.padding(bottom = 5.dp),
@@ -348,7 +342,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             Text(
                 text = "Players:",
                 style = MaterialTheme.typography.h6,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier.testTag("${gameLobby.name}/players_title")
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -367,7 +362,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
             GameLobbyCardGameMode(gameLobby)
 
-            GameLobbyCardJoinButton(gameLobby.code)
+            GameLobbyCardJoinButton(gameLobby.code, gameLobby)
         }
     }
 
@@ -376,7 +371,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * @param code the code of the gameLobby to join
      */
     @Composable
-    private fun GameLobbyCardJoinButton(code: String) {
+    private fun GameLobbyCardJoinButton(code: String, gameLobby: GameLobby) {
         val mContext = LocalContext.current
         val warningState = remember { mutableStateOf("") }
         gameLobbyCode = code
@@ -390,7 +385,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             RectangleButton(
                 onClick = { gameLobbyCodeButtonOnClick(warningState,mContext)},
                 description = getString(R.string.join_game_lobby_button_text),
-                testTag = "joinGameLobbyButton"
+                testTag = "${gameLobby.name}/joinGameLobbyButton"
             )
             if(warningState.value != "") {
                 Text(
@@ -415,13 +410,14 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             Row {
                 Image(
                     painter = painterResource(id = R.drawable.tmp_happysmile),
-                    contentDescription = "${player.name} icon",
+                    contentDescription = "${gameLobby.name}/${player.name} icon",
                     modifier = Modifier
                         .size(20.dp)
-                        .testTag("playerIcon")
+                        .testTag("${gameLobby.name}/playerIcon")
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
+                    modifier = Modifier.testTag("${gameLobby.name}/player_name"),
                     text = player.name,
                     style = MaterialTheme.typography.body1
                 )
@@ -518,7 +514,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     warningState.value = getString(R.string.game_lobby_is_full)
                 } else {
                     warningState.value = ""
-                    joinGameLobbyRoom()
+                    joinGameLobbyRoom(mContext)
                 }
             }
         }
@@ -527,13 +523,17 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
-    private fun joinGameLobbyRoom() {
+    private fun joinGameLobbyRoom(mContext: Context) {
         val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-            gameLobby.addUser(fakeAuthenticatedUser)
-            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            gameLobby.addUser(currentUser)
 
-            // TODO: link to the gameLobby room activity
+            //launch the gameLobby room activity
+            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+            gameLobbyIntent.putExtra("lobby_code", gameLobbyCode)
+            startActivity(gameLobbyIntent)
+            finish()
         }
     }
 
