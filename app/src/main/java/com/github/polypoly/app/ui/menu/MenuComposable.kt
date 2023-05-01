@@ -142,11 +142,6 @@ object MenuComposable {
     @Composable
     private fun RankingsButton() {
         // TODO: delete this OptionButton and uncomment the block below when RankingActivity exists
-        OptionButton(
-            onClick = {},
-            iconId = R.drawable.tmp_happysmile,
-            description = "Open Rankings"
-        )
         IconRoundButton(
             onClick = { /*TODO*/ },
             icon = Icons.Default.Star,
