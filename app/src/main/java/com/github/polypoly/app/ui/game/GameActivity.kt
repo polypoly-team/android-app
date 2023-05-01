@@ -82,7 +82,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapUI.MapView(gameViewModel)
+                    MapUI.MapView(gameViewModel, interactingWithProperty)
                     PropertyInteractUIComponent()
                     RollDiceDialog()
                     RollDiceButton()
@@ -107,7 +107,7 @@ class GameActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                MapUI.MapView(gameViewModel)
+                MapUI.MapView(gameViewModel, interactingWithProperty)
                 PropertyInteractUIComponent()
                 RollDiceDialog()
                 RollDiceButton()

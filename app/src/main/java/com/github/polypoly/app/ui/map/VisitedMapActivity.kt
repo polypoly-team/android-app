@@ -6,11 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
@@ -19,6 +19,9 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  */
 class VisitedMapActivity : ComponentActivity()  {
     private val mapViewModel: MapViewModel = MapViewModel()
+
+    // flag to show the building info dialog
+    private val interactingWithProperty = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +40,8 @@ class VisitedMapActivity : ComponentActivity()  {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            MapUI.MapView(mapViewModel = mapViewModel)
+            MapUI.MapView(mapViewModel = mapViewModel,
+                interactingWithProperty = interactingWithProperty)
             ShowPopup()
         }
     }
@@ -47,7 +51,7 @@ class VisitedMapActivity : ComponentActivity()  {
      */
     @Composable
     private fun ShowPopup() {
-        if (GameActivity.interactingWithProperty.value) {
+        if (interactingWithProperty.value) {
             PopupBuildingDescription()
         }
     }
@@ -58,9 +62,9 @@ class VisitedMapActivity : ComponentActivity()  {
     @Composable
     private fun PopupBuildingDescription() {
         val currentProperty =
-            GameActivity.gameViewModel.markerToLocationProperty[GameActivity.gameViewModel.selectedMarker]
+            mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]
         AlertDialog(
-            onDismissRequest = { GameActivity.interactingWithProperty.value = false },
+            onDismissRequest = { interactingWithProperty.value = false },
             modifier = Modifier.testTag("building_description_dialog"),
             title = {
                 Text(text = currentProperty?.name ?: "")
@@ -106,7 +110,7 @@ class VisitedMapActivity : ComponentActivity()  {
     private fun CloseButton() {
         Button(
             onClick = {
-                GameActivity.interactingWithProperty.value = false },
+                interactingWithProperty.value = false },
             modifier = Modifier
                 .testTag("close_building_description_dialog")
                 .padding(Padding.large),

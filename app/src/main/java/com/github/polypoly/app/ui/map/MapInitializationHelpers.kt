@@ -10,8 +10,8 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
+import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
-import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -76,7 +76,7 @@ fun initMapView(context: Context): MapView {
  * @return the marker that was added
  */
 fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int,
-                mapViewModel: MapViewModel
+                mapViewModel: MapViewModel, interactingWithProperty: MutableState<Boolean>
 ): Marker {
     fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_pin)
