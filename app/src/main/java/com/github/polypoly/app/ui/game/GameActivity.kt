@@ -16,6 +16,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -81,7 +82,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapUI.MapView()
+                    MapUI.MapView(gameViewModel)
                     PropertyInteractUIComponent()
                     RollDiceDialog()
                     RollDiceButton()
@@ -106,7 +107,7 @@ class GameActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                MapUI.MapView()
+                MapUI.MapView(gameViewModel)
                 PropertyInteractUIComponent()
                 RollDiceDialog()
                 RollDiceButton()
@@ -121,7 +122,7 @@ class GameActivity : ComponentActivity() {
     }
 
     companion object {
-        val gameViewModel: GameViewModel = GameViewModel()
+        val gameViewModel: MapViewModel = MapViewModel()
 
         // flag to show the building info dialog
         val interactingWithProperty = mutableStateOf(false)

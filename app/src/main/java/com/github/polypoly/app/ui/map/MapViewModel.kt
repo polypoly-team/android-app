@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.game
+package com.github.polypoly.app.ui.map
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +14,7 @@ import org.osmdroid.views.overlay.Marker
  * ViewModel for the Map screen that stores the distance walked by the user, as well as
  * the closest location to the user.
  */
-class GameViewModel(
+class MapViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
 

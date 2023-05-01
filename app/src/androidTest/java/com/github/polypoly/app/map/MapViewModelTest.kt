@@ -1,7 +1,7 @@
 package com.github.polypoly.app.map
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.github.polypoly.app.ui.game.GameViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -12,7 +12,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @InternalCoroutinesApi
-class GameViewModelTest {
+class MapViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -21,11 +21,11 @@ class GameViewModelTest {
 
     private val testScope = TestScope(testDispatcher)
 
-    private lateinit var gameViewModel: GameViewModel
+    private lateinit var gameViewModel: MapViewModel
 
     @Before
     fun setUp() {
-        gameViewModel = GameViewModel(testDispatcher)
+        gameViewModel = MapViewModel(testDispatcher)
     }
 
     @Test

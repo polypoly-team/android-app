@@ -18,6 +18,8 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * The map the user can visit when he/she is connected as a guest
  */
 class VisitedMapActivity : ComponentActivity()  {
+    private val mapViewModel: MapViewModel = MapViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,7 +37,7 @@ class VisitedMapActivity : ComponentActivity()  {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            MapUI.MapView()
+            MapUI.MapView(mapViewModel = mapViewModel)
             ShowPopup()
         }
     }
@@ -64,7 +66,7 @@ class VisitedMapActivity : ComponentActivity()  {
                 Text(text = currentProperty?.name ?: "")
             },
             text = {
-                BuildingDescription(currentProperty)
+                if(currentProperty != null) BuildingDescription(currentProperty)
             },
             buttons = {
                 CloseButton()
@@ -77,20 +79,20 @@ class VisitedMapActivity : ComponentActivity()  {
      * @param currentProperty the building we want to show the description
      */
     @Composable
-    private fun BuildingDescription(currentProperty: LocationProperty?) {
+    private fun BuildingDescription(currentProperty: LocationProperty) {
         Column {
-            if(currentProperty?.description != null && currentProperty.description != "") {
+            if(currentProperty.description != "") {
                 Text(text = currentProperty.description)
             } else {
                 Text(text ="No Info about this building")
             }
             Spacer(modifier = Modifier.height(Padding.medium))
-            if(currentProperty?.positivePoint != null && currentProperty.positivePoint != "") {
+            if(currentProperty.positivePoint != "") {
                 Text(text = "Positive point: ", color = MaterialTheme.colors.primary)
                 Text(text = currentProperty.positivePoint)
                 Spacer(modifier = Modifier.height(Padding.medium))
             }
-            if(currentProperty?.negativePoint != null && currentProperty.negativePoint != "") {
+            if(currentProperty.negativePoint != "") {
                 Text(text = "Negative point: ", color = MaterialTheme.colors.primary)
                 Text(text = currentProperty.negativePoint)
             }

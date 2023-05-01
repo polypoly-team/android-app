@@ -11,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
 import com.github.polypoly.app.R
-import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import org.osmdroid.tileprovider.MapTileProviderBasic
@@ -34,6 +33,7 @@ private const val MARKER_SIDE_LENGTH = 100
 
 /**
  * Tile source for EPFL campus map.
+ * @param floorId the floor of the map to display
  */
 class CampusTileSource(private val floorId: Int) :
     OnlineTileSourceBase("EPFLCampusTileSource", 0, 18, 256, ".png", arrayOf()) {
@@ -50,6 +50,7 @@ class CampusTileSource(private val floorId: Int) :
 
 /**
  * Initializes the map view with the given start position.
+ * @param context the current context
  */
 fun initMapView(context: Context): MapView {
     val mapView = MapView(context)
@@ -67,8 +68,16 @@ fun initMapView(context: Context): MapView {
 
 /**
  * Adds a marker to the given map view.
+ * @param mapView the map view to add the marker to
+ * @param position the position of the marker
+ * @param title the title of the marker
+ * @param zoneColor the color of the marker
+ * @param mapViewModel the view model of the map
+ * @return the marker that was added
  */
-fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int): Marker {
+fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int,
+                mapViewModel: MapViewModel
+): Marker {
     fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_pin)
         val scaledBitmap = Bitmap.createScaledBitmap(
@@ -90,7 +99,7 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
     marker.setOnMarkerClickListener { _, _ ->
-        gameViewModel.selectedMarker = marker
+        mapViewModel.selectedMarker = marker
         interactingWithProperty.value = true
         true
     }
@@ -100,18 +109,21 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
 
 /**
  * Initializes the location overlay and sets the location listener.
+ * @param mapView the map view to add the location overlay to
+ * @param mapViewModel the view model of the map
+ * @return the location overlay that was added
  */
-fun initLocationOverlay(mapView: MapView): MyLocationNewOverlay {
+fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocationNewOverlay {
     val locationProvider = GpsMyLocationProvider(mapView.context)
     var lastLocation = Location("")
 
     val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
         override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
             super.onLocationChanged(location, provider)
-            gameViewModel.setCloseLocation(
+            mapViewModel.setCloseLocation(
                 updateAllDistancesAndFindClosest(mapView, GeoPoint(location))
             )
-            gameViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
+            mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
         }
     }
@@ -119,13 +131,13 @@ fun initLocationOverlay(mapView: MapView): MyLocationNewOverlay {
     locationOverlay.enableMyLocation()
     locationOverlay.enableFollowLocation()
     locationOverlay.runOnFirstFix {
-        gameViewModel.setCloseLocation(
+        mapViewModel.setCloseLocation(
             updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation))
         )
         mapView.post {
             mapView.controller.animateTo(locationOverlay.myLocation)
         }
-        gameViewModel.resetDistanceWalked()
+        mapViewModel.resetDistanceWalked()
     }
     return locationOverlay
 }
