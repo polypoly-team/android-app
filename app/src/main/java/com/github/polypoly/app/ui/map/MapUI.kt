@@ -7,9 +7,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.ui.game.addMarkerTo
-import com.github.polypoly.app.ui.game.initLocationOverlay
-import com.github.polypoly.app.ui.game.initMapView
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
