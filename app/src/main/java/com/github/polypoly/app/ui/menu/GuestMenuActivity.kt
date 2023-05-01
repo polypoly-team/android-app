@@ -142,6 +142,6 @@ class GuestMenuActivity : ComponentActivity()  {
         /**
          * The default nickname of a guest
          */
-        private const val DEFAULT_NICKNAME = "Guest"
+        const val DEFAULT_NICKNAME = "Guest"
     }
 }

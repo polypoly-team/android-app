@@ -135,7 +135,7 @@ class CreateProfileActivity : ComponentActivity() {
             },
             text = "Let's go with this nickname!",
             enabled = nickname.value.isNotEmpty(),
-            testTag = "guest_button",
+            testTag = "validate_button",
             width = 300,
         )
     }
