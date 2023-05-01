@@ -47,6 +47,13 @@ object LocationPropertyRepository {
             baseMortgagePrice = 50,
             latitude = 46.51861304708622,
             longitude = 6.561904544895297,
+            description = "The BC is a building for the Computer Science and Communication Systems " +
+                    "(IC) faculty. You can see IC students enjoying the daylight, worldly events that" +
+                    " take up the whole hall during revision period, piano players and students" +
+                    " bitching about the piano players. If you're looking for luxury and beautiful" +
+                    " architecture, this is a good second choice when the Rolex is full.",
+            positivePoint = "It seems that there is air conditioning in summer",
+            negativePoint = "The toilet lights all turn off at the same time when the switch is pressed"
         ),
         LocationProperty(
             name = "INM",
@@ -55,6 +62,14 @@ object LocationPropertyRepository {
             baseMortgagePrice = 50,
             latitude = 46.51862967945017,
             longitude = 6.563195429654059,
+            description = "A building of the computer section, composed of a rather dark library, " +
+                    "a cafeteria and some small exercise rooms. It is the junction between the other " +
+                    "IN buildings. You will find a beautiful and completely unused relaxation room " +
+                    "below the library, which you can just stare at with envy since you will surely " +
+                    "be denied access to it.",
+            positivePoint = "Three microwaves in the cafeteria, which is a rare opportunity",
+            negativePoint = "There is no longer a restaurant owner in the cafeteria, and everyone" +
+                    " misses the days when there were 5,5 CHF sandwiches."
         ),
         LocationProperty(
             name = "INF",
@@ -63,6 +78,11 @@ object LocationPropertyRepository {
             baseMortgagePrice = 50,
             latitude = 46.5187569432044,
             longitude = 6.563754302940894,
+            description = "This building, cherished by computer science students, consists of three" +
+                    " mytic classrooms, without daylight, a museum that only students on break from" +
+                    " studying visit and offices.",
+            positivePoint = "Very large working room open all the time",
+            negativePoint = "Risk of vitamin D deficiency"
         ),
         LocationProperty(
             name = "INJ",
@@ -71,6 +91,13 @@ object LocationPropertyRepository {
             baseMortgagePrice = 50,
             latitude = 46.5183787509451,
             longitude = 6.563782977860895,
+            description = "Computer building mainly composed of offices. To this day no one knows" +
+                    " the difference between this building, INN and INR. It seems that there are" +
+                    " classrooms lost in the offices, but these are only accessed by the most" +
+                    " adventurous students.",
+            positivePoint = "Our team did not find anything positive point about this building despite" +
+                    " our good will",
+            negativePoint = "No noise should be made when accessing classrooms next to offices"
         ),
         LocationProperty(
             name = "INN",

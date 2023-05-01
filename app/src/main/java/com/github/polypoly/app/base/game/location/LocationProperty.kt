@@ -35,6 +35,9 @@ data class LocationProperty(
     val baseMortgagePrice: Int = 0,
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
+    val description: String = "",
+    val positivePoint: String = "",
+    val negativePoint: String = "",
 ) {
     /**
      *   The position of the [LocationProperty] on the map.
