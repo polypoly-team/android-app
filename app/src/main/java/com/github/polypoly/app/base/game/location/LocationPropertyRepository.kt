@@ -50,7 +50,7 @@ object LocationPropertyRepository {
             description = "The BC is a building for the Computer Science and Communication Systems " +
                     "(IC) faculty. You can see IC students enjoying the daylight, worldly events that" +
                     " take up the whole hall during revision period, piano players and students" +
-                    " bitching about the piano players. If you're looking for luxury and beautiful" +
+                    " complaining about the piano players. If you're looking for luxury and beautiful" +
                     " architecture, this is a good second choice when the Rolex is full.",
             positivePoint = "It seems that there is air conditioning in summer",
             negativePoint = "The toilet lights all turn off at the same time when the switch is pressed"
@@ -79,7 +79,7 @@ object LocationPropertyRepository {
             latitude = 46.5187569432044,
             longitude = 6.563754302940894,
             description = "This building, cherished by computer science students, consists of three" +
-                    " mytic classrooms, without daylight, a museum that only students on break from" +
+                    " mythical classrooms, without daylight, a museum that only students on break from" +
                     " studying visit and offices.",
             positivePoint = "Very large working room open all the time",
             negativePoint = "Risk of vitamin D deficiency"
@@ -95,7 +95,7 @@ object LocationPropertyRepository {
                     " the difference between this building, INN and INR. It seems that there are" +
                     " classrooms lost in the offices, but these are only accessed by the most" +
                     " adventurous students.",
-            positivePoint = "Our team did not find anything positive point about this building despite" +
+            positivePoint = "Our team did not find anything positive about this building despite" +
                     " our good will",
             negativePoint = "No noise should be made when accessing classrooms next to offices"
         ),

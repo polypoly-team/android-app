@@ -3,13 +3,15 @@ package com.github.polypoly.app.ui.map
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 /**
@@ -25,6 +27,9 @@ class VisitedMapActivity : ComponentActivity()  {
         }
     }
 
+    /**
+     * The content of the map to visit
+     */
     @Composable
     fun VisitedMapContent() {
         Surface(
@@ -59,15 +64,53 @@ class VisitedMapActivity : ComponentActivity()  {
                 Text(text = currentProperty?.name ?: "")
             },
             text = {
-                Text(text = currentProperty?.description ?: "")
+                BuildingDescription(currentProperty)
             },
             buttons = {
-                Button(onClick = {
-                    GameActivity.interactingWithProperty.value = false }) {
-                    Text(text = "Close")
-                }
+                CloseButton()
             }
         )
+    }
+
+    /**
+     * Building description, positive point and negative point.
+     * @param currentProperty the building we want to show the description
+     */
+    @Composable
+    private fun BuildingDescription(currentProperty: LocationProperty?) {
+        Column {
+            if(currentProperty?.description != null && currentProperty.description != "") {
+                Text(text = currentProperty.description)
+            } else {
+                Text(text ="No Info about this building")
+            }
+            Spacer(modifier = Modifier.height(Padding.medium))
+            if(currentProperty?.positivePoint != null && currentProperty.positivePoint != "") {
+                Text(text = "Positive point: ", color = MaterialTheme.colors.primary)
+                Text(text = currentProperty.positivePoint)
+                Spacer(modifier = Modifier.height(Padding.medium))
+            }
+            if(currentProperty?.negativePoint != null && currentProperty.negativePoint != "") {
+                Text(text = "Negative point: ", color = MaterialTheme.colors.primary)
+                Text(text = currentProperty.negativePoint)
+            }
+        }
+    }
+
+    /**
+     * Button which close the building info dialog
+     */
+    @Composable
+    private fun CloseButton() {
+        Button(
+            onClick = {
+                GameActivity.interactingWithProperty.value = false },
+            modifier = Modifier
+                .testTag("close_building_description_dialog")
+                .padding(Padding.large),
+        ) {
+            Text(text = "Close")
+        }
     }
 
 
