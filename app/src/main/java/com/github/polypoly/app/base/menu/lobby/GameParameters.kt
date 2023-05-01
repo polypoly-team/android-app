@@ -8,7 +8,7 @@ import com.github.polypoly.app.base.game.location.LocationRepository
  * @property gameMode The game mode of the future game
  * @property minimumNumberOfPlayers The minimum number of players needed to start the game
  * @property maximumNumberOfPlayers The maximum number of players that can join the lobby
- * @property roundDuration The duration of a round in the
+ * @property roundDuration The duration of a round in minutes
  * @property maxRound The maximum number of round before the game end. This settings is available
  * only in RICHEST_PLAYER mode. Is null if an other game mode is selected.
  * @property gameMap The map of the game whit the different zones available

@@ -1,5 +1,7 @@
 package com.github.polypoly.app.ui.menu.lobby
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -7,23 +9,36 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
-import com.github.polypoly.app.R
-import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_INITIAL_BALANCE_DEFAULT
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_INITIAL_BALANCE_STEP
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_INITIAL_BALANCE
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_PLAYERS
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_ROUNDS
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MENU_PICKER_WIDTH
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_PLAYERS
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_ROUNDS
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUNDS_DURATIONS
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUND_DURATION_DEFAULT
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE as GAME_LOBBY_MIN_INITIAL_BALANCE1
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,42 +60,23 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     }
 
     /**
-     *  this function creates a menu that allows the user to chose settings for the game.
-     *  The user can chose the name of the game, if the game is private, the min number of players, the max number of players, the number of rounds, the round duration, the GameMode, the initialPlayerBalance.
-     *  these are displayed as a list of fields that the user can edit, with arrows on the right and on the left to iterate through the values (not for the game name).
-     *  there is also a button at the end to create a lobby, that is disabled until all the fields are filled.
-     *  above the button will be shown the game code, that will be used by other players to join the lobby. The game code should be "FAKE_CODE" for now
-     *
-     *  all the fields title should stick to the left side, all the editable fields should stick to the right side.
-     *  the menu should look like this ('[]' are used to indicate a field that can be edited):
-     *  [Choose a game name] (text field)
-     *  Private game :          [] (checkbox. default is false)
-     *  Min number of players : [] (arrow left) 2 (arrow right) (increases and decreases by 1. min value is 2 and max value is 8. default is 2. must be <= max number of players, otherwise locks value if trying to increase)
-     *  Max number of players : [] (arrow left) 8 (arrow right) (increases and decreases by 1. min value is 2 and max value is 8. Must be >= min number of players. default is 8, otherwise locks the value if trying to decrease)
-     *  Number of rounds :      [] (arrow left) 5 (arrow right) (increases and decreases by 1. min value is 2 and max value is 30. default is 5)
-     *  Round duration :        [] (arrow left) 1 day (arrow right) (5, 10, 15, 20, 25, 30, 45, 60 minutes, then 1, 2, 3, 4, 5, 10, 15, 20 hours, then 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 days. default is 1 day. values will be prompted as so in the field, but will have numerical values in code)
-     *  Game mode :             [] (arrow left) Classic (arrow right) (iterates through GameMode.values(). default GameMode.RICHEST_PLAYER)
-     *  Initial player balance: [] (arrow left) 1500 (arrow right) (increases and decreases by 100. min value is 100 and max value is 10000. default is 1500)
-     *
-     *  Game code is: #FAKE_CODE
-     *  [Create game] (button) (disabled until all the fields are filled)
+     * The menu for creating a game
      */
     @Composable
     fun GameSettingsMenu() {
-        val gameName = remember { mutableStateOf("") }
-        val isPrivateGame = remember { mutableStateOf(false) }
-        val minNumPlayers = remember { mutableStateOf(2) }
-        val maxNumPlayers = remember { mutableStateOf(8) }
-        val numRounds = remember { mutableStateOf(5) }
-        val roundDuration = remember { mutableStateOf("1 day") }
-        val gameMode = remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
-        val initialPlayerBalance = remember { mutableStateOf(1500) }
-        val gameCode = uniqueCodeGenerator.generateUniqueCode()
-        
-        val createGameEnabled : Boolean = gameName.value.isNotBlank() &&
-                (minNumPlayers.value <= maxNumPlayers.value) &&
-                (initialPlayerBalance.value in (100..10000))
+        val mContext = LocalContext.current
 
+        val gameName = remember { mutableStateOf("") }
+        val isPrivateGame = remember { mutableStateOf(GAME_LOBBY_PRIVATE_DEFAULT) }
+        val minNumPlayers = remember { mutableStateOf(GAME_LOBBY_MIN_PLAYERS) }
+        val maxNumPlayers = remember { mutableStateOf(GAME_LOBBY_MAX_PLAYERS) }
+        val numRounds = remember { mutableStateOf(GAME_LOBBY_ROUNDS_DEFAULT) }
+        val roundDuration = remember { mutableStateOf(GAME_LOBBY_ROUND_DURATION_DEFAULT) }
+        val gameMode = remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
+        val initialPlayerBalance = remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
+        val gameCode = remember {uniqueCodeGenerator.generateUniqueCode()}
+        
+        val createGameEnabled : Boolean = gameName.value.isNotBlank()
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 25.dp),
         ) {
@@ -126,7 +122,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                     minNumPlayers.value = if (it <= maxNumPlayers.value) it
                     else maxNumPlayers.value
                 },
-                minValue = 2,
+                minValue = GAME_LOBBY_MIN_PLAYERS,
                 maxValue = maxNumPlayers.value
             )
 
@@ -135,27 +131,22 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 value = maxNumPlayers.value,
                 onValueChange = { if (it >= minNumPlayers.value) maxNumPlayers.value = it },
                 minValue = minNumPlayers.value,
-                maxValue = 8
+                maxValue = GAME_LOBBY_MAX_PLAYERS
             )
 
             NumberPickerField(
                 title = "Number of rounds : ",
                 value = numRounds.value,
                 onValueChange = { numRounds.value = it },
-                minValue = 2,
-                maxValue = 30
+                minValue = GAME_LOBBY_MIN_ROUNDS,
+                maxValue = GAME_LOBBY_MAX_ROUNDS
             )
 
             ListPickerField(
                 title = "Round duration : ",
                 value = roundDuration.value,
                 onValueChange = { roundDuration.value = it },
-                items = listOf(
-                    "5 min", "10 min", "15 min", "20 min", "25 min", "30 min",
-                    "1 hour", "2 hours", "3 hours", "4 hours", "5 hours", "10 hours",
-                    "15 hours", "20 hours", "1 day", "2 days", "3 days", "4 days",
-                    "5 days", "6 days", "7 days", "8 days", "9 days", "10 days"
-                )
+                items = GAME_LOBBY_ROUNDS_DURATIONS.keys.toList()
             )
 
             ListPickerField(
@@ -169,20 +160,25 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 title = "Initial player balance: ",
                 value = initialPlayerBalance.value,
                 onValueChange = { initialPlayerBalance.value = it },
-                minValue = 100,
-                maxValue = 15000,
-                step = 500
+                minValue = GAME_LOBBY_MIN_INITIAL_BALANCE1,
+                maxValue = GAME_LOBBY_MAX_INITIAL_BALANCE,
+                step = GAME_LOBBY_INITIAL_BALANCE_STEP
             )
 
+            Divider(
+                modifier = Modifier.padding(vertical = 25.dp).fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),
+                thickness = 1.dp,
+                color = androidx.compose.ui.graphics.Color.Black
+            )
 
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Game code is: $gameCode" )
+                Text(text = "Game code is: $gameCode", Modifier.padding(bottom = 20.dp))
                 GameButton(
-                    onClick = { },
+                    onClick = { createGame(mContext, gameName.value, isPrivateGame.value, minNumPlayers.value, maxNumPlayers.value, numRounds.value, roundDuration.value, gameMode.value, initialPlayerBalance.value, gameCode) },
                     text = "Create game",
                     enabled = createGameEnabled,
                 )
@@ -191,8 +187,16 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         }
     }
 
+    /**
+     * A picker field that displays numbers within a bounded range, using arrows to increment or decrement the value
+     * @param title The title of the field
+     * @param value The current value of the field
+     * @param onValueChange The callback to be called when the value of the field changes
+     * @param minValue The minimum value of the field
+     * @param maxValue The maximum value of the field
+     */
     @Composable
-    fun NumberPickerField(
+    private fun NumberPickerField(
         title: String,
         value: Int,
         onValueChange: (Int) -> Unit,
@@ -203,17 +207,18 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = title, modifier = Modifier.weight(1f))
             ArrowButton(
                 onClick = { if (value > minValue) onValueChange(value - step) },
-                enabled = isEnabled && value > minValue
+                enabled = isEnabled && value > minValue,
+                leftArrow = true
             )
             Text(
                 text = value.toString(),
                 modifier = Modifier
-                    .width(65.dp)
+                    .width(GAME_LOBBY_MENU_PICKER_WIDTH)
                     .wrapContentWidth(Alignment.CenterHorizontally),
                 textAlign = TextAlign.Center
             )
@@ -224,14 +229,23 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         }
     }
 
+    /**
+     * A picker field that displays a list of items and allows the user to iterate through them with arrows
+     * @param title The title of the field
+     * @param value The current value of the field
+     * @param onValueChange The callback to be called when the value of the field changes
+     * @param items The list of items to be displayed
+     * @param isEnabled Whether the field is enabled or not
+     * @param width The width of the field
+     */
     @Composable
-    fun <T> ListPickerField(
+    private fun <T> ListPickerField(
         title: String,
         value: T,
         onValueChange: (T) -> Unit,
         items: List<T>,
         isEnabled: Boolean = true,
-        width : Dp = 65.dp
+        width : Dp = GAME_LOBBY_MENU_PICKER_WIDTH
     ) {
         val currentIndex = items.indexOf(value)
 
@@ -246,7 +260,8 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                         onValueChange(items[currentIndex - 1])
                     }
                 },
-                enabled = isEnabled && currentIndex > 0
+                enabled = isEnabled && currentIndex > 0,
+                leftArrow = true
             )
             Text(
                 text = value.toString(),
@@ -259,28 +274,47 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                         onValueChange(items[currentIndex + 1])
                     }
                 },
-                enabled = isEnabled && currentIndex < items.lastIndex
+                enabled = isEnabled && currentIndex < items.lastIndex,
             )
         }
     }
 
 
     @Composable
-    private fun ArrowButton(onClick: () -> Unit, enabled: Boolean) {
+    private fun ArrowButton(onClick: () -> Unit, enabled: Boolean, leftArrow : Boolean = false) {
         IconButton(onClick = onClick, enabled = enabled) {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "Arrow",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp).rotate(if (leftArrow) 180f else 0f)
             )
         }
+    }
+
+    private fun createGame(mContext : Context, name: String, isPrivate: Boolean, minPlayers: Int, maxPlayers: Int, numRounds: Int, roundDuration: String, gameMode: GameMode, initialPlayerBalance: Int, gameCode: String) {
+
+        val rules : GameParameters = GameParameters(
+            gameMode = gameMode,
+            minimumNumberOfPlayers = minPlayers,
+            maximumNumberOfPlayers = maxPlayers,
+            roundDuration = GAME_LOBBY_ROUNDS_DURATIONS[roundDuration]!!,
+            maxRound = numRounds,
+            initialPlayerBalance = initialPlayerBalance
+        )
+        val lobby : GameLobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
+
+        //TODO : create game in database and navigate to game screen
+        val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+        gameLobbyIntent.putExtra("lobby_code", "1234")
+        startActivity(gameLobbyIntent)
+        finish()
     }
 
     /**
      * a button
      */
     @Composable
-    fun GameButton(onClick: () -> Unit, text: String, enabled: Boolean = true) {
+    private fun GameButton(onClick: () -> Unit, text: String, enabled: Boolean = true) {
         Button(
             onClick = onClick,
             modifier = Modifier
