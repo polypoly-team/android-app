@@ -2,11 +2,12 @@
     <string name="app_name">polypoly</string>
     <string name="title_activity_greeting" />
     <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_sign_in">authentication</string>
-    <string name="title_activity_welcome">polypoly</string>
+    <string name="title_activity_sign_in">polypoly</string>
+    <string name="title_activity_welcome">welcome</string>
 
     // LOBBIES ==================================================================
     <string name="title_activity_join_game_lobby">JoinLobby</string>
+    <string name="title_create_game_lobby">CreateLobby</string>
     <string name="join_game_lobby_button_text">Join</string>
     <string name="game_lobby_does_not_exist">Lobby does not exist</string>
     <string name="game_lobby_code_is_empty">Lobby code is empty</string>

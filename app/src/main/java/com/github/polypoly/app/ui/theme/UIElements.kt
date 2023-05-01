@@ -1,8 +1,6 @@
 package com.github.polypoly.app.ui.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 
 /**
@@ -18,6 +16,17 @@ object UIElements {
             unfocusedBorderColor = MaterialTheme.colors.secondary,
             focusedBorderColor = MaterialTheme.colors.primary,
             unfocusedLabelColor = MaterialTheme.colors.secondary
+        )
+    }
+
+    @Composable
+    fun checkboxColors() : CheckboxColors {
+        return CheckboxDefaults.colors(
+            checkedColor = MaterialTheme.colors.primary,
+            uncheckedColor = MaterialTheme.colors.secondary,
+            checkmarkColor = MaterialTheme.colors.onPrimary,
+            disabledColor = MaterialTheme.colors.onSecondary,
+            disabledIndeterminateColor = MaterialTheme.colors.onSecondary,
         )
     }
 }

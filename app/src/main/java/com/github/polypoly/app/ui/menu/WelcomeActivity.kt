@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -123,10 +124,8 @@ class WelcomeActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
                 GameButton(onClick = {
-                    // TODO: dummy button that sends to GameLobbyActivity, temporary
-                    val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-                    gameLobbyIntent.putExtra("lobby_code", "1234abc")
-                    startActivity(gameLobbyIntent)
+                    val createGameLobbyIntent = Intent(mContext, CreateGameLobbyActivity::class.java)
+                    startActivity(createGameLobbyIntent)
                 }, text = "Create Game?")
             }
         }
