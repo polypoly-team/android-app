@@ -9,18 +9,14 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidView
-import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -29,8 +25,6 @@ import org.osmdroid.views.overlay.Marker
  * Activity for displaying the map used in the game.
  */
 class GameActivity : ComponentActivity() {
-    // store the map view for testing purposes
-    lateinit var mapView: MapView private set
 
     // mock current Player
     private val currentPlayer = Player(
@@ -87,7 +81,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapView()
+                    MapUI.MapView()
                     PropertyInteractUIComponent()
                     RollDiceDialog()
                     RollDiceButton()
@@ -103,28 +97,6 @@ class GameActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Initialize the map view that sits beneath the UI components.
-     */
-    @Composable
-    fun MapView() {
-        AndroidView(factory = { context ->
-            Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-            val mapView = initMapView(context)
-            for (zone in getZones())
-                for (location in zone.locationProperties) {
-                    val marker =
-                        addMarkerTo(mapView, location.position(), location.name, zone.color)
-                    gameViewModel.markerToLocationProperty[marker] = location
-                }
-
-            val currentLocationOverlay = initLocationOverlay(mapView)
-            mapView.overlays.add(currentLocationOverlay)
-            this.mapView = mapView
-            mapView
-        }, modifier = Modifier.testTag("map"))
-    }
-
     // ============================== PREVIEW ==============================
     @Preview
     @Composable
@@ -134,7 +106,7 @@ class GameActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                MapView()
+                MapUI.MapView()
                 PropertyInteractUIComponent()
                 RollDiceDialog()
                 RollDiceButton()

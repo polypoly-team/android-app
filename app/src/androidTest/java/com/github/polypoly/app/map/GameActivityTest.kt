@@ -1,28 +1,22 @@
 package com.github.polypoly.app.map
 
-import android.content.Context
-import android.location.Location
-import android.location.LocationManager
-import android.os.SystemClock
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.text.TextRange
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.ui.map.MapUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
-import org.w3c.dom.Text
 
 @RunWith(AndroidJUnit4::class)
 class GameActivityTest {
@@ -158,7 +152,7 @@ class GameActivityTest {
     }
     
     private fun getRandomMarker(): Marker {
-        val mapView = composeTestRule.activity.mapView
+        val mapView = MapUI.mapView
         val n = mapView.overlays.filterIsInstance<Marker>().size
         val random = (0 until n).random()
         return mapView.overlays.filterIsInstance<Marker>()[random]
