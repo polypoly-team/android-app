@@ -280,6 +280,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     }
 
 
+    /**
+     * A button that displays an arrow
+     */
     @Composable
     private fun ArrowButton(onClick: () -> Unit, enabled: Boolean, leftArrow : Boolean = false) {
         IconButton(onClick = onClick, enabled = enabled) {
@@ -291,9 +294,12 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         }
     }
 
+    /**
+     *  Creates a game lobby, registers it in DB and navigates to the game lobby screen
+     */
     private fun createGame(mContext : Context, name: String, isPrivate: Boolean, minPlayers: Int, maxPlayers: Int, numRounds: Int, roundDuration: String, gameMode: GameMode, initialPlayerBalance: Int, gameCode: String) {
 
-        val rules : GameParameters = GameParameters(
+        val rules = GameParameters(
             gameMode = gameMode,
             minimumNumberOfPlayers = minPlayers,
             maximumNumberOfPlayers = maxPlayers,
@@ -301,7 +307,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             maxRound = numRounds,
             initialPlayerBalance = initialPlayerBalance
         )
-        val lobby : GameLobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
+        val lobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
 
         //TODO : create game in database and navigate to game screen
         val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
