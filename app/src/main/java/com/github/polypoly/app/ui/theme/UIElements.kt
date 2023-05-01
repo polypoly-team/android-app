@@ -40,8 +40,8 @@ object UIElements {
      * @param height the height of the button in dp (default 60)
      */
     @Composable
-    fun DiscreetButton(onClick: () -> Unit, text: String, testTag: String,
-                       width: Int = 200, height: Int = 60) {
+    fun SecondaryButton(onClick: () -> Unit, text: String, testTag: String,
+                        width: Int = 200, height: Int = 60) {
         Button(
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 0.dp,

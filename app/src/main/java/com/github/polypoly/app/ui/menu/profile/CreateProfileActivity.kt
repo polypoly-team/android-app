@@ -128,7 +128,7 @@ class CreateProfileActivity : ComponentActivity() {
                     // TODO
                 } else {
                     val guestMenuIntent = Intent(mContext, GuestMenuActivity::class.java)
-                    guestMenuIntent.putExtra("userNickname", nickname.value)
+                    guestMenuIntent.putExtra("user_nickname", nickname.value)
                     finish()
                     startActivity(guestMenuIntent)
                 }

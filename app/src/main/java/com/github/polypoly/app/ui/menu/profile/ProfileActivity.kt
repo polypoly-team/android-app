@@ -32,7 +32,7 @@ import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.ui.theme.UIElements.DiscreetButton
+import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 
 class ProfileActivity : MenuActivity("Profile") {
 
@@ -133,7 +133,7 @@ class ProfileActivity : MenuActivity("Profile") {
     fun ModifyProfileButton() {
         val mContext = LocalContext.current
 
-        DiscreetButton(
+        SecondaryButton(
             onClick = {
                 val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                 profileModifyingIntent.putExtra("userId", userId)

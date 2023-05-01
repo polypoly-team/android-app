@@ -18,11 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.base.GameMusic.stopSong
 import com.github.polypoly.app.ui.menu.MenuComposable.RulesButton
 import com.github.polypoly.app.ui.menu.MenuComposable.SettingsButton
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.ui.theme.UIElements.DiscreetButton
+import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 
 /**
@@ -42,7 +43,7 @@ class GuestMenuActivity : ComponentActivity()  {
     fun SimpleMenuContent() {
         GameMusic.setSong(LocalContext.current, R.raw.mocksong)
         GameMusic.startSong()
-        val nickname: String = intent.getStringExtra("userNickname") ?: DEFAULT_NICKNAME
+        val nickname: String = intent.getStringExtra("user_nickname") ?: DEFAULT_NICKNAME
 
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,8 +86,9 @@ class GuestMenuActivity : ComponentActivity()  {
     @Composable
     private fun ReturnToSignInButton() {
         val mContext = LocalContext.current
+        stopSong()
 
-        DiscreetButton(
+        SecondaryButton(
             onClick = {
                 val signInIntent = Intent(mContext, SignInActivity::class.java)
                 finish()
