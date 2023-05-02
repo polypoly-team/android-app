@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.base.GameMusic.stopSong
+import com.github.polypoly.app.ui.map.VisitMapActivity
 import com.github.polypoly.app.ui.menu.MenuComposable.RulesButton
 import com.github.polypoly.app.ui.menu.MenuComposable.SettingsButton
 import com.github.polypoly.app.ui.theme.Padding
@@ -102,8 +103,13 @@ class GuestMenuActivity : ComponentActivity()  {
      */
     @Composable
     private fun DiscoverTheMapButton() {
+        val mContext = LocalContext.current
         MainActionButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                val visitedMapIntent = Intent(mContext, VisitMapActivity::class.java)
+                finish()
+                startActivity(visitedMapIntent)
+            },
             testTag = "discover_map_button",
             text = "Discover the map",
             enabled = true,
