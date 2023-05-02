@@ -17,7 +17,7 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 /**
  * The map the user can visit when he/she is connected as a guest
  */
-class VisitedMapActivity : ComponentActivity()  {
+class VisitMapActivity : ComponentActivity()  {
     val mapViewModel: MapViewModel = MapViewModel()
 
     // flag to show the building info dialog

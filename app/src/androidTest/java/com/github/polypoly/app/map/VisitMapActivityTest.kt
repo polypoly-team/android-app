@@ -6,7 +6,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.ui.map.MapUI
-import com.github.polypoly.app.ui.map.VisitedMapActivity
+import com.github.polypoly.app.ui.map.VisitMapActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -17,10 +17,10 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class VisitedMapActivityTest {
+class VisitMapActivityTest {
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<VisitedMapActivity>()
+    val composeTestRule = createAndroidComposeRule<VisitMapActivity>()
 
     @Before
     fun startIntents() { Intents.init() }

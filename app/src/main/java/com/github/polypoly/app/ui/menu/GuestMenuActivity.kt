@@ -17,10 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.base.GameMusic.stopSong
-import com.github.polypoly.app.ui.map.VisitedMapActivity
+import com.github.polypoly.app.ui.map.VisitMapActivity
 import com.github.polypoly.app.ui.menu.MenuComposable.RulesButton
 import com.github.polypoly.app.ui.menu.MenuComposable.SettingsButton
-import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
@@ -107,7 +106,7 @@ class GuestMenuActivity : ComponentActivity()  {
         val mContext = LocalContext.current
         MainActionButton(
             onClick = {
-                val visitedMapIntent = Intent(mContext, VisitedMapActivity::class.java)
+                val visitedMapIntent = Intent(mContext, VisitMapActivity::class.java)
                 finish()
                 startActivity(visitedMapIntent)
             },
