@@ -6,5 +6,6 @@ object Padding {
     val small = 4.dp
     val medium = 8.dp
     val large = 16.dp
+    val veryLarge = 32.dp
     val onBackground = 30.dp
 }

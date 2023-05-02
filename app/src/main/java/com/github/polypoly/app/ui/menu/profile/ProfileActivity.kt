@@ -33,6 +33,7 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 
 class ProfileActivity : MenuActivity("Profile") {
 
@@ -132,26 +133,17 @@ class ProfileActivity : MenuActivity("Profile") {
     @Composable
     fun ModifyProfileButton() {
         val mContext = LocalContext.current
-        Button(
-            elevation = ButtonDefaults.elevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp
-            ),
+
+        SecondaryButton(
             onClick = {
                 val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
                 profileModifyingIntent.putExtra("userId", userId)
                 finish()
                 startActivity(profileModifyingIntent)
             },
-            shape = CircleShape,
-            modifier = Modifier
-                .testTag("modifyProfileButton"),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant)
-        ) {
-            Text("Modify profile")
-        }
+            text = "Modify profile",
+            testTag = "modify_profile_button"
+        )
     }
 
     /**

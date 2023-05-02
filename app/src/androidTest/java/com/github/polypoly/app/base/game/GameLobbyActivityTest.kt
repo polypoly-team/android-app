@@ -6,7 +6,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.ui.game.MapActivity
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import org.junit.After
 import org.junit.Before
@@ -32,7 +32,7 @@ class GameLobbyActivityTest {
     @Test
     fun goButtonLaunchesGameActivity() {
         goButton.performClick()
-        Intents.intended(IntentMatchers.hasComponent(MapActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasComponent(GameActivity::class.java.name))
     }
 
 }
