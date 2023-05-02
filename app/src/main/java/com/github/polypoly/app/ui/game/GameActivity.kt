@@ -10,16 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
-import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -32,50 +30,9 @@ class GameActivity : ComponentActivity() {
     // store the map view for testing purposes
     lateinit var mapView: MapView private set
 
-    // mock current Player
-    private val currentPlayer = Player(
-        user = User(
-            id = 4572,
-            name = "User test 1",
-            bio = "",
-            skin = Skin.default(),
-            stats = Stats(0, 0, 0, 0, 0),
-            trophiesWon = listOf(),
-            trophiesDisplay = mutableListOf(),
-        ),
-        balance = 420,
-        ownedLocations = listOf(),
-        roundLost = null,
-    )
-
-    // mock List of Players
-    private val players = listOf(
-        Player(
-            user = User(
-                id = 4573,
-                name = "User test 2",
-                bio = "",
-                skin = Skin.default(),
-                stats = Stats(0, 0, 0, 0, 0),
-                trophiesWon = listOf(),
-                trophiesDisplay = mutableListOf(),
-            ),
-            balance = 32,
-            ownedLocations = listOf(),
-            roundLost = null,
-        ), Player(
-            user = User(
-                id = 4574,
-                name = "User test 3",
-                bio = "",
-                skin = Skin.default(),
-                stats = Stats(0, 0, 0, 0, 0),
-                trophiesWon = listOf(),
-                trophiesDisplay = mutableListOf(),
-            ),
-            balance = 56,
-            ownedLocations = listOf(),
-            roundLost = null,
+    val game = Game.launchFromPendingGame(
+        GameLobby(
+            admin = GlobalInstances.currentUser
         )
     )
 
@@ -92,10 +49,11 @@ class GameActivity : ComponentActivity() {
                     RollDiceDialog()
                     RollDiceButton()
                     DistanceWalkedUIComponents()
+                    print("${GlobalInstances.currentUser.id}")
                     Hud(
-                        currentPlayer,
-                        players,
-                        16,
+                        game.getPlayer(GlobalInstances.currentUser.id)!!,
+                        game.players,
+                        game.currentRound,
                         gameViewModel.interactableProperty.value?.name ?: ""
                     )
                 }
@@ -123,29 +81,6 @@ class GameActivity : ComponentActivity() {
             this.mapView = mapView
             mapView
         }, modifier = Modifier.testTag("map"))
-    }
-
-    // ============================== PREVIEW ==============================
-    @Preview
-    @Composable
-    fun MapViewPreview() {
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                MapView()
-                PropertyInteractUIComponent()
-                RollDiceDialog()
-                RollDiceButton()
-                DistanceWalkedUIComponents()
-                Hud(
-                    currentPlayer, players,
-                    16,
-                    gameViewModel.interactableProperty.value?.name ?: ""
-                )
-            }
-        }
     }
 
     companion object {
