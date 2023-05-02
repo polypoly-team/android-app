@@ -18,10 +18,10 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  * The map the user can visit when he/she is connected as a guest
  */
 class VisitedMapActivity : ComponentActivity()  {
-    private val mapViewModel: MapViewModel = MapViewModel()
+    val mapViewModel: MapViewModel = MapViewModel()
 
     // flag to show the building info dialog
-    private val interactingWithProperty = mutableStateOf(false)
+    val interactingWithProperty = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
