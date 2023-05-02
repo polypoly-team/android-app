@@ -57,6 +57,11 @@
             android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ui.menu.GuestMenuActivity"
+            android:exported="true"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".ui.menu.SignInActivity"
             android:exported="true"
             android:label="@string/title_activity_sign_in"
