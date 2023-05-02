@@ -68,7 +68,7 @@ class GuestMenuActivityTest {
         val guestNameTest = "Test"
         val testIntent =
             Intent(ApplicationProvider.getApplicationContext(), GuestMenuActivity::class.java)
-        testIntent.putExtra("userNickname", guestNameTest)
+        testIntent.putExtra("user_nickname", guestNameTest)
         ActivityScenario.launch<GuestMenuActivity>(testIntent)
 
         composeTestRule.onNodeWithText("Welcome $guestNameTest").assertIsDisplayed()
