@@ -85,6 +85,6 @@ class VisitedMapActivityTest {
         composeTestRule.onNodeWithTag("building_description_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithTag("close_building_description_dialog").performClick()
         runBlocking { delay(500) }
-        composeTestRule.onNodeWithTag("building_description_dialog").assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag("building_description_dialog").assertDoesNotExist()
     }
 }
