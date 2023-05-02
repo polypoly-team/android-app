@@ -144,8 +144,9 @@ object MenuComposable {
     private fun RankingsButton() {
         ActivityOptionButton(
             destinationActivity = RankingsActivity::class.java,
-            iconId = R.drawable.tmp_happysmile,
-            description = "Open Rankings"
+            icon = Icons.Default.Person,
+            description = "Open Rankings",
+            testTag = "rankings_button"
         )
     }
 
