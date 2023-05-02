@@ -1,8 +1,8 @@
 package com.github.polypoly.app.ui.game
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,25 +10,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
@@ -55,14 +64,23 @@ fun HudLocation(location: String) {
             .fillMaxWidth()
             .padding(Padding.medium)
     ) {
-        Text(
-            text = location,
-            modifier = Modifier
-                .align(Alignment.TopCenter).testTag("location_text")
-                .offset(y = 30.dp)
-            ,
-            fontSize = MaterialTheme.typography.h6.fontSize
-        )
+        if (location.isNotEmpty())
+            Text(
+                text = location,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .testTag("location_text")
+                    .offset(y = 10.dp)
+                    .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                    .border(
+                        1.dp,
+                        changeOpacity(MaterialTheme.colors.onBackground, 0.5f),
+                        shape = Shapes.medium
+                    )
+                    .padding(Padding.medium),
+                fontSize = MaterialTheme.typography.h4.fontSize,
+                fontWeight = MaterialTheme.typography.h4.fontWeight
+            )
     }
 }
 
@@ -76,22 +94,16 @@ fun HudPlayer(playerData: Player) {
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier
-                .padding(Padding.medium)
-                .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                .align(Alignment.BottomEnd)
+            modifier = Modifier.align(BottomEnd),
+            contentAlignment = Center
         ) {
-            Row(Modifier.padding(Padding.medium)) {
-                HudButton(
-                    name = "playerInfoButton",
-                    onClick = { openPlayerInfo = true },
-                    icon_id = R.drawable.tmp_happysmile,
-                    description = "See player information"
-                )
-                Column(Modifier.padding(Padding.medium)) {
-                    HudText("playerBalance", "${playerData.getBalance()} $")
-                }
-            }
+            MoneyHudText("playerBalance", "${playerData.getBalance()} $")
+            HudButton(
+                name = "playerInfoButton",
+                onClick = { openPlayerInfo = true },
+                icon = Icons.Filled.Person,
+                description = "See player information"
+            )
         }
     }
 
@@ -136,8 +148,8 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                     "Expand or collapse the stats for other players and the game",
                     { isExpanded = !isExpanded },
                     isExpanded,
-                    R.drawable.tmp_sadsmile,
-                    R.drawable.tmp_happysmile
+                    Icons.Filled.ArrowDropUp,
+                    Icons.Filled.Info
                 )
 
                 // The stats for other players and the game slide in and out when the drop down
@@ -176,7 +188,7 @@ fun HudGame(round: Int) {
         HudButton(
             name = "gameInfoButton",
             onClick = { openGameInfo = true },
-            icon_id = R.drawable.tmp_happysmile,
+            icon = Icons.Filled.Info,
             description = "See game information"
         )
         Column(Modifier.padding(Padding.medium)) {
@@ -213,7 +225,7 @@ fun HudOtherPlayer(playerData: Player) {
         HudButton(
             name = "otherPlayerInfoButton",
             onClick = { openOtherPlayerInfo = true },
-            icon_id = R.drawable.tmp_happysmile,
+            icon = Icons.Filled.Person,
             description = "See other player information"
         )
         Column(Modifier.padding(Padding.medium)) {
@@ -250,10 +262,9 @@ fun HudGameMenu() {
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
-                .padding(Padding.medium)
                 .align(Alignment.BottomStart)
         ) {
-            Column(Modifier.padding(Padding.medium)) {
+            Column(modifier = Modifier.padding(10.dp, 0.dp)) {
                 // The game menu slides in and out when the game menu button is pressed
                 AnimatedVisibility(
                     visible = openGameMenu,
@@ -261,8 +272,7 @@ fun HudGameMenu() {
                     Surface(
                         color = MaterialTheme.colors.background,
                         shape = Shapes.medium,
-                        modifier = Modifier
-                            .padding(Padding.medium)
+                        modifier = Modifier.padding(Padding.medium)
                     ) {
                         MenuComposable.RowButtons()
                     }
@@ -272,7 +282,7 @@ fun HudGameMenu() {
                 HudButton(
                     name = "gameMenuDropDownButton",
                     onClick = { openGameMenu = !openGameMenu },
-                    icon_id = R.drawable.tmp_happysmile,
+                    icon = Icons.Filled.Menu,
                     description = "Expand or collapse the game menu"
                 )
             }
@@ -284,18 +294,20 @@ fun HudGameMenu() {
  * A button that is used in the HUD
  */
 @Composable
-fun HudButton(name: String, onClick: () -> Unit, icon_id: Int, description: String) {
+fun HudButton(name: String, onClick: () -> Unit, icon: ImageVector, description: String) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .semantics { contentDescription = description }
-            .testTag(name),
+            .testTag(name)
+            .padding(bottom = Padding.large),
         shape = CircleShape,
     ) {
-        Image(
-            painter = painterResource(icon_id),
-            contentDescription = description,
-            modifier = Modifier.size(50.dp)
+        Icon(
+            icon, contentDescription = null,
+            modifier = Modifier
+                .padding(Padding.small)
+                .size(30.dp)
         )
     }
 }
@@ -315,6 +327,22 @@ fun HudText(name: String, text: String) {
     )
 }
 
+@Composable
+fun MoneyHudText(name: String, text: String) {
+    Box(modifier = Modifier.offset(x = (-50).dp, y = -(7).dp)) {
+        Text(
+            text = text,
+            modifier = Modifier
+                .testTag(name)
+                .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                .width(100.dp)
+                .padding(Padding.medium),
+            fontSize = MaterialTheme.typography.h6.fontSize,
+            fontWeight = MaterialTheme.typography.h6.fontWeight
+        )
+    }
+}
+
 /**
  * A button whose icon changes depending on a toggle
  */
@@ -324,8 +352,8 @@ fun ToggleIconButton(
     description: String,
     onClick: () -> Unit,
     toggle: Boolean,
-    onIcon: Int,
-    offIcon: Int
+    onIcon: ImageVector,
+    offIcon: ImageVector
 ) {
     Button(
         onClick = onClick,
@@ -335,18 +363,16 @@ fun ToggleIconButton(
         shape = CircleShape,
     )
     {
-        if (toggle) {
-            Image(
-                painter = painterResource(onIcon),
-                contentDescription = "Expand",
-                modifier = Modifier.size(50.dp)
-            )
-        } else {
-            Image(
-                painter = painterResource(offIcon),
-                contentDescription = "Collapse",
-                modifier = Modifier.size(50.dp)
-            )
-        }
+        if (toggle)
+            Icon(onIcon, contentDescription = null, modifier = Modifier.size(20.dp))
+        else
+            Icon(offIcon, contentDescription = null, modifier = Modifier.size(50.dp))
     }
+}
+
+/**
+ * Changes the opacity of a color
+ */
+fun changeOpacity(color: Color, opacity: Float): Color {
+    return Color(color.red, color.green, color.blue, opacity)
 }
