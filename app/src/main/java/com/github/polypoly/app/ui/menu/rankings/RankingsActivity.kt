@@ -1,32 +1,62 @@
 package com.github.polypoly.app.ui.menu.rankings
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
 import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.MenuActivity
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.ui.theme.CustomTabRow
+import com.github.polypoly.app.ui.theme.Padding
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 
 /**
- * The rankings activity, composed of a row of rankings lists tabs
+ * The maximum number of entries to display in a ranking list
+ */
+private const val maxRankingEntries: Int = 100
+
+/**
+ * The rankings activity, displaying a row of rankings lists tabs of [User]s according to
+ * different [RankingCategory]s
  */
 class RankingsActivity : MenuActivity("Rankings") {
+    /**
+     * The [RankingsViewModel] used to fetch the users from the database and compute the rankings
+     */
+    private val viewModel: RankingsViewModel = RankingsViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Fetch the users from the database
+        viewModel.fetchUsers()
+
         setContent {
             MenuContent {
                 RankingsContent()
@@ -35,69 +65,145 @@ class RankingsActivity : MenuActivity("Rankings") {
     }
 
     /**
-     * The different categories of rankings
-     *
-     * @property name The name of the category
-     * @property criteria The criteria to use to rank the users
-     */
-    enum class RankingCategory(val description: String, val criteria: (User) -> Int) {
-        WINS("Most Wins", { user -> user.stats.numberOfWins }),
-        TROPHIES("Most Trophies", { user -> user.trophiesWon.count() }),
-        GAMES("Most Games", { user -> user.stats.numberOfGames })
-    }
-
-    /**
      * The rankings view, composed of a row of rankings lists for each [RankingCategory]
      */
+    @OptIn(ExperimentalPagerApi::class)
     @Composable
     private fun RankingsContent() {
-        var users: List<User> = emptyList()
-
-        // Retrieve all registered users from the database
-        remoteDB.getAllValues<User>(DB_USERS_PROFILES_PATH).thenAccept { users = it }
-
+        // There's a tab for each ranking category
         val tabs = RankingCategory.values()
-        var selectedTabIndex by remember { mutableStateOf(0) }
+        val state = rememberPagerState()
 
-        Column {
-            // The row of tabs at the top of the screen that lists the types of rankings
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = MaterialTheme.colors.onPrimary) {
-                tabs.forEachIndexed { index, category ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = {
-                            Text(
-                                text = category.description,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    )
-                }
-            }
+        Box(Modifier.fillMaxSize()) {
+            // The background of the rankings view, displaying the game map
+            Image(
+                painter = painterResource(id = R.drawable.epfl_osm_2),
+                contentDescription = "A background image of the game map",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.FillBounds
+            )
 
-            // The column that displays the rankings list of the currently selected tab
-            LazyColumn {
-                items(computeRanking(users, tabs[selectedTabIndex])) {
-                    Text(text = it.name)
-                    Text(text = tabs[selectedTabIndex].criteria(it).toString())
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black.copy(alpha = 0.4f))
+            ) {
+                CustomTabRow(
+                    tabs = tabs.map { it.description },
+                    state = state
+                )
+
+                HorizontalPager(
+                    modifier = Modifier.weight(1f),
+                    count = tabs.size,
+                    state = state
+                ) { page ->
+                    RankingList(tabs[page])
                 }
             }
         }
     }
 
     /**
-     * Computes the ranking of the given users according to the given category
+     * The list view of rankings for the given [RankingCategory]
      *
-     * @param users The users to rank
      * @param category The category to use to rank the users
      *
-     * @return The list of users, ranked according to the given category
+     * @see RankingsContent
      */
-    private fun computeRanking(users: List<User>, category: RankingCategory): List<User> {
-        return users.sortedByDescending { user -> category.criteria(user) }
+    @Composable
+    private fun RankingList(category: RankingCategory) {
+        // The column that displays the rankings list of the currently selected tab
+        LazyColumn(Modifier.padding(Padding.onBackground)) {
+            itemsIndexed(viewModel.getRanking(category).take(maxRankingEntries)) { rank, user ->
+                UserRank(rank, user, category)
+            }
+        }
+    }
+
+    /**
+     * A card displaying the [User]'s rank according to a [RankingCategory], along with their
+     * statistics for the given ranking criteria
+     *
+     * @param rank The rank of the user
+     * @param user The user to display
+     * @param category The category used to rank the users
+     *
+     * @see RankingList
+     */
+    @Composable
+    private fun UserRank(rank: Int, user: User, category: RankingCategory) {
+        // User ranks in the list view alternate between primary and secondary color
+        val cardColor = CardDefaults.cardColors(containerColor =
+            if (rank % 2 == 0)
+                MaterialTheme.colors.primary
+            else
+                MaterialTheme.colors.secondaryVariant)
+        val textColor =
+            if (rank % 2 == 0)
+                MaterialTheme.colors.onPrimary
+            else
+                MaterialTheme.colors.onSecondary
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(
+                // Flat cards
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp
+            ),
+            colors = cardColor
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                content = {
+                    // User's rank, on the left
+                    Text(
+                        text = "#${rank + 1}",
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = Padding.large, top = Padding.medium, bottom = Padding.medium),
+                        color = textColor
+                    )
+                    // TODO: Add user's skin on the rankings
+                    // User's name, centered
+                    Text(
+                        text = user.name,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.SemiBold,
+                        color = textColor
+                    )
+                    // User's statistics for the given category, on the right
+                    Text(
+                        text = category.criteria(user).toString(),
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(end = Padding.large, top = Padding.medium, bottom = Padding.medium),
+                        color = textColor
+                    )
+                }
+            )
+        }
+    }
+
+    @Preview(
+        name = "Light Mode"
+    )
+    @Preview(
+        name = "Dark Mode",
+        uiMode = Configuration.UI_MODE_NIGHT_YES
+    )
+    /**
+     * Preview of the [RankingsActivity]
+     */
+    @Composable
+    fun RankingsPreview() {
+        MenuContent {
+            RankingsContent()
+        }
     }
 }
