@@ -12,7 +12,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.RulesObject
-import com.github.polypoly.app.ui.map.VisitedMapActivity
+import com.github.polypoly.app.ui.map.VisitMapActivity
 import com.github.polypoly.app.ui.menu.GuestMenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
@@ -90,6 +90,6 @@ class GuestMenuActivityTest {
     @Test
     fun goToVisitedMapActivityWhenClickOnDiscoverMapButton() {
         composeTestRule.onNodeWithTag("discover_map_button").performClick()
-        Intents.intended(IntentMatchers.hasComponent(VisitedMapActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasComponent(VisitMapActivity::class.java.name))
     }
 }
