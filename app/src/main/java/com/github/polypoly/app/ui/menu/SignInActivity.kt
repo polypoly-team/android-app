@@ -6,15 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
@@ -35,6 +31,7 @@ import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -178,7 +175,7 @@ class SignInActivity : ComponentActivity() {
      */
     @Composable
     private fun SignInButton() {
-        SignOrGuestButton(
+        MainActionButton(
             onClick = {
                 val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
@@ -189,7 +186,8 @@ class SignInActivity : ComponentActivity() {
                 signInLauncher.launch(signInIntent)
             },
             text = "Sign in to play!",
-            tag = "sign_in_button"
+            testTag = "sign_in_button",
+            enabled = true,
         )
     }
 
@@ -198,33 +196,14 @@ class SignInActivity : ComponentActivity() {
      */
     @Composable
     private fun GuestButton() {
-        SignOrGuestButton(
+        MainActionButton(
             onClick = {
                 launchCreateProfile(false)
             },
             text = "Play as guest",
-            tag = "guest_button"
+            testTag = "guest_button",
+            enabled = true,
         )
-    }
-
-    /**
-     * Button format for the sign-in and guest buttons
-     * @param onClick the action to do when the button is clicked
-     * @param text the text to display on the button
-     * @param tag the tag to use for testing
-     */
-    @Composable
-    private fun SignOrGuestButton(onClick: () -> Unit, text: String, tag: String) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .width(200.dp)
-                .height(60.dp)
-                .testTag(tag),
-            shape = CircleShape,
-        ) {
-            Text(text = text)
-        }
     }
 
     /**

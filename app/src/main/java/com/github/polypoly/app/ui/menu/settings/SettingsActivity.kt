@@ -21,6 +21,7 @@ import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.google.firebase.auth.FirebaseAuth
 
 /**
@@ -59,7 +60,9 @@ class SettingsActivity : MenuActivity("Settings") {
                 Column {
                     Text(text = "Song settings")
                     MusicSlider()
-                    SignOutButton()
+                    if(isSignedIn) {
+                        SignOutButton()
+                    }
                 }
             }
         }
