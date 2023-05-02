@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Displays the distance walked and a button to reset it.
@@ -40,22 +40,22 @@ fun DistanceWalkedUIComponents() {
             modifier = Modifier
                 .background(MaterialTheme.colors.primary)
                 .align(TopEnd)
-                .testTag("distanceWalkedRow")
+                .testTag("distance_walked_row")
         ) {
             Icon(
                 Icons.Filled.DirectionsWalk,
                 contentDescription = "Distance Walked",
-                tint = White,
+                tint = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(Padding.medium)
                     .align(CenterVertically)
             )
             Text(
                 text = formattedDistance(gameViewModel.distanceWalked.value),
-                color = White,
+                color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .testTag("distanceWalked")
+                    .padding(Padding.medium)
+                    .testTag("distance_walked")
             )
         }
     }

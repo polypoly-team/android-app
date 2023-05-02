@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -74,12 +73,11 @@ fun HudLocation(location: String) {
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
-                        changeOpacity(MaterialTheme.colors.onBackground, 0.5f),
+                        MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                fontSize = MaterialTheme.typography.h4.fontSize,
-                fontWeight = MaterialTheme.typography.h4.fontWeight
+                style = MaterialTheme.typography.h4
             )
     }
 }
@@ -337,8 +335,7 @@ fun MoneyHudText(name: String, text: String) {
                 .background(MaterialTheme.colors.background, shape = Shapes.medium)
                 .width(100.dp)
                 .padding(Padding.medium),
-            fontSize = MaterialTheme.typography.h6.fontSize,
-            fontWeight = MaterialTheme.typography.h6.fontWeight
+            style = MaterialTheme.typography.h6,
         )
     }
 }
@@ -370,9 +367,3 @@ fun ToggleIconButton(
     }
 }
 
-/**
- * Changes the opacity of a color
- */
-fun changeOpacity(color: Color, opacity: Float): Color {
-    return Color(color.red, color.green, color.blue, opacity)
-}
