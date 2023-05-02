@@ -6,10 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.user.Skin
@@ -94,29 +92,6 @@ class GameActivity : ComponentActivity() {
                         gameViewModel.interactableProperty.value?.name ?: ""
                     )
                 }
-            }
-        }
-    }
-
-    // ============================== PREVIEW ==============================
-    @Preview
-    @Composable
-    fun MapViewPreview() {
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                MapUI.MapView(gameViewModel, interactingWithProperty)
-                PropertyInteractUIComponent()
-                RollDiceDialog()
-                RollDiceButton()
-                DistanceWalkedUIComponents()
-                Hud(
-                    currentPlayer, players,
-                    16,
-                    gameViewModel.interactableProperty.value?.name ?: ""
-                )
             }
         }
     }
