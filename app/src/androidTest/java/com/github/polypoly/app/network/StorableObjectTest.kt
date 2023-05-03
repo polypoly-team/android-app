@@ -21,7 +21,7 @@ class StorableObjectTest: PolyPolyTest(true, false) {
     private val TEST_PERSON_DB_1 = TestPersonDB("1", "Sylvain", 2023-TEST_PERSON_1.birth)
     private val TEST_PERSON_DB_2 = TestPersonDB("2", "bigflo", 2023-TEST_PERSON_2.birth)
     private val TEST_PERSON_DB_3 = TestPersonDB("3", "Truck", 2023-TEST_PERSON_3.birth)
-    
+
     @Test
     fun getUnregisteredDataFails() {
         val failedFuture = TestPerson().get(LOCAL_KEY)
@@ -94,4 +94,4 @@ class TestPerson(
     }
 }
 
-data class TestPersonDB(val key: String, val name: String, val age: Int)
+data class TestPersonDB(val key: String = "", val name: String = "", val age: Int = 0)
