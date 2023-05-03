@@ -12,7 +12,6 @@ class MockDB: IRemoteStorage {
 
     private val keysHierarchy: MutableMap<String, MutableList<String>> = mutableMapOf()
     private val data: MutableMap<String, Any> = mutableMapOf()
-    private val actions: MutableMap<String, (Any) -> Unit> = mutableMapOf()
 
     private fun cleanKey(key: String): String {
         return key.removePrefix("/").removeSuffix("/")
@@ -55,9 +54,6 @@ class MockDB: IRemoteStorage {
         if (!data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(IllegalAccessException("Update a value not already registered"))
         }
-        if(actions.containsKey(key)) {
-            actions[key]?.invoke(value as Any)
-        }
         return setValue(keyCleaned, value)
     }
 
@@ -78,26 +74,26 @@ class MockDB: IRemoteStorage {
         TODO("Not yet implemented")
     }
 
-    override fun <T : Any> addListener(
+    override fun <T : Any> addChangeListener(
         key: String,
         action: (newObj: T) -> Unit,
         clazz: KClass<T>
     ): CompletableFuture<Boolean> {
-        val keyCleaned = cleanKey(key)
-        if (!data.containsKey(keyCleaned)) {
-            return CompletableFuture.failedFuture(IllegalAccessException("Adds a listener to an unregistered value"))
-        }
-        actions[keyCleaned] = action as (Any) -> Unit
-        return CompletableFuture.completedFuture(true)
+        TODO("Not yet implemented")
     }
 
-    override fun removeListener(key: String): CompletableFuture<Boolean> {
-        if(actions.containsKey(key)) {
-            actions.remove(key)
-            return CompletableFuture.completedFuture(true)
-        }
-        return CompletableFuture.completedFuture(false)
+    override fun deleteChangeListener(key: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
     }
+
+    override fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteRemoveListener(key: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
 
     /**
      * Clears all value in the mock database
@@ -105,6 +101,5 @@ class MockDB: IRemoteStorage {
     fun clear() {
         data.clear()
         keysHierarchy.clear()
-        actions.clear()
     }
 }

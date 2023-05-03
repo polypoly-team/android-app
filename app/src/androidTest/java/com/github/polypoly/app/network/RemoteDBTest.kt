@@ -207,10 +207,33 @@ class RemoteDBTest: PolyPolyTest(false, false) {
 
     // =============================================================== REMOVE VALUE
     @Test
-    fun dataCanBeRemoved() {}
+    fun unregisteredDataCantBeRemoved() {
+        val key = "some_key"
+        assertFalse(
+            remoteDB.removeValue(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
 
     @Test
-    fun unregisteredDataCantBeRemoved() {}*/
+    fun registeredDataCanBeRemoved() {
+        val key = "some_key"
+        val data = TEST_USER_1
+        remoteDB.registerValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(
+            remoteDB.removeValue(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun registeredDataIsRemoved() {
+        val key = "some_key"
+        val data = TEST_USER_1
+        remoteDB.registerValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.removeValue(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertFalse(
+            remoteDB.keyExists(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
 
     /*// ========================================================= ADD LISTENER
     @Test

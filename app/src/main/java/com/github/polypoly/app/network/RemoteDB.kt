@@ -109,7 +109,13 @@ open class RemoteDB(
     }
 
     override fun removeValue(key: String): CompletableFuture<Boolean> {
-        TODO("Not implemented yet") // Hint: set value to null
+        return keyExists(key).thenCompose { exists ->
+            if(exists) {
+                setValue(key, null)
+            } else {
+                CompletableFuture.completedFuture(false)
+            }
+        }
     }
 
     // ========================================================================== LISTENERS
