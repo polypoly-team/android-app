@@ -86,13 +86,6 @@ class MockDB: IRemoteStorage {
         TODO("Not yet implemented")
     }
 
-    override fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteRemoveListener(key: String): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
-    }
 
     /**
      * Clears all value in the mock database

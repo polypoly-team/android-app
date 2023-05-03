@@ -112,9 +112,7 @@ open class RemoteDB(
         return keyExists(key).thenCompose { exists ->
             if(exists) {
                 deleteChangeListener(key).thenCompose {
-                    deleteRemoveListener(key).thenCompose {
-                        setValue(key, null)
-                    }
+                    setValue(key, null)
                 }
             } else {
                 CompletableFuture.completedFuture(false)
@@ -137,6 +135,7 @@ open class RemoteDB(
     }
 
     private val changeListeners = mutableMapOf<String, ValueEventListener>()
+    private val removeListeners = mutableMapOf<String, ValueEventListener>()
 
     override fun <T : Any> addChangeListener(
         key: String,
@@ -168,14 +167,6 @@ open class RemoteDB(
                 ref.removeEventListener(previousListener)
             }
         }
-    }
-
-    override fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(true) // TODO
-    }
-
-    override fun deleteRemoveListener(key: String): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(true) // TODO
     }
 
 }

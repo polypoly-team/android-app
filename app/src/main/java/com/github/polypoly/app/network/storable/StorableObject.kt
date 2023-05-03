@@ -37,14 +37,18 @@ abstract class StorableObject<T : Any>
      * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
      */
     fun getAll(): CompletableFuture<List<StorableObject<T>>> {
-        TODO("implement")
+        return remoteDB.getAllValues(path, clazz).thenCompose { objList ->
+            val result = CompletableFuture<List<StorableObject<T>>>()
+            result.complete(objList.map { obj -> toLocalObject(obj) })
+            result
+        }
     }
 
     /**
      * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
      */
     fun exists(key: String): CompletableFuture<Boolean> {
-        TODO("implement")
+        return remoteDB.keyExists(key)
     }
 
     // ================================================================== SETTERS
@@ -85,10 +89,10 @@ abstract class StorableObject<T : Any>
 
     /**
      * Removes (if any) the action to be executed when this object is modified in DB
-     * @return A future with false iff the action was not removed (if no action was found, returns true)
+     * @return A promise holding false iff the action was not removed (if no action was found, holds true)
      */
     fun offChange(): CompletableFuture<Boolean> {
-        TODO("implement")
+        return remoteDB.deleteChangeListener(path + key)
     }
 
     /**
@@ -97,16 +101,16 @@ abstract class StorableObject<T : Any>
      * @param action: Action to be executed when the DB object is removed
      * @return A future with true iff the action was successfully added
      */
-    fun onRemove(action: Unit): CompletableFuture<Boolean> {
-        return remoteDB.addRemoveListener(path + key, action)
+    fun onRemove(action: () -> Unit): CompletableFuture<Boolean> {
+        TODO("implement if necessary")
     }
 
     /**
      * Removes (if any) the action to be executed when this object is removed in DB
-     * @return A future with false iff the action was not removed (if no action was found, returns true)
+     * @return A promise holding false iff the action was not removed (if no action was found, holds true)
      */
     fun offRemove(): CompletableFuture<Boolean> {
-        TODO("implement")
+        TODO("implement if necessary")
     }
 
     // ================================================================== CONVERTERS

@@ -94,8 +94,6 @@ interface IRemoteStorage {
      */
     fun deleteChangeListener(key: String): CompletableFuture<Boolean>
 
-    fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean>
-    fun deleteRemoveListener(key: String): CompletableFuture<Boolean>
 }
 
 /**
