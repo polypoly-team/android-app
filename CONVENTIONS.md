@@ -40,9 +40,9 @@ In the same fashion, if your activity extends `MenuActivity`, do as follows (wit
 
 
 ## NAMING
-#### Variables, parameters, classes
-In all the project we use ***camelCase***
+#### Variables, parameters, classes, files
+In all the project we use ***camelCase*** (with first letter capitalized for classes and files)
 
-#### Tags, content description
+#### Tags, content description, packages
 However, when you want to add tags, test_tags, descriptions, please use ***snake_case***
 

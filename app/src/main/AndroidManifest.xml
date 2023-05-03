@@ -24,12 +24,17 @@
             android:label="@string/title_activity_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
-            android:name=".ui.game.MapActivity"
+            android:name=".ui.game.GameActivity"
             android:exported="true" /> <!-- ========================================= MENU ACTIVITIES -->
         <activity
             android:name=".ui.menu.lobby.JoinGameLobbyActivity"
             android:exported="false"
             android:label="@string/title_activity_join_game_lobby"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
+            android:name=".ui.menu.lobby.CreateGameLobbyActivity"
+            android:exported="false"
+            android:label="@string/title_create_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
             android:name=".ui.menu.settings.SettingsActivity"
@@ -47,7 +52,22 @@
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ui.menu.profile.CreateProfileActivity"
+            android:exported="true"
+            android:label="@string/title_activity_greeting"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".ui.menu.WelcomeActivity"
+            android:exported="true"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
+            android:name=".ui.map.VisitMapActivity"
+            android:exported="true"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
+            android:name=".ui.menu.GuestMenuActivity"
             android:exported="true"
             android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.Polypoly" />

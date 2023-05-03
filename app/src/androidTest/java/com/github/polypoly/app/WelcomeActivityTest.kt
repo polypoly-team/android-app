@@ -25,10 +25,10 @@ class WelcomeActivityTest : PolyPolyTest(false, false, true) {
     private val buttonJoinGame = composeTestRule.onNodeWithText("Join Game!")
     private val buttonCreateGame = composeTestRule.onNodeWithText("Create Game?")
 
-    private val optionButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
-    private val optionButtonRankings = composeTestRule.onNodeWithContentDescription("Open Rankings")
-    private val optionButtonProfile = composeTestRule.onNodeWithContentDescription("Open Profile")
-    private val optionButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
+    private val optionButtonRules = composeTestRule.onNodeWithTag("rules_button")
+    private val optionButtonRankings = composeTestRule.onNodeWithTag("rankings_button")
+    private val optionButtonProfile = composeTestRule.onNodeWithTag("profile_button")
+    private val optionButtonSettings = composeTestRule.onNodeWithTag("settings_button")
 
     private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
 

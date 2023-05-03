@@ -20,13 +20,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
-//TODO: FIX TESTS FOR CI
 @RunWith(AndroidJUnit4::class)
 class ProfileActivityTest: PolyPolyTest(true, true) {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ProfileActivity>()
 
-    private val button = composeTestRule.onNodeWithTag("modifyProfileButton")
+    private val button = composeTestRule.onNodeWithTag("modify_profile_button")
 
     private val userLoggedIn = TEST_USER_0 // TODO: effectively log in the user before any test
 

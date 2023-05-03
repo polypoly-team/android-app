@@ -6,14 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
@@ -25,14 +22,16 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.RemoteDB
+import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -85,18 +84,31 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
+     * starts the Create Profile and sets the isSignedIn flag
+     */
+    private fun launchCreateProfile(signIn: Boolean) {
+        val createProfileIntent = Intent(this, CreateProfileActivity::class.java)
+        isSignedIn = signIn
+        startActivity(createProfileIntent)
+        finish()
+    }
+
+    /**
      * launched when the sign-in flow is wanted to be started
      */
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) {}
 
+    /**
+     * The content of the SignInActivity
+     */
     @Composable
     fun SignInContent() {
         mAuthListener = FirebaseAuth.AuthStateListener {
             val user = firebaseAuth?.currentUser
             if (user != null) {
-                currentUser = user
+                currentFBUser = user
                 launchWelcome()
             }
         }
@@ -112,12 +124,15 @@ class SignInActivity : ComponentActivity() {
                     // The first element is the logo of the game
                     GameLogo()
                     Spacer(modifier = Modifier.weight(1f))
-                    SignInButton()
+                    SignInOrGuestButtons()
                 }
             }
         }
     }
 
+    /**
+     * The logo of polypoly
+     */
     @Composable
     fun GameLogo() {
         Row(
@@ -134,10 +149,10 @@ class SignInActivity : ComponentActivity() {
     }
 
     /**
-     * This button is used to launch the sign-in flow
+     * The sign-in button and the guest button to access the menu with or without an account
      */
     @Composable
-    private fun SignInButton() {
+    private fun SignInOrGuestButtons() {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
@@ -147,26 +162,48 @@ class SignInActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(2.dp)
-                    .testTag("sign_in_button")
             ) {
-                Button(
-                    onClick = {
-                        val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
-
-                        val signInIntent = AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .build()
-                        signInLauncher.launch(signInIntent)
-                    },
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(70.dp),
-                ) {
-                    Text(text = "Sign in to play!")
-                }
+                SignInButton()
+                Spacer(modifier = Modifier.height(30.dp))
+                GuestButton()
             }
         }
+    }
+
+    /**
+     * This button is used to launch the sign-in flow
+     */
+    @Composable
+    private fun SignInButton() {
+        MainActionButton(
+            onClick = {
+                val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+
+                val signInIntent = AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(providers)
+                    .build()
+                signInLauncher.launch(signInIntent)
+            },
+            text = "Sign in to play!",
+            testTag = "sign_in_button",
+            enabled = true,
+        )
+    }
+
+    /**
+     * This button is used to not sign in and play as a guest
+     */
+    @Composable
+    private fun GuestButton() {
+        MainActionButton(
+            onClick = {
+                launchCreateProfile(false)
+            },
+            text = "Play as guest",
+            testTag = "guest_button",
+            enabled = true,
+        )
     }
 
     /**
