@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -38,7 +36,7 @@ import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUNDS_DURAT
 import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUND_DURATION_DEFAULT
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE as GAME_LOBBY_MIN_INITIAL_BALANCE1
+import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +48,8 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             }
         }
     }
+
+    var gameCode = uniqueCodeGenerator.generateUniqueCode()
 
     @Composable
     fun CreateGameLobbyContent() {
@@ -66,27 +66,26 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     fun GameSettingsMenu() {
         val mContext = LocalContext.current
 
-        val gameName = remember { mutableStateOf("") }
-        val isPrivateGame = remember { mutableStateOf(GAME_LOBBY_PRIVATE_DEFAULT) }
-        val minNumPlayers = remember { mutableStateOf(GAME_LOBBY_MIN_PLAYERS) }
-        val maxNumPlayers = remember { mutableStateOf(GAME_LOBBY_MAX_PLAYERS) }
-        val numRounds = remember { mutableStateOf(GAME_LOBBY_ROUNDS_DEFAULT) }
-        val roundDuration = remember { mutableStateOf(GAME_LOBBY_ROUND_DURATION_DEFAULT) }
-        val gameMode = remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
-        val initialPlayerBalance = remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
-        val gameCode = remember {uniqueCodeGenerator.generateUniqueCode()}
-        
-        val createGameEnabled : Boolean = gameName.value.isNotBlank()
+        var gameName by remember { mutableStateOf("") }
+        var isPrivateGame by remember { mutableStateOf(GAME_LOBBY_PRIVATE_DEFAULT) }
+        var minNumPlayers by remember { mutableStateOf(GAME_LOBBY_MIN_PLAYERS) }
+        var maxNumPlayers by remember { mutableStateOf(GAME_LOBBY_MAX_PLAYERS) }
+        var numRounds by remember { mutableStateOf(GAME_LOBBY_ROUNDS_DEFAULT) }
+        var roundDuration by remember { mutableStateOf(GAME_LOBBY_ROUND_DURATION_DEFAULT) }
+        var gameMode by remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
+        var initialPlayerBalance by remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
+
+        val createGameEnabled : Boolean = gameName.isNotBlank()
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 25.dp),
         ) {
             OutlinedTextField(
-                value = gameName.value,
+                value = gameName,
                 onValueChange = { newText : String ->
-                    gameName.value =
+                    gameName =
                         if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= 10)
                             newText
-                        else gameName.value
+                        else gameName
                 },
                 singleLine = true,
                 label = { Text("Choose a game name") },
@@ -107,8 +106,8 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 ) {
                     Checkbox(
                         modifier = Modifier.offset(x = 12.dp),
-                        checked = isPrivateGame.value,
-                        onCheckedChange = {isPrivateGame.value = !isPrivateGame.value},
+                        checked = isPrivateGame,
+                        onCheckedChange = {isPrivateGame = !isPrivateGame},
                         colors = UIElements.checkboxColors()
                     )
                 }
@@ -117,50 +116,50 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
 
             NumberPickerField(
                 title = "Min number of players : ",
-                value = minNumPlayers.value,
+                value = minNumPlayers,
                 onValueChange = {
-                    minNumPlayers.value = if (it <= maxNumPlayers.value) it
-                    else maxNumPlayers.value
+                    minNumPlayers = if (it <= maxNumPlayers) it
+                    else maxNumPlayers
                 },
                 minValue = GAME_LOBBY_MIN_PLAYERS,
-                maxValue = maxNumPlayers.value
+                maxValue = maxNumPlayers
             )
 
             NumberPickerField(
                 title = "Max number of players : ",
-                value = maxNumPlayers.value,
-                onValueChange = { if (it >= minNumPlayers.value) maxNumPlayers.value = it },
-                minValue = minNumPlayers.value,
+                value = maxNumPlayers,
+                onValueChange = { if (it >= minNumPlayers) maxNumPlayers = it },
+                minValue = minNumPlayers,
                 maxValue = GAME_LOBBY_MAX_PLAYERS
             )
 
             NumberPickerField(
                 title = "Number of rounds : ",
-                value = numRounds.value,
-                onValueChange = { numRounds.value = it },
+                value = numRounds,
+                onValueChange = { numRounds = it },
                 minValue = GAME_LOBBY_MIN_ROUNDS,
                 maxValue = GAME_LOBBY_MAX_ROUNDS
             )
 
             ListPickerField(
                 title = "Round duration : ",
-                value = roundDuration.value,
-                onValueChange = { roundDuration.value = it },
+                value = roundDuration,
+                onValueChange = { roundDuration = it },
                 items = GAME_LOBBY_ROUNDS_DURATIONS.keys.toList()
             )
 
             ListPickerField(
                 title = "Game mode : ",
-                value = gameMode.value,
-                onValueChange = { gameMode.value = it },
+                value = gameMode,
+                onValueChange = { gameMode = it },
                 items = GameMode.values().toList()
             )
 
             NumberPickerField(
                 title = "Initial player balance: ",
-                value = initialPlayerBalance.value,
-                onValueChange = { initialPlayerBalance.value = it },
-                minValue = GAME_LOBBY_MIN_INITIAL_BALANCE1,
+                value = initialPlayerBalance,
+                onValueChange = { initialPlayerBalance = it },
+                minValue = GAME_LOBBY_MIN_INITIAL_BALANCE,
                 maxValue = GAME_LOBBY_MAX_INITIAL_BALANCE,
                 step = GAME_LOBBY_INITIAL_BALANCE_STEP
             )
@@ -178,7 +177,17 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             ) {
                 Text(text = "Game code is: $gameCode", Modifier.padding(bottom = 20.dp))
                 GameButton(
-                    onClick = { createGame(mContext, gameName.value, isPrivateGame.value, minNumPlayers.value, maxNumPlayers.value, numRounds.value, roundDuration.value, gameMode.value, initialPlayerBalance.value, gameCode) },
+                    onClick = {
+                        val rules = GameParameters(
+                            gameMode = gameMode,
+                            minimumNumberOfPlayers = minNumPlayers,
+                            maximumNumberOfPlayers = maxNumPlayers,
+                            roundDuration = GAME_LOBBY_ROUNDS_DURATIONS[roundDuration]!!,
+                            maxRound = numRounds,
+                            initialPlayerBalance = initialPlayerBalance
+                        )
+                        createGameLobby(mContext, rules, gameName, isPrivateGame, gameCode)
+                              },
                     text = "Create game",
                     enabled = createGameEnabled,
                 )
@@ -297,16 +306,8 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     /**
      *  Creates a game lobby, registers it in DB and navigates to the game lobby screen
      */
-    private fun createGame(mContext : Context, name: String, isPrivate: Boolean, minPlayers: Int, maxPlayers: Int, numRounds: Int, roundDuration: String, gameMode: GameMode, initialPlayerBalance: Int, gameCode: String) {
+    private fun createGameLobby(mContext : Context, rules: GameParameters, name: String, isPrivate: Boolean, gameCode: String) {
 
-        val rules = GameParameters(
-            gameMode = gameMode,
-            minimumNumberOfPlayers = minPlayers,
-            maximumNumberOfPlayers = maxPlayers,
-            roundDuration = GAME_LOBBY_ROUNDS_DURATIONS[roundDuration]!!,
-            maxRound = numRounds,
-            initialPlayerBalance = initialPlayerBalance
-        )
         val lobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
 
         //TODO : create game in database and navigate to game screen

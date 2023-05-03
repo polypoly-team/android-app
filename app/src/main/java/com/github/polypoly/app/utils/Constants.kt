@@ -27,6 +27,7 @@ class Constants {
         const val GAME_LOBBY_MAX_INITIAL_BALANCE = 15000
         const val GAME_LOBBY_INITIAL_BALANCE_STEP = 500
         const val GAME_LOBBY_INITIAL_BALANCE_DEFAULT = 2500
+        //TODO make an enum
         const val GAME_LOBBY_ROUND_DURATION_DEFAULT = "1 day"
         val GAME_LOBBY_ROUNDS_DURATIONS = mapOf(
             "5 min" to 5, "10 min" to 5, "15 min" to 5, "20 min" to 5, "25 min" to 5, "30 min" to 5,
