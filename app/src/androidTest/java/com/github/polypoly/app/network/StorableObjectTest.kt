@@ -5,6 +5,7 @@ import com.github.polypoly.app.network.storable.StorableObject
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -24,12 +25,12 @@ class StorableObjectTest: PolyPolyTest(true, false) {
 
     @Test
     fun getUnregisteredDataFails() {
-        val failedFuture = TestPerson().get(LOCAL_KEY)
-        failedFuture.handle { _, e ->
+        val failedPromise = TestPerson().get(LOCAL_KEY)
+        failedPromise.handle { _, e ->
             assertTrue(e != null)
             assertTrue(e is NoSuchElementException)
         }
-        assertThrows(ExecutionException::class.java) { failedFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
+        assertThrows(ExecutionException::class.java) { failedPromise.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
 
     @Test
