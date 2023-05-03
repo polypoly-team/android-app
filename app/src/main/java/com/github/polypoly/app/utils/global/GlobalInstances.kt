@@ -4,7 +4,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.IRemoteStorage
-import com.github.polypoly.app.utils.UniqueCodeGenerator
+import com.github.polypoly.app.ui.menu.lobby.UniqueGameLobbyCodeGenerator
 import com.google.firebase.auth.FirebaseUser
 
 /**
@@ -23,6 +23,6 @@ class GlobalInstances {
         var currentFBUser : FirebaseUser? = null
         var isSignedIn = false
 
-        val uniqueCodeGenerator = UniqueCodeGenerator()
+        val uniqueCodeGenerator = UniqueGameLobbyCodeGenerator()
     }
 }

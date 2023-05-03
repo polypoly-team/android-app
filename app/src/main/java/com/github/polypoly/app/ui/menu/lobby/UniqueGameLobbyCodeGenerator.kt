@@ -1,10 +1,6 @@
-package com.github.polypoly.app.utils
+package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
-import android.provider.Settings.System.getString
-import com.github.polypoly.app.R
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_CHARACTERS
 import com.github.polypoly.app.utils.global.GlobalInstances
@@ -15,7 +11,7 @@ import kotlin.random.Random
 /**
  * Generates a unique code for a game lobby
  */
-class UniqueCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE_LENGTH) {
+class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE_LENGTH) {
 
     fun generateUniqueCode(): String {
         var code: String
