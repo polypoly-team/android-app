@@ -1,7 +1,7 @@
 package com.github.polypoly.app.map
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.github.polypoly.app.ui.game.MapViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -21,11 +21,11 @@ class MapViewModelTest {
 
     private val testScope = TestScope(testDispatcher)
 
-    private lateinit var mapViewModel: MapViewModel
+    private lateinit var gameViewModel: MapViewModel
 
     @Before
     fun setUp() {
-        mapViewModel = MapViewModel(testDispatcher)
+        gameViewModel = MapViewModel(testDispatcher)
     }
 
     @Test
@@ -34,10 +34,10 @@ class MapViewModelTest {
         val addedDistance = 5f
         val expectedDistance = initialDistance + addedDistance
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance, gameViewModel.distanceWalked.value, 0.001f)
     }
 
     @Test
@@ -46,15 +46,15 @@ class MapViewModelTest {
         val addedDistance = 5f
         val expectedDistance = initialDistance + addedDistance
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance, gameViewModel.distanceWalked.value, 0.001f)
 
-        mapViewModel.resetDistanceWalked()
+        gameViewModel.resetDistanceWalked()
         testScope.advanceUntilIdle()
 
-        assertEquals(initialDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(initialDistance, gameViewModel.distanceWalked.value, 0.001f)
     }
 
     @Test
@@ -63,15 +63,15 @@ class MapViewModelTest {
         val addedDistance = 5f
         val expectedDistance = initialDistance + addedDistance
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance, gameViewModel.distanceWalked.value, 0.001f)
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance + addedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance + addedDistance, gameViewModel.distanceWalked.value, 0.001f)
     }
 
     @Test
@@ -80,19 +80,19 @@ class MapViewModelTest {
         val addedDistance = 5f
         val expectedDistance = initialDistance + addedDistance
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance, gameViewModel.distanceWalked.value, 0.001f)
 
-        mapViewModel.addDistanceWalked(addedDistance)
+        gameViewModel.addDistanceWalked(addedDistance)
         testScope.advanceUntilIdle()
 
-        assertEquals(expectedDistance + addedDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(expectedDistance + addedDistance, gameViewModel.distanceWalked.value, 0.001f)
 
-        mapViewModel.resetDistanceWalked()
+        gameViewModel.resetDistanceWalked()
         testScope.advanceUntilIdle()
 
-        assertEquals(initialDistance, mapViewModel.distanceWalked.value, 0.001f)
+        assertEquals(initialDistance, gameViewModel.distanceWalked.value, 0.001f)
     }
 }

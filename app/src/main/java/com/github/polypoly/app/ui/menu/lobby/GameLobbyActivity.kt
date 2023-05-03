@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.ui.game.MapActivity
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.util.toDp
 
@@ -186,7 +186,7 @@ class GameLobbyActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(onClick = {
-                val gameIntent = Intent(mContext, MapActivity::class.java)
+                val gameIntent = Intent(mContext, GameActivity::class.java)
                 startActivity(gameIntent)
             }) {
                 Text(text = "GO!")

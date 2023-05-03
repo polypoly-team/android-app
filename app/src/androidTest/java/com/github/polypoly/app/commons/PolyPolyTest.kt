@@ -15,6 +15,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.google.firebase.auth.FirebaseAuth
 import org.junit.After
 import org.junit.Before
@@ -90,7 +91,7 @@ abstract class PolyPolyTest(
         val testPlayer5 = Player(TEST_USER_5, 0, listOf(), 5)
         val testPlayer6 = Player(TEST_USER_0, 0, listOf(), 5)
         val gameRulesDefault = GameParameters(GameMode.RICHEST_PLAYER, 3, 7,
-            2, 10, LocationRepository.getZones(), 200)
+            2, 10, LocationPropertyRepository.getZones(), 200)
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)

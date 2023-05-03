@@ -3,6 +3,7 @@ package com.github.polypoly.app.base.menu.lobby
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.game.location.LocationRepository
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 
 /**
  * A class that represent the parameters of a [Game]
@@ -21,7 +22,7 @@ data class GameParameters (
     val maximumNumberOfPlayers: Int = 7,
     val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
     val maxRound: Int? = null,
-    val gameMap: List<Zone> = LocationRepository.getZones(),
+    val gameMap: List<Zone> = LocationPropertyRepository.getZones(),
     val initialPlayerBalance: Int = 500,
 ) {
 
