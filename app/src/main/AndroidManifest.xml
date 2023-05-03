@@ -32,6 +32,11 @@
             android:label="@string/title_activity_join_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ui.menu.lobby.CreateGameLobbyActivity"
+            android:exported="false"
+            android:label="@string/title_create_game_lobby"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".ui.menu.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
