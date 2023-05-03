@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,7 @@ val PLAYER_ICON_SIZE = IntSize(50, 60)
  */
 class GameLobbyActivity : ComponentActivity() {
 
-    private val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
+    val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -188,12 +189,14 @@ class GameLobbyActivity : ComponentActivity() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(onClick = {
-                if (enabled) {
+            Button(
+                enabled = enabled,
+                modifier = Modifier.testTag("GoButton"),
+                onClick = {
                     val gameIntent = Intent(mContext, GameActivity::class.java)
                     startActivity(gameIntent)
-                }
-            }) {
+                })
+            {
                 if (enabled) {
                     Text(text = "GO!")
                 } else {
