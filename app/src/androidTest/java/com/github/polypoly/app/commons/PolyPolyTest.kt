@@ -15,10 +15,12 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBIn
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.google.firebase.auth.FirebaseAuth
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -149,11 +151,6 @@ abstract class PolyPolyTest(
     @Before
     fun prepareTest() {
         remoteDB = mockDB
-        if(signFakeUserIn) {
-            `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
-            currentUser = currentUserMock
-            isSignedIn = true
-        }
         if (clearRemoteStorage) {
             clearMockDB()
         }

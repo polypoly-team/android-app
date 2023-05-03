@@ -109,14 +109,13 @@ open class RemoteDB(
     }
 
     override fun removeValue(key: String): CompletableFuture<Boolean> {
-        return keyExists(key).thenCompose { exists ->
-            if(exists) {
-                deleteChangeListener(key).thenCompose {
-                    setValue(key, null)
-                }
+        return deleteAllOnChangeListeners(key).thenCompose { result ->
+            if(result) {
+                setValue(key, null)
             } else {
                 CompletableFuture.completedFuture(false)
             }
+
         }
     }
 
@@ -134,15 +133,14 @@ open class RemoteDB(
         }
     }
 
-    private val changeListeners = mutableMapOf<String, ValueEventListener>()
+    private val changeListeners = mutableMapOf<Pair<String, String>, ValueEventListener>()
 
-    override fun <T : Any> addChangeListener(
-        key: String,
-        action: (T) -> Unit,
-        clazz: KClass<T>
+    override fun <T : Any>addOnChangeListener(
+        key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>
     ): CompletableFuture<Boolean> {
+
         return getRefAndThen(key) { ref ->
-            val previousListener = changeListeners.remove(key)
+            val previousListener = changeListeners.remove(Pair(key, tag))
             if(previousListener != null) {
                 ref.removeEventListener(previousListener)
             }
@@ -154,18 +152,32 @@ open class RemoteDB(
                 }
                 override fun onCancelled(error: DatabaseError) {}
             }
-            changeListeners[key] = listener
+            changeListeners[Pair(key, tag)] = listener
             ref.addValueEventListener(listener)
         }
     }
 
-    override fun deleteChangeListener(key: String): CompletableFuture<Boolean> {
+    override fun deleteOnChangeListener(key: String, tag: String): CompletableFuture<Boolean> {
         return getRefAndThen(key) { ref ->
-            val previousListener = changeListeners.remove(key)
+            val previousListener = changeListeners.remove(Pair(key, tag))
             if(previousListener != null) {
                 ref.removeEventListener(previousListener)
             }
         }
+    }
+
+    override fun deleteAllOnChangeListeners(key: String): CompletableFuture<Boolean> {
+        return getRefAndThen(key) { ref ->
+            changeListeners
+                .filterKeys { pair -> pair.first == key }
+                .map { (pair, _) -> pair }
+                .forEach { pair ->
+                    val previousListener = changeListeners.remove(pair)
+                    if(previousListener != null) {
+                        ref.removeEventListener(previousListener)
+                    }
+                }
+            }
     }
 
 }

@@ -74,15 +74,20 @@ class MockDB: IRemoteStorage {
         TODO("Not yet implemented")
     }
 
-    override fun <T : Any> addChangeListener(
+    override fun <T : Any> addOnChangeListener(
         key: String,
+        tag: String,
         action: (newObj: T) -> Unit,
         clazz: KClass<T>
     ): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun deleteChangeListener(key: String): CompletableFuture<Boolean> {
+    override fun deleteOnChangeListener(key: String, tag: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteAllOnChangeListeners(key: String): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 

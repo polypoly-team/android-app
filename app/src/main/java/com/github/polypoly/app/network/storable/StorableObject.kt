@@ -84,7 +84,7 @@ abstract class StorableObject<T : Any>
      * @return A future with true iff the action was successfully added
      */
     fun onChange(action: (newObj: T) -> Unit): CompletableFuture<Boolean> {
-        return remoteDB.addChangeListener(path + key, action, clazz)
+        return remoteDB.addOnChangeListener(path + key, "temp", action, clazz)
     }
 
     /**
@@ -92,7 +92,7 @@ abstract class StorableObject<T : Any>
      * @return A promise holding false iff the action was not removed (if no action was found, holds true)
      */
     fun offChange(): CompletableFuture<Boolean> {
-        return remoteDB.deleteChangeListener(path + key)
+        return remoteDB.deleteOnChangeListener(path + key, "temp")
     }
 
     /**
