@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -13,9 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -32,6 +39,7 @@ import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_L
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_ROUNDS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
+import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
@@ -76,8 +84,12 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         var initialPlayerBalance by remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
 
         val createGameEnabled : Boolean = gameName.isNotBlank()
+
+        val focusManager = LocalFocusManager.current
+
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 25.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 25.dp)
+                .testTag("create_game_menu"),
         ) {
             OutlinedTextField(
                 value = gameName,
@@ -87,25 +99,30 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             newText
                         else gameName
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                }),
                 singleLine = true,
-                label = { Text("Choose a game name") },
-                modifier = Modifier.fillMaxWidth(),
+                label = { Text(getString(R.string.create_game_lobby_choose_game_name)) },
+                modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally).testTag("game_name_text_field"),
                 colors = UIElements.outlineTextFieldColors()
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("private_game_row"),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Private game : ", modifier = Modifier.weight(1f))
+                Text(getString(R.string.create_game_lobby_private_game), modifier = Modifier.weight(1f).testTag("private_game_text"))
 
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.weight(1f).fillMaxWidth()
                 ) {
                     Checkbox(
-                        modifier = Modifier.offset(x = 12.dp),
+                        modifier = Modifier.offset(x = 14.dp)
+                            .testTag("private_game_checkbox"),
                         checked = isPrivateGame,
                         onCheckedChange = {isPrivateGame = !isPrivateGame},
                         colors = UIElements.checkboxColors()
@@ -115,7 +132,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
 
 
             NumberPickerField(
-                title = "Min number of players : ",
+                title = getString(R.string.create_game_lobby_min_num_players),
                 value = minNumPlayers,
                 onValueChange = {
                     minNumPlayers = if (it <= maxNumPlayers) it
@@ -126,7 +143,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
 
             NumberPickerField(
-                title = "Max number of players : ",
+                title = getString(R.string.create_game_lobby_max_num_players),
                 value = maxNumPlayers,
                 onValueChange = { if (it >= minNumPlayers) maxNumPlayers = it },
                 minValue = minNumPlayers,
@@ -134,7 +151,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
 
             NumberPickerField(
-                title = "Number of rounds : ",
+                title = getString(R.string.create_game_lobby_num_rounds),
                 value = numRounds,
                 onValueChange = { numRounds = it },
                 minValue = GAME_LOBBY_MIN_ROUNDS,
@@ -142,21 +159,21 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
 
             ListPickerField(
-                title = "Round duration : ",
+                title = getString(R.string.create_game_lobby_round_duration),
                 value = roundDuration,
                 onValueChange = { roundDuration = it },
                 items = GameLobbyConstants.RoundDurations.values().toList()
             )
 
             ListPickerField(
-                title = "Game mode : ",
+                title = getString(R.string.create_game_lobby_game_mode),
                 value = gameMode,
                 onValueChange = { gameMode = it },
                 items = GameMode.values().toList()
             )
 
             NumberPickerField(
-                title = "Initial player balance: ",
+                title = getString(R.string.create_game_lobby_initial_balance),
                 value = initialPlayerBalance,
                 onValueChange = { initialPlayerBalance = it },
                 minValue = GAME_LOBBY_MIN_INITIAL_BALANCE,
@@ -165,17 +182,19 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
 
             Divider(
-                modifier = Modifier.padding(vertical = 25.dp).fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),
+                modifier = Modifier.padding(vertical = Padding.large).fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),
                 thickness = 1.dp,
                 color = androidx.compose.ui.graphics.Color.Black
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .testTag("create_game_lobby_column"),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Game code is: $gameCode", Modifier.padding(bottom = 20.dp))
+                Text(text = getString(R.string.create_game_lobby_game_code, gameCode), Modifier.padding(bottom = 20.dp),
+                )
                 BigButton(
                     onClick = {
                         val rules = GameParameters(
@@ -188,8 +207,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                         )
                         createGameLobby(mContext, rules, gameName, isPrivateGame, gameCode)
                               },
-                    text = "Create game",
+                    text = getString(R.string.create_game_lobby_create_game),
                     enabled = createGameEnabled,
+                    testTag = "create_game_lobby_button"
                 )
             }
 
@@ -215,25 +235,28 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         step: Int = 1,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("${title}number_picker_row"),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = title, modifier = Modifier.weight(1f))
             ArrowButton(
                 onClick = { if (value > minValue) onValueChange(value - step) },
                 enabled = isEnabled && value > minValue,
-                leftArrow = true
+                leftArrow = true,
+                title = title
             )
             Text(
                 text = value.toString(),
                 modifier = Modifier
                     .width(GAME_LOBBY_MENU_PICKER_WIDTH)
-                    .wrapContentWidth(Alignment.CenterHorizontally),
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .testTag("${title}number_picker_field"),
                 textAlign = TextAlign.Center
             )
             ArrowButton(
                 onClick = { if (value < maxValue) onValueChange(value + step) },
-                enabled = isEnabled && value < maxValue
+                enabled = isEnabled && value < maxValue,
+                title = title
             )
         }
     }
@@ -259,7 +282,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         val currentIndex = items.indexOf(value)
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("${title}list_picker_row"),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = title, modifier = Modifier.weight(1f))
@@ -270,11 +293,13 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                     }
                 },
                 enabled = isEnabled && currentIndex > 0,
-                leftArrow = true
+                leftArrow = true,
+                title = title
             )
             Text(
                 text = value.toString(),
-                modifier = Modifier.width(width).wrapContentWidth(Alignment.CenterHorizontally),
+                modifier = Modifier.width(width).wrapContentWidth(Alignment.CenterHorizontally)
+                    .testTag("${title}list_picker_field"),
                 textAlign = TextAlign.Center
             )
             ArrowButton(
@@ -284,6 +309,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                     }
                 },
                 enabled = isEnabled && currentIndex < items.lastIndex,
+                title = title
             )
         }
     }
@@ -293,11 +319,11 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
      * A button that displays an arrow
      */
     @Composable
-    private fun ArrowButton(onClick: () -> Unit, enabled: Boolean, leftArrow : Boolean = false) {
-        IconButton(onClick = onClick, enabled = enabled) {
+    private fun ArrowButton(onClick: () -> Unit, enabled: Boolean, leftArrow : Boolean = false, title : String = "") {
+        IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.testTag(title + (if(leftArrow) "left_" else "right_") +"arrow")) {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
-                contentDescription = "Arrow",
+                contentDescription = (if(leftArrow) "left_" else "right_") +"arrow",
                 modifier = Modifier.size(24.dp).rotate(if (leftArrow) 180f else 0f)
             )
         }
@@ -310,7 +336,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
 
         val lobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
 
-        //TODO : create game in database and navigate to game screen
+        //TODO : create game in database and navigate to game lobby screen
         val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
         gameLobbyIntent.putExtra("lobby_code", "1234")
         startActivity(gameLobbyIntent)

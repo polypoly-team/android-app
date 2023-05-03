@@ -15,5 +15,18 @@
     <string name="joined_game_lobby_with_code">Joined lobby with code: </string>
     <string name="game_lobby_list_title">Join a lobby! </string>
     <string name="title_activity_game_lobby">GameLobbyActivity</string>
+
+    // create game lobby
+    <string name="create_game_lobby_choose_game_name">Choose a game name</string>
+    <string name="create_game_lobby_private_game">Private game :</string>
+    <string name="create_game_lobby_min_num_players">Min number of players :</string>
+    <string name="create_game_lobby_max_num_players">Max number of players :</string>
+    <string name="create_game_lobby_num_rounds">Number of rounds :</string>
+    <string name="create_game_lobby_round_duration">Round duration :</string>
+    <string name="create_game_lobby_game_mode">Game mode :</string>
+    <string name="create_game_lobby_initial_balance">Initial player balance:</string>
+    <string name="create_game_lobby_game_code">Game code is: %s</string>
+    <string name="create_game_lobby_create_game">Create game</string>
+
     // =========================================================================
 </resources>
