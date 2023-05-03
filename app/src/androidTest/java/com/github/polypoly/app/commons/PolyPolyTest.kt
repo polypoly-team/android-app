@@ -10,18 +10,15 @@ import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -98,9 +95,6 @@ abstract class PolyPolyTest(
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
         TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
 
-        val firebaseAuthMock = mock(FirebaseAuth::class.java)
-        val currentUserMock = mock(FirebaseUser::class.java)
-
         private val mockDB = MockDB()
 
         init {
@@ -154,11 +148,6 @@ abstract class PolyPolyTest(
 
     @Before
     fun prepareTest() {
-        if(signFakeUserIn) {
-            `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
-            currentFBUser = currentUserMock
-            isSignedIn = true
-        }
         if (clearRemoteStorage) {
             clearMockDB()
         }

@@ -6,10 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,11 +17,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.base.GameMusic
-import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
+import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.BigButton
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -121,36 +120,17 @@ class WelcomeActivity : ComponentActivity() {
                 modifier = Modifier.padding(2.dp)
             ) {
                 // Join button
-                GameButton(onClick = {
+                BigButton(onClick = {
                     val joinGroupIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
-                GameButton(onClick = {
-                    // TODO: dummy button that sends to GameLobbyActivity, temporary
-                    val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-                    gameLobbyIntent.putExtra("lobby_code", "1234abc")
-                    startActivity(gameLobbyIntent)
+                BigButton(onClick = {
+                    val createGameLobbyIntent = Intent(mContext, CreateGameLobbyActivity::class.java)
+                    startActivity(createGameLobbyIntent)
                 }, text = "Create Game?")
             }
-        }
-    }
-
-    // ============================================================= HELPERS
-
-    /**
-     * Simply a common button that'll be used for important purposes
-     */
-    @Composable
-    fun GameButton(onClick: () -> Unit, text: String) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .width(200.dp)
-                .height(70.dp),
-        ) {
-            Text(text = text)
         }
     }
 }
