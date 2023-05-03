@@ -31,6 +31,7 @@ class RankingsViewModel: ViewModel() {
      */
     fun fetchUsers() {
         // Request all registered users from the database
+        // TODO: Update this call on the DB operations are encapsulated
         remoteDB.getAllValues<User>(DB_USERS_PROFILES_PATH).thenAccept {
             users = it
             // Recompute the users' rankings on reply
