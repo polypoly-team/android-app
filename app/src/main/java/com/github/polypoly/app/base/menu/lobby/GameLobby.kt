@@ -2,8 +2,6 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.storable.GameLobbyDB
-import com.github.polypoly.app.network.storable.StorableObject
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
