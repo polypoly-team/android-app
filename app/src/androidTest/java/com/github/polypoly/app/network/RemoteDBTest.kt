@@ -16,6 +16,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import kotlin.NoSuchElementException
 import kotlin.reflect.KClass
 
 @RunWith(JUnit4::class)
@@ -79,7 +80,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         val failFuture = remoteDB.getValue<User>(invalidKey)
         failFuture.handle { _, exception ->
             assertTrue(exception != null)
-            assertTrue(exception is IllegalAccessException)
+            assertTrue(exception is NoSuchElementException)
         }
         assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
