@@ -28,14 +28,6 @@ class GameLobbyConstants {
         const val GAME_LOBBY_MAX_INITIAL_BALANCE = 15000
         const val GAME_LOBBY_INITIAL_BALANCE_STEP = 500
         const val GAME_LOBBY_INITIAL_BALANCE_DEFAULT = 2500
-        //TODO make an enum
-        const val GAME_LOBBY_ROUND_DURATION_DEFAULT = "1 day"
-        val GAME_LOBBY_ROUNDS_DURATIONS = mapOf(
-            "5 min" to 5, "10 min" to 10, "15 min" to 15, "20 min" to 20, "25 min" to 25, "30 min" to 30,
-            "1 hour" to 60, "2 hours" to 120, "3 hours" to 180, "4 hours" to 240, "5 hours" to 300, "10 hours" to 600,
-            "15 hours" to 900, "20 hours" to 1200, "1 day" to 1440, "2 days" to 2880, "3 days" to 4320, "4 days" to 5760,
-            "5 days" to 7200, "6 days" to 8640, "7 days" to 10080, "8 days" to 11520, "9 days" to 12960, "10 days" to 14400
-        )
 
         /**
          * Constants for game lobby menu UI
@@ -107,6 +99,10 @@ class GameLobbyConstants {
              */
             fun getDefaultValue(): RoundDurations{
                 return ONE_DAY
+            }
+
+            fun getMaxRoundDuration(): RoundDurations{
+                return RoundDurations.values().sortedArrayDescending().first()
             }
         }
 
