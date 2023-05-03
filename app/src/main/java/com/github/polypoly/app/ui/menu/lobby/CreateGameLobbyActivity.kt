@@ -22,21 +22,22 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_INITIAL_BALANCE_DEFAULT
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_INITIAL_BALANCE_STEP
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_INITIAL_BALANCE
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_PLAYERS
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_ROUNDS
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MENU_PICKER_WIDTH
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_PLAYERS
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_ROUNDS
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUNDS_DURATIONS
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_ROUND_DURATION_DEFAULT
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_INITIAL_BALANCE_DEFAULT
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_INITIAL_BALANCE_STEP
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_INITIAL_BALANCE
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_NAME_LENGTH
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_PLAYERS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_ROUNDS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MENU_PICKER_WIDTH
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_PLAYERS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_ROUNDS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUNDS_DURATIONS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUND_DURATION_DEFAULT
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         }
     }
 
-    var gameCode = uniqueCodeGenerator.generateUniqueCode()
+    var gameCode = uniqueCodeGenerator.generateUniqueGameLobbyCode()
 
     @Composable
     fun CreateGameLobbyContent() {
@@ -71,7 +72,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         var minNumPlayers by remember { mutableStateOf(GAME_LOBBY_MIN_PLAYERS) }
         var maxNumPlayers by remember { mutableStateOf(GAME_LOBBY_MAX_PLAYERS) }
         var numRounds by remember { mutableStateOf(GAME_LOBBY_ROUNDS_DEFAULT) }
-        var roundDuration by remember { mutableStateOf(GAME_LOBBY_ROUND_DURATION_DEFAULT) }
+        var roundDuration by remember { mutableStateOf(GameLobbyConstants.RoundDurations.getDefaultValue()) }
         var gameMode by remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
         var initialPlayerBalance by remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
 
@@ -83,7 +84,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 value = gameName,
                 onValueChange = { newText : String ->
                     gameName =
-                        if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= 10)
+                        if (newText.matches(Regex("[a-zA-Z\\d]*")) && newText.length <= GAME_LOBBY_MAX_NAME_LENGTH)
                             newText
                         else gameName
                 },
@@ -145,7 +146,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 title = "Round duration : ",
                 value = roundDuration,
                 onValueChange = { roundDuration = it },
-                items = GAME_LOBBY_ROUNDS_DURATIONS.keys.toList()
+                items = GameLobbyConstants.RoundDurations.values().toList()
             )
 
             ListPickerField(
@@ -182,7 +183,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             gameMode = gameMode,
                             minimumNumberOfPlayers = minNumPlayers,
                             maximumNumberOfPlayers = maxNumPlayers,
-                            roundDuration = GAME_LOBBY_ROUNDS_DURATIONS[roundDuration]!!,
+                            roundDuration = roundDuration.toMinutes(),
                             maxRound = numRounds,
                             initialPlayerBalance = initialPlayerBalance
                         )

@@ -1,8 +1,8 @@
 package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_CODE_LENGTH
-import com.github.polypoly.app.utils.Constants.Companion.GAME_LOBBY_MAX_CHARACTERS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CHARACTERS
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.Settings
 import java.util.concurrent.CompletableFuture
@@ -13,7 +13,7 @@ import kotlin.random.Random
  */
 class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE_LENGTH) {
 
-    fun generateUniqueCode(): String {
+    fun generateUniqueGameLobbyCode(): String {
         var code: String
         do {
             code = generateCode()
@@ -25,7 +25,7 @@ class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE
      * Generates a random code of length [codeLength]
      */
     private fun generateCode(): String {
-        val digits = GAME_LOBBY_MAX_CHARACTERS
+        val digits = GAME_LOBBY_CHARACTERS
         val sb = StringBuilder(codeLength)
         for (i in 0 until codeLength) {
             sb.append(digits[Random.nextInt(digits.length)])
@@ -38,6 +38,7 @@ class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE
      */
     @SuppressLint("NewApi")
     private fun codeIsValid(code: String): Boolean {
+        //TODO: DB call to fix after new DB implementation
         var codeIsValid = true
         val lobbyKey = Settings.DB_GAME_LOBBIES_PATH + code
         GlobalInstances.remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->

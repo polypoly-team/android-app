@@ -2,6 +2,7 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.game.location.LocationRepository
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 
 /**
  * A class that represent the parameters of a [Game]
@@ -18,21 +19,21 @@ data class GameParameters (
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
-    val roundDuration: Int = 360,
+    val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationRepository.getZones(),
     val initialPlayerBalance: Int = 500,
 ) {
 
     // TODO: define real value as this is useless
-    private val maxRoundHours = Int.MAX_VALUE
+    private val maxRoundMinutes = Int.MAX_VALUE
 
     init {
         if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration <= 0 || roundDuration >= maxRoundHours)
+        if (roundDuration <= 0 || roundDuration >= GameLobbyConstants.RoundDurations.values().last().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }
