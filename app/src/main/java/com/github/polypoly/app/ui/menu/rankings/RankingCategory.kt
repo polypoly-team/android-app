@@ -5,7 +5,7 @@ import com.github.polypoly.app.base.user.User
 /**
  * The different categories of rankings
  *
- * @property name The name of the category
+ * @property description The name of the category
  * @property criteria The criteria to use to rank the users
  */
 enum class RankingCategory(val description: String, val criteria: (User) -> Int) {
