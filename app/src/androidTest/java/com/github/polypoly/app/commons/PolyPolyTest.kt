@@ -2,7 +2,6 @@ package com.github.polypoly.app.commons
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.location.LocationRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
