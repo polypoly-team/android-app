@@ -135,7 +135,6 @@ open class RemoteDB(
     }
 
     private val changeListeners = mutableMapOf<String, ValueEventListener>()
-    private val removeListeners = mutableMapOf<String, ValueEventListener>()
 
     override fun <T : Any> addChangeListener(
         key: String,
