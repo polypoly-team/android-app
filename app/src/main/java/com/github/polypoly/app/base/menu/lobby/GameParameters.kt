@@ -25,9 +25,6 @@ data class GameParameters (
     val initialPlayerBalance: Int = 500,
 ) {
 
-    // TODO: define real value as this is useless
-    private val maxRoundMinutes = Int.MAX_VALUE
-
     init {
         if (minimumNumberOfPlayers <= 1)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
