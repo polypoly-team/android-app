@@ -38,6 +38,7 @@ import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_L
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
+import com.github.polypoly.app.ui.theme.UIElements.BigButton
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,7 +178,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(text = "Game code is: $gameCode", Modifier.padding(bottom = 20.dp))
-                GameButton(
+                BigButton(
                     onClick = {
                         val rules = GameParameters(
                             gameMode = gameMode,
@@ -316,21 +317,5 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         gameLobbyIntent.putExtra("lobby_code", "1234")
         startActivity(gameLobbyIntent)
         finish()
-    }
-
-    /**
-     * a button
-     */
-    @Composable
-    private fun GameButton(onClick: () -> Unit, text: String, enabled: Boolean = true) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .width(200.dp)
-                .height(70.dp),
-            enabled = enabled
-        ) {
-            Text(text = text)
-        }
     }
 }

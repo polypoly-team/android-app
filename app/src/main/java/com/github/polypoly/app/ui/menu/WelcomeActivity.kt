@@ -24,6 +24,7 @@ import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.BigButton
 
 /**
  * This activity is the view that a player will see when launching the app, the idea is that
@@ -117,34 +118,17 @@ class WelcomeActivity : ComponentActivity() {
                 modifier = Modifier.padding(2.dp)
             ) {
                 // Join button
-                GameButton(onClick = {
+                BigButton(onClick = {
                     val joinGroupIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))
                 // Create button
-                GameButton(onClick = {
+                BigButton(onClick = {
                     val createGameLobbyIntent = Intent(mContext, CreateGameLobbyActivity::class.java)
                     startActivity(createGameLobbyIntent)
                 }, text = "Create Game?")
             }
-        }
-    }
-
-    // ============================================================= HELPERS
-
-    /**
-     * Simply a common button that'll be used for important purposes
-     */
-    @Composable
-    fun GameButton(onClick: () -> Unit, text: String) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .width(200.dp)
-                .height(70.dp),
-        ) {
-            Text(text = text)
         }
     }
 }
