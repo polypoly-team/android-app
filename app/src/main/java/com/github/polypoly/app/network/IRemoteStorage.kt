@@ -67,25 +67,29 @@ interface IRemoteStorage {
 
     /**
      * Removes the element with the given key
-     * @param key: key of the value to set
-     * @return A promise holding true iff the value was successfully removed
+     * @param key: key of the value to delete
+     * @return A promise holding true if a value was successfully removed, false if no value existed
      */
     fun removeValue(key: String): CompletableFuture<Boolean>
 
+    // ========================================================================== LISTENERS
     /**
      * Adds an event listener to the data with the given key
      * @param key: key of the data to listen
      * @param action: the action to execute on data change
      * @return A promise holding true iff the listener was successfully set
      */
-    fun <T : Any>addListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
+    fun <T : Any>addChangeListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
 
     /**
      * Removes (if any) the listener associated to data corresponding to the given key
      * @param key: key of the data to stop listening
      * @return A promise holding true iff the listener was successfully removed
      */
-    fun removeListener(key: String): CompletableFuture<Boolean>
+    fun deleteChangeListener(key: String): CompletableFuture<Boolean>
+
+    fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean>
+    fun deleteRemoveListener(key: String): CompletableFuture<Boolean>
 }
 
 /**

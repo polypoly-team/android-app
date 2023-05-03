@@ -112,51 +112,30 @@ open class RemoteDB(
         TODO("Not implemented yet") // Hint: set value to null
     }
 
+    // ========================================================================== LISTENERS
+
+    override fun <T : Any> addChangeListener(
+        key: String,
+        action: (newObj: T) -> Unit,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteChangeListener(key: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteRemoveListener(key: String): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
     // ========================================================================== LISTENING
 
-    private val listeners: MutableMap<String, Pair<DatabaseReference, ValueEventListener>> = mutableMapOf()
-
-    override fun <T: Any> addListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
-        val promise = CompletableFuture<Boolean>()
-
-        rootRef.child(key).get().addOnSuccessListener { data ->
-            if(data.exists()) {
-                val listener = object:ValueEventListener {
-                    override fun onDataChange(data: DataSnapshot) {
-                        action(data.getValue(clazz.java)!!)
-                    }
-                    override fun onCancelled(error: DatabaseError) {}
-                }
-                data.ref.addValueEventListener(listener)
-                listeners[key] = Pair(data.ref, listener)
-                promise.complete(true)
-            } else {
-                promise.completeExceptionally(NoSuchElementException("Try to add a listener on a value with no existing key"))
-            }
-
-        }.addOnFailureListener(promise::completeExceptionally)
-        return promise
-    }
-
-    override fun removeListener(key: String): CompletableFuture<Boolean> {
-        val promise = CompletableFuture<Boolean>()
-
-        rootRef.child(key).get().addOnSuccessListener { data ->
-            if(data.exists()) {
-                if(listeners.containsKey(key)) {
-                    val pair = listeners[key]
-                    pair?.first?.removeEventListener(pair.second)
-                    listeners.remove(key)
-                    promise.complete(true)
-                }
-                promise.complete(false)
-            } else {
-                promise.completeExceptionally(NoSuchElementException("Try to add a listener on a value with no existing key"))
-            }
-
-        }.addOnFailureListener(promise::completeExceptionally)
-        return promise
-    }
 
 
 }

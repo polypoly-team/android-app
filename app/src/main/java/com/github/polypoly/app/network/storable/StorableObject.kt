@@ -17,14 +17,15 @@ import kotlin.reflect.KClass
 abstract class StorableObject<T : Any>
     (private val path: String, private val key: String, private val clazz: KClass<T>) {
 
+    // ================================================================== GETTERS
     /**
      * Gets the local version of the stored DB object
      * @param key: The key of the object in DB
      * @return A future with the local version object
      *
-     * @note The returned value doesn't depend on the current object instance
+     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
      */
-    fun getByKey(key: String): CompletableFuture<StorableObject<T>> {
+    fun get(key: String): CompletableFuture<StorableObject<T>> {
         return remoteDB.getValue(path + key, clazz).thenCompose { obj ->
             val result = CompletableFuture<StorableObject<T>>()
             result.complete(toLocalObject(obj))
@@ -32,6 +33,21 @@ abstract class StorableObject<T : Any>
         }
     }
 
+    /**
+     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
+     */
+    fun getAll(): CompletableFuture<List<StorableObject<T>>> {
+        TODO("implement")
+    }
+
+    /**
+     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
+     */
+    fun exists(key: String): CompletableFuture<Boolean> {
+        TODO("implement")
+    }
+
+    // ================================================================== SETTERS
     /**
      * Registers this instance (DB version) in the DB
      * @return A future with true iff the object was successfully stored
@@ -56,6 +72,7 @@ abstract class StorableObject<T : Any>
         return remoteDB.removeValue(path + key)
     }
 
+    // ================================================================== LISTENERS
     /**
      * Executes a given action whenever the DB object corresponding to this instance is
      * modified.
@@ -63,11 +80,36 @@ abstract class StorableObject<T : Any>
      * @return A future with true iff the action was successfully added
      */
     fun onChange(action: (newObj: T) -> Unit): CompletableFuture<Boolean> {
-        return remoteDB.addListener(path + key, action, clazz)
+        return remoteDB.addChangeListener(path + key, action, clazz)
     }
 
-    // ================================================== ABSTRACT METHODS
+    /**
+     * Removes (if any) the action to be executed when this object is modified in DB
+     * @return A future with false iff the action was not removed (if no action was found, returns true)
+     */
+    fun offChange(): CompletableFuture<Boolean> {
+        TODO("implement")
+    }
 
+    /**
+     * Executes a given action whenever the DB object corresponding to this instance is
+     * removed.
+     * @param action: Action to be executed when the DB object is removed
+     * @return A future with true iff the action was successfully added
+     */
+    fun onRemove(action: Unit): CompletableFuture<Boolean> {
+        return remoteDB.addRemoveListener(path + key, action)
+    }
+
+    /**
+     * Removes (if any) the action to be executed when this object is removed in DB
+     * @return A future with false iff the action was not removed (if no action was found, returns true)
+     */
+    fun offRemove(): CompletableFuture<Boolean> {
+        TODO("implement")
+    }
+
+    // ================================================================== CONVERTERS
     /**
      * Converts this instance to its DB version
      * @return the DB version
@@ -79,7 +121,7 @@ abstract class StorableObject<T : Any>
      * @param dbObject: the object to convert
      * @return the local version
      *
-     * @note The returned value doesn't depend on the current object instance
+     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
      */
     protected abstract fun toLocalObject(dbObject: T) : StorableObject<T>
 }

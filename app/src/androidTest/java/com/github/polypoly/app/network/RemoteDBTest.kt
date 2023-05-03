@@ -205,14 +205,14 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertEquals(data, dataFound)
     }
 
-    /* TODO: implement tests when removeValue() is
+    // =============================================================== REMOVE VALUE
     @Test
     fun dataCanBeRemoved() {}
 
     @Test
     fun unregisteredDataCantBeRemoved() {}*/
 
-    // ========================================================= ADD LISTENER
+    /*// ========================================================= ADD LISTENER
     @Test
     fun addingListenerToUnregisteredDataFails() {
         val key = "some_key"
@@ -324,6 +324,6 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         //remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         //remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertFalse(boolean)
-    }
+    }*/
 
 }
