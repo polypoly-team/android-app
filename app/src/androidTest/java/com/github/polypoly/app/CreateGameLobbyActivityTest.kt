@@ -57,8 +57,10 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false) {
         for (pickerTitle in ALL_LIST_PICKERS_TITLES) {
             composeTestRule.onNodeWithTag(pickerTitle + "list_picker_row").assertIsDisplayed()
             composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertIsDisplayed()
+            composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertHasClickAction()
             composeTestRule.onNodeWithTag(pickerTitle + "list_picker_field").assertIsDisplayed()
             composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertIsDisplayed()
+            composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertHasClickAction()
         }
 
         for (pickerTitle in ALL_NUM_PICKERS_TITLES) {
@@ -67,6 +69,7 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false) {
             composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertHasClickAction()
             composeTestRule.onNodeWithTag(pickerTitle + "number_picker_field").assertIsDisplayed()
             composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertIsDisplayed()
+            composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertHasClickAction()
         }
 
     }
