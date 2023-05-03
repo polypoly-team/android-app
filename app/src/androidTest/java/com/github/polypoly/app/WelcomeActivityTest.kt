@@ -1,16 +1,19 @@
 package com.github.polypoly.app
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.ui.menu.WelcomeActivity
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
-import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

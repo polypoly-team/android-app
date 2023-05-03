@@ -1,7 +1,7 @@
 package com.github.polypoly.app.base.menu.lobby
 
-import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.game.location.LocationRepository
+import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 
 /**
