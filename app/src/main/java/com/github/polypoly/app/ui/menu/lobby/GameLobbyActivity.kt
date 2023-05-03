@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +25,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +37,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.util.toDp
+import androidx.compose.runtime.livedata.observeAsState
 
 val PLAYER_ICON_SIZE = IntSize(50, 60)
 
@@ -52,14 +53,13 @@ val PLAYER_ICON_SIZE = IntSize(50, 60)
  * When there are enough players as specified in [GameRules], the admin (the one who created the game)
  * can start the game.
  */
-class GameLobbyActivity : ComponentActivity() {
-    private lateinit var gameLobby: MutableState<GameLobby>
+class GameLobbyActivity() : ComponentActivity() {
 
+    private val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        receiveGameLobby()
         setContent { GameLobbyContent() }
     }
 
@@ -74,25 +74,29 @@ class GameLobbyActivity : ComponentActivity() {
      */
     @Composable
     private fun GameLobbyContent() {
-        gameLobby = remember { mutableStateOf(GameLobby()) }
-        PolypolyTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+        val gameLobby = gameLobbyWaitingModel.getGameLobby().observeAsState().value
+        val readyForStart = gameLobbyWaitingModel.getReadyForStart().observeAsState().value
+
+        if (gameLobby != null && readyForStart != null) {
+            PolypolyTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
                 ) {
-                    Text("Game Lobby name: ${gameLobby.value.name}")
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(text = "QUIT")
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Game Lobby name: ${gameLobby.name}")
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(text = "QUIT")
+                        }
+                        PlayerGrid(gameLobby.usersRegistered)
+                        GoButton(readyForStart)
+                        Text("${gameLobby.usersRegistered.size} users (min ${gameLobby.rules.minimumNumberOfPlayers} to start)")
                     }
-                    PlayerGrid()
-                    GoButton()
                 }
             }
         }
-
     }
 
     // ===================================================== GAME LOBBY COMPONENTS
@@ -103,11 +107,11 @@ class GameLobbyActivity : ComponentActivity() {
      * if the row hasn't enough players to fill, "blank" players are displayed
      */
     @Composable
-    private fun PlayerGrid() {
+    private fun PlayerGrid(players: List<User>) {
         val sidePadding = 50
         val interPadding = 10
 
-        val numberOfPlayers = gameLobby.value.usersRegistered.size
+        val numberOfPlayers = players.size
         var playersPerRow by remember { mutableStateOf(3)}
         var numberOfRows by remember { mutableStateOf(1) }
 
@@ -120,11 +124,12 @@ class GameLobbyActivity : ComponentActivity() {
                     val width = coordinates.size.width.toDp
                     while (
                         playersPerRow > 1 &&
-                        width < (PLAYER_ICON_SIZE.width*playersPerRow + 2*sidePadding + (playersPerRow + 1)*interPadding)
+                        width < (PLAYER_ICON_SIZE.width * playersPerRow + 2 * sidePadding + (playersPerRow + 1) * interPadding)
                     ) {
                         playersPerRow--
                     }
-                    numberOfRows = (numberOfPlayers + (numberOfPlayers%playersPerRow)) / playersPerRow
+                    numberOfRows =
+                        (numberOfPlayers + (numberOfPlayers % playersPerRow)) / playersPerRow
                 },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
@@ -144,7 +149,7 @@ class GameLobbyActivity : ComponentActivity() {
                             if (playerIdx >= numberOfPlayers) {
                                 PlayerIcon(user = null)
                             } else {
-                                PlayerIcon(user = gameLobby.value.usersRegistered[playerIdx])
+                                PlayerIcon(user = players[playerIdx])
                             }
                             playerIdx++
                             if(itCol != playersPerRow - 1) {
@@ -189,46 +194,26 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     /**
-     * If there are enough players in the game, launches it, else it displays an error message.
-     * Note that this button is only visible to the admin user
-     *
-     * TODO: so far a dummy button that redirects to MapActivity, handle real behavior as checking if there are enough players
+     * If there are enough players in the game, launches it
      */
     @Composable
-    private fun GoButton() {
+    private fun GoButton(enabled: Boolean) {
         val mContext = LocalContext.current
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(onClick = {
-                val gameIntent = Intent(mContext, GameActivity::class.java)
-                startActivity(gameIntent)
+                if (enabled) {
+                    val gameIntent = Intent(mContext, GameActivity::class.java)
+                    startActivity(gameIntent)
+                }
             }) {
-                Text(text = "GO!")
+                if (enabled) {
+                    Text(text = "GO!")
+                } else {
+                    Text(text = "Still waiting for more players before starting...")
+                }
             }
-            Text(text = "${gameLobby.value.usersRegistered.size} / ${gameLobby.value.rules.minimumNumberOfPlayers}")
         }
-    }
-
-    // ===================================================== GAME LOBBY HELPERS
-
-    /**
-     * This function gets the corresponding GameLobby from the DB and updates our variable each time
-     * it is changed in the DB
-     */
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun receiveGameLobby() {
-        val lobbyCode = intent.getStringExtra("lobby_code")
-        /*remoteDB.getSnapshot(DB_GAME_LOBBIES_PATH + lobbyCode).thenAccept { data ->
-            run {
-                gameLobby.value = data.getValue(GameLobby::class.java)!!
-                data.ref.addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        gameLobby.value = dataSnapshot.getValue(GameLobby::class.java)!!
-                    }
-                    override fun onCancelled(databaseError: DatabaseError) {}
-                })
-            }
-        }*/ // TODO: react to DB in real time
     }
 }
