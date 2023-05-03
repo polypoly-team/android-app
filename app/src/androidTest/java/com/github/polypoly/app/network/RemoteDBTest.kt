@@ -24,13 +24,15 @@ class RemoteDBTest: PolyPolyTest(false, false) {
 
     private val rootTests = "test-hugo"
     var dbRootRef: DatabaseReference
+    private val testDB: RemoteDB
 
     init {
         val db = Firebase.database
         try {
             db.setPersistenceEnabled(false)
         } catch (_: Exception) {}
-        remoteDB = RemoteDB(db, rootTests)
+        testDB = RemoteDB(db, rootTests)
+        remoteDB = testDB
         remoteDBInitialized = true
 
         dbRootRef = db.reference.child(rootTests)
@@ -38,6 +40,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
 
     override fun _prepareTest() {
         clearRealDB()
+        remoteDB = testDB
     }
 
     private fun clearRealDB() {

@@ -154,6 +154,7 @@ abstract class PolyPolyTest(
 
     @Before
     fun prepareTest() {
+        remoteDB = mockDB
         if(signFakeUserIn) {
             `when`(currentUserMock.uid).thenReturn(CURRENT_USER.id.toString())
             currentUser = currentUserMock
