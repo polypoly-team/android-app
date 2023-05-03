@@ -2,10 +2,10 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocalizationLevel
-import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.user.User
 
 /**
