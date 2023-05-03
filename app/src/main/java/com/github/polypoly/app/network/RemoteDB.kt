@@ -111,7 +111,11 @@ open class RemoteDB(
     override fun removeValue(key: String): CompletableFuture<Boolean> {
         return keyExists(key).thenCompose { exists ->
             if(exists) {
-                setValue(key, null)
+                deleteChangeListener(key).thenCompose {
+                    deleteRemoveListener(key).thenCompose {
+                        setValue(key, null)
+                    }
+                }
             } else {
                 CompletableFuture.completedFuture(false)
             }
@@ -119,29 +123,59 @@ open class RemoteDB(
     }
 
     // ========================================================================== LISTENERS
+    /**
+     * Gets the reference of a given key and if it exists, executes the given action with that reference
+     * @return a promise with true if the action was successfully executed, false else or if no value was found
+     */
+    private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
+        return keyExists(key).thenCompose { exists ->
+            if(exists) {
+                action(rootRef.child(key))
+            }
+            CompletableFuture.completedFuture(exists)
+        }
+    }
+
+    private val changeListeners = mutableMapOf<String, ValueEventListener>()
 
     override fun <T : Any> addChangeListener(
         key: String,
-        action: (newObj: T) -> Unit,
+        action: (T) -> Unit,
         clazz: KClass<T>
     ): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return getRefAndThen(key) { ref ->
+            val previousListener = changeListeners.remove(key)
+            if(previousListener != null) {
+                ref.removeEventListener(previousListener)
+            }
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()) {
+                        action(snapshot.getValue(clazz.java)!!)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            }
+            changeListeners[key] = listener
+            ref.addValueEventListener(listener)
+        }
     }
 
     override fun deleteChangeListener(key: String): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return getRefAndThen(key) { ref ->
+            val previousListener = changeListeners.remove(key)
+            if(previousListener != null) {
+                ref.removeEventListener(previousListener)
+            }
+        }
     }
 
     override fun addRemoveListener(key: String, action: Unit): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return CompletableFuture.completedFuture(true) // TODO
     }
 
     override fun deleteRemoveListener(key: String): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return CompletableFuture.completedFuture(true) // TODO
     }
-
-    // ========================================================================== LISTENING
-
-
 
 }

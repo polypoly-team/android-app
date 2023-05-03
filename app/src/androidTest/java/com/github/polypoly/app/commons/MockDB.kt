@@ -94,7 +94,6 @@ class MockDB: IRemoteStorage {
         TODO("Not yet implemented")
     }
 
-
     /**
      * Clears all value in the mock database
      */

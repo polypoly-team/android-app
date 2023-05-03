@@ -74,17 +74,23 @@ interface IRemoteStorage {
 
     // ========================================================================== LISTENERS
     /**
-     * Adds an event listener to the data with the given key
+     * Adds an event listener to the data with the given key. If another action was attached to this
+     * node, replaces it
      * @param key: key of the data to listen
      * @param action: the action to execute on data change
-     * @return A promise holding true iff the listener was successfully set
+     * @return A promise holding true if the listener was successfully set, false if no such value exists
+     *
+     * @note The number of times the [action] will take place is not deterministic, as minor DB changes
+     * may trigger it, so don't use actions that use the number of times [action] is called
      */
     fun <T : Any>addChangeListener(key: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
 
     /**
      * Removes (if any) the listener associated to data corresponding to the given key
      * @param key: key of the data to stop listening
-     * @return A promise holding true iff the listener was successfully removed
+     * @return A promise holding true if the listener was successfully removed, false if no such value exists
+     *
+     * @note Calling this may call the change listener one last time
      */
     fun deleteChangeListener(key: String): CompletableFuture<Boolean>
 

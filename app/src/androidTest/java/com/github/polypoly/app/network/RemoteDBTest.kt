@@ -235,118 +235,148 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         )
     }
 
-    /*// ========================================================= ADD LISTENER
+    // ========================================================= ADD CHANGE LISTENER
     @Test
-    fun addingListenerToUnregisteredDataFails() {
+    fun addingChangeListenerToUnregisteredDataFails() {
         val key = "some_key"
         val action = { _: User -> }
-
-        val failFuture = remoteDB.addListener(key, action, User::class)
-        failFuture.handle { _, exception ->
-            assertTrue(exception != null)
-            assertTrue(exception is IllegalAccessError)
-        }
-        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
-    }
-
-    @Test
-    fun addingListenerToRegisteredDataWorks() {
-        val key = "some_key"
-        val action = { _: User -> }
-
-        val data = TEST_USER_1
-        addDataToDB(data, key)
-
-        assertTrue(
-            remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        )
-
-        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
-    }
-
-    @Test
-    fun listenerIsExecutedAtUpdate() {
-        val key = "some_key"
-        var boolean = false
-        val action = { _: User -> boolean = true}
-
-        val data = TEST_USER_1
-        addDataToDB(data, key)
-
-        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertTrue(boolean)
-
-        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
-    }
-
-    @Test
-    fun listenerIsNotExecutedAtRest() {
-        val key = "some_key"
-        var boolean = false
-        val action = { _: User -> boolean = true}
-
-        val data = TEST_USER_1
-        addDataToDB(data, key)
-
-        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertFalse(boolean)
-
-        remoteDB.removeListener(key) // REMOVE TO NOT OVERLAP
-    }
-
-    // ========================================================= REMOVE LISTENER
-    @Test
-    fun removingListenerFromUnregisteredDataFails() {
-        val key = "some_key"
-
-        val failFuture = remoteDB.removeListener(key)
-        failFuture.handle { _, exception ->
-            assertTrue(exception != null)
-            assertTrue(exception is IllegalAccessError)
-        }
-        assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
-    }
-
-    @Test
-    fun removingListenerFromNotListenedDataReturnsFalse() {
-        val key = "some_key"
-
-        val data = TEST_USER_1
-        addDataToDB(data, key)
-
         assertFalse(
-            remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
     }
 
     @Test
-    fun removingListenerFromListenedDataReturnsTrue() {
+    fun addingChangeListenerToRegisteredDataWorks() {
         val key = "some_key"
         val action = { _: User -> }
 
         val data = TEST_USER_1
         addDataToDB(data, key)
 
-        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertTrue(
-            remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
     }
 
     @Test
-    fun listenerIsNotExecutedWhenRemoved() {
+    fun changeListenerIsExecutedAtUpdate() {
         val key = "some_key"
-        var boolean = false
-        val action = { _: User -> boolean = true}
+        var num = 0
+        val action = { _: User -> num += 1 }
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1, key)
+
+        remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(num >= 2)
+    }
+
+    @Test
+    fun oldChangeListenerIsNotExecutedAtOverwrite() {
+        val key = "some_key"
+        var num1 = 0
+        val action1 = { _: User -> num1 += 1 }
+        val action2 = { _: User -> }
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1, key)
+
+        remoteDB.addChangeListener(key, action1, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.addChangeListener(key, action2, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(num1 <= 1)
+    }
+
+    @Test
+    fun newChangeListenerIsExecutedAtOverwrite() {
+        val key = "some_key"
+        var num1 = 0
+        var num2 = 0
+        val action1 = { _: User -> num1 += 1 }
+        val action2 = { _: User -> num2 += 1 }
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1, key)
+
+        remoteDB.addChangeListener(key, action1, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.addChangeListener(key, action2, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(num2 >= 3)
+    }
+
+    @Test
+    fun changeListenerIsNotExecutedAtRest() {
+        val key = "some_key"
+        var num = 0
+        val action = { _: User -> num += 1 }
 
         val data = TEST_USER_1
         addDataToDB(data, key)
 
-        remoteDB.addListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        //remoteDB.removeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        //remoteDB.updateValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertFalse(boolean)
-    }*/
+        remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(num, 0)
+    }
+
+    // ========================================================= REMOVE CHANGE LISTENER
+    @Test
+    fun deletingChangeListenerFromUnregisteredDataFails() {
+        val key = "some_key"
+        assertFalse(
+            remoteDB.deleteChangeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun deletingChangeListenerFromUnregisteredDataWorks() {
+        val key = "some_key"
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        assertTrue(
+            remoteDB.deleteChangeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun changeListenerIsNotExecutedAfterDeletion() {
+        val key = "some_key"
+        var num = 0
+        val action = { _: User -> num += 1 }
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1, key)
+
+        remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.deleteChangeListener(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(num <= 1)
+    }
+
+    @Test
+    fun changeListenerIsNotExecutedAfterRemoveValue() {
+        val key = "some_key"
+        var num = 0
+        val action = { _: User -> num += 1 }
+
+        val data = TEST_USER_1
+        addDataToDB(data, key)
+
+        remoteDB.addChangeListener(key, action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.removeValue(key)
+        assertTrue(num <= 1)
+    }
 
 }
