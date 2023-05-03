@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -93,8 +94,12 @@ class WelcomeActivity : ComponentActivity() {
                 .padding(20.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.tmp_happysmile),
+                painter = painterResource(id = R.drawable.super_cool_logo),
                 contentDescription = "game_logo",
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
             )
         }
     }
