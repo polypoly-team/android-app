@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -60,7 +61,8 @@ fun CustomTabRow(tabs: List<String>, state: PagerState) {
     ScrollableTabRow(
         modifier = Modifier
             .height(50.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .testTag("tab_row"),
         selectedTabIndex = state.currentPage,
         indicator = indicator,
         backgroundColor = MaterialTheme.colors.primary,

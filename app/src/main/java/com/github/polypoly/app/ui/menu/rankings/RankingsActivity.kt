@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -95,7 +96,9 @@ class RankingsActivity : MenuActivity("Rankings") {
                 )
 
                 HorizontalPager(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("ranking_lists"),
                     count = tabs.size,
                     state = state
                 ) { page ->
@@ -115,7 +118,10 @@ class RankingsActivity : MenuActivity("Rankings") {
     @Composable
     private fun RankingList(category: RankingCategory) {
         // The column that displays the rankings list of the currently selected tab
-        LazyColumn(Modifier.padding(Padding.onBackground)) {
+        LazyColumn(
+            Modifier
+                .padding(Padding.onBackground)
+        ) {
             itemsIndexed(viewModel.getRanking(category).take(maxRankingEntries)) { rank, user ->
                 UserRank(rank, user, category)
             }
