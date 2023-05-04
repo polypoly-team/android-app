@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 fun CircularLoader(
     size: Dp = 32.dp,
     sweepAngle: Float = 90f,
-    duration: Int,
+    duration: Int = 1000,
     animationColor: Color = MaterialTheme.colors.primary,
     backgroundColor: Color = MaterialTheme.colors.secondary,
     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth

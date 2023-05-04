@@ -1,7 +1,9 @@
 package com.github.polypoly.app.commons
 
+import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -10,13 +12,16 @@ import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -186,5 +191,25 @@ abstract class PolyPolyTest(
             requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
         )
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
+    }
+
+    /**
+     * Observes a live data until it updates its value and returns the new value
+     * @param liveData data to observe
+     * @return T The new value found after the data update
+     */
+    fun <T> waitForDataUpdate(liveData: LiveData<T>): T {
+        val promise: CompletableFuture<T> = CompletableFuture()
+        val observer: (T) -> Unit = { value: T -> promise.complete(value) }
+
+        val scope = CoroutineScope(Dispatchers.Main + Job())
+
+        scope.launch { liveData.observeForever(observer) }
+
+        val result = promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        scope.launch { liveData.removeObserver(observer) }
+
+        return result
     }
 }

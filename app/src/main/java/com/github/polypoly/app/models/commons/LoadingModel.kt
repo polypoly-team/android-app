@@ -23,6 +23,6 @@ abstract class LoadingModel: ViewModel() {
      * @param loading true iff the model is currently loading something
      */
     protected fun setLoading(loading: Boolean) {
-        isLoading.value = loading
+        isLoading.postValue(loading)
     }
 }
