@@ -17,7 +17,7 @@ open class RemoteDB(
     root: String
 ) : IRemoteStorage {
 
-    val rootRef: DatabaseReference
+    private val rootRef: DatabaseReference
 
     init {
         if(db == null)

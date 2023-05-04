@@ -5,7 +5,6 @@ import com.github.polypoly.app.network.storable.StorableObject
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -60,6 +59,7 @@ class StorableObjectTest: PolyPolyTest(true, false) {
         addDataToDB(TEST_PERSON_DB_1, DB_MOCK_USER_PATH+TEST_PERSON_1.id)
         addDataToDB(TEST_PERSON_DB_2, DB_MOCK_USER_PATH+TEST_PERSON_2.id)
         addDataToDB(TEST_PERSON_DB_3, DB_MOCK_USER_PATH+TEST_PERSON_3.id)
+        @Suppress("UNCHECKED_CAST")
         val list = TestPerson().getAll().get(TIMEOUT_DURATION, TimeUnit.SECONDS) as List<TestPerson>
         val expectedList = listOf(TEST_PERSON_1, TEST_PERSON_2, TEST_PERSON_3)
         list.forEach { person ->
