@@ -8,6 +8,10 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.base.game.Game
+import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.map.MapUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -19,7 +23,12 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest {
+class GameActivityTest: PolyPolyTest(true, false) {
+
+    init {
+        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        GameRepository.player = GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+    }
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<GameActivity>()
