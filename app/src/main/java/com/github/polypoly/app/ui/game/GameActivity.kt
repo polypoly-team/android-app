@@ -105,11 +105,6 @@ class GameActivity : ComponentActivity() {
         //used to determine if the player is close enough to a location to interact with it
         private const val MAX_INTERACT_DISTANCE = 10.0 // meters
 
-        fun formattedDistance(distance: Float): String {
-            return if (distance < 1000) "${"%.1f".format(distance)}m"
-            else "${"%.1f".format(distance / 1000)}km"
-        }
-
         /**
          * Updates the distance of all markers and returns the closest one.
          *
@@ -119,18 +114,11 @@ class GameActivity : ComponentActivity() {
             mapView: MapView,
             myLocation: GeoPoint
         ): LocationProperty? {
-            fun updateDistance(marker: Marker, myLocation: GeoPoint) {
-                val distance = myLocation.distanceToAsDouble(marker.position).toFloat()
-                marker.snippet = "Distance: ${formattedDistance(distance)}"
-            }
-
             fun markersOf(mapView: MapView): List<Marker> {
                 return mapView.overlays.filterIsInstance<Marker>()
             }
-
             var closestLocationProperty = null as LocationProperty?
             for (marker in markersOf(mapView)) {
-                updateDistance(marker, myLocation)
                 val markerLocation = gameViewModel.markerToLocationProperty[marker]!!
                 if (closestLocationProperty == null ||
                     myLocation.distanceToAsDouble(markerLocation.position())
