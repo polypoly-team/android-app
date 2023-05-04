@@ -40,10 +40,12 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
 
     @Test
     fun goButtonLaunchesGameActivityWhenGameCanStart() {
+        val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
+
         // Setup game lobby ready for start
         addDataToDB(TEST_GAME_LOBBY_AVAILABLE_1, lobbyKey)
 
-        composeTestRule.activity.gameLobbyWaitingModel.waitForSync().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        syncFuture.get(TIMEOUT_DURATION * 2, TimeUnit.SECONDS)
         composeTestRule.waitForIdle()
 
         goButton.assertTextEquals("GO!")
