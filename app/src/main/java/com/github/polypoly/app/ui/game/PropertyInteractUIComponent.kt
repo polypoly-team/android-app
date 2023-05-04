@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 
 /**
@@ -47,7 +47,7 @@ private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
         title = {
             Row {
                 val currentProperty =
-                    gameViewModel.markerToLocationProperty[gameViewModel.selectedMarker]
+                    mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]
                 Text(text = currentProperty?.name ?: "Unknown")
                 Spacer(modifier = Modifier.weight(0.5f))
                 Text(text = "Base price: ${currentProperty?.basePrice}")

@@ -64,7 +64,7 @@ class GameLobbyActivity : ComponentActivity() {
     private fun GameLobbyContent() {
         val gameLobby = gameLobbyWaitingModel.getGameLobby().observeAsState().value
         val readyForStart = gameLobbyWaitingModel.getReadyForStart().observeAsState().value
-        val dataLoading = gameLobbyWaitingModel.getIsLoading().value
+        val dataLoading = gameLobbyWaitingModel.getIsLoading().observeAsState().value
 
         if (gameLobby != null && readyForStart != null) {
             PolypolyTheme {

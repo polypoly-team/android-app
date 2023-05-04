@@ -159,7 +159,7 @@ class GameActivityTest {
     }
 
     private fun forceOpenMarkerDialog() {
-        GameActivity.gameViewModel.selectedMarker = getRandomMarker()
+        GameActivity.mapViewModel.selectedMarker = getRandomMarker()
         GameActivity.interactingWithProperty.value = true
         runBlocking { delay(500) }
     }

@@ -1,15 +1,28 @@
 package com.github.polypoly.app.data
 
+import com.github.polypoly.app.base.game.Game
+import com.github.polypoly.app.base.game.Player
+
 /**
- * Static repository object storing data held across the entire app
+ * Static singleton repository object storing data held across the entire app
  * Initial version of repository pattern
  * @see https://developer.android.com/codelabs/basic-android-kotlin-training-repository-pattern#0
  */
 class GameRepository {
     companion object {
         /**
-         * Singleton object storing the game code used across the application
+         * Game code used across the application
          */
         var gameCode: String? = null
+
+        /**
+         * Game used accross the application
+         */
+        var game: Game? = null
+
+        /**
+         * Game used accross the application
+         */
+        var player: Player? = null
     }
 }

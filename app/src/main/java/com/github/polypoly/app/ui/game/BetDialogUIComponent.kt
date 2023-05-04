@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
 /**
  * Bet popup dialog
@@ -100,7 +100,7 @@ private fun BetDialogButtons(
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
 ) {
-    val minBet = gameViewModel.markerToLocationProperty[gameViewModel.selectedMarker]?.basePrice!!
+    val minBet = mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]?.basePrice!!
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
@@ -38,7 +38,7 @@ fun RollDiceButton() {
                 .offset(y = (-80).dp)
                 .testTag("rollDiceButton"),
             onClick = {
-                if (gameViewModel.interactableProperty.value != null)
+                if (mapViewModel.interactableProperty.value != null)
                     showRollDiceDialog.value = true
             },
             shape = CircleShape
@@ -82,14 +82,14 @@ fun RollDiceDialog() {
  * ensuring that the player does not visit the same location twice.
  */
 private fun rollDiceLocations(): List<LocationProperty> {
-    val locationsNotToVisitName = mutableListOf(gameViewModel.interactableProperty.value?.name)
+    val locationsNotToVisitName = mutableListOf(mapViewModel.interactableProperty.value?.name)
 
     val locationsToVisit = mutableListOf<LocationProperty>()
     for (i in 1..3) {
         val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
-        val closestLocations = gameViewModel.markerToLocationProperty.entries
+        val closestLocations = mapViewModel.markerToLocationProperty.entries
             .filter { !locationsNotToVisitName.contains(it.value.name) }
-            .sortedBy { it.key.position.distanceToAsDouble(gameViewModel.interactableProperty.value!!.position()) }
+            .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.interactableProperty.value!!.position()) }
             .take(11)
 
         locationsToVisit.add(closestLocations[diceRollsSum].value)
