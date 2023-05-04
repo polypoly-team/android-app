@@ -2,7 +2,7 @@ env:
   CC_TEST_REPORTER_ID: ENCRYPTED[729d703dabe07f9797508fd1d6d4e46fa7fd4c6784c7683f8544638198a3489733bdd1aa176faafa693e87b66a37edda]
 
 container:
-  image: cirrusci/android-sdk:30
+  image: cirrusci/android-sdk:33
   cpu: 4
   memory: 16G
   kvm: true
