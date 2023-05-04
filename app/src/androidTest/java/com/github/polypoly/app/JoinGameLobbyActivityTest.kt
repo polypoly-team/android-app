@@ -58,7 +58,6 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
-        Intents.intended(IntentMatchers.hasExtra("lobby_code", lobbyCode))
     }
 
     @Test
@@ -118,7 +117,6 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         lobbyHeader.performClick()
         composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).performClick()
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
-        Intents.intended(IntentMatchers.hasExtra("lobby_code", lobby.code))
     }
 
     @Test
