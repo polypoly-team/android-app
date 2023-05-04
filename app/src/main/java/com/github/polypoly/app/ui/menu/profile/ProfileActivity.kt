@@ -31,6 +31,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
+import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 
@@ -109,7 +110,7 @@ class ProfileActivity : MenuActivity("Profile") {
     fun Profile(user: User) {
         Column(
             modifier = Modifier
-                .padding(all = 30.dp),
+                .padding(all = Padding.onBackground),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -118,10 +119,10 @@ class ProfileActivity : MenuActivity("Profile") {
                 verticalAlignment = Alignment.Top
             ) {
                 UserAppearance()
-                Spacer(modifier = Modifier.width(30.dp))
+                Spacer(modifier = Modifier.width(Padding.onBackground))
                 ProfileInfo(user)
             }
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(Padding.onBackground))
             ModifyProfileButton()
         }
     }
@@ -161,7 +162,7 @@ class ProfileActivity : MenuActivity("Profile") {
                     contentScale = ContentScale.FillHeight
                 )
                 .background(color = Color.Black.copy(alpha = 0.4f))
-                .padding(all = 30.dp)
+                .padding(all = Padding.onBackground)
                 .testTag("statisticsAndTrophies"),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
