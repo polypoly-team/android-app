@@ -45,9 +45,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
         // Setup game lobby ready for start
         addDataToDB(TEST_GAME_LOBBY_AVAILABLE_1, lobbyKey)
 
-        try {
-            syncFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        } catch (_: Exception) {}
+        syncFuture.get(TIMEOUT_DURATION * 20, TimeUnit.SECONDS)
 
         composeTestRule.waitForIdle()
 
