@@ -62,6 +62,10 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
+
+                // For demo only
+                GameRepository.player = GameRepository.game!!.getPlayer(GameRepository.game!!.admin.id)
+
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
                 GameViewModel(

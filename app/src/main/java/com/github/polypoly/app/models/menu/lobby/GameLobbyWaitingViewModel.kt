@@ -55,10 +55,16 @@ class GameLobbyWaitingViewModel(
     private suspend fun pollGameLobby() {
         // Polls the storage for updates every pollingDelay millisecs until coroutine is terminated
         // TODO: replace this with listening to the storage once available
+
+        delay(POLLING_DELAY) // For demo only
+
         while (true) {
             val pollingFuture = storage.getValue<GameLobby>(DB_GAME_LOBBIES_PATH + lobbyCode)
 
             pollingFuture.thenApply { gameLobby ->
+
+                gameLobby.addUser(User(id = 123456789)) // For demo only
+
                 gameLobbyData.value = gameLobby
                 readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
 
