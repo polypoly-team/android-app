@@ -61,7 +61,6 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
         // Setup game lobby not ready for start
         addDataToDB(TEST_GAME_LOBBY_AVAILABLE_2, lobbyKey)
 
-        composeTestRule.activity.gameLobbyWaitingModel.waitForSync().get(TIMEOUT_DURATION * 3, TimeUnit.SECONDS)
         composeTestRule.waitForIdle()
 
         goButton.assertIsNotEnabled()
