@@ -8,9 +8,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
@@ -30,12 +29,30 @@ class GameViewModel(
 
     private val playerData: MutableLiveData<Player> = MutableLiveData(player)
 
+    private val roundTurnData: MutableLiveData<Int> = MutableLiveData(game.currentRound)
+
+    private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
+
     fun getGameData(): LiveData<Game> {
         return gameData
     }
 
     fun getPlayerData(): LiveData<Player> {
         return playerData
+    }
+
+    fun getRoundTurnData(): LiveData<Int> {
+        return roundTurnData
+    }
+
+    fun getGameFinishedData(): LiveData<Boolean> {
+        return gameEndedData
+    }
+
+    fun nextTurn() {
+        gameData.value?.nextTurn()
+        roundTurnData.value = gameData.value?.currentRound ?: -1
+        gameEndedData.value = gameData.value?.isGameFinished() ?: false
     }
 
     companion object {

@@ -31,13 +31,14 @@ class Game private constructor(
             owner = null,
             level = PropertyLevel.LEVEL_0,
         ) } }
-    val currentRound: Int = 1
+    var currentRound: Int = 1
 
     /**
      * Go to the next turn
      */
     fun nextTurn() {
         // TODO update the data with the DB
+        ++currentRound
         if(isGameFinished()) {
             val pastGame = endGame()
             // TODO send the pastGame to the DB
@@ -49,7 +50,7 @@ class Game private constructor(
      * @return true if the game is finished, false otherwise
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
-    private fun isGameFinished(): Boolean {
+    fun isGameFinished(): Boolean {
         return when(rules.gameMode) {
             GameMode.LAST_STANDING -> {
                 players.filter { !it.hasLost() }.size <= 1

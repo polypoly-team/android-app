@@ -4,20 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.github.polypoly.app.base.game.Game
-import com.github.polypoly.app.base.game.Player
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.MapViewModel
@@ -42,8 +45,10 @@ class GameActivity : ComponentActivity() {
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
         val game = gameModel.getGameData().observeAsState().value
+        val gameTurn = gameModel.getRoundTurnData().observeAsState().value
+        val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
-        if (player != null && game != null) {
+        if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -53,14 +58,54 @@ class GameActivity : ComponentActivity() {
                     PropertyInteractUIComponent()
                     RollDiceDialog()
                     RollDiceButton()
+                    nextTurnButton(gameEnded)
                     DistanceWalkedUIComponents()
                     Hud(
                         player,
                         game.players,
-                        16,
+                        gameTurn,
                         mapViewModel.interactableProperty.value?.name ?: ""
                     )
+                    gameEndedLabel(gameEnded)
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun nextTurnButton(gameEnded: Boolean) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                modifier = Modifier
+                    .size(30.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-30).dp)
+                    .testTag("nextTurnButton"),
+                onClick = {
+                    if (!gameEnded) {
+                        gameModel.nextTurn()
+                    }
+                },
+                shape = CircleShape
+            ) {
+                Icon(Icons.Filled.ArrowForward, contentDescription = "Next turn")
+            }
+        }
+    }
+
+    @Composable
+    fun gameEndedLabel(gameEnded: Boolean) {
+        if (gameEnded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colors.primary.copy(alpha = 0.7f))
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "The game ended !!",
+                    fontWeight = FontWeight(1000)
+                )
             }
         }
     }
