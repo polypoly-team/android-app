@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
+import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.util.toDp
@@ -63,6 +64,7 @@ class GameLobbyActivity : ComponentActivity() {
     private fun GameLobbyContent() {
         val gameLobby = gameLobbyWaitingModel.getGameLobby().observeAsState().value
         val readyForStart = gameLobbyWaitingModel.getReadyForStart().observeAsState().value
+        val dataLoading = gameLobbyWaitingModel.getIsLoading().value
 
         if (gameLobby != null && readyForStart != null) {
             PolypolyTheme {
@@ -73,13 +75,15 @@ class GameLobbyActivity : ComponentActivity() {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Game Lobby name: ${gameLobby.name}")
-                        Button(onClick = { /*TODO*/ }) {
-                            Text(text = "QUIT")
+                        if (dataLoading == true) {
+                            CircularLoader()
+                        } else {
+                            Text("Game Lobby name: ${gameLobby.name}")
+                            PlayerGrid(gameLobby.usersRegistered)
+                            GoButton(readyForStart)
+                            Text("${gameLobby.usersRegistered.size} users (min ${gameLobby.rules.minimumNumberOfPlayers} to start)")
+                            QuitButton()
                         }
-                        PlayerGrid(gameLobby.usersRegistered)
-                        GoButton(readyForStart)
-                        Text("${gameLobby.usersRegistered.size} users (min ${gameLobby.rules.minimumNumberOfPlayers} to start)")
                     }
                 }
             }
@@ -203,6 +207,13 @@ class GameLobbyActivity : ComponentActivity() {
                     Text(text = "Still waiting for more players before starting...")
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun QuitButton() {
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = "QUIT")
         }
     }
 }

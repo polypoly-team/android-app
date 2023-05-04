@@ -4,8 +4,8 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture
 class GameLobbyWaitingViewModel(
     private val lobbyCode: String,
     private val storage: IRemoteStorage,
-): ViewModel() {
+): LoadingModel() {
 
     private val gameLobbyData: MutableLiveData<GameLobby> = MutableLiveData(GameLobby())
 
@@ -29,6 +29,7 @@ class GameLobbyWaitingViewModel(
     private val waitingForSyncPromise: ArrayList<CompletableFuture<Boolean>> = arrayListOf()
 
     init {
+        setLoading(true)
         viewModelScope.launch {
             pollGameLobby()
         }
@@ -64,6 +65,8 @@ class GameLobbyWaitingViewModel(
                     future.complete(true)
                 }
                 waitingForSyncPromise.clear()
+
+                setLoading(false)
             }
 
             delay(POLLING_DELAY)
