@@ -11,8 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
@@ -29,7 +31,7 @@ import org.osmdroid.views.overlay.Marker
  */
 class GameActivity : ComponentActivity() {
 
-    val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
+    private val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +41,7 @@ class GameActivity : ComponentActivity() {
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
-        val game = gameModel.getGameData().value
+        val game = gameModel.getGameData().observeAsState().value
 
         if (player != null && game != null) {
             PolypolyTheme {

@@ -26,9 +26,9 @@ class GameViewModel(
     storage: IRemoteStorage
 ): LoadingModel() {
 
-    private val gameData: MutableLiveData<Game> = MutableLiveData()
+    private val gameData: MutableLiveData<Game> = MutableLiveData(game)
 
-    private val playerData: MutableLiveData<Player> = MutableLiveData()
+    private val playerData: MutableLiveData<Player> = MutableLiveData(player)
 
     fun getGameData(): LiveData<Game> {
         return gameData
