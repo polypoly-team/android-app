@@ -1,5 +1,6 @@
 package com.github.polypoly.app.ui.menu.lobby
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -25,7 +26,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
@@ -196,10 +199,7 @@ class GameLobbyActivity : ComponentActivity() {
             Button(
                 enabled = enabled,
                 modifier = Modifier.testTag("GoButton"),
-                onClick = {
-                    val gameIntent = Intent(mContext, GameActivity::class.java)
-                    startActivity(gameIntent)
-                })
+                onClick = { launchGameActivity(mContext) })
             {
                 if (enabled) {
                     Text(text = "GO!")
@@ -207,6 +207,15 @@ class GameLobbyActivity : ComponentActivity() {
                     Text(text = "Still waiting for more players before starting...")
                 }
             }
+        }
+    }
+
+    private fun launchGameActivity(packageContext: Context) {
+        val completedLobby = gameLobbyWaitingModel.getGameLobby().value
+        if (completedLobby != null) {
+            GameRepository.game = Game.launchFromPendingGame(completedLobby)
+            val gameIntent = Intent(packageContext, GameActivity::class.java)
+            startActivity(gameIntent)
         }
     }
 
