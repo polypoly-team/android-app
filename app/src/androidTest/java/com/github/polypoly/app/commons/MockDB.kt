@@ -18,8 +18,11 @@ class MockDB: IRemoteStorage {
 
     override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
         val keyCleaned = cleanKey(key)
-        if (!data.containsKey(keyCleaned))
-            return CompletableFuture.failedFuture(IllegalAccessException("Invalid key $keyCleaned"))
+        if (!data.containsKey(keyCleaned)) {
+            val failure = CompletableFuture<T>()
+            failure.completeExceptionally(IllegalAccessException("Invalid key $keyCleaned"))
+            return failure
+        }
         @Suppress("UNCHECKED_CAST")
         return CompletableFuture.completedFuture(data[cleanKey(key)] as T)
     }
