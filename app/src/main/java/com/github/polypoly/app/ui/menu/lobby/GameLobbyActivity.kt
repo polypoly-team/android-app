@@ -216,6 +216,7 @@ class GameLobbyActivity : ComponentActivity() {
             GameRepository.game = Game.launchFromPendingGame(completedLobby)
             val gameIntent = Intent(packageContext, GameActivity::class.java)
             startActivity(gameIntent)
+            finish()
         }
     }
 

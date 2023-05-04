@@ -21,7 +21,7 @@ class GameRepository {
         var game: Game? = null
 
         /**
-         * Game used accross the application
+         * Player logged-in across the application
          */
         var player: Player? = null
     }

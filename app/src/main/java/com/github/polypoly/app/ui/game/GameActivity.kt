@@ -80,7 +80,7 @@ class GameActivity : ComponentActivity() {
                     .size(30.dp)
                     .align(Alignment.BottomCenter)
                     .offset(y = (-30).dp)
-                    .testTag("nextTurnButton"),
+                    .testTag("next_turn_button"),
                 onClick = {
                     if (!gameEnded) {
                         gameModel.nextTurn()
