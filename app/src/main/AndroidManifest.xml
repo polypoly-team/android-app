@@ -47,6 +47,11 @@
             android:label="@string/title_activity_greeting"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ui.menu.rankings.RankingsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_rankings"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".ui.menu.profile.ProfileActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"

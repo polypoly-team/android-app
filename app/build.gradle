@@ -101,6 +101,13 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
+
+    /**
+     * The pager used to be able to swipe on a tab's elements to go to the next tab, first used
+     * in the rankings activity
+     */
+    implementation "com.google.accompanist:accompanist-pager:0.21.2-beta"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.21.2-beta"
 }
 
 tasks.withType(Test) {
