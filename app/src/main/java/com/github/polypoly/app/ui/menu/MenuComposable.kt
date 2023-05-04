@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat.startActivity
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.ui.menu.rankings.RankingsActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
 import com.github.polypoly.app.ui.theme.UIElements.IconRoundButton
 
@@ -141,18 +142,12 @@ object MenuComposable {
 
     @Composable
     private fun RankingsButton() {
-        // TODO: delete this OptionButton and uncomment the block below when RankingActivity exists
-        IconRoundButton(
-            onClick = { /*TODO*/ },
-            icon = Icons.Default.Star,
-            iconDescription = "Open Rankings",
+        ActivityOptionButton(
+            destinationActivity = RankingsActivity::class.java,
+            icon = Icons.Default.Person,
+            description = "Open Rankings",
             testTag = "rankings_button"
         )
-        /*ActivityOptionButton(
-            destinationActivity = RankingsActivity::class.java,
-            iconId = R.drawable.tmp_happysmile,
-            description = "Open Rankings"
-        )*/
     }
 
     @Composable

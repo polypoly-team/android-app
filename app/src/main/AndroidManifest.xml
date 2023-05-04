@@ -32,6 +32,11 @@
             android:label="@string/title_activity_join_game_lobby"
             android:theme="@style/Theme.Polypoly" />
         <activity
+            android:name=".ui.menu.lobby.CreateGameLobbyActivity"
+            android:exported="false"
+            android:label="@string/title_create_game_lobby"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
             android:name=".ui.menu.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
@@ -40,6 +45,11 @@
             android:name=".ui.menu.profile.ProfileModifyingActivity"
             android:exported="true"
             android:label="@string/title_activity_greeting"
+            android:theme="@style/Theme.Polypoly" />
+        <activity
+            android:name=".ui.menu.rankings.RankingsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_rankings"
             android:theme="@style/Theme.Polypoly" />
         <activity
             android:name=".ui.menu.profile.ProfileActivity"
