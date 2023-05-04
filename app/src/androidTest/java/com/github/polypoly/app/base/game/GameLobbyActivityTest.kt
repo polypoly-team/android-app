@@ -36,7 +36,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
     fun releaseIntents() { Intents.release() }
 
     // Composables used in tests
-    private val goButton = composeTestRule.onNodeWithTag("GoButton")
+    private val goButton = composeTestRule.onNodeWithTag("go_button")
 
     @Test
     fun goButtonLaunchesGameActivityWhenGameCanStart() {
@@ -45,7 +45,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
         // Setup game lobby ready for start
         addDataToDB(TEST_GAME_LOBBY_AVAILABLE_1, lobbyKey)
 
-        syncFuture.get(TIMEOUT_DURATION * 2, TimeUnit.SECONDS)
+        syncFuture.get(TIMEOUT_DURATION * 3, TimeUnit.SECONDS)
         composeTestRule.waitForIdle()
 
         goButton.assertTextEquals("GO!")
@@ -59,7 +59,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
         // Setup game lobby not ready for start
         addDataToDB(TEST_GAME_LOBBY_AVAILABLE_2, lobbyKey)
 
-        composeTestRule.activity.gameLobbyWaitingModel.waitForSync().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.activity.gameLobbyWaitingModel.waitForSync().get(TIMEOUT_DURATION * 3, TimeUnit.SECONDS)
         composeTestRule.waitForIdle()
 
         goButton.assertIsNotEnabled()

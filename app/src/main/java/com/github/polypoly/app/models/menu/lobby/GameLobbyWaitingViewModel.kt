@@ -85,7 +85,7 @@ class GameLobbyWaitingViewModel(
 
     companion object {
 
-        private const val POLLING_DELAY = 1000L //> polling delay in millisec until listening to DB is available
+        private const val POLLING_DELAY = 5000L //> polling delay in millisec until listening to DB is available
 
         /**
          * Factory object for the GameLobbyWaitingViewModel
