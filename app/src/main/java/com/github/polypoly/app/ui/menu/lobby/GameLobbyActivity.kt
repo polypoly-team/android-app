@@ -198,7 +198,7 @@ class GameLobbyActivity : ComponentActivity() {
         ) {
             Button(
                 enabled = enabled,
-                modifier = Modifier.testTag("GoButton"),
+                modifier = Modifier.testTag("go_button"),
                 onClick = { launchGameActivity(mContext) })
             {
                 if (enabled) {

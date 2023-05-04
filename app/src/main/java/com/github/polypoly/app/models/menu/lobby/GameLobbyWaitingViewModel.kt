@@ -53,7 +53,7 @@ class GameLobbyWaitingViewModel(
     }
 
     private suspend fun pollGameLobby() {
-        // Polls the storage for updates every pollingDelay millisecs until coroutine is terminated
+        // Polls the storage for updates every [pollingDelay] millisecs until coroutine is terminated
         // TODO: replace this with listening to the storage once available
         while (true) {
             val pollingFuture = storage.getValue<GameLobby>(DB_GAME_LOBBIES_PATH + lobbyCode)
@@ -89,7 +89,7 @@ class GameLobbyWaitingViewModel(
 
     companion object {
 
-        private const val POLLING_DELAY = 3000L //> polling delay in millisec until listening to DB is available
+        private const val POLLING_DELAY = 2000L //> polling delay in millisec until listening to DB is available
 
         /**
          * Factory object for the GameLobbyWaitingViewModel
