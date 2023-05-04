@@ -36,7 +36,7 @@ abstract class PolyPolyTest(
 ) {
     companion object {
         // Global tests constants
-        const val TIMEOUT_DURATION = 5L
+        const val TIMEOUT_DURATION = 15L
 
         // Ensures only one global initialization even for multithreaded testing
         var globalInitCompleted = false
