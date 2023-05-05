@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.ui.game.GameActivity.Companion.gameViewModel
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
 /**
@@ -51,7 +51,7 @@ fun DistanceWalkedUIComponents() {
                     .align(CenterVertically)
             )
             Text(
-                text = formattedDistance(gameViewModel.distanceWalked.value),
+                text = formattedDistance(mapViewModel.distanceWalked.value),
                 color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
                     .padding(Padding.medium)
