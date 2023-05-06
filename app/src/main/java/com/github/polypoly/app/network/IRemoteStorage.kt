@@ -1,6 +1,6 @@
 package com.github.polypoly.app.network
 
-import com.google.firebase.database.ValueEventListener
+import com.github.polypoly.app.network.storable.StorableObject
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 

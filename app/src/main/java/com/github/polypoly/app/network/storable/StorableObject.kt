@@ -1,10 +1,5 @@
 package com.github.polypoly.app.network.storable
 
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 /**
@@ -14,103 +9,47 @@ import kotlin.reflect.KClass
  * This class takes a generic type T as argument, corresponding to the data class that is
  * going to be stored in the DB.
  */
-abstract class StorableObject<T : Any>
-    (private val path: String, private val key: String, private val clazz: KClass<T>) {
+abstract class StorableObject<T : Any> (DBPath: String) {
 
-    // ================================================================== GETTERS
-    /**
-     * Gets the local version of the stored DB object
-     * @param key: The key of the object in DB
-     * @return A future with the local version object
-     *
-     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
-     */
-    fun get(key: String): CompletableFuture<StorableObject<T>> {
-        return remoteDB.getValue(path + key, clazz).thenCompose { obj ->
-            val result = CompletableFuture<StorableObject<T>>()
-            result.complete(toLocalObject(obj))
-            result
+    init {
+        initClassCompanion(DBPath, this::class.toString(), ::toLocalObject)
+    }
+
+    companion object {
+        private val paths = mutableMapOf<String, String>()
+        private val converters = mutableMapOf<String, (Any) -> StorableObject<*>>()
+
+        @JvmStatic
+        private fun <T: Any> initClassCompanion(
+            DBPath: String,
+            className: String,
+            convertToDB: (T) -> StorableObject<T>
+        ) {
+            paths[className] = DBPath
+            @Suppress("UNCHECKED_CAST")
+            converters[className] = convertToDB as (Any) -> StorableObject<*>
         }
-    }
 
-    /**
-     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
-     */
-    fun getAll(): CompletableFuture<List<StorableObject<T>>> {
-        return remoteDB.getAllValues(path, clazz).thenCompose { objList ->
-            val result = CompletableFuture<List<StorableObject<T>>>()
-            result.complete(objList.map { obj -> toLocalObject(obj) })
-            result
+        fun <T: StorableObject<*>> getPath(clazz: KClass<T>): String {
+            return paths[clazz.toString()] ?:
+            throw NoSuchElementException("The DB path for this class doesn't exist")
         }
-    }
 
-    /**
-     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
-     */
-    fun exists(key: String): CompletableFuture<Boolean> {
-        return remoteDB.keyExists(key)
-    }
+        inline fun <reified T: StorableObject<*>> getPath(): String {
+            return getPath(T::class)
+        }
 
-    // ================================================================== SETTERS
-    /**
-     * Registers this instance (DB version) in the DB
-     * @return A future with true iff the object was successfully stored
-     */
-    fun register(): CompletableFuture<Boolean> {
-        return remoteDB.registerValue(path + key, toDBObject())
-    }
+        fun <T: StorableObject<*>> convertToLocal(clazz: KClass<T>, obj: Any): T {
+            val converter = converters[clazz.toString()] ?:
+            throw NoSuchElementException("The DB converter for this class doesn't exist")
 
-    /**
-     * Updates this instance (DB version) in the DB
-     * @return A future with true iff the object was successfully updated
-     */
-    fun update(): CompletableFuture<Boolean> {
-        return remoteDB.updateValue(path + key, toDBObject())
-    }
+            @Suppress("UNCHECKED_CAST")
+            return converter(obj) as T
+        }
 
-    /**
-     * Removes this instance (DB version) from the DB
-     * @return A future with true iff the object was successfully removed
-     */
-    fun remove(): CompletableFuture<Boolean> {
-        return remoteDB.removeValue(path + key)
-    }
-
-    // ================================================================== LISTENERS
-    /**
-     * Executes a given action whenever the DB object corresponding to this instance is
-     * modified.
-     * @param action: Action to be executed when the DB object changes
-     * @return A future with true iff the action was successfully added
-     */
-    fun onChange(action: (newObj: T) -> Unit): CompletableFuture<Boolean> {
-        return remoteDB.addOnChangeListener(path + key, "temp", action, clazz)
-    }
-
-    /**
-     * Removes (if any) the action to be executed when this object is modified in DB
-     * @return A promise holding false iff the action was not removed (if no action was found, holds true)
-     */
-    fun offChange(): CompletableFuture<Boolean> {
-        return remoteDB.deleteOnChangeListener(path + key, "temp")
-    }
-
-    /**
-     * Executes a given action whenever the DB object corresponding to this instance is
-     * removed.
-     * @param action: Action to be executed when the DB object is removed
-     * @return A future with true iff the action was successfully added
-     */
-    fun onRemove(action: () -> Unit): CompletableFuture<Boolean> {
-        TODO("implement if necessary")
-    }
-
-    /**
-     * Removes (if any) the action to be executed when this object is removed in DB
-     * @return A promise holding false iff the action was not removed (if no action was found, holds true)
-     */
-    fun offRemove(): CompletableFuture<Boolean> {
-        TODO("implement if necessary")
+        inline fun <reified T: StorableObject<*>> convertToLocal(obj: Any): T {
+            return convertToLocal(T::class, obj)
+        }
     }
 
     // ================================================================== CONVERTERS
@@ -118,14 +57,17 @@ abstract class StorableObject<T : Any>
      * Converts this instance to its DB version
      * @return the DB version
      */
-    protected abstract fun toDBObject() : T
+    protected abstract fun toDBObject(): T
 
     /**
      * Converts the given DB version to its local version
      * @param dbObject: the object to convert
      * @return the local version
      *
-     * @note /!\ STATIC /!\ The returned value doesn't depend on the current object instance
+     * @note /!\ STATIC /!\ The returned value shouldn't depend on the current object instance
      */
-    protected abstract fun toLocalObject(dbObject: T) : StorableObject<T>
+    protected abstract fun toLocalObject(dbObject: T): StorableObject<T>
+
+
 }
+

@@ -2,6 +2,7 @@ package com.github.polypoly.app.network
 
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.network.storable.StorableObject
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -22,56 +23,7 @@ class StorableObjectTest: PolyPolyTest(true, false) {
     private val TEST_PERSON_DB_2 = TestPersonDB("2", "bigflo", 2023-TEST_PERSON_2.birth)
     private val TEST_PERSON_DB_3 = TestPersonDB("3", "Truck", 2023-TEST_PERSON_3.birth)
 
-    @Test
-    fun getUnregisteredDataFails() {
-        val failedPromise = TestPerson().get(LOCAL_KEY)
-        failedPromise.handle { _, e ->
-            assertTrue(e != null)
-            assertTrue(e is NoSuchElementException)
-        }
-        assertThrows(ExecutionException::class.java) { failedPromise.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
-    }
 
-    @Test
-    fun getRegisteredDataWorks() {
-        addDataToDB(TEST_PERSON_DB_1, GLOBAL_KEY)
-        TestPerson().get(LOCAL_KEY).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-    }
-
-    @Test
-    fun getRegisteredDataHasCorrectValue() {
-        addDataToDB(TEST_PERSON_DB_1, DB_MOCK_USER_PATH+TEST_PERSON_1.id)
-        addDataToDB(TEST_PERSON_DB_2, DB_MOCK_USER_PATH+TEST_PERSON_2.id)
-        val testPerson1 = TestPerson().get(TEST_PERSON_1.id).get(TIMEOUT_DURATION, TimeUnit.SECONDS) as TestPerson
-        val testPerson2 = TestPerson().get(TEST_PERSON_2.id).get(TIMEOUT_DURATION, TimeUnit.SECONDS) as TestPerson
-        assertTrue(testPerson1.birth == TEST_PERSON_1.birth)
-        assertTrue(testPerson2.birth == TEST_PERSON_2.birth)
-    }
-
-    @Test
-    fun getAllHoldsEmptyListWhenNoData() {
-        val list = TestPerson().getAll().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertTrue(list.isEmpty())
-    }
-
-    @Test
-    fun getAllHoldsAllRegisteredData() {
-        addDataToDB(TEST_PERSON_DB_1, DB_MOCK_USER_PATH+TEST_PERSON_1.id)
-        addDataToDB(TEST_PERSON_DB_2, DB_MOCK_USER_PATH+TEST_PERSON_2.id)
-        addDataToDB(TEST_PERSON_DB_3, DB_MOCK_USER_PATH+TEST_PERSON_3.id)
-        @Suppress("UNCHECKED_CAST")
-        val list = TestPerson().getAll().get(TIMEOUT_DURATION, TimeUnit.SECONDS) as List<TestPerson>
-        val expectedList = listOf(TEST_PERSON_1, TEST_PERSON_2, TEST_PERSON_3)
-        list.forEach { person ->
-            assertTrue(
-                expectedList.any { expectedPerson ->
-                    expectedPerson.id == person.id &&
-                    expectedPerson.name == person.name &&
-                    expectedPerson.birth == person.birth
-                }
-            )
-        }
-    }
 
 }
 
@@ -84,7 +36,7 @@ class TestPerson(
     val id: String = "",
     val name: String = "",
     val birth: Int = 2003
-): StorableObject<TestPersonDB>(DB_MOCK_USER_PATH, id, TestPersonDB::class) {
+): StorableObject<TestPersonDB>(DB_MOCK_USER_PATH) {
 
     override fun toDBObject(): TestPersonDB {
         return TestPersonDB(id, name, 2023 - birth)
