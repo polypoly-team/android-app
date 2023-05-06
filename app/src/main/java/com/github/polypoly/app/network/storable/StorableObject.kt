@@ -93,6 +93,5 @@ abstract class StorableObject<T : Any> (DBPath: String) {
      */
     protected abstract fun toLocalObject(dbObject: T): StorableObject<T>
 
-
 }
 

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 class StorableObjectTest: PolyPolyTest(true, false) {
 
-    // Values that often used in tests
+    // Values that are often used in tests
     private val TEST_PERSON_1 = TestPerson("1", "Sylvain", 1930)
     private val TEST_PERSON_2 = TestPerson("2", "bigflo", 2001)
     private val TEST_PERSON_3 = TestPerson("3", "Truck", 1988)

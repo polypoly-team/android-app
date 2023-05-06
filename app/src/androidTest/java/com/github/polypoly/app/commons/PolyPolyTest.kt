@@ -16,7 +16,6 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
