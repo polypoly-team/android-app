@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 /**
  * [StorableObject] is the super class of all classes that'll be contained in the DB.
  * It implements all the abstractions needed by the remote storage to do all the queries, i.e.
- * - The path that precedes every key for a given class (e.g. "objectX/"),
+ * - The [dbPath] that precedes every key for a given class (e.g. "objectX/"),
  * - The converter (to local) that converts a T DB object to a local StorableObject<T>,
  * - The converter (to DB)]that converts an instance of a local StorableObject<T> to a DB T.
  *
@@ -13,11 +13,15 @@ import kotlin.reflect.KClass
  *
  * This class takes a generic type T as argument, corresponding to the data class that is
  * going to be stored in the DB.
+ *
+ * @note attribute [key] should be the primary key used to store the object in the DB
+ *
+ * @note for the subclass to be correctly initialized, one instance should be created before any operation
  */
-abstract class StorableObject<T : Any> (DBPath: String) {
+abstract class StorableObject<T : Any> (dbPath: String, private val key: String) {
 
     init {
-        registerClassToCompanion(DBPath, this::class.toString(), ::toLocalObject)
+        registerClassToCompanion(dbPath, this::class.toString(), ::toLocalObject)
     }
 
     companion object {
@@ -26,17 +30,17 @@ abstract class StorableObject<T : Any> (DBPath: String) {
 
         /**
          * Everytime a subclass is created, this companion object will store its path and converter
-         * @param DBPath: the mentioned path
+         * @param dbPath: the mentioned path
          * @param className: the name of the subclass
          * @param convertToDB: the DB to Local converter
          */
         @JvmStatic
         private fun <T: Any> registerClassToCompanion(
-            DBPath: String,
+            dbPath: String,
             className: String,
             convertToDB: (T) -> StorableObject<T>
         ) {
-            paths[className] = DBPath
+            paths[className] = dbPath
             @Suppress("UNCHECKED_CAST")
             converters[className] = convertToDB as (Any) -> StorableObject<*>
         }
@@ -92,6 +96,9 @@ abstract class StorableObject<T : Any> (DBPath: String) {
      * @note /!\ STATIC /!\ The returned value shouldn't depend on the current object instance
      */
     protected abstract fun toLocalObject(dbObject: T): StorableObject<T>
+
+    // ================================================================== HELPERS
+    protected fun getKey(): String { return key }
 
 }
 
