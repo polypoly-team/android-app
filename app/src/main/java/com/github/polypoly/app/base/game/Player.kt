@@ -1,9 +1,12 @@
 package com.github.polypoly.app.base.game
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.ui.game.PlayerState
 import kotlin.random.Random
 
 /**
@@ -19,6 +22,7 @@ data class Player (
     private var balance: Int = 0,
     private var ownedLocations: List<InGameLocation> = listOf(),
     private var roundLost: Int? = null,
+    val mutableState: MutableState<PlayerState> = mutableStateOf(PlayerState.INIT)
 ) : Comparable<Player> {
 
     /**
