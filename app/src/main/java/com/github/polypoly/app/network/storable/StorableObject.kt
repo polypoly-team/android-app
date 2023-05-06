@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 abstract class StorableObject<T : Any> (DBPath: String) {
 
     init {
-        initClassCompanion(DBPath, this::class.toString(), ::toLocalObject)
+        registerClassToCompanion(DBPath, this::class.toString(), ::toLocalObject)
     }
 
     companion object {
@@ -31,7 +31,7 @@ abstract class StorableObject<T : Any> (DBPath: String) {
          * @param convertToDB: the DB to Local converter
          */
         @JvmStatic
-        private fun <T: Any> initClassCompanion(
+        private fun <T: Any> registerClassToCompanion(
             DBPath: String,
             className: String,
             convertToDB: (T) -> StorableObject<T>
