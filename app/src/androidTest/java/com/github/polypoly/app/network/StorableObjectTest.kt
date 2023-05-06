@@ -12,9 +12,6 @@ import java.util.concurrent.TimeUnit
 class StorableObjectTest: PolyPolyTest(true, false) {
 
     // Values that often used in tests
-    private val GLOBAL_KEY = DB_MOCK_USER_PATH + "some_key"
-    private val LOCAL_KEY = "some_key"
-
     private val TEST_PERSON_1 = TestPerson("1", "Sylvain", 1930)
     private val TEST_PERSON_2 = TestPerson("2", "bigflo", 2001)
     private val TEST_PERSON_3 = TestPerson("3", "Truck", 1988)
@@ -28,15 +25,15 @@ class StorableObjectTest: PolyPolyTest(true, false) {
 }
 
 
-// ================================================================== MOCK USER
+// ================================================================== TEST PERSON
 
-const val DB_MOCK_USER_PATH = "test_people/"
+const val DB_TEST_USER_PATH = "test_people/"
 
 class TestPerson(
     val id: String = "",
     val name: String = "",
     val birth: Int = 2003
-): StorableObject<TestPersonDB>(DB_MOCK_USER_PATH) {
+): StorableObject<TestPersonDB>(DB_TEST_USER_PATH) {
 
     override fun toDBObject(): TestPersonDB {
         return TestPersonDB(id, name, 2023 - birth)
@@ -48,3 +45,6 @@ class TestPerson(
 }
 
 data class TestPersonDB(val key: String = "", val name: String = "", val age: Int = 0)
+
+
+// ================================================================== DUMMY SUBCLASSES
