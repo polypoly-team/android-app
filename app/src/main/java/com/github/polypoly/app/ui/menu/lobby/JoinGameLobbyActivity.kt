@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
@@ -531,7 +532,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             //launch the gameLobby room activity
             remoteDB.updateValue(currentLobbyKey, gameLobby)
             val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-            gameLobbyIntent.putExtra("lobby_code", gameLobbyCode)
+            GameRepository.gameCode = gameLobbyCode
+
             startActivity(gameLobbyIntent)
             finish()
         }
