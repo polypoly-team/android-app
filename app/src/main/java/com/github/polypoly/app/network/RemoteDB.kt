@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 /**
  * Implementation of IRemoteStorage as a Firebase remote DB
  */
-open class RemoteDB(
+class RemoteDB(
     db: FirebaseDatabase?,
     root: String
 ) : IRemoteStorage {
@@ -170,7 +170,7 @@ open class RemoteDB(
         return getRefAndThen(key) { ref ->
             changeListeners
                 .filterKeys { pair -> pair.first == key }
-                .map { (pair, _) -> pair }
+                .keys
                 .forEach { pair ->
                     val previousListener = changeListeners.remove(pair)
                     if(previousListener != null) {

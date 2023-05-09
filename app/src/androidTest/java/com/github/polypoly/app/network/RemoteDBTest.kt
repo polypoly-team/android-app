@@ -3,7 +3,6 @@ package com.github.polypoly.app.network
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.storable.StorableObject
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.google.firebase.database.DatabaseReference
@@ -281,6 +280,23 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         remoteDB.updateValue(key, data1).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertTrue(num >= 2)
+    }
+
+    @Test
+    fun onChangeListenerIsExecutedWithNewData() {
+        val key = "some_key"
+        val userList = mutableListOf<User>()
+        val action = { user: User ->
+            val ignore = userList.add(user)
+        }
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1, key)
+
+        remoteDB.addOnChangeListener(key, "tag", action, User::class).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(key, data2).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(userList.any { user -> user.id == data2.id })
     }
 
     @Test

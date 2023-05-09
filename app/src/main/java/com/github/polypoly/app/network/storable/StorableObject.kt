@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
  *
  * @note for the subclass to be correctly initialized, one instance should be created before any operation
  */
-abstract class StorableObject<T : Any> (dbPath: String, private val key: String) {
+abstract class StorableObject<T : Any> (dbPath: String, val key: String) {
 
     init {
         registerClassToCompanion(dbPath, this::class.toString(), ::toLocalObject)
@@ -96,9 +96,6 @@ abstract class StorableObject<T : Any> (dbPath: String, private val key: String)
      * @note /!\ STATIC /!\ The returned value shouldn't depend on the current object instance
      */
     protected abstract fun toLocalObject(dbObject: T): StorableObject<T>
-
-    // ================================================================== HELPERS
-    protected fun getKey(): String { return key }
 
 }
 

@@ -20,9 +20,9 @@ class MockDB: IRemoteStorage {
     override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
         val keyCleaned = cleanKey(key)
         if (!data.containsKey(keyCleaned)) {
-            val failedPromise = CompletableFuture<T>()
-            failedPromise.completeExceptionally(IllegalAccessException("Invalid key $keyCleaned"))
-            return failedPromise
+            val failedFuture = CompletableFuture<T>()
+            failedFuture.completeExceptionally(NoSuchElementException("Invalid key $keyCleaned"))
+            return failedFuture
         }
         @Suppress("UNCHECKED_CAST")
         return CompletableFuture.completedFuture(data[cleanKey(key)] as T)
@@ -47,15 +47,16 @@ class MockDB: IRemoteStorage {
 
     override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
         val keyCleaned = cleanKey(key)
-        if (data.containsKey(keyCleaned))
+        if (data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(IllegalAccessException("Registering a value already registered"))
+        }
         return setValue(keyCleaned, value)
     }
 
     override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
         val keyCleaned = cleanKey(key)
         if (!data.containsKey(keyCleaned)) {
-            return CompletableFuture.failedFuture(IllegalAccessException("Update a value not already registered"))
+            return CompletableFuture.failedFuture(NoSuchElementException("Update a value not already registered"))
         }
         return setValue(keyCleaned, value)
     }
