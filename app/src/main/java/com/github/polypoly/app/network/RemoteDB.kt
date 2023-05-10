@@ -2,20 +2,22 @@ package com.github.polypoly.app.network
 
 
 import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 /**
  * Implementation of IRemoteStorage as a Firebase remote DB
  */
-open class RemoteDB(
+class RemoteDB(
     db: FirebaseDatabase?,
     root: String
 ) : IRemoteStorage {
 
-    val rootRef: DatabaseReference
+    private val rootRef: DatabaseReference
 
     init {
         if(db == null)
@@ -105,4 +107,77 @@ open class RemoteDB(
         }.addOnFailureListener(registerPromise::completeExceptionally)
         return registerPromise
     }
+
+    override fun removeValue(key: String): CompletableFuture<Boolean> {
+        return deleteAllOnChangeListeners(key).thenCompose { result ->
+            if(result) {
+                setValue(key, null)
+            } else {
+                CompletableFuture.completedFuture(false)
+            }
+
+        }
+    }
+
+    // ========================================================================== LISTENERS
+    /**
+     * Gets the reference of a given key and if it exists, executes the given action with that reference
+     * @return a promise with true if the action was successfully executed, false else or if no value was found
+     */
+    private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
+        return keyExists(key).thenCompose { exists ->
+            if(exists) {
+                action(rootRef.child(key))
+            }
+            CompletableFuture.completedFuture(exists)
+        }
+    }
+
+    private val changeListeners = mutableMapOf<Pair<String, String>, ValueEventListener>()
+
+    override fun <T : Any>addOnChangeListener(
+        key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+
+        return getRefAndThen(key) { ref ->
+            val previousListener = changeListeners.remove(Pair(key, tag))
+            if(previousListener != null) {
+                ref.removeEventListener(previousListener)
+            }
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(snapshot.exists()) {
+                        action(snapshot.getValue(clazz.java)!!)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            }
+            changeListeners[Pair(key, tag)] = listener
+            ref.addValueEventListener(listener)
+        }
+    }
+
+    override fun deleteOnChangeListener(key: String, tag: String): CompletableFuture<Boolean> {
+        return getRefAndThen(key) { ref ->
+            val previousListener = changeListeners.remove(Pair(key, tag))
+            if(previousListener != null) {
+                ref.removeEventListener(previousListener)
+            }
+        }
+    }
+
+    override fun deleteAllOnChangeListeners(key: String): CompletableFuture<Boolean> {
+        return getRefAndThen(key) { ref ->
+            changeListeners
+                .filterKeys { pair -> pair.first == key }
+                .keys
+                .forEach { pair ->
+                    val previousListener = changeListeners.remove(pair)
+                    if(previousListener != null) {
+                        ref.removeEventListener(previousListener)
+                    }
+                }
+            }
+    }
+
 }
