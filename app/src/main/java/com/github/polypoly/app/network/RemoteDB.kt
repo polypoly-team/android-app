@@ -26,6 +26,10 @@ class RemoteDB(
         rootRef = db.getReference(root)
     }
 
+    // ====================================================================================
+    // ============================================================================ HELPERS
+    // ====================================================================================
+
     private fun <T> getValueAndThen(
         absoluteKey: String,
         onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit,
@@ -52,7 +56,7 @@ class RemoteDB(
 
     /**
      * Gets the reference of a given key and if it exists, executes the given action with that reference
-     * @return a promise with true if the action was successfully executed, false else or if no value was found
+     * @return a future with true if the action was successfully executed, false else or if no value was found
      */
     private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
         return absoluteKeyExists(key).thenCompose { exists ->
@@ -61,6 +65,16 @@ class RemoteDB(
             }
             CompletableFuture.completedFuture(exists)
         }
+    }
+
+    /**
+     * Converts a data snapshot to a given subclass of [StorableObject].
+     * The data contained in data is of type U, the returned object is of type T = StorableObject<U>
+     * @return the converted object
+     */
+    private fun <T : StorableObject<*>> convertDataToObject(data: DataSnapshot, clazz: KClass<T>): T {
+        val dbObj = data.getValue(StorableObject.getDBClass(clazz).java)!!
+        return StorableObject.convertToLocal(clazz, dbObj)
     }
 
 
@@ -73,8 +87,7 @@ class RemoteDB(
         return getValueAndThen(
             StorableObject.getPath(clazz) + key,
             { data, valuePromise ->
-                val dbObj = data.getValue(StorableObject.getDBClass(clazz).java)!!
-                valuePromise.complete(StorableObject.convertToLocal(clazz, dbObj))
+                valuePromise.complete(convertDataToObject(data, clazz))
             },
             { valuePromise ->
                 valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
@@ -87,8 +100,7 @@ class RemoteDB(
             { data, valuesPromise ->
                 val objects = ArrayList<T>()
                 for (child in data.children) {
-                    val dbObj = child.getValue(StorableObject.getDBClass(clazz).java)!!
-                    objects.add(StorableObject.convertToLocal(clazz, dbObj))
+                    objects.add(convertDataToObject(child, clazz))
                 }
                 valuesPromise.complete(objects)
             },
@@ -129,6 +141,9 @@ class RemoteDB(
         return registerPromise
     }
 
+    /**
+     * @note we maybe could improve this as it will check the key existence twice
+     */
     override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         return deleteAllOnChangeListeners(key, clazz).thenCompose { result ->
             if(result) {
@@ -158,10 +173,9 @@ class RemoteDB(
                 ref.removeEventListener(previousListener)
             }
             val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if(snapshot.exists()) {
-                        val newDBObj = snapshot.getValue(StorableObject.getDBClass(clazz).java)!!
-                        action(StorableObject.convertToLocal(clazz, newDBObj))
+                override fun onDataChange(data: DataSnapshot) {
+                    if(data.exists()) {
+                        action(convertDataToObject(data, clazz))
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {}
