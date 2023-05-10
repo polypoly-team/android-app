@@ -1,6 +1,7 @@
 package com.github.polypoly.app.network
 
 
+import com.github.polypoly.app.network.storable.StorableObject
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -53,27 +54,41 @@ class RemoteDB(
         return valuePromise
     }
 
-    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
-        return getValueAndThen(key, { data, valuePromise ->
-            valuePromise.complete(data.getValue(clazz.java)!!)
-        }, { valuePromise ->
-            valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
-        })
-    }
 
-    override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
-        return getValueAndThen(key, { data, valuesPromise ->
-            val users = ArrayList<T>()
-            for (child in data.children) {
-                users.add(child.getValue(clazz.java)!!)
-            }
-            valuesPromise.complete(users)
-        }, { promise -> promise.complete(listOf()) })
-    }
+    // ====================================================================================
+    // ========================================================================== OVERRIDES
+    // ====================================================================================
 
-    override fun getAllKeys(parentKey: String): CompletableFuture<List<String>> {
+    // ========================================================================== GETTERS
+    override fun <T : StorableObject<*>> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
         return getValueAndThen(
-            parentKey,
+            StorableObject.getPath(clazz) + key,
+            { data, valuePromise ->
+                val dbObj = data.getValue(StorableObject.getDBClass(clazz).java)!!
+                valuePromise.complete(StorableObject.convertToLocal(clazz, dbObj))
+            },
+            { valuePromise ->
+                valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
+            })
+    }
+
+    override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {
+        return getValueAndThen(
+            StorableObject.getPath(clazz),
+            { data, valuesPromise ->
+                val objects = ArrayList<T>()
+                for (child in data.children) {
+                    val dbObj = child.getValue(StorableObject.getDBClass(clazz).java)!!
+                    objects.add(StorableObject.convertToLocal(clazz, dbObj))
+                }
+                valuesPromise.complete(objects)
+            },
+            { promise -> promise.complete(listOf()) })
+    }
+
+    override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
+        return getValueAndThen(
+            StorableObject.getPath(clazz),
             { data, keysPromise ->
                 val keys = ArrayList<String>()
                 for (child in data.children) {
@@ -84,14 +99,15 @@ class RemoteDB(
             { promise -> promise.complete(listOf()) }) // empty list if no parent key
     }
 
-    override fun keyExists(key: String): CompletableFuture<Boolean> {
+    override fun <T : StorableObject<*>> keyExists(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         return getValueAndThen(
-            key,
+            StorableObject.getPath(clazz) + key,
             { _, promise -> promise.complete(true) }, // value found so key exists
             { promise -> promise.complete(false) }  // value not found so key doesn't exist
         )
     }
 
+    // ========================================================================== SETTERS
     override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
         return setValueWithCheck(key, value, false, IllegalAccessException("Try to register a value with an already existing key"))
     }
