@@ -111,7 +111,7 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
      * Converts this instance to its DB version
      * @return the DB version
      */
-    protected abstract fun toDBObject(): T
+    abstract fun toDBObject(): T
 
     /**
      * Converts the given DB version to its local version

@@ -54,6 +54,19 @@ class RemoteDB(
         return valuePromise
     }
 
+    /**
+     * Gets the reference of a given key and if it exists, executes the given action with that reference
+     * @return a promise with true if the action was successfully executed, false else or if no value was found
+     */
+    private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
+        return keyExists(key).thenCompose { exists ->
+            if(exists) {
+                action(rootRef.child(key))
+            }
+            CompletableFuture.completedFuture(exists)
+        }
+    }
+
 
     // ====================================================================================
     // ========================================================================== OVERRIDES
@@ -108,84 +121,83 @@ class RemoteDB(
     }
 
     // ========================================================================== SETTERS
-    override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(key, value, false, IllegalAccessException("Try to register a value with an already existing key"))
+    override fun <T : StorableObject<*>> registerValue(value: T): CompletableFuture<Boolean> {
+        return setValueWithCheck(value.key, value.toDBObject(), false, IllegalAccessException("Try to register a value with an already existing key"))
     }
 
-    override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(key, value, true, NoSuchElementException("Try to update a value with no existing key"))
+    override fun <T : StorableObject<*>> updateValue(value: T): CompletableFuture<Boolean> {
+        return setValueWithCheck(value.key, value.toDBObject(), true, NoSuchElementException("Try to update a value with no existing key"))
     }
 
-    override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
+    override fun <T : StorableObject<*>> setValue(value: T): CompletableFuture<Boolean> {
         val registerPromise = CompletableFuture<Boolean>()
-        rootRef.child(key).setValue(value).addOnSuccessListener {
+        rootRef.child(value.key).setValue(value.toDBObject()).addOnSuccessListener {
             registerPromise.complete(true)
         }.addOnFailureListener(registerPromise::completeExceptionally)
         return registerPromise
     }
 
-    override fun removeValue(key: String): CompletableFuture<Boolean> {
-        return deleteAllOnChangeListeners(key).thenCompose { result ->
+    override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
+        return deleteAllOnChangeListeners(key, clazz).thenCompose { result ->
             if(result) {
-                setValue(key, null)
+                getRefAndThen(StorableObject.getPath(clazz) + key) { ref ->
+                    ref.setValue(null)
+                }
             } else {
                 CompletableFuture.completedFuture(false)
             }
-
         }
     }
 
     // ========================================================================== LISTENERS
-    /**
-     * Gets the reference of a given key and if it exists, executes the given action with that reference
-     * @return a promise with true if the action was successfully executed, false else or if no value was found
-     */
-    private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
-        return keyExists(key).thenCompose { exists ->
-            if(exists) {
-                action(rootRef.child(key))
-            }
-            CompletableFuture.completedFuture(exists)
-        }
-    }
 
     private val changeListeners = mutableMapOf<Pair<String, String>, ValueEventListener>()
 
-    override fun <T : Any>addOnChangeListener(
-        key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>
+    override fun <T : StorableObject<*>> addOnChangeListener(
+        key: String,
+        tag: String,
+        action: (newObj: T) -> Unit,
+        clazz: KClass<T>
     ): CompletableFuture<Boolean> {
-
-        return getRefAndThen(key) { ref ->
-            val previousListener = changeListeners.remove(Pair(key, tag))
+        val absoluteKey = StorableObject.getPath(clazz) + key
+        return getRefAndThen(absoluteKey) { ref ->
+            val previousListener = changeListeners.remove(Pair(absoluteKey, tag))
             if(previousListener != null) {
                 ref.removeEventListener(previousListener)
             }
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(snapshot.exists()) {
-                        action(snapshot.getValue(clazz.java)!!)
+                        val newDBObj = snapshot.getValue(StorableObject.getDBClass(clazz).java)!!
+                        action(StorableObject.convertToLocal(clazz, newDBObj))
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {}
             }
-            changeListeners[Pair(key, tag)] = listener
+            changeListeners[Pair(absoluteKey, tag)] = listener
             ref.addValueEventListener(listener)
         }
     }
 
-    override fun deleteOnChangeListener(key: String, tag: String): CompletableFuture<Boolean> {
-        return getRefAndThen(key) { ref ->
-            val previousListener = changeListeners.remove(Pair(key, tag))
+    override fun <T : StorableObject<*>> deleteOnChangeListener(
+        key: String,
+        tag: String,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean>{
+        val absoluteKey = StorableObject.getPath(clazz) + key
+        return getRefAndThen(absoluteKey) { ref ->
+            val previousListener = changeListeners.remove(Pair(absoluteKey, tag))
             if(previousListener != null) {
                 ref.removeEventListener(previousListener)
             }
         }
     }
 
-    override fun deleteAllOnChangeListeners(key: String): CompletableFuture<Boolean> {
-        return getRefAndThen(key) { ref ->
+    override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
+        val absoluteKey = StorableObject.getPath(clazz) + key
+        return getRefAndThen(absoluteKey) { ref ->
             changeListeners
-                .filterKeys { pair -> pair.first == key }
+                .filterKeys { pair -> pair.first == absoluteKey }
                 .keys
                 .forEach { pair ->
                     val previousListener = changeListeners.remove(pair)
