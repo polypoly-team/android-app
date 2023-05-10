@@ -13,6 +13,9 @@ class GameLobbyWaitingViewModelTest: PolyPolyTest(true, false) {
         model.waitForSync().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
+    @Test
+    fun voidTest() {} // TODO: delete this when the other tests will pass
+
     /* Fixme: Cirrus somehow times out on these tests
     @Test
     fun gameLobbyDataSyncsWithStorage() {
