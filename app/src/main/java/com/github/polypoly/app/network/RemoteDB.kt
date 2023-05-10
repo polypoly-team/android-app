@@ -26,25 +26,13 @@ class RemoteDB(
         rootRef = db.getReference(root)
     }
 
-    private fun <T> setValueWithCheck(key: String, value: T, shouldExist: Boolean, error: Exception): CompletableFuture<Boolean> {
-        return keyExists(key).thenCompose { exists ->
-            var result = CompletableFuture<Boolean>()
-            if (exists != shouldExist) {
-                result.completeExceptionally(error)
-            } else {
-                result = setValue(key, value)
-            }
-            result
-        }
-    }
-
     private fun <T> getValueAndThen(
-        key: String,
+        absoluteKey: String,
         onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit,
         onError: (CompletableFuture<T>) -> Unit
     ) : CompletableFuture<T> {
         val valuePromise = CompletableFuture<T>()
-        rootRef.child(key).get().addOnSuccessListener{ data ->
+        rootRef.child(absoluteKey).get().addOnSuccessListener{ data ->
             if (!data.exists()) {
                 onError(valuePromise)
             } else {
@@ -54,12 +42,20 @@ class RemoteDB(
         return valuePromise
     }
 
+    private fun absoluteKeyExists(absoluteKey: String): CompletableFuture<Boolean> {
+        return getValueAndThen(
+            absoluteKey,
+            { _, promise -> promise.complete(true) }, // value found so key exists
+            { promise -> promise.complete(false) }  // value not found so key doesn't exist
+        )
+    }
+
     /**
      * Gets the reference of a given key and if it exists, executes the given action with that reference
      * @return a promise with true if the action was successfully executed, false else or if no value was found
      */
     private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
-        return keyExists(key).thenCompose { exists ->
+        return absoluteKeyExists(key).thenCompose { exists ->
             if(exists) {
                 action(rootRef.child(key))
             }
@@ -113,20 +109,16 @@ class RemoteDB(
     }
 
     override fun <T : StorableObject<*>> keyExists(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        return getValueAndThen(
-            StorableObject.getPath(clazz) + key,
-            { _, promise -> promise.complete(true) }, // value found so key exists
-            { promise -> promise.complete(false) }  // value not found so key doesn't exist
-        )
+        return absoluteKeyExists(StorableObject.getPath(clazz))
     }
 
     // ========================================================================== SETTERS
     override fun <T : StorableObject<*>> registerValue(value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(value.key, value.toDBObject(), false, IllegalAccessException("Try to register a value with an already existing key"))
+        return setValueWithCheck(value.key, value, false, IllegalAccessException("Try to register a value with an already existing key"))
     }
 
     override fun <T : StorableObject<*>> updateValue(value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(value.key, value.toDBObject(), true, NoSuchElementException("Try to update a value with no existing key"))
+        return setValueWithCheck(value.key, value, true, NoSuchElementException("Try to update a value with no existing key"))
     }
 
     override fun <T : StorableObject<*>> setValue(value: T): CompletableFuture<Boolean> {
@@ -206,6 +198,24 @@ class RemoteDB(
                     }
                 }
             }
+    }
+
+    // ========================================================================== HELPERS
+    private fun <T : StorableObject<*>> setValueWithCheck(
+        absoluteKey: String,
+        value: T,
+        shouldExist: Boolean,
+        error: Exception
+    ): CompletableFuture<Boolean> {
+        return absoluteKeyExists(absoluteKey).thenCompose { exists ->
+            var result = CompletableFuture<Boolean>()
+            if (exists != shouldExist) {
+                result.completeExceptionally(error)
+            } else {
+                result = setValue(value)
+            }
+            result
+        }
     }
 
 }
