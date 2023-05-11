@@ -153,6 +153,7 @@ abstract class PolyPolyTest(
 
     @Before
     fun prepareTest() {
+        remoteDB = mockDB
         if (clearRemoteStorage) {
             clearMockDB()
         }

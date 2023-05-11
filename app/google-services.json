@@ -39,6 +39,22 @@
           }
         },
         {
+          "client_id": "349880221971-b91drro3p0nomq40vjam36cs2p3asett.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "0649aeaead69cfe420cd3642a8291f1fe728d483"
+          }
+        },
+        {
+          "client_id": "349880221971-crqivhfhspit9js53gu8eneh84ck5fhh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "14b140984b6d4c1c99b7532125ab9bf1ab5a8e49"
+          }
+        },
+        {
           "client_id": "349880221971-emvmonf9q3ast350fnbo1r554c9i6ktr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
