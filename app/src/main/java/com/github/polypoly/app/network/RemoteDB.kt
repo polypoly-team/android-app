@@ -94,26 +94,17 @@ class RemoteDB(
     }
 
     override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
-        val returnFuture = CompletableFuture<List<T>>()
+        val returnFuture = CompletableFuture<ArrayList<T>>()
         keys.forEach { key ->
-            returnFuture.thenCompose {
-                getValue(key, clazz) }
+            getValue(key, clazz).thenApply { value ->
+                returnFuture.thenApply { list -> list.add(value) }
+            }
         }
-        CompletableFuture.
-        return returnFuture
+        return returnFuture as CompletableFuture<List<T>>
     }
 
     override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {
-        return getValueAndThen(
-            StorableObject.getPath(clazz),
-            { data, valuesPromise ->
-                val objects = ArrayList<T>()
-                for (child in data.children) {
-                    objects.add(convertDataToObject(child, clazz))
-                }
-                valuesPromise.complete(objects)
-            },
-            { promise -> promise.complete(listOf()) })
+        return getAllKeys(clazz).thenCompose { keys -> getValues(keys, clazz) }
     }
 
     override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
@@ -184,7 +175,7 @@ class RemoteDB(
             val listener = object : ValueEventListener {
                 override fun onDataChange(data: DataSnapshot) {
                     if(data.exists()) {
-                        action(convertDataToObject(data, clazz))
+                        convertDataToObject(data, clazz).thenApply { obj -> action(obj) }
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {}

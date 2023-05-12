@@ -134,6 +134,7 @@ data class GameLobby(
     }
 }
 
+// TODO: add tests for data class
 data class GameLobbyDB(
     val code: String = "",
     val name: String = "",
