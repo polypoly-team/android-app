@@ -1,5 +1,6 @@
-package com.github.polypoly.app.network.storable
+package com.github.polypoly.app.network
 
+import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 /**
@@ -28,7 +29,7 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
     companion object {
         private val classes = mutableMapOf<String, KClass<*>>()
         private val paths = mutableMapOf<String, String>()
-        private val converters = mutableMapOf<String, (Any) -> StorableObject<*>>()
+        private val converters = mutableMapOf<String, (Any) -> CompletableFuture<StorableObject<*>>>()
 
         /**
          * Everytime a subclass is created, this companion object will store its path and converter
@@ -41,12 +42,12 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
             dbClass: KClass<T>,
             dbPath: String,
             className: String,
-            convertToDB: (T) -> StorableObject<T>
+            convertToLocal: (T) -> CompletableFuture<StorableObject<T>>
         ) {
             classes[className] = dbClass
             paths[className] = dbPath
             @Suppress("UNCHECKED_CAST")
-            converters[className] = convertToDB as (Any) -> StorableObject<*>
+            converters[className] = convertToLocal as (Any) -> CompletableFuture<StorableObject<*>>
         }
 
         /**
@@ -90,18 +91,18 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
          * For the given subclass [T], returns the local version of the DB [obj]
          * @param clazz: the Kotlin subclass
          */
-        fun <T: StorableObject<*>> convertToLocal(clazz: KClass<T>, obj: Any): T {
+        fun <T: StorableObject<*>> convertToLocal(clazz: KClass<T>, obj: Any): CompletableFuture<T> {
             val converter = converters[clazz.toString()] ?:
             throw NoSuchElementException("The DB converter for this class doesn't exist")
 
             @Suppress("UNCHECKED_CAST")
-            return converter(obj) as T
+            return converter(obj) as CompletableFuture<T>
         }
 
         /**
          * Inline redefinition to avoid passing a [KClass] as parameter
          */
-        inline fun <reified T: StorableObject<*>> convertToLocal(obj: Any): T {
+        inline fun <reified T: StorableObject<*>> convertToLocal(obj: Any): CompletableFuture<T> {
             return convertToLocal(T::class, obj)
         }
     }
@@ -120,7 +121,7 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
      *
      * @note /!\ STATIC /!\ The returned value shouldn't depend on the current object instance
      */
-    protected abstract fun toLocalObject(dbObject: T): StorableObject<T>
+    protected abstract fun toLocalObject(dbObject: T): CompletableFuture<StorableObject<T>>
 
 }
 

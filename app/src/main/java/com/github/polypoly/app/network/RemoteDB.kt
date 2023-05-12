@@ -1,7 +1,6 @@
 package com.github.polypoly.app.network
 
 
-import com.github.polypoly.app.network.storable.StorableObject
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -72,7 +71,7 @@ class RemoteDB(
      * The data contained in data is of type U, the returned object is of type T = StorableObject<U>
      * @return the converted object
      */
-    private fun <T : StorableObject<*>> convertDataToObject(data: DataSnapshot, clazz: KClass<T>): T {
+    private fun <T : StorableObject<*>> convertDataToObject(data: DataSnapshot, clazz: KClass<T>): CompletableFuture<T> {
         val dbObj = data.getValue(StorableObject.getDBClass(clazz).java)!!
         return StorableObject.convertToLocal(clazz, dbObj)
     }
@@ -87,11 +86,21 @@ class RemoteDB(
         return getValueAndThen(
             StorableObject.getPath(clazz) + key,
             { data, valuePromise ->
-                valuePromise.complete(convertDataToObject(data, clazz))
+                valuePromise.thenCompose { convertDataToObject(data, clazz) }
             },
             { valuePromise ->
                 valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
             })
+    }
+
+    override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
+        val returnFuture = CompletableFuture<List<T>>()
+        keys.forEach { key ->
+            returnFuture.thenCompose {
+                getValue(key, clazz) }
+        }
+        CompletableFuture.
+        return returnFuture
     }
 
     override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {

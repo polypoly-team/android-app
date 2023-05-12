@@ -1,6 +1,5 @@
 package com.github.polypoly.app.network
 
-import com.github.polypoly.app.network.storable.StorableObject
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -25,6 +24,16 @@ interface IRemoteStorage {
      * @throws NoSuchElementException (in the future) if the key isn't in the DB
      */
     fun <T : StorableObject<*>> getValue(key: String, clazz: KClass<T>): CompletableFuture<T>
+
+    /**
+     * Retrieves the [T] instances associated to the given keys
+     * @param keys: keys of the values asked
+     * @param clazz: corresponding [StorableObject] subclass
+     * @return A future with the values found
+     *
+     * @throws NoSuchElementException (in the future) if one of the keys isn't in the DB
+     */
+    fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>>
 
     /**
      * Retrieves all values associated to a given [StorableObject] subclass
@@ -132,6 +141,7 @@ interface IRemoteStorage {
  */
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getAllValues() = getAllValues(T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getValue(key: String) = getValue(key, T::class)
+inline fun <reified T : StorableObject<*>> IRemoteStorage.getValues(keys: List<String>) = getValues(keys, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getAllKeys() = getAllKeys(T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.removeValue(key: String) = removeValue(key, T::class)
 inline fun <reified T : StorableObject<*>>

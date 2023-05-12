@@ -2,6 +2,11 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.network.getValues
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
+import java.util.concurrent.CompletableFuture
 
 /**
  * Represent a game lobby where [User]s can join and wait for the game to start,
@@ -18,7 +23,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-) {
+): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
     val usersRegistered: List<User> get() = currentUsersRegistered.toList()
@@ -95,5 +100,51 @@ data class GameLobby(
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
         return Game.launchFromPendingGame(this)
+    }
+
+    // ====================================================================== STORABLE
+
+    // TODO: add tests for converters
+    override fun toDBObject(): GameLobbyDB {
+        return GameLobbyDB(
+            code,
+            name,
+            private,
+            rules,
+            currentUsersRegistered.map { user -> user.id.toString() },
+            admin.id.toString()
+        )
+    }
+
+    override fun toLocalObject(dbObject: GameLobbyDB): CompletableFuture<StorableObject<GameLobbyDB>> {
+        val returnFuture = CompletableFuture<GameLobby>()
+        return returnFuture.thenCompose {
+            remoteDB.getValues<User>(dbObject.userIds)
+        }.thenApply { users ->
+            val lobby = GameLobby(
+                users.first { user -> user.id.toString() == dbObject.adminId },
+                dbObject.parameters,
+                dbObject.name,
+                dbObject.code,
+                dbObject.private
+            )
+            lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
+            lobby
+        }
+    }
+}
+
+data class GameLobbyDB(
+    val code: String = "",
+    val name: String = "",
+    val private: Boolean = false,
+    val parameters: GameParameters = GameParameters(),
+    val userIds: List<String> = listOf(),
+    val adminId: String = ""
+) {
+    init {
+        if(!userIds.contains(adminId)) {
+            throw IllegalArgumentException("Admin id must be in user ids")
+        }
     }
 }

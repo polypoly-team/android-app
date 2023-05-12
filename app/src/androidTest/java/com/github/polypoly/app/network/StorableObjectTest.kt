@@ -1,7 +1,6 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.network.storable.StorableObject
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
