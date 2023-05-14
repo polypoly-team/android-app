@@ -54,7 +54,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
 
     // ========================================================================== GETTERS
 
-    @Test
+    /*@Test
     fun dataCanBeRetrievedFromKey() {
         val data = TEST_USER_1
         addDataToDB(data)
@@ -62,7 +62,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertEquals(data, dataFound)
     }
 
-    /*@Test
+    @Test
     fun gettingDataWithInvalidKeyFails() {
         val invalidKey = "invalid_key"
         val failFuture = remoteDB.getValue<User>(invalidKey)

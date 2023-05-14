@@ -1,6 +1,7 @@
 package com.github.polypoly.app.commons
 
 import com.github.polypoly.app.network.IRemoteStorage
+import com.github.polypoly.app.network.StorableObject
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
@@ -17,52 +18,72 @@ class MockDB: IRemoteStorage {
         return key.removePrefix("/").removeSuffix("/")
     }
 
-    override fun <T : Any> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
-        val keyCleaned = cleanKey(key)
+    // ====================================================================================
+    // ========================================================================== OVERRIDES
+    // ====================================================================================
+
+    // ========================================================================== GETTERS
+
+    override fun <T : StorableObject<*>> getValue(
+        key: String,
+        clazz: KClass<T>
+    ): CompletableFuture<T> {
+        val keyCleaned = cleanKey(StorableObject.getPath(clazz) + key)
         if (!data.containsKey(keyCleaned)) {
             val failedFuture = CompletableFuture<T>()
             failedFuture.completeExceptionally(NoSuchElementException("Invalid key $keyCleaned"))
             return failedFuture
         }
-        @Suppress("UNCHECKED_CAST")
-        return CompletableFuture.completedFuture(data[cleanKey(key)] as T)
+        return StorableObject.convertToLocal(clazz, data[cleanKey(key)]!!)
     }
 
-    override fun <T : Any> getAllValues(key: String, clazz: KClass<T>): CompletableFuture<List<T>> {
+    override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {
         val objs = mutableListOf<T>()
-        val parentKeyCleaned = cleanKey(key)
-        @Suppress("UNCHECKED_CAST")
-        for (child in keysHierarchy[parentKeyCleaned] ?: listOf())
-            objs.add(data["$parentKeyCleaned/$child"] as T)
+        val parentKeyCleaned = cleanKey(StorableObject.getPath(clazz))
+
+        for (child in keysHierarchy[parentKeyCleaned] ?: listOf()) {
+            val localObj = StorableObject.convertToLocal(clazz, data["$parentKeyCleaned/$child"]!!).get()
+            objs.add(localObj)
+        }
         return CompletableFuture.completedFuture(objs)
     }
 
-    override fun getAllKeys(parentKey: String): CompletableFuture<List<String>> {
-        return CompletableFuture.completedFuture(keysHierarchy[cleanKey(parentKey)] ?: listOf())
+    override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
+        return CompletableFuture.completedFuture(keysHierarchy[cleanKey(StorableObject.getPath(clazz))] ?: listOf())
     }
 
-    override fun keyExists(key: String): CompletableFuture<Boolean> {
-        return CompletableFuture.completedFuture(data.containsKey(cleanKey(key)))
+    override fun <T : StorableObject<*>> keyExists(
+        key: String,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+        val keyCleaned = cleanKey(StorableObject.getPath(clazz) + key)
+        return CompletableFuture.completedFuture(data.containsKey(keyCleaned))
     }
 
-    override fun <T> registerValue(key: String, value: T): CompletableFuture<Boolean> {
-        val keyCleaned = cleanKey(key)
+    // ========================================================================== SETTERS
+
+    override fun <T : StorableObject<*>> registerValue(value: T): CompletableFuture<Boolean> {
+        val keyCleaned = cleanKey(value.getAbsoluteKey())
         if (data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(IllegalAccessException("Registering a value already registered"))
         }
-        return setValue(keyCleaned, value)
+        return setValue(value)
     }
 
-    override fun <T> updateValue(key: String, value: T): CompletableFuture<Boolean> {
-        val keyCleaned = cleanKey(key)
+    override fun <T : StorableObject<*>> updateValue(value: T): CompletableFuture<Boolean> {
+        val keyCleaned = cleanKey(value.getAbsoluteKey())
         if (!data.containsKey(keyCleaned)) {
             return CompletableFuture.failedFuture(NoSuchElementException("Update a value not already registered"))
         }
-        return setValue(keyCleaned, value)
+        return setValue(value)
     }
 
-    override fun <T> setValue(key: String, value: T): CompletableFuture<Boolean> {
-        val keyCleaned = cleanKey(key)
+    override fun <T : StorableObject<*>> setValue(value: T): CompletableFuture<Boolean> {
+        val keyCleaned = cleanKey(value.getAbsoluteKey())
         val hierarchy = keyCleaned.split("/")
         for (index in 0 until hierarchy.size - 1) {
             val parent = hierarchy[index]
@@ -70,28 +91,25 @@ class MockDB: IRemoteStorage {
             keysHierarchy.putIfAbsent(parent, mutableListOf())
             keysHierarchy[parent]!!.add(child)
         }
-        data[keyCleaned] = value as Any
+        data[keyCleaned] = value.toDBObject()
         return CompletableFuture.completedFuture(true)
     }
 
-    override fun removeValue(key: String): CompletableFuture<Boolean> {
+    override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun <T : Any> addOnChangeListener(
-        key: String,
-        tag: String,
-        action: (newObj: T) -> Unit,
-        clazz: KClass<T>
-    ): CompletableFuture<Boolean> {
+    // ========================================================================== LISTENERS
+
+    override fun <T : StorableObject<*>> addOnChangeListener(key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun deleteOnChangeListener(key: String, tag: String): CompletableFuture<Boolean> {
+    override fun <T : StorableObject<*>> deleteOnChangeListener(key: String, tag: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllOnChangeListeners(key: String): CompletableFuture<Boolean> {
+    override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 

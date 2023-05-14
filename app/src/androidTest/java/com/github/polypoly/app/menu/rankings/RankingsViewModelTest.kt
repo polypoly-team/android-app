@@ -7,7 +7,6 @@ import com.github.polypoly.app.commons.PolyPolyTest.Companion.NO_SKIN
 import com.github.polypoly.app.ui.menu.rankings.RankingCategory
 import com.github.polypoly.app.ui.menu.rankings.RankingsViewModel
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +20,7 @@ class RankingsViewModelTest {
 
     private fun setUsers(users: List<User>) {
         mockDB.clear()
-        users.forEach { mockDB.setValue(DB_USERS_PROFILES_PATH + it.name, it) }
+        users.forEach { mockDB.setValue(it) }
         remoteDB = mockDB
     }
 

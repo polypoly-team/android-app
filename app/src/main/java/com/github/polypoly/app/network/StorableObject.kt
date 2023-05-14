@@ -53,8 +53,6 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
         /**
          * For the given subclass [T], returns the stored corresponding DB class
          * @param clazz: the Kotlin subclass
-         *
-         * TODO: test this feature
          */
         fun <T: StorableObject<*>> getDBClass(clazz: KClass<T>): KClass<T> {
             val dbClass = classes[clazz.toString()] ?:
@@ -108,6 +106,15 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
     }
 
     // ================================================================== CONVERTERS
+
+    /**
+     * Returns the absolute key of the object, i.e. the path + the object key
+     * @return the absolute path or an empty string if no path was found (should not happen)
+     */
+    fun getAbsoluteKey(): String {
+        return paths[this::class.toString()] + key
+    }
+
     /**
      * Converts this instance to its DB version
      * @return the DB version

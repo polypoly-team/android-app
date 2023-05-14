@@ -126,16 +126,16 @@ class RemoteDB(
 
     // ========================================================================== SETTERS
     override fun <T : StorableObject<*>> registerValue(value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(value.key, value, false, IllegalAccessException("Try to register a value with an already existing key"))
+        return setValueWithCheck(value, false, IllegalAccessException("Try to register a value with an already existing key"))
     }
 
     override fun <T : StorableObject<*>> updateValue(value: T): CompletableFuture<Boolean> {
-        return setValueWithCheck(value.key, value, true, NoSuchElementException("Try to update a value with no existing key"))
+        return setValueWithCheck(value, true, NoSuchElementException("Try to update a value with no existing key"))
     }
 
     override fun <T : StorableObject<*>> setValue(value: T): CompletableFuture<Boolean> {
         val registerPromise = CompletableFuture<Boolean>()
-        rootRef.child(value.key).setValue(value.toDBObject()).addOnSuccessListener {
+        rootRef.child(value.getAbsoluteKey()).setValue(value.toDBObject()).addOnSuccessListener {
             registerPromise.complete(true)
         }.addOnFailureListener(registerPromise::completeExceptionally)
         return registerPromise
@@ -216,12 +216,11 @@ class RemoteDB(
 
     // ========================================================================== HELPERS
     private fun <T : StorableObject<*>> setValueWithCheck(
-        absoluteKey: String,
         value: T,
         shouldExist: Boolean,
         error: Exception
     ): CompletableFuture<Boolean> {
-        return absoluteKeyExists(absoluteKey).thenCompose { exists ->
+        return absoluteKeyExists(value.getAbsoluteKey()).thenCompose { exists ->
             var result = CompletableFuture<Boolean>()
             if (exists != shouldExist) {
                 result.completeExceptionally(error)

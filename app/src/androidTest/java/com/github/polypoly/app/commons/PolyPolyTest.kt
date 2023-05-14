@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.reflect.KClass
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(

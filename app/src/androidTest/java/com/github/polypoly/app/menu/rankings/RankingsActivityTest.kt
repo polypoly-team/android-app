@@ -9,7 +9,6 @@ import com.github.polypoly.app.commons.MockDB
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.ui.menu.rankings.RankingsActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +24,7 @@ class RankingsActivityTest : PolyPolyTest(false, false, true) {
 
     private fun setUsers(users: List<User>) {
         mockDB.clear()
-        users.forEach { mockDB.setValue(DB_USERS_PROFILES_PATH + it.name, it) }
+        users.forEach { mockDB.setValue(it) }
         remoteDB = mockDB
     }
 
