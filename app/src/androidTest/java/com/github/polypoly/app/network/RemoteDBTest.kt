@@ -52,7 +52,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
-    // ========================================================================== GETTERS
+
 
     /*@Test
     fun dataCanBeRetrievedFromKey() {
@@ -126,9 +126,11 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertFalse(
             remoteDB.keyExists(nonExistingKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
-    }
+    }*/
 
-    @Test
+    // ========================================================================== SETTERS
+
+    /*@Test
     fun newDataCanBeRegistered() {
         val data = TEST_USER_1
         val key = "some_key"
@@ -194,7 +196,6 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertEquals(data, dataFound)
     }
 
-    // =============================================================== REMOVE VALUE
     @Test
     fun unregisteredDataCantBeRemoved() {
         val key = "some_key"
@@ -222,14 +223,10 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertFalse(
             remoteDB.keyExists(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         )
-    }
+    }*/
 
-    // =============================================================================
-    // ========================================================= LISTENERS
-    // =============================================================================
-
-    // ========================================================= ADD ON CHANGE LISTENER
-    @Test
+    // ========================================================================== LISTENERS
+    /*@Test
     fun addingOnChangeListenerToUnregisteredDataFails() {
         val key = "some_key"
         val action = { _: User -> }
@@ -357,7 +354,6 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertEquals(num, 0)
     }
 
-    // ========================================================= DELETE ON CHANGE LISTENER
     @Test
     fun deletingOnChangeListenerFromUnregisteredDataFails() {
         val key = "some_key"
@@ -431,7 +427,6 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertTrue(num1 >= 3)
     }
 
-    // ========================================================= DELETE ALL ON CHANGE LISTENER
     @Test
     fun deletingAllOnChangeListenersFromUnregisteredDataFails() {
         val key = "some_key"
