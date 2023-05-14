@@ -33,11 +33,11 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -200,7 +200,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{ lobbies ->
+                        remoteDB.getAllValues<GameLobby>().thenAccept{ lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")
@@ -502,8 +502,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         if (gameLobbyCode.isEmpty()) {
             warningState.value = getString(R.string.game_lobby_code_is_empty)
         } else {
-            val lobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
-            remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
+            val lobbyKey = gameLobbyCode
+            remoteDB.keyExists<GameLobby>(lobbyKey).thenCompose { keyExists ->
                 if (!keyExists) {
                     warningState.value = getString(R.string.game_lobby_does_not_exist)
                     CompletableFuture.failedFuture(IllegalAccessException())
@@ -525,12 +525,12 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
     private fun joinGameLobbyRoom(mContext: Context) {
-        val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
+        val currentLobbyKey = gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
             gameLobby.addUser(currentUser)
 
             //launch the gameLobby room activity
-            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            remoteDB.updateValue(gameLobby)
             val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
             GameRepository.gameCode = gameLobbyCode
 

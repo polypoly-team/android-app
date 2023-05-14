@@ -60,7 +60,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
     @Test
     fun goButtonIsDisabledWhenGameCannotStart() {
         // Setup game lobby not ready for start
-        addDataToDB(TEST_GAME_LOBBY_AVAILABLE_2, lobbyKey)
+        addDataToDB(TEST_GAME_LOBBY_AVAILABLE_2)
 
         composeTestRule.waitForIdle()
 

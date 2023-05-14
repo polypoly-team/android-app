@@ -52,32 +52,17 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
-    private fun <T : Any> classCanBeStoredInDB(clazz: KClass<T>) {
-        val noArgsKey = "no-args-obj"
-        val noArgsConstructor = clazz.java.getDeclaredConstructor()
-        val noArgsInstance = noArgsConstructor.newInstance()
-        addDataToDB(listOf(noArgsInstance), listOf(noArgsKey))
-        assertEquals(
-            noArgsInstance,
-            remoteDB.getValue(noArgsKey, clazz).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        )
-    }
-
-    /*@Test
-    fun gameLobbyCanBeStoredInDB() {
-        classCanBeStoredInDB(GameLobby::class)
-    }
+    // ========================================================================== GETTERS
 
     @Test
     fun dataCanBeRetrievedFromKey() {
-        val key = "some_key"
         val data = TEST_USER_1
-        addDataToDB(data, key)
-        val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        addDataToDB(data)
+        val dataFound = remoteDB.getValue<User>(TEST_USER_1.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(data, dataFound)
     }
 
-    @Test
+    /*@Test
     fun gettingDataWithInvalidKeyFails() {
         val invalidKey = "invalid_key"
         val failFuture = remoteDB.getValue<User>(invalidKey)

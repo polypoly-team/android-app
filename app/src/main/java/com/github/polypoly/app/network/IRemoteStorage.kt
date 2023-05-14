@@ -143,6 +143,7 @@ inline fun <reified T : StorableObject<*>> IRemoteStorage.getAllValues() = getAl
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getValue(key: String) = getValue(key, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getValues(keys: List<String>) = getValues(keys, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.getAllKeys() = getAllKeys(T::class)
+inline fun <reified T : StorableObject<*>> IRemoteStorage.keyExists(key: String) = keyExists(key, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.removeValue(key: String) = removeValue(key, T::class)
 inline fun <reified T : StorableObject<*>>
         IRemoteStorage.addOnChangeListener(key: String, tag: String, noinline action: (newObj: T) -> Unit) = addOnChangeListener(key, tag, action, T::class)

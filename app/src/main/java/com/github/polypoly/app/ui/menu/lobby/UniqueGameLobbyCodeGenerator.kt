@@ -1,6 +1,8 @@
 package com.github.polypoly.app.ui.menu.lobby
 
 import android.annotation.SuppressLint
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CHARACTERS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.utils.global.GlobalInstances
@@ -40,8 +42,7 @@ class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE
     private fun codeIsValid(code: String): Boolean {
         //TODO: DB call to fix after new DB implementation
         var codeIsValid = true
-        val lobbyKey = Settings.DB_GAME_LOBBIES_PATH + code
-        GlobalInstances.remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
+        GlobalInstances.remoteDB.keyExists<GameLobby>(code).thenCompose { keyExists ->
             CompletableFuture.completedFuture(keyExists)
         }.thenAccept { codeIsValid = !it}
 
