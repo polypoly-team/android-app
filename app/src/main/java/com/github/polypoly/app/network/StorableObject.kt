@@ -106,7 +106,7 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
         }
     }
 
-    // ================================================================== CONVERTERS
+    // ================================================================== GETTERS
 
     /**
      * Returns the absolute key of the object, i.e. the path + the object key
@@ -115,6 +115,8 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
     fun getAbsoluteKey(): String {
         return paths[this::class.toString()] + key
     }
+
+    // ================================================================== CONVERTERS
 
     /**
      * Converts this instance to its DB version

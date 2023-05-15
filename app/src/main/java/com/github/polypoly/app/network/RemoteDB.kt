@@ -124,13 +124,10 @@ class RemoteDB(
     }
 
     override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
-        val returnFuture = CompletableFuture<ArrayList<T>>()
-        keys.forEach { key ->
-            getValue(key, clazz).thenApply { value ->
-                returnFuture.thenApply { list -> list.add(value) }
-            }
+        val futures = keys.map { key -> getValue(key, clazz) }
+        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {
+            futures.map { it.join() }
         }
-        return returnFuture as CompletableFuture<List<T>>
     }
 
     override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {
