@@ -26,6 +26,7 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_INITIAL_BALANCE_DEFAULT
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_INITIAL_BALANCE_STEP
@@ -44,6 +45,7 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
@@ -338,8 +340,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
 
         //TODO : create game in database and navigate to game lobby screen
         val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-        gameLobbyIntent.putExtra("lobby_code", "1234")
+        //remoteDB.updateValue(gameCode, lobby)
         startActivity(gameLobbyIntent)
+        GameRepository.gameCode = "1234"
         finish()
     }
 }
