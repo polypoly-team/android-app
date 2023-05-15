@@ -74,9 +74,7 @@ class GameLobbyActivity : ComponentActivity() {
         val dataLoading = gameLobbyWaitingModel.getIsLoading().observeAsState().value
 
         if (gameLobby != null && readyForStart != null) {
-            val minRequiredPlayers = 3
-            val maxPlayers = 8
-
+            val playersList = remember{mutableStateOf(gameLobby.usersRegistered)}
 
             PolypolyTheme {
                     Surface(
@@ -96,7 +94,7 @@ class GameLobbyActivity : ComponentActivity() {
                             ) {
                                 SettingsMenu(gameLobby.rules)
 
-                                PlayersList(gameLobby.usersRegistered)
+                                PlayersList(playersList)
 
                                 StartGameButton(
                                     gameLobby.usersRegistered,
@@ -112,6 +110,10 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Clickable menu that unrolls to show the game settings
+     * @param gameParameters the game parameters to display
+     */
     @Composable
     fun SettingsMenu(gameParameters: GameParameters) {
         var expanded by remember { mutableStateOf(false) }
@@ -156,7 +158,7 @@ class GameLobbyActivity : ComponentActivity() {
 
                         SettingsItem(title = getString(R.string.create_game_lobby_game_mode), value = gameParameters.gameMode.toString())
                         SettingsItem(title = getString(R.string.create_game_lobby_num_rounds), value = gameParameters.maxRound.toString())
-                        SettingsItem(title = getString(R.string.create_game_lobby_round_duration), value = gameParameters.getRoundDuration().toString())
+                        SettingsItem(title = getString(R.string.create_game_lobby_round_duration), value = gameParameters.getRoundDurationValue().toString())
                         SettingsItem(title = getString(R.string.create_game_lobby_initial_balance), value = gameParameters.initialPlayerBalance.toString())
                     }
                 }
@@ -165,6 +167,11 @@ class GameLobbyActivity : ComponentActivity() {
 
     }
 
+    /**
+     * Row for settings menu that displays the title and the value of a given setting
+     * @param title the title of the setting
+     * @param value the value of the setting
+     */
     @Composable
     fun SettingsItem(title: String, value: String) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -182,10 +189,14 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * list of players that have joined the lobby
+     * @param Players the list of players
+     */
     @Composable
-    fun PlayersList(Players: List<User>) {
+    fun PlayersList(Players: MutableState<List<User>>, ) {
         Column {
-            for (player in Players) {
+            for (player in Players.value) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -205,7 +216,7 @@ class GameLobbyActivity : ComponentActivity() {
                 }
             }
 
-            repeat(8 - Players.size) {
+            repeat(8 - Players.value.size) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

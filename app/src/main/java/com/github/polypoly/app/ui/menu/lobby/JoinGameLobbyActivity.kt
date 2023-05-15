@@ -442,7 +442,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 fontSize = 16.sp
             )
             Text(
-                text = "${gameLobby.rules.getRoundDuration()}",
+                text = "${gameLobby.rules.getRoundDurationValue()}",
                 style = MaterialTheme.typography.body1
             )
         }

@@ -3,7 +3,6 @@ package com.github.polypoly.app.base.menu.lobby
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
-import java.time.Duration
 
 /**
  * A class that represent the parameters of a [Game]
@@ -20,7 +19,7 @@ data class GameParameters (
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
-    private val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
+    val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationPropertyRepository.getZones(),
     val initialPlayerBalance: Int = 500,
@@ -35,7 +34,7 @@ data class GameParameters (
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 
-    fun getRoundDuration(): GameLobbyConstants.RoundDurations {
+    fun getRoundDurationValue(): GameLobbyConstants.RoundDurations {
         return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }!!
     }
 }
