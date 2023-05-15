@@ -117,10 +117,7 @@ data class GameLobby(
     }
 
     override fun toLocalObject(dbObject: GameLobbyDB): CompletableFuture<StorableObject<GameLobbyDB>> {
-        val returnFuture = CompletableFuture<GameLobby>()
-        return returnFuture.thenCompose {
-            remoteDB.getValues<User>(dbObject.userIds)
-        }.thenApply { users ->
+        return remoteDB.getValues<User>(dbObject.userIds).thenApply { users ->
             val lobby = GameLobby(
                 users.first { user -> user.id.toString() == dbObject.adminId },
                 dbObject.parameters,
@@ -140,7 +137,7 @@ data class GameLobbyDB(
     val name: String = "",
     val private: Boolean = false,
     val parameters: GameParameters = GameParameters(),
-    val userIds: List<String> = listOf(),
+    val userIds: List<String> = listOf(""),
     val adminId: String = ""
 ) {
     init {

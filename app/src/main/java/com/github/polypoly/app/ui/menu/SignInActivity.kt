@@ -25,18 +25,13 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.keyExists
-import com.github.polypoly.app.network.removeValue
+import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 /**
