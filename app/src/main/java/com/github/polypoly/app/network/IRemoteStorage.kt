@@ -115,6 +115,12 @@ interface IRemoteStorage {
     fun <T : StorableObject<*>> addOnChangeListener(key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
 
     /**
+     * Same as [addOnChangeListener] with key parameter but this will listen to the root of the corresponding
+     * StorableObject subclass
+     */
+    fun <T : StorableObject<*>> addOnChangeListener(tag: String, action: (newObjects: List<T>) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean>
+
+    /**
      * Removes (if any) the listener with [tag] associated to data corresponding to the given key
      * @param key: key of the data to stop listening
      * @param tag: the name tag of the listener
@@ -126,11 +132,23 @@ interface IRemoteStorage {
     fun <T : StorableObject<*>> deleteOnChangeListener(key: String, tag: String, clazz: KClass<T>): CompletableFuture<Boolean>
 
     /**
+     * Same as [deleteOnChangeListener] with key parameter but this will delete the listener
+     * listening to the root of the correspondingStorableObject subclass with the given [tag]
+     */
+    fun <T : StorableObject<*>> deleteOnChangeListener(tag: String, clazz: KClass<T>): CompletableFuture<Boolean>
+
+    /**
      * Removes (if any) all the listeners attached to the data corresponding to the given key
      * @param key: key of the data to stop listening
      * @param clazz: corresponding [StorableObject] subclass
      */
     fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean>
+
+    /**
+     * Same as [deleteAllOnChangeListeners] with key parameter but this will delete all listeners
+     * listening to the root of the correspondingStorableObject subclass
+     */
+    fun <T : StorableObject<*>> deleteAllOnChangeListeners(clazz: KClass<T>): CompletableFuture<Boolean>
 
 }
 
@@ -151,5 +169,8 @@ inline fun <reified T : StorableObject<*>> IRemoteStorage.removeValue(key: Strin
 
 // LISTENERS
 inline fun <reified T : StorableObject<*>> IRemoteStorage.addOnChangeListener(key: String, tag: String, noinline action: (newObj: T) -> Unit) = addOnChangeListener(key, tag, action, T::class)
+inline fun <reified T : StorableObject<*>> IRemoteStorage.addOnChangeListener(tag: String, noinline action: (newObjects: List<T>) -> Unit) = addOnChangeListener(tag, action, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.deleteOnChangeListener(key: String, tag: String) = deleteOnChangeListener(key, tag, T::class)
+inline fun <reified T : StorableObject<*>> IRemoteStorage.deleteOnChangeListener(tag: String) = deleteOnChangeListener(tag, T::class)
 inline fun <reified T : StorableObject<*>> IRemoteStorage.deleteAllOnChangeListeners(key: String) = deleteAllOnChangeListeners(key, T::class)
+inline fun <reified T : StorableObject<*>> IRemoteStorage.deleteAllOnChangeListeners() = deleteAllOnChangeListeners(T::class)

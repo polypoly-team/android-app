@@ -15,8 +15,6 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBU
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +26,6 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.reflect.KClass
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
