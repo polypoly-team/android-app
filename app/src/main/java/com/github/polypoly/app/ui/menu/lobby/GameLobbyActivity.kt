@@ -9,7 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,36 +19,41 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.People
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.Game
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
+import com.github.polypoly.app.utils.global.GlobalInstances
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
  * that join the game in real time.
  *
- * When there are enough players as specified in [GameRules], the admin (the one who created the game)
+ * When there are enough players as specified in [GameParameters], the admin (the one who created the game)
  * can start the game.
  */
 class GameLobbyActivity : ComponentActivity() {
@@ -77,37 +83,62 @@ class GameLobbyActivity : ComponentActivity() {
 
         if (gameLobby != null && readyForStart != null) {
             val playersList = remember{mutableStateOf(gameLobby.usersRegistered)}
-
             PolypolyTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colors.background
-                    ) {
-                        if (dataLoading == true) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularLoader()
+                Column {
+                    TopAppBar(
+                        title = { Text(text = gameLobby.name) },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                val currentLobby = gameLobbyWaitingModel.getGameLobby().value!!
+                                val currentLobbyKey = currentLobby.code
+                                GlobalInstances.remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
+                                    gameLobby.removeUser(GlobalInstances.currentUser.id)
+                                    GlobalInstances.remoteDB.updateValue(currentLobbyKey, gameLobby)
+                                    GameRepository.gameCode = null
+                                }
+                                finish()
+                            }) {
+                                Icon(Icons.Filled.ArrowBack, "back_icon")
                             }
-                        } else {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                verticalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                SettingsMenu(gameLobby.rules)
+                        },
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = MaterialTheme.colors.background,
+                        elevation = 10.dp
+                    )
+                    Box {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colors.background
+                        ) {
 
-                                PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers)
+                            if (dataLoading == true) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularLoader()
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column() {
+                                        SettingsMenu(gameLobby.rules)
+                                        Spacer(modifier = Modifier.padding(Padding.large))
+                                        PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers)
+                                    }
 
-                                StartGameButton(
-                                    gameLobby.usersRegistered,
-                                    gameLobby.rules.minimumNumberOfPlayers,
-                                    gameLobby.rules.maximumNumberOfPlayers,
-                                    gameLobby.code
-                                )
+                                    StartGameButton(
+                                        gameLobby.usersRegistered,
+                                        gameLobby.rules.minimumNumberOfPlayers,
+                                        gameLobby.rules.maximumNumberOfPlayers,
+                                        gameLobby.code
+                                    )
+                                }
                             }
                         }
-
                     }
+                }
             }
         }
     }
@@ -193,10 +224,10 @@ class GameLobbyActivity : ComponentActivity() {
 
     /**
      * list of players that have joined the lobby
-     * @param Players the list of players
+     * @param players the list of players
      */
     @Composable
-    fun PlayersList(Players: MutableState<List<User>>,maximumNumberOfPlayers: Int){
+    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int){
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -205,6 +236,7 @@ class GameLobbyActivity : ComponentActivity() {
                 Text(
                     text = "Players:",
                     style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.primary,
                     modifier = Modifier.padding(vertical = Padding.small)
                 )
 
@@ -213,37 +245,65 @@ class GameLobbyActivity : ComponentActivity() {
                         imageVector = Icons.Filled.People,
                         contentDescription = "Player Count Icon",
                         modifier = Modifier.size(24.dp),
-                    )
+                        tint = MaterialTheme.colors.primary
+                        )
 
                     Text(
-                        text = "${Players.value.size}/$maximumNumberOfPlayers",
+                        text = "${players.value.size}/$maximumNumberOfPlayers",
                         style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(vertical = Padding.small)
-                    )
+                        modifier = Modifier.padding(Padding.small),
+                        color = MaterialTheme.colors.primary,
+                        )
                 }
             }
 
-            for (player in Players.value) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = Padding.small),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.tmp_happysmile),
-                        contentDescription = "${player.name} icon",
-                        modifier = Modifier.size(smallIconSize)
-                    )
-                    Spacer(modifier = Modifier.width(Padding.medium))
-                    Text(
-                        text = player.name,
-                        style = MaterialTheme.typography.body1
-                    )
+
+            for (player in players.value) {
+
+                val secondary = MaterialTheme.colors.secondary
+                val backGround = MaterialTheme.colors.background
+                var flashColor by remember { mutableStateOf(secondary) }
+                var textSize by remember { mutableStateOf(0f) }
+                val animatedColor by animateColorAsState(
+                    targetValue = flashColor,
+                    animationSpec = repeatable(
+                        iterations = 3,
+                        animation = tween(durationMillis = 350),
+                        repeatMode = RepeatMode.Reverse)
+                )
+
+                LaunchedEffect(key1 = player) {
+                    textSize = 1f
+                    flashColor = backGround
+                }
+                AnimatedVisibility(visibleState = remember { MutableTransitionState(false).apply { targetState = true } }){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(animatedColor, animatedColor, Color.Transparent),
+                                    startX = 0f
+                                )
+                            )
+                            .padding(vertical = Padding.small),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.tmp_happysmile),
+                            contentDescription = "${player.name} icon",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(Padding.medium))
+                        Text(
+                            text = player.name,
+                            style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize)
+                        )
+                    }
                 }
             }
 
-            repeat(8 - Players.value.size) {
+            repeat(8 - players.value.size) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -265,20 +325,27 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String) {
         val morePlayersNeeded = minRequiredPlayers - players.size
-
+        val mContext = LocalContext.current
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Group code is: $lobbyCode",
-                style = MaterialTheme.typography.body1
-            )
+            Row {
+                Text(
+                    text = "Group code is: ",
+                    style = MaterialTheme.typography.body1
+                )
+                Text(
+                    text = lobbyCode,
+                    style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.secondary)
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(Padding.small))
 
             BigButton(
-                onClick = {},
+                onClick = {launchGameActivity(mContext)},
                 enabled = players.size >= minRequiredPlayers,
                 text = "Start Game"
             )
