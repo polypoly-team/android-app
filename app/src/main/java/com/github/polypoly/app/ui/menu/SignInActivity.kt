@@ -28,9 +28,12 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.network.keyExists
+import com.github.polypoly.app.network.removeValue
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -48,12 +51,7 @@ class SignInActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Global initialization of the database
-        if (!remoteDBInitialized) { // Check if a test already initialized the remote storage
-            val db = Firebase.database
-            remoteDB = RemoteDB(db, "live")
-//            addFakeDataToDB() // < -- uncomment this line to add fake data to the DB
-        }
-
+        initRemoteDB()
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {

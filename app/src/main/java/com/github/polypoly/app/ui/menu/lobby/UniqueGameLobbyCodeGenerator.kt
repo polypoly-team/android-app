@@ -1,6 +1,5 @@
 package com.github.polypoly.app.ui.menu.lobby
 
-import android.annotation.SuppressLint
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CHARACTERS

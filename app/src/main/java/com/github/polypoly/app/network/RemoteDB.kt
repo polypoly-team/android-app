@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 /**
@@ -66,7 +67,7 @@ class RemoteDB(
             }
         }.addOnFailureListener(waitingFuture::completeExceptionally)
 
-        return waitingFuture.get()
+        return waitingFuture.thenCompose { future -> future }
     }
 
     /**

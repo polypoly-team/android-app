@@ -45,6 +45,7 @@ import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
+import java.util.concurrent.CompletableFuture
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
