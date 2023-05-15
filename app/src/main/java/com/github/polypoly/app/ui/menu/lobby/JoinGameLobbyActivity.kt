@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,9 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.People
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
@@ -271,7 +275,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     .clickable { onOpenChange(!isOpen) }
             ) {
                 GameLobbyCardHeader(gameLobby)
-                if (isOpen) {
+                AnimatedVisibility(visible = isOpen) {
                     GameLobbyCardDetails(gameLobby)
                 }
             }
@@ -308,12 +312,13 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     private fun GameLobbyCardPlayerCount(gameLobby: GameLobby) {
         Row {
             Image(
-                painter = painterResource(id = R.drawable.avatar),
+                imageVector = Icons.Default.People,
                 contentDescription = "people icon",
                 modifier = Modifier
                     .size(30.dp)
                     .testTag("${gameLobby.name}/peopleIcon")
-                    .padding(top = 5.dp)
+                    .padding(top = 5.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
             )
             Text(
                 text = "${gameLobby.usersRegistered.size}/${gameLobby.rules.maximumNumberOfPlayers}",
