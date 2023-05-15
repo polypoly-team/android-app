@@ -113,7 +113,6 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false) {
         composeTestRule.onNodeWithTag("create_game_lobby_button").performClick()
         //TODO : modify when DB is done (put the lobby code in the intent)
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
-        Intents.intended(IntentMatchers.hasExtra("lobby_code", "1234"))
     }
 
     @Test

@@ -101,7 +101,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
                 composeTestRule.onNodeWithContentDescription("${lobby.name}/${player.name} icon").assertIsDisplayed()
             }
             composeTestRule.onNodeWithText("Round duration: ", useUnmergedTree = true).assertIsDisplayed()
-            composeTestRule.onNodeWithText(lobby.rules.roundDuration.toString(), useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithText(lobby.rules.getRoundDurationValue().toString(), useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText("Game mode: ", useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText(lobby.rules.gameMode.toString(), useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).assertIsDisplayed().assertHasClickAction()
