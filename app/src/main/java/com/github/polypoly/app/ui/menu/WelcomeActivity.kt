@@ -103,7 +103,6 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
-    // TODO: add the real activity directions to the buttons
     /**
      * So far, the player has two main options, join an existing game or create a new one,
      * these buttons are then used for these purposes and have a fixed size.

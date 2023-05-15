@@ -6,7 +6,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -213,14 +212,6 @@ class RemoteDB(
         }
     }
 
-    override fun <T : StorableObject<*>> addOnChangeListener(
-        tag: String,
-        action: (newObjects: List<T>) -> Unit,
-        clazz: KClass<T>
-    ): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
-    }
-
     override fun <T : StorableObject<*>> deleteOnChangeListener(
         key: String,
         tag: String,
@@ -233,13 +224,6 @@ class RemoteDB(
                 ref.removeEventListener(previousListener)
             }
         }
-    }
-
-    override fun <T : StorableObject<*>> deleteOnChangeListener(
-        tag: String,
-        clazz: KClass<T>
-    ): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
     }
 
     override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
@@ -257,7 +241,24 @@ class RemoteDB(
             }
     }
 
-    override fun <T : StorableObject<*>> deleteAllOnChangeListeners(clazz: KClass<T>): CompletableFuture<Boolean> {
+    private val rootChangeListeners = mutableMapOf<Pair<String, String>, ValueEventListener>()
+
+    override fun <T : StorableObject<*>> addOnRootChangeListener(
+        tag: String,
+        action: (newObjects: List<T>) -> Unit,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : StorableObject<*>> deleteOnRootChangeListener(
+        tag: String,
+        clazz: KClass<T>
+    ): CompletableFuture<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : StorableObject<*>> deleteAllOnRootChangeListeners(clazz: KClass<T>): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 

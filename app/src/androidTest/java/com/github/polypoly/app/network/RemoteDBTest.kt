@@ -273,7 +273,7 @@ class RemoteDBTest: PolyPolyTest(false, false) {
     // ========================================================================== LISTENERS
     // ====================================================================================
 
-    // ========================================================================== ADD ON CHANGE
+    // ========================================================================== ADD ON CHANGE (key)
 
     @Test
     fun addingOnChangeListenerToUnregisteredDataFails() {
@@ -394,6 +394,32 @@ class RemoteDBTest: PolyPolyTest(false, false) {
 
         remoteDB.addOnChangeListener(data.key, "tag", action).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(num, 0)
+    }
+
+    // ========================================================================== ADD ON CHANGE (root)
+
+    @Test
+    fun addingOnChangeListenerToARootWorks() {
+        val action = { _: List<User> -> }
+
+        assertTrue(
+            remoteDB.addOnChangeListener("tag", action).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        )
+    }
+
+    @Test
+    fun rootOnChangeListenerIsExecutedAtDataRegistration() {
+        var num = 0
+        val action = { _: List<User> -> num += 1 }
+
+        remoteDB.addOnChangeListener("tag", action).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        val data1 = TEST_USER_1
+        val data2 = TEST_USER_2
+        addDataToDB(data1)
+        addDataToDB(data2)
+
+        assertTrue(num >= 2)
     }
 
     // ========================================================================== DELETE ON CHANGE

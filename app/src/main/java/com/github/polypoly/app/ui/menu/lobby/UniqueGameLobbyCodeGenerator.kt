@@ -5,8 +5,7 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CHARACTERS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
-import com.github.polypoly.app.utils.global.GlobalInstances
-import com.github.polypoly.app.utils.global.Settings
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 
@@ -15,12 +14,15 @@ import kotlin.random.Random
  */
 class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE_LENGTH) {
 
-    fun generateUniqueGameLobbyCode(): String {
-        var code: String
-        do {
-            code = generateCode()
-        } while (!codeIsValid(code))
-        return code
+    fun generateUniqueGameLobbyCode(): CompletableFuture<String> {
+        val code = generateCode()
+        return codeIsUsed(code).thenCompose { isUsed ->
+            if(isUsed) {
+                generateUniqueGameLobbyCode()
+            } else {
+                CompletableFuture.completedFuture(code)
+            }
+        }
     }
 
     /**
@@ -38,14 +40,7 @@ class UniqueGameLobbyCodeGenerator(private val codeLength: Int = GAME_LOBBY_CODE
     /**
      * Checks if the code is valid by checking if it is not already in the database
      */
-    @SuppressLint("NewApi")
-    private fun codeIsValid(code: String): Boolean {
-        //TODO: DB call to fix after new DB implementation
-        var codeIsValid = true
-        GlobalInstances.remoteDB.keyExists<GameLobby>(code).thenCompose { keyExists ->
-            CompletableFuture.completedFuture(keyExists)
-        }.thenAccept { codeIsValid = !it}
-
-        return codeIsValid
+    private fun codeIsUsed(code: String): CompletableFuture<Boolean> {
+        return remoteDB.keyExists<GameLobby>(code)
     }
 }
