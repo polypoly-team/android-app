@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -29,6 +30,7 @@ class RemoteDB(
     // ============================================================================ HELPERS
     // ====================================================================================
 
+    @Deprecated("Prefer to use getDataAndThen")
     private fun <T> getValueAndThen(
         absoluteKey: String,
         onSuccess: (DataSnapshot, CompletableFuture<T>) -> Unit,
@@ -45,11 +47,37 @@ class RemoteDB(
         return valuePromise
     }
 
+    /**
+     * First gets the [DataSnapshot] associated to the given [absoluteKey] and then composes it
+     * with the corresponding given future (onSuccess if the data exists, onFailure else)
+     * @return a future composed with [onSuccess] or [onFailure]
+     */
+    private fun <T> getDataAndThen(
+        absoluteKey: String,
+        onSuccess: (DataSnapshot) -> CompletableFuture<T>,
+        onFailure: CompletableFuture<T>
+    ): CompletableFuture<T> {
+        val waitingFuture = CompletableFuture<CompletableFuture<T>>()
+
+        rootRef.child(absoluteKey).get().addOnSuccessListener { data ->
+            if(!data.exists()) {
+                waitingFuture.complete(onFailure)
+            } else {
+                waitingFuture.complete(onSuccess(data))
+            }
+        }.addOnFailureListener(waitingFuture::completeExceptionally)
+
+        return waitingFuture.get()
+    }
+
+    /**
+     * @return a future with true iff the given [absoluteKey] is in the DB
+     */
     private fun absoluteKeyExists(absoluteKey: String): CompletableFuture<Boolean> {
-        return getValueAndThen(
+        return getDataAndThen(
             absoluteKey,
-            { _, promise -> promise.complete(true) }, // value found so key exists
-            { promise -> promise.complete(false) }  // value not found so key doesn't exist
+            { CompletableFuture.completedFuture(true) },
+            CompletableFuture.completedFuture(false)
         )
     }
 
@@ -57,13 +85,15 @@ class RemoteDB(
      * Gets the reference of a given key and if it exists, executes the given action with that reference
      * @return a future with true if the action was successfully executed, false else or if no value was found
      */
-    private fun getRefAndThen(key: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
-        return absoluteKeyExists(key).thenCompose { exists ->
-            if(exists) {
-                action(rootRef.child(key))
-            }
-            CompletableFuture.completedFuture(exists)
-        }
+    private fun getRefAndThen(absoluteKey: String, action: (DatabaseReference) -> Unit): CompletableFuture<Boolean> {
+        return getDataAndThen(
+            absoluteKey,
+            { data ->
+                action(data.ref)
+                CompletableFuture.completedFuture(true)
+            },
+            CompletableFuture.completedFuture(false)
+        )
     }
 
     /**
@@ -83,14 +113,14 @@ class RemoteDB(
 
     // ========================================================================== GETTERS
     override fun <T : StorableObject<*>> getValue(key: String, clazz: KClass<T>): CompletableFuture<T> {
-        return getValueAndThen(
+        val failedFuture = CompletableFuture<T>()
+        failedFuture.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
+
+        return getDataAndThen(
             StorableObject.getPath(clazz) + key,
-            { data, valuePromise ->
-                valuePromise.thenCompose { convertDataToObject(data, clazz) }
-            },
-            { valuePromise ->
-                valuePromise.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
-            })
+            { data -> convertDataToObject(data, clazz) },
+            failedFuture
+        )
     }
 
     override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
@@ -108,20 +138,21 @@ class RemoteDB(
     }
 
     override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
-        return getValueAndThen(
+        return getDataAndThen(
             StorableObject.getPath(clazz),
-            { data, keysPromise ->
+            { data ->
                 val keys = ArrayList<String>()
                 for (child in data.children) {
                     keys.add(child.key!!)
                 }
-                keysPromise.complete(keys)
+                CompletableFuture.completedFuture(keys)
             },
-            { promise -> promise.complete(listOf()) }) // empty list if no parent key
+            CompletableFuture.completedFuture(listOf()) // empty list if no parent key
+        )
     }
 
     override fun <T : StorableObject<*>> keyExists(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        return absoluteKeyExists(StorableObject.getPath(clazz))
+        return absoluteKeyExists(StorableObject.getPath(clazz) + key)
     }
 
     // ========================================================================== SETTERS

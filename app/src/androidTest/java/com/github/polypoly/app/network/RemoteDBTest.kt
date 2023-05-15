@@ -128,16 +128,24 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         )
     }*/
 
+    // ==================================================================================
     // ========================================================================== SETTERS
+    // ==================================================================================
 
-    /*@Test
-    fun newDataCanBeRegistered() {
+    // ========================================================================== REGISTER VALUE
+
+    @Test
+    fun unregisteredDataCanBeRegistered() {
         val data = TEST_USER_1
-        val key = "some_key"
-        assertTrue(
-            remoteDB.registerValue(key, data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        )
-        val dataFound = remoteDB.getValue<User>(key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertTrue(remoteDB.registerValue(data).get(TIMEOUT_DURATION, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun unregisteredDataIsWellRegistered() {
+        val data = TEST_USER_1
+        remoteDB.registerValue(data).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        val dataFound = remoteDB.getValue<User>(data.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(data, dataFound)
     }
 
@@ -157,7 +165,9 @@ class RemoteDBTest: PolyPolyTest(false, false) {
         assertThrows(ExecutionException::class.java) { failFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS) }
     }
 
-    @Test
+    // ========================================================================== UPDATE VALUE
+
+    /*@Test
     fun dataCanBeUpdatedAfterRegistration() {
         val key = "some_key"
         val data = TEST_USER_1

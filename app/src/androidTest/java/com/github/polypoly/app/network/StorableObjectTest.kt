@@ -47,6 +47,11 @@ class StorableObjectTest: PolyPolyTest(true, false) {
     }
 
     @Test
+    fun convertAnObjectWithWrongClassFails() {
+        assertThrows(IllegalArgumentException::class.java) { StorableObject.convertToLocal<TestPerson>(DummySubclass1()).get() }
+    }
+
+    @Test
     fun dbClassesAreWellStored() {
         DummySubclass1()
         assertTrue(TestPersonDB::class.toString() == StorableObject.getDBClass(TestPerson::class).toString())

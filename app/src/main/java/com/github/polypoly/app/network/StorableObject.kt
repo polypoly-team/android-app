@@ -54,12 +54,9 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
          * For the given subclass [T], returns the stored corresponding DB class
          * @param clazz: the Kotlin subclass
          */
-        fun <T: StorableObject<*>> getDBClass(clazz: KClass<T>): KClass<T> {
-            val dbClass = classes[clazz.toString()] ?:
+        fun <T : StorableObject<*>> getDBClass(clazz: KClass<T>): KClass<*> {
+            return classes[clazz.toString()] ?:
             throw NoSuchElementException("The DB class for this class doesn't exist")
-
-            @Suppress("UNCHECKED_CAST")
-            return dbClass as KClass<T>
         }
 
         /**
@@ -92,6 +89,10 @@ abstract class StorableObject<T : Any> (dbClass: KClass<T>, dbPath: String, val 
         fun <T: StorableObject<*>> convertToLocal(clazz: KClass<T>, obj: Any): CompletableFuture<T> {
             val converter = converters[clazz.toString()] ?:
             throw NoSuchElementException("The DB converter for this class doesn't exist")
+
+            if(obj::class.toString() != getDBClass(clazz).toString()) {
+                throw IllegalArgumentException("The object to convert has not the correct class")
+            }
 
             @Suppress("UNCHECKED_CAST")
             return converter(obj) as CompletableFuture<T>

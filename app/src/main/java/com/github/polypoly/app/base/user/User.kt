@@ -40,13 +40,11 @@ data class User(
     }
 
     // ====================================================================== STORABLE
-
-    // TODO: add tests for converters
     override fun toDBObject(): User {
-        return this
+        return User(id, name, bio, skin, stats, trophiesWon, trophiesDisplay, currentUser)
     }
 
     override fun toLocalObject(dbObject: User): CompletableFuture<StorableObject<User>> {
-        return CompletableFuture.completedFuture(this)
+        return CompletableFuture.completedFuture(dbObject)
     }
 }
