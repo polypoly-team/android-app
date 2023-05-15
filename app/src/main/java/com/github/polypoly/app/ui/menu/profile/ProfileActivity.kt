@@ -33,6 +33,7 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 
 class ProfileActivity : MenuActivity("Profile") {
@@ -183,7 +184,7 @@ class ProfileActivity : MenuActivity("Profile") {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.background,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .padding(20.dp)
         ) {
@@ -272,7 +273,7 @@ class ProfileActivity : MenuActivity("Profile") {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.secondaryVariant,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .fillMaxWidth()
                 .padding(15.dp)

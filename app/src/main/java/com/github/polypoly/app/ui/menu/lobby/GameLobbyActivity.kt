@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.People
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
+import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
@@ -94,7 +96,7 @@ class GameLobbyActivity : ComponentActivity() {
                             ) {
                                 SettingsMenu(gameLobby.rules)
 
-                                PlayersList(playersList)
+                                PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers)
 
                                 StartGameButton(
                                     gameLobby.usersRegistered,
@@ -194,8 +196,33 @@ class GameLobbyActivity : ComponentActivity() {
      * @param Players the list of players
      */
     @Composable
-    fun PlayersList(Players: MutableState<List<User>>, ) {
+    fun PlayersList(Players: MutableState<List<User>>,maximumNumberOfPlayers: Int){
         Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Players:",
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = Padding.small)
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.People,
+                        contentDescription = "Player Count Icon",
+                        modifier = Modifier.size(24.dp),
+                    )
+
+                    Text(
+                        text = "${Players.value.size}/$maximumNumberOfPlayers",
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(vertical = Padding.small)
+                    )
+                }
+            }
+
             for (player in Players.value) {
                 Row(
                     modifier = Modifier
@@ -205,8 +232,8 @@ class GameLobbyActivity : ComponentActivity() {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.tmp_happysmile),
-                        contentDescription = "$player icon",
-                        modifier = Modifier.size(20.dp)
+                        contentDescription = "${player.name} icon",
+                        modifier = Modifier.size(smallIconSize)
                     )
                     Spacer(modifier = Modifier.width(Padding.medium))
                     Text(
@@ -226,12 +253,13 @@ class GameLobbyActivity : ComponentActivity() {
                     Image(
                         imageVector = Icons.Default.PermIdentity,
                         contentDescription = "free_player_slot",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(smallIconSize)
                     )
                 }
             }
         }
     }
+
 
 
     @Composable

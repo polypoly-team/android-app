@@ -413,7 +413,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     painter = painterResource(id = R.drawable.tmp_happysmile),
                     contentDescription = "${gameLobby.name}/${player.name} icon",
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(UIElements.smallIconSize)
                         .testTag("${gameLobby.name}/playerIcon")
                 )
                 Spacer(modifier = Modifier.width(10.dp))
