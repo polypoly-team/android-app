@@ -34,7 +34,7 @@ class MockDB: IRemoteStorage {
             failedFuture.completeExceptionally(NoSuchElementException("Invalid key $keyCleaned"))
             return failedFuture
         }
-        return StorableObject.convertToLocal(clazz, data[cleanKey(key)]!!)
+        return StorableObject.convertToLocal(clazz, data[keyCleaned]!!)
     }
 
     override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {

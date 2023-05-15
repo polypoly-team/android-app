@@ -127,7 +127,7 @@ class ProfileActivity : MenuActivity("Profile") {
     }
 
     /**
-     * A button to go to the page where the user can modify his/her profile
+     * A button to go to the page where the user can modify their profile
      */
     @Composable
     fun ModifyProfileButton() {

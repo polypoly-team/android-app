@@ -24,8 +24,8 @@ class RankingsViewModelTest {
         remoteDB = mockDB
     }
 
-    private fun mockUser(name: String, numberOfGame: Int, numberOfWin: Int, trophyCount: Int): User {
-        return User(1000, name, "", NO_SKIN,
+    private fun mockUser(id: Long, numberOfGame: Int, numberOfWin: Int, trophyCount: Int): User {
+        return User(id, id.toString(), "", NO_SKIN,
             Stats(0, 0, numberOfGame, numberOfWin, 0),
             List(trophyCount) { 1 }, mutableListOf())
     }
@@ -40,11 +40,11 @@ class RankingsViewModelTest {
     fun rankingsViewModelComputesMostGamesRanking() {
         setUsers(
             listOf(
-                mockUser("1", 10, 0, 0),
-                mockUser("2", 20, 0, 0),
-                mockUser("3", 30, 0, 0),
-                mockUser("4", 50, 0, 0),
-                mockUser("5", 40, 0, 0)
+                mockUser(1, 10, 0, 0),
+                mockUser(2, 20, 0, 0),
+                mockUser(3, 30, 0, 0),
+                mockUser(4, 50, 0, 0),
+                mockUser(5, 40, 0, 0)
             )
         )
 
@@ -60,11 +60,11 @@ class RankingsViewModelTest {
     fun rankingsViewModelComputesMostWinsRanking() {
         setUsers(
             listOf(
-                mockUser("1", 0, 5, 0),
-                mockUser("2", 0, 3, 0),
-                mockUser("3", 0, 2, 0),
-                mockUser("4", 0, 1, 0),
-                mockUser("5", 0, 4, 0)
+                mockUser(1, 0, 5, 0),
+                mockUser(2, 0, 3, 0),
+                mockUser(3, 0, 2, 0),
+                mockUser(4, 0, 1, 0),
+                mockUser(5, 0, 4, 0)
             )
         )
 
@@ -80,11 +80,11 @@ class RankingsViewModelTest {
     fun rankingsViewModelComputesMostTrophiesRanking() {
         setUsers(
             listOf(
-                mockUser("1", 0, 0, 5),
-                mockUser("2", 0, 0, 4),
-                mockUser("3", 0, 0, 3),
-                mockUser("4", 0, 0, 2),
-                mockUser("5", 0, 0, 1)
+                mockUser(1, 0, 0, 5),
+                mockUser(2, 0, 0, 4),
+                mockUser(3, 0, 0, 3),
+                mockUser(4, 0, 0, 2),
+                mockUser(5, 0, 0, 1)
             )
         )
 
