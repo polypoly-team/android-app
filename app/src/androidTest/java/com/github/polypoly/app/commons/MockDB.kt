@@ -38,18 +38,14 @@ class MockDB: IRemoteStorage {
     }
 
     override fun <T : StorableObject<*>> getValues(keys: List<String>, clazz: KClass<T>): CompletableFuture<List<T>> {
-        TODO("Not yet implemented")
+        val futures = keys.map { key -> getValue(key, clazz) }
+        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {
+            futures.map { it.join() }
+        }
     }
 
     override fun <T : StorableObject<*>> getAllValues(clazz: KClass<T>): CompletableFuture<List<T>> {
-        val objs = mutableListOf<T>()
-        val parentKeyCleaned = cleanKey(StorableObject.getPath(clazz))
-
-        for (child in keysHierarchy[parentKeyCleaned] ?: listOf()) {
-            val localObj = StorableObject.convertToLocal(clazz, data["$parentKeyCleaned/$child"]!!).get()
-            objs.add(localObj)
-        }
-        return CompletableFuture.completedFuture(objs)
+        return getAllKeys(clazz).thenCompose { keys -> getValues(keys, clazz) }
     }
 
     override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
