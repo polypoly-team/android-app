@@ -303,7 +303,7 @@ class GameLobbyActivity : ComponentActivity() {
                 }
             }
 
-            repeat(8 - players.value.size) {
+            repeat(maximumNumberOfPlayers - players.value.size) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
