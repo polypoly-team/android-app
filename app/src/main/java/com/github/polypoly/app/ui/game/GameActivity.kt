@@ -42,7 +42,7 @@ class GameActivity : ComponentActivity() {
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
-        mapViewModel.currentPlayer = player!!
+        mapViewModel.currentPlayer = player
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
@@ -55,7 +55,7 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, interactingWithProperty)
                     PropertyInteractUIComponent()
-                    if (player.playerState.value == PlayerState.ROLLING_DICE) {
+                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
                         RollDiceDialog()
                         RollDiceButton()
                     }

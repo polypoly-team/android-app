@@ -119,7 +119,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
         GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
         GameActivity.mapViewModel.goingToLocationProperty = getRandomLocationProperty()
         setCurrentPlayerState(PlayerState.MOVING)
-        runBlocking { delay(500) }
+        wait()
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -131,12 +131,14 @@ class GameActivityTest : PolyPolyTest(true, false) {
     fun mapActivity_Displays_Only_Necessary_UI_Components_INTERACTING() {
         setCurrentPlayerState(PlayerState.INTERACTING)
         GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
-        runBlocking { delay(500) }
+        wait()
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
+
+    private fun wait() = runBlocking { delay(500) }
 
     private fun getRandomLocationProperty(): LocationProperty {
         return GameActivity.mapViewModel.markerToLocationProperty[getRandomMarker()]!!
@@ -156,6 +158,6 @@ class GameActivityTest : PolyPolyTest(true, false) {
     private fun forceOpenMarkerDialog() {
         GameActivity.mapViewModel.selectedMarker = getRandomMarker()
         GameActivity.interactingWithProperty.value = true
-        runBlocking { delay(500) }
+        wait()
     }
 }

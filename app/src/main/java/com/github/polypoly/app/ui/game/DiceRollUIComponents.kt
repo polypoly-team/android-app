@@ -64,7 +64,7 @@ fun RollDiceDialog() {
                         for (i in 0..2)
                             Button(onClick = {
                                 showRollDiceDialog.value = false
-                                mapViewModel.currentPlayer!!.playerState.value = PlayerState.MOVING
+                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING
                                 mapViewModel.goingToLocationProperty = rollDice[i]
                             }) {
                                 Text(rollDice[i].name)

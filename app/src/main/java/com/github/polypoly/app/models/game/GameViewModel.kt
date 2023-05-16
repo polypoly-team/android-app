@@ -56,6 +56,7 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
+                // TODO: Remove this when the game is created from the lobby
                 GameRepository.game = Game.launchFromPendingGame(
                     GameLobby(
                         admin = GlobalInstances.currentUser
@@ -65,7 +66,7 @@ class GameViewModel(
                     GlobalInstances.currentUser,
                     3000
                 )
-                GameRepository.player?.playerState!!.value = PlayerState.ROLLING_DICE
+                GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
                 GameViewModel(

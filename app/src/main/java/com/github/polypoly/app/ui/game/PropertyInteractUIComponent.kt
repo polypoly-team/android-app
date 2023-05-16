@@ -88,5 +88,5 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
 
 private fun leaveBetDialog() {
     interactingWithProperty.value = false
-    mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
+    mapViewModel.currentPlayer?.playerState?.value = PlayerState.INTERACTING
 }

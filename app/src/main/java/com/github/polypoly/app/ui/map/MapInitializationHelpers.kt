@@ -130,9 +130,9 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocatio
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
-                && mapViewModel.currentPlayer!!.playerState.value == PlayerState.MOVING
+                && mapViewModel.currentPlayer?.playerState!!.value == PlayerState.MOVING
                 && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty) {
-                mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
+                mapViewModel.currentPlayer?.playerState!!.value = PlayerState.INTERACTING
                 mapViewModel.goingToLocationProperty = null
             }
         }
