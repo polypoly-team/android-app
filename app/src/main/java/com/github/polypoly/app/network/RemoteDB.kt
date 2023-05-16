@@ -1,13 +1,16 @@
 package com.github.polypoly.app.network
 
 
+import com.github.polypoly.app.network.StorableObject.Companion.convertToLocal
+import com.github.polypoly.app.network.StorableObject.Companion.getDBClass
+import com.github.polypoly.app.network.StorableObject.Companion.getPath
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.CompletableFuture.completedFuture
 import kotlin.reflect.KClass
 
 /**
@@ -60,14 +63,10 @@ class RemoteDB(
         val waitingFuture = CompletableFuture<CompletableFuture<T>>()
 
         rootRef.child(absoluteKey).get().addOnSuccessListener { data ->
-            if(!data.exists()) {
-                waitingFuture.complete(onFailure)
-            } else {
-                waitingFuture.complete(onSuccess(data))
-            }
+            waitingFuture.complete(if(!data.exists()) onFailure else onSuccess(data))
         }.addOnFailureListener(waitingFuture::completeExceptionally)
 
-        return waitingFuture.thenCompose { future -> future }
+        return waitingFuture.thenCompose { it }
     }
 
     /**
@@ -76,8 +75,8 @@ class RemoteDB(
     private fun absoluteKeyExists(absoluteKey: String): CompletableFuture<Boolean> {
         return getDataAndThen(
             absoluteKey,
-            { CompletableFuture.completedFuture(true) },
-            CompletableFuture.completedFuture(false)
+            { completedFuture(true) },
+            completedFuture(false)
         )
     }
 
@@ -90,9 +89,9 @@ class RemoteDB(
             absoluteKey,
             { data ->
                 action(data.ref)
-                CompletableFuture.completedFuture(true)
+                completedFuture(true)
             },
-            CompletableFuture.completedFuture(false)
+            completedFuture(false)
         )
     }
 
@@ -102,8 +101,8 @@ class RemoteDB(
      * @return the converted object
      */
     private fun <T : StorableObject<*>> convertDataToObject(data: DataSnapshot, clazz: KClass<T>): CompletableFuture<T> {
-        val dbObj = data.getValue(StorableObject.getDBClass(clazz).java)!!
-        return StorableObject.convertToLocal(clazz, dbObj)
+        val dbObj = data.getValue(getDBClass(clazz).java)!!
+        return convertToLocal(clazz, dbObj)
     }
 
 
@@ -117,7 +116,7 @@ class RemoteDB(
         failedFuture.completeExceptionally(NoSuchElementException("No value found for key <$key>"))
 
         return getDataAndThen(
-            StorableObject.getPath(clazz) + key,
+            getPath(clazz) + key,
             { data -> convertDataToObject(data, clazz) },
             failedFuture
         )
@@ -136,20 +135,20 @@ class RemoteDB(
 
     override fun <T : StorableObject<*>> getAllKeys(clazz: KClass<T>): CompletableFuture<List<String>> {
         return getDataAndThen(
-            StorableObject.getPath(clazz),
+            getPath(clazz),
             { data ->
                 val keys = ArrayList<String>()
                 for (child in data.children) {
                     keys.add(child.key!!)
                 }
-                CompletableFuture.completedFuture(keys)
+                completedFuture(keys)
             },
-            CompletableFuture.completedFuture(listOf()) // empty list if no parent key
+            completedFuture(listOf()) // empty list if no parent key
         )
     }
 
     override fun <T : StorableObject<*>> keyExists(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        return absoluteKeyExists(StorableObject.getPath(clazz) + key)
+        return absoluteKeyExists(getPath(clazz) + key)
     }
 
     // ========================================================================== SETTERS
@@ -175,11 +174,11 @@ class RemoteDB(
     override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
         return deleteAllOnChangeListeners(key, clazz).thenCompose { result ->
             if(result) {
-                getRefAndThen(StorableObject.getPath(clazz) + key) { ref ->
+                getRefAndThen(getPath(clazz) + key) { ref ->
                     ref.setValue(null)
                 }
             } else {
-                CompletableFuture.completedFuture(false)
+                completedFuture(false)
             }
         }
     }
@@ -194,7 +193,7 @@ class RemoteDB(
         action: (newObj: T) -> Unit,
         clazz: KClass<T>
     ): CompletableFuture<Boolean> {
-        val absoluteKey = StorableObject.getPath(clazz) + key
+        val absoluteKey = getPath(clazz) + key
         return getRefAndThen(absoluteKey) { ref ->
             val previousListener = changeListeners.remove(Pair(absoluteKey, tag))
             if(previousListener != null) {
@@ -218,7 +217,7 @@ class RemoteDB(
         tag: String,
         clazz: KClass<T>
     ): CompletableFuture<Boolean>{
-        val absoluteKey = StorableObject.getPath(clazz) + key
+        val absoluteKey = getPath(clazz) + key
         return getRefAndThen(absoluteKey) { ref ->
             val previousListener = changeListeners.remove(Pair(absoluteKey, tag))
             if(previousListener != null) {
@@ -228,7 +227,7 @@ class RemoteDB(
     }
 
     override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        val absoluteKey = StorableObject.getPath(clazz) + key
+        val absoluteKey = getPath(clazz) + key
         return getRefAndThen(absoluteKey) { ref ->
             changeListeners
                 .filterKeys { pair -> pair.first == absoluteKey }
