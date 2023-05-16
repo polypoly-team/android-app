@@ -73,8 +73,6 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     private fun GameLobbyPreview() { GameLobbyContent() }
 
-    // ===================================================== MAIN CONTENT
-
     /**
      * Displays all the UI of the GameLobby
      */
@@ -88,59 +86,73 @@ class GameLobbyActivity : ComponentActivity() {
             val playersList = remember{mutableStateOf(gameLobby.usersRegistered)}
             PolypolyTheme {
                 Column {
-                    TopAppBar(
-                        title = { Text(text = gameLobby.name) },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    leaveLobby()
-                                },
-                                modifier = Modifier.rotate(180f)
-                            )
-                            {
-                                Icon(Icons.Filled.Logout, "leave_lobby_icon")
-                            }
-                        },
-                        backgroundColor = MaterialTheme.colors.primary,
-                        contentColor = MaterialTheme.colors.background,
-                        elevation = 10.dp,
-                    )
+                    GameLobbyAppBar(lobbyName = gameLobby.name)
+
                     Box {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
                             color = MaterialTheme.colors.background
                         ) {
-
-                            if (dataLoading == true) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    CircularLoader()
-                                }
-                            } else {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp),
-                                    verticalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Column() {
-                                        SettingsMenu(gameLobby.rules)
-                                        Spacer(modifier = Modifier.padding(Padding.large))
-                                        PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)
-                                    }
-
-                                    StartGameButton(
-                                        gameLobby.usersRegistered,
-                                        gameLobby.rules.minimumNumberOfPlayers,
-                                        gameLobby.rules.maximumNumberOfPlayers,
-                                        gameLobby.code,
-                                        gameLobby.admin.id
-                                    )
-                                }
+                            when (dataLoading) {
+                                true -> LoadingContent()
+                                false -> GameLobbyBody(gameLobby, playersList)
+                                else -> {}
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun GameLobbyAppBar(lobbyName: String) {
+        TopAppBar(
+            title = { Text(text = lobbyName) },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        leaveLobby()
+                    },
+                    modifier = Modifier.rotate(180f)
+                ) {
+                    Icon(Icons.Filled.Logout, "leave_lobby_icon")
+                }
+            },
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = MaterialTheme.colors.background,
+            elevation = 10.dp,
+        )
+    }
+
+    @Composable
+    fun LoadingContent() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularLoader()
+        }
+    }
+
+    @Composable
+    fun GameLobbyBody(gameLobby: GameLobby, playersList: MutableState<List<User>>) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column() {
+                SettingsMenu(gameLobby.rules)
+                Spacer(modifier = Modifier.padding(Padding.large))
+                PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)
+            }
+
+            StartGameButton(
+                gameLobby.usersRegistered,
+                gameLobby.rules.minimumNumberOfPlayers,
+                gameLobby.rules.maximumNumberOfPlayers,
+                gameLobby.code,
+                gameLobby.admin.id
+            )
         }
     }
 
@@ -198,7 +210,6 @@ class GameLobbyActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 
     /**
@@ -223,122 +234,145 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * list of players that have joined the lobby
-     * @param players the list of players
-     */
     @Composable
-    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int, adminId : Long){
+    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int, adminId: Long) {
         Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            PlayerHeader(players, maximumNumberOfPlayers)
+            PlayerRows(players, adminId)
+            EmptyPlayerSlots(players, maximumNumberOfPlayers)
+        }
+    }
+
+    @Composable
+    fun PlayerHeader(players: MutableState<List<User>>, maximumNumberOfPlayers: Int) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Players:",
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(vertical = Padding.small)
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.People,
+                    contentDescription = "Player Count Icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colors.primary
+                )
+
                 Text(
-                    text = "Players:",
+                    text = "${players.value.size}/$maximumNumberOfPlayers",
                     style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(Padding.small),
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(vertical = Padding.small)
                 )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.People,
-                        contentDescription = "Player Count Icon",
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colors.primary
-                        )
-
-                    Text(
-                        text = "${players.value.size}/$maximumNumberOfPlayers",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(Padding.small),
-                        color = MaterialTheme.colors.primary,
-                        )
-                }
-            }
-
-
-            for (player in players.value) {
-
-                val secondary = MaterialTheme.colors.secondary
-                val backGround = MaterialTheme.colors.background
-                var flashColor by remember { mutableStateOf(secondary) }
-                var textSize by remember { mutableStateOf(0f) }
-                val animatedColor by animateColorAsState(
-                    targetValue = flashColor,
-                    animationSpec = repeatable(
-                        iterations = 3,
-                        animation = tween(durationMillis = 350),
-                        repeatMode = RepeatMode.Reverse)
-                )
-
-                LaunchedEffect(key1 = player) {
-                    textSize = 1f
-                    flashColor = backGround
-                }
-                AnimatedVisibility(visibleState = remember { MutableTransitionState(false).apply { targetState = true } }){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        animatedColor,
-                                        animatedColor,
-                                        Color.Transparent
-                                    ),
-                                    startX = 0f
-                                )
-                            )
-                            .padding(vertical = Padding.small),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.tmp_happysmile),
-                            contentDescription = "${player.name} icon",
-                            modifier = Modifier.size(smallIconSize)
-                        )
-
-                        Spacer(modifier = Modifier.width(Padding.medium))
-
-                        Text(
-                            text = player.name,
-                            style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize)
-                        )
-
-                        Spacer(modifier = Modifier.width(Padding.medium))
-
-                        if(player.id == adminId) {
-                            Image(
-                                imageVector = Icons.Filled.Stars,
-                                contentDescription = "admin star",
-                                modifier = Modifier.size(smallIconSize),
-                                colorFilter = ColorFilter.tint(secondary)
-                            )
-                        }
-                    }
-                }
-            }
-
-            repeat(maximumNumberOfPlayers - players.value.size) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = Padding.small),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        imageVector = Icons.Default.PermIdentity,
-                        contentDescription = "free_player_slot",
-                        modifier = Modifier.size(smallIconSize)
-                    )
-                }
             }
         }
     }
 
+    @Composable
+    fun PlayerRows(players: MutableState<List<User>>, adminId: Long) {
+        for (player in players.value) {
+            PlayerRow(player, adminId)
+        }
+    }
 
+    @Composable
+    fun PlayerRow(player: User, adminId: Long) {
+        val secondary = MaterialTheme.colors.secondary
+        val backGround = MaterialTheme.colors.background
+        var flashColor by remember { mutableStateOf(secondary) }
+        var textSize by remember { mutableStateOf(0f) }
+        val animatedColor by animateColorAsState(
+            targetValue = flashColor,
+            animationSpec = repeatable(
+                iterations = 3,
+                animation = tween(durationMillis = 350),
+                repeatMode = RepeatMode.Reverse)
+        )
+
+        LaunchedEffect(key1 = player) {
+            textSize = 1f
+            flashColor = backGround
+        }
+        AnimatedVisibility(visibleState = remember { MutableTransitionState(false).apply { targetState = true } }){
+            SinglePlayerRow(player, adminId, animatedColor)
+        }
+    }
+
+    @Composable
+    fun SinglePlayerRow(player: User, adminId: Long, animatedColor: Color) {
+
+        val secondary = MaterialTheme.colors.secondary
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            animatedColor,
+                            animatedColor,
+                            Color.Transparent
+                        ),
+                        startX = 0f
+                    )
+                )
+                .padding(vertical = Padding.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.tmp_happysmile),
+                contentDescription = "${player.name} icon",
+                modifier = Modifier.size(smallIconSize)
+            )
+
+            Spacer(modifier = Modifier.width(Padding.medium))
+
+            Text(
+                text = player.name,
+                style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize)
+            )
+
+            Spacer(modifier = Modifier.width(Padding.medium))
+
+            if(player.id == adminId) {
+                Image(
+                    imageVector = Icons.Filled.Stars,
+                    contentDescription = "admin star",
+                    modifier = Modifier.size(smallIconSize),
+                    colorFilter = tint(secondary)
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun EmptyPlayerSlots(players: MutableState<List<User>>, maximumNumberOfPlayers: Int) {
+        repeat(maximumNumberOfPlayers - players.value.size) {
+            EmptyPlayerSlot()
+        }
+    }
+
+    @Composable
+    fun EmptyPlayerSlot() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Padding.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                imageVector = Icons.Default.PermIdentity,
+                contentDescription = "free_player_slot",
+                modifier = Modifier.size(smallIconSize)
+            )
+        }
+    }
 
     @Composable
     fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: Long,) {
@@ -347,38 +381,16 @@ class GameLobbyActivity : ComponentActivity() {
 
         val isAdmin = currentUser.id == adminId
 
-        val buttonText = if (isAdmin) {
-            if (players.size >= minRequiredPlayers) "Start Game!" else "Can't start Game :("
-        } else {
-            if (players.size >= minRequiredPlayers) "Admin can start!" else "Admin can't start..."
-        }
-        val onClickAction = if (isAdmin) {
-            { launchGameActivity(mContext) }
-        } else {
-            {}
-        }
-
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row {
-                Text(
-                    text = "Group code is: ",
-                    style = MaterialTheme.typography.body1
-                )
-                Text(
-                    text = lobbyCode,
-                    style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-            }
-
+            LobbyCodeDisplay(lobbyCode)
 
             Spacer(modifier = Modifier.height(Padding.small))
+
+            val buttonText = getButtonText(isAdmin, players.size, minRequiredPlayers)
+            val onClickAction = getOnClickAction(isAdmin, mContext)
 
             BigButton(
                 onClick = onClickAction,
@@ -388,44 +400,92 @@ class GameLobbyActivity : ComponentActivity() {
 
             Spacer(modifier = Modifier.height(Padding.small))
 
-            if (morePlayersNeeded > 0) {
-                Row {
-                    Text(
-                        text = "At least ",
-                        style = MaterialTheme.typography.body1
-                    )
-                    Text(
-                        text = "$morePlayersNeeded more",
-                        style = MaterialTheme.typography.body1.copy(
-                            color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Text(
-                        text = " players needed to start...",
-                        style = MaterialTheme.typography.body1
-                    )
-                }
-            } else {
-                Row {
-                    Text(
-                        text = "Players: ",
-                        style = MaterialTheme.typography.body1
-                    )
-                    Text(
-                        text = "${players.size} / $maxPlayers",
-                        style = MaterialTheme.typography.body1.copy(
-                            color = MaterialTheme.colors.primary
-                        )
-                    )
-                }
-
-            }
+            PlayerStatusDisplay(morePlayersNeeded, players, maxPlayers)
         }
     }
 
+    @Composable
+    fun LobbyCodeDisplay(lobbyCode: String) {
+        Row {
+            Text(
+                text = "Group code is: ",
+                style = MaterialTheme.typography.body1
+            )
+            Text(
+                text = lobbyCode,
+                style = MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+    }
 
+    fun getButtonText(isAdmin: Boolean, playerCount: Int, minRequiredPlayers: Int): String {
+        return if (isAdmin) {
+            if (playerCount >= minRequiredPlayers) "Start Game!" else "Can't start Game :("
+        } else {
+            if (playerCount >= minRequiredPlayers) "Admin can start!" else "Admin can't start..."
+        }
+    }
 
+    fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
+        return if (isAdmin) {
+            { launchGameActivity(mContext) }
+        } else {
+            {}
+        }
+    }
+
+    @Composable
+    fun PlayerStatusDisplay(morePlayersNeeded: Int, players: List<User>, maxPlayers: Int) {
+        if (morePlayersNeeded > 0) {
+            MorePlayersNeededDisplay(morePlayersNeeded)
+        } else {
+            CurrentPlayerCountDisplay(players, maxPlayers)
+        }
+    }
+
+    @Composable
+    fun MorePlayersNeededDisplay(morePlayersNeeded: Int) {
+        Row {
+            Text(
+                text = "At least ",
+                style = MaterialTheme.typography.body1
+            )
+            Text(
+                text = "$morePlayersNeeded more",
+                style = MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = " players needed to start...",
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+
+    @Composable
+    fun CurrentPlayerCountDisplay(players: List<User>, maxPlayers: Int) {
+        Row {
+            Text(
+                text = "Players: ",
+                style = MaterialTheme.typography.body1
+            )
+            Text(
+                text = "${players.size} / $maxPlayers",
+                style = MaterialTheme.typography.body1.copy(
+                    color = MaterialTheme.colors.primary
+                )
+            )
+        }
+    }
+
+    /**
+     * Launch the game activity and finish this activity.
+     */
     private fun launchGameActivity(packageContext: Context) {
         val completedLobby = gameLobbyWaitingModel.getGameLobby().value
         if (completedLobby != null) {
