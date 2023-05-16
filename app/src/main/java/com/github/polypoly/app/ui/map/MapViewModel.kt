@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,10 @@ class MapViewModel(
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
     lateinit var selectedMarker: Marker
+
+    var goingToLocationProperty: LocationProperty? = null
+
+    var currentPlayer: Player? = null
 
     val markerToLocationProperty = mutableMapOf<Marker, LocationProperty>()
 
@@ -53,7 +58,7 @@ class MapViewModel(
      *
      * @param locationProperty The location to set as the closest location.
      */
-    fun setCloseLocation(locationProperty: LocationProperty?) {
+    fun setInteractableLocation(locationProperty: LocationProperty?) {
         viewModelScope.launch(dispatcher) {
             _interactableProperty.value = locationProperty
         }
