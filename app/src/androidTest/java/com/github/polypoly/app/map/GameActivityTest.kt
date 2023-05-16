@@ -37,7 +37,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Before
     fun setUp() {
-        runBlocking { delay(3000) } // TODO: Find a better way to wait for the UI to update
+        runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
     }
 
     @Before

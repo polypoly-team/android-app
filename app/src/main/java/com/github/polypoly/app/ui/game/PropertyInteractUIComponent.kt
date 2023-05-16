@@ -29,12 +29,8 @@ fun PropertyInteractUIComponent() {
     if (showBetDialog.value) {
         BetDialog(onBuy = {
             // TODO: Handle the buy action with the entered amount here
-            showBetDialog.value = false
-            mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
-        }, onClose = {
-            showBetDialog.value = false
-            mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
-        })
+            leaveBetDialog()
+        }, onClose = { leaveBetDialog() })
     }
 }
 
@@ -82,13 +78,15 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
             Text(text = "Bet")
         }
         Button(
-            onClick = {
-                interactingWithProperty.value = false
-                mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
-            },
+            onClick = { leaveBetDialog() },
             modifier = Modifier.testTag("closeButton")
         ) {
             Text(text = "Close")
         }
     }
+}
+
+private fun leaveBetDialog() {
+    interactingWithProperty.value = false
+    mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
 }
