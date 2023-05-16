@@ -26,10 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
 import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
@@ -89,16 +92,9 @@ class GameLobbyActivity : ComponentActivity() {
                         title = { Text(text = gameLobby.name) },
                         navigationIcon = {
                             IconButton(onClick = {
-                                val currentLobby = gameLobbyWaitingModel.getGameLobby().value!!
-                                val currentLobbyKey = currentLobby.code
-                                GlobalInstances.remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-                                    gameLobby.removeUser(GlobalInstances.currentUser.id)
-                                    GlobalInstances.remoteDB.updateValue(currentLobbyKey, gameLobby)
-                                    GameRepository.gameCode = null
-                                }
-                                finish()
+                                leaveLobby()
                             }) {
-                                Icon(Icons.Filled.ArrowBack, "back_icon")
+                                Icon(Icons.Filled.Logout, "leave_lobby_icon")
                             }
                         },
                         backgroundColor = MaterialTheme.colors.primary,
@@ -125,14 +121,15 @@ class GameLobbyActivity : ComponentActivity() {
                                     Column() {
                                         SettingsMenu(gameLobby.rules)
                                         Spacer(modifier = Modifier.padding(Padding.large))
-                                        PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers)
+                                        PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)
                                     }
 
                                     StartGameButton(
                                         gameLobby.usersRegistered,
                                         gameLobby.rules.minimumNumberOfPlayers,
                                         gameLobby.rules.maximumNumberOfPlayers,
-                                        gameLobby.code
+                                        gameLobby.code,
+                                        gameLobby.admin.id
                                     )
                                 }
                             }
@@ -227,7 +224,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param players the list of players
      */
     @Composable
-    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int){
+    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int, adminId : Long){
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -282,7 +279,11 @@ class GameLobbyActivity : ComponentActivity() {
                             .fillMaxWidth()
                             .background(
                                 Brush.horizontalGradient(
-                                    colors = listOf(animatedColor, animatedColor, Color.Transparent),
+                                    colors = listOf(
+                                        animatedColor,
+                                        animatedColor,
+                                        Color.Transparent
+                                    ),
                                     startX = 0f
                                 )
                             )
@@ -292,13 +293,26 @@ class GameLobbyActivity : ComponentActivity() {
                         Image(
                             painter = painterResource(id = R.drawable.tmp_happysmile),
                             contentDescription = "${player.name} icon",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(smallIconSize)
                         )
+
                         Spacer(modifier = Modifier.width(Padding.medium))
+
                         Text(
                             text = player.name,
                             style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize)
                         )
+
+                        Spacer(modifier = Modifier.width(Padding.medium))
+
+                        if(player.id == adminId) {
+                            Image(
+                                imageVector = Icons.Filled.Stars,
+                                contentDescription = "admin star",
+                                modifier = Modifier.size(smallIconSize),
+                                colorFilter = ColorFilter.tint(secondary)
+                            )
+                        }
                     }
                 }
             }
@@ -323,9 +337,23 @@ class GameLobbyActivity : ComponentActivity() {
 
 
     @Composable
-    fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String) {
+    fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: Long,) {
         val morePlayersNeeded = minRequiredPlayers - players.size
         val mContext = LocalContext.current
+
+        val isAdmin = currentUser.id == adminId
+
+        val buttonText = if (isAdmin) {
+            if (players.size >= minRequiredPlayers) "Start Game!" else "Can't start Game :("
+        } else {
+            if (players.size >= minRequiredPlayers) "Admin can start!" else "Admin can't start..."
+        }
+        val onClickAction = if (isAdmin) {
+            { launchGameActivity(mContext) }
+        } else {
+            {}
+        }
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -337,34 +365,61 @@ class GameLobbyActivity : ComponentActivity() {
                 )
                 Text(
                     text = lobbyCode,
-                    style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.secondary)
+                    style = MaterialTheme.typography.body1.copy(
+                        color = MaterialTheme.colors.primary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
+
             }
 
 
             Spacer(modifier = Modifier.height(Padding.small))
 
             BigButton(
-                onClick = {launchGameActivity(mContext)},
+                onClick = onClickAction,
                 enabled = players.size >= minRequiredPlayers,
-                text = "Start Game"
+                text = buttonText
             )
 
             Spacer(modifier = Modifier.height(Padding.small))
 
             if (morePlayersNeeded > 0) {
-                Text(
-                    text = "At least $morePlayersNeeded more players needed to start...",
-                    style = MaterialTheme.typography.body1
-                )
+                Row {
+                    Text(
+                        text = "At least ",
+                        style = MaterialTheme.typography.body1
+                    )
+                    Text(
+                        text = "$morePlayersNeeded more",
+                        style = MaterialTheme.typography.body1.copy(
+                            color = MaterialTheme.colors.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Text(
+                        text = " players needed to start...",
+                        style = MaterialTheme.typography.body1
+                    )
+                }
             } else {
-                Text(
-                    text = "Players: ${players.size} / $maxPlayers",
-                    style = MaterialTheme.typography.body1
-                )
+                Row {
+                    Text(
+                        text = "Players: ",
+                        style = MaterialTheme.typography.body1
+                    )
+                    Text(
+                        text = "${players.size} / $maxPlayers",
+                        style = MaterialTheme.typography.body1.copy(
+                            color = MaterialTheme.colors.primary
+                        )
+                    )
+                }
+
             }
         }
     }
+
 
 
     private fun launchGameActivity(packageContext: Context) {
@@ -375,6 +430,32 @@ class GameLobbyActivity : ComponentActivity() {
             startActivity(gameIntent)
             finish()
         }
+    }
+
+    /**
+     * Leave the lobby and return to the main menu.
+     * Makes sure that the admin is replaced by another user if the admin leaves.
+     */
+    private fun leaveLobby() {
+        val currentLobby = gameLobbyWaitingModel.getGameLobby().value!!
+        val currentLobbyKey = currentLobby.code
+        GlobalInstances.remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
+            gameLobby.removeUser(currentUser.id)
+            val newAdmin = if (currentUser.id == gameLobby.admin.id) gameLobby.usersRegistered.random() else currentUser
+            val newGameLobby = GameLobby(
+                newAdmin,
+                gameLobby.rules,
+                gameLobby.name,
+                gameLobby.code,
+                gameLobby.private
+            )
+            for ( user in gameLobby.usersRegistered.filter { it.id != newAdmin.id }) {
+                newGameLobby.addUser(user)
+            }
+            GlobalInstances.remoteDB.updateValue(currentLobbyKey, gameLobby)
+            GameRepository.gameCode = null
+        }
+        finish()
     }
 
 }
