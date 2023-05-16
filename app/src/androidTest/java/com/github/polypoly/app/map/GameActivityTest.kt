@@ -6,12 +6,13 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.ui.map.MapUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -23,104 +24,36 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest: PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
-        GameRepository.player = GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+        GameRepository.player =
+            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
     }
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<GameActivity>()
 
-    private val otherPlayersAndGameDropDownButton = composeTestRule.onNodeWithTag("otherPlayersAndGameDropDownButton")
-    private val gameInfoButton = composeTestRule.onNodeWithTag("gameInfoButton")
-    private val playerInfoButton = composeTestRule.onNodeWithTag("playerInfoButton")
-    private val gameMenuDropDownButton = composeTestRule.onNodeWithTag("gameMenuDropDownButton")
-
-    private val menuButtonRules = composeTestRule.onNodeWithContentDescription("Show Rules")
-    private val menuButtonRankings = composeTestRule.onNodeWithContentDescription("Open Rankings")
-    private val menuButtonProfile = composeTestRule.onNodeWithContentDescription("Open Profile")
-    private val menuButtonSettings = composeTestRule.onNodeWithContentDescription("Open Settings")
-
-    private val rules = composeTestRule.onNodeWithText(RulesObject.rulesTitle)
-
     @Before
     fun setUp() {
-        runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
+        runBlocking { delay(3000) } // TODO: Find a better way to wait for the UI to update
     }
 
     @Before
-    fun startIntents() { Intents.init() }
+    fun startIntents() {
+        Intents.init()
+    }
 
     @After
-    fun releaseIntents() { Intents.release() }
-
-    /*@Test
-    fun hudIsDisplayed() {
-        otherPlayersAndGameDropDownButton.assertIsDisplayed()
-        playerInfoButton.assertIsDisplayed()
-        gameMenuDropDownButton.assertIsDisplayed()
+    fun releaseIntents() {
+        Intents.release()
     }
-
-    @Test
-    fun gameInfoAndOtherPlayersInfoAreDisplayedOnDropDownButtonClick() {
-        gameInfoButton.assertDoesNotExist()
-        otherPlayersAndGameDropDownButton.performClick()
-        gameInfoButton.assertIsDisplayed()
-    }
-
-    @Test
-    fun gameInfoAndOtherPlayersInfoAreCollapsedWhenDropDownButtonIsClickedAgain() {
-        otherPlayersAndGameDropDownButton.performClick()
-        gameInfoButton.assertIsDisplayed()
-        otherPlayersAndGameDropDownButton.performClick()
-        gameInfoButton.assertDoesNotExist()
-    }
-
-    @Test
-    fun gameMenuIsDisplayedOnDropDownButtonClick() {
-        gameMenuDropDownButton.performClick()
-        menuButtonRules.assertIsDisplayed()
-        menuButtonRankings.assertIsDisplayed()
-        menuButtonProfile.assertIsDisplayed()
-        menuButtonSettings.assertIsDisplayed()
-    }
-
-    @Test
-    fun gameMenuRulesButtonDisplaysRules() {
-        gameMenuDropDownButton.performClick()
-        menuButtonRules.performClick()
-        rules.assertIsDisplayed()
-    }
-
-    @Test
-    fun gameMenuRulesDismissOnOutsideClick() {
-        gameMenuDropDownButton.performClick()
-        menuButtonRules.performClick()
-        rules.assertIsDisplayed()
-        gameMenuDropDownButton.performClick()
-        rules.assertDoesNotExist()
-    }
-
-    @Test
-    fun gameMenuProfileButtonDisplaysActivity() {
-        gameMenuDropDownButton.performClick()
-        menuButtonProfile.performClick()
-        Intents.intended(IntentMatchers.hasComponent(ProfileActivity::class.java.name))
-    }
-
-    @Test
-    fun gameMenuSettingsButtonDisplaysActivity() {
-        gameMenuDropDownButton.performClick()
-        menuButtonSettings.performClick()
-        Intents.intended(IntentMatchers.hasComponent(SettingsActivity::class.java.name))
-    }*/
 
     @Test
     fun mapActivity_UIComponents_Displayed() {
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
-        //composeTestRule.onNodeWithTag("distanceWalked").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
     }
 
     @Test
@@ -159,7 +92,60 @@ class GameActivityTest: PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
         composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
-    
+
+    // While it may be better for grades to have a test for each component,
+    // it would multiply the time these tests take to run by a lot, due to how long it takes to
+    // start the activity. This is why I have chosen to group them by state.
+
+    @Test
+    fun mapActivity_Displays_Only_Necessary_UI_Components_INIT() {
+        setCurrentPlayerState(PlayerState.INIT)
+        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+    }
+
+    @Test
+    fun mapActivity_Displays_Only_Necessary_UI_Components_ROLLING_DICE() {
+        setCurrentPlayerState(PlayerState.ROLLING_DICE)
+        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("roll_dice_button").assertIsDisplayed()
+    }
+
+    @Test
+    fun mapActivity_Displays_Only_Necessary_UI_Components_MOVING() {
+        GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
+        GameActivity.mapViewModel.goingToLocationProperty = getRandomLocationProperty()
+        setCurrentPlayerState(PlayerState.MOVING)
+        runBlocking { delay(500) }
+        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("going_to_location_text").assertIsDisplayed()
+    }
+
+    @Test
+    fun mapActivity_Displays_Only_Necessary_UI_Components_INTERACTING() {
+        setCurrentPlayerState(PlayerState.INTERACTING)
+        GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
+        runBlocking { delay(500) }
+        composeTestRule.onNodeWithTag("map").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
+    }
+
+    private fun getRandomLocationProperty(): LocationProperty {
+        return GameActivity.mapViewModel.markerToLocationProperty[getRandomMarker()]!!
+    }
+
+    private fun setCurrentPlayerState(state: PlayerState) {
+        GameActivity.mapViewModel.currentPlayer!!.playerState.value = state
+    }
+
     private fun getRandomMarker(): Marker {
         val mapView = MapUI.mapView
         val n = mapView.overlays.filterIsInstance<Marker>().size

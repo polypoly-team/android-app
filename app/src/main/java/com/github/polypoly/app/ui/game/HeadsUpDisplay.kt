@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -49,20 +50,21 @@ import com.github.polypoly.app.ui.theme.Shapes
  */
 @Composable
 fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String) {
-    HudPlayer(playerData)
-    HudOtherPlayersAndGame(otherPlayersData, round)
-    HudLocation(location)
-    if (playerData.playerState.value == PlayerState.MOVING) {
-        HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp))
+    Column(modifier = Modifier.testTag("hud")) {
+        HudPlayer(playerData)
+        HudOtherPlayersAndGame(otherPlayersData, round)
+        HudLocation(location, testTag = "interactable_location_text")
+        if (playerData.playerState.value == PlayerState.MOVING)
+            HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
+        HudGameMenu()
     }
-    HudGameMenu()
 }
 
 /**
  * The HUD for the current nearby location (a text at the top of the screen)
  */
 @Composable
-fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp)) {
+fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,7 +75,7 @@ fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp)) {
                 text = location,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .testTag("location_text")
+                    .testTag(testTag)
                     .offset(offset.x, offset.y)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(

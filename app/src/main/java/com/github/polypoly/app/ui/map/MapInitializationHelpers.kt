@@ -12,10 +12,8 @@ import android.graphics.drawable.Drawable
 import android.location.Location
 import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import com.github.polypoly.app.ui.game.PlayerState
-import net.bytebuddy.dynamic.scaffold.TypeInitializer.None
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -126,7 +124,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocatio
     val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
         override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
             super.onLocationChanged(location, provider)
-            mapViewModel.setCloseLocation(
+            mapViewModel.setInteractableLocation(
                 updateAllDistancesAndFindClosest(mapView, GeoPoint(location))
             )
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
@@ -143,7 +141,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocatio
     locationOverlay.enableMyLocation()
     locationOverlay.enableFollowLocation()
     locationOverlay.runOnFirstFix {
-        mapViewModel.setCloseLocation(
+        mapViewModel.setInteractableLocation(
             updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation))
         )
         mapView.post {

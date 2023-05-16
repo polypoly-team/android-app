@@ -58,7 +58,7 @@ class MapViewModel(
      *
      * @param locationProperty The location to set as the closest location.
      */
-    fun setCloseLocation(locationProperty: LocationProperty?) {
+    fun setInteractableLocation(locationProperty: LocationProperty?) {
         viewModelScope.launch(dispatcher) {
             _interactableProperty.value = locationProperty
         }

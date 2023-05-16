@@ -36,7 +36,7 @@ fun RollDiceButton() {
                 .size(80.dp)
                 .align(BottomCenter)
                 .offset(y = (-80).dp)
-                .testTag("rollDiceButton"),
+                .testTag("roll_dice_button"),
             onClick = {
                 if (mapViewModel.interactableProperty.value != null)
                     showRollDiceDialog.value = true
