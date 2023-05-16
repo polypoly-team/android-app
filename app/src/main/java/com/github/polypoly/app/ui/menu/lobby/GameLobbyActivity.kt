@@ -91,15 +91,19 @@ class GameLobbyActivity : ComponentActivity() {
                     TopAppBar(
                         title = { Text(text = gameLobby.name) },
                         navigationIcon = {
-                            IconButton(onClick = {
-                                leaveLobby()
-                            }) {
+                            IconButton(
+                                onClick = {
+                                    leaveLobby()
+                                },
+                                modifier = Modifier.rotate(180f)
+                            )
+                            {
                                 Icon(Icons.Filled.Logout, "leave_lobby_icon")
                             }
                         },
                         backgroundColor = MaterialTheme.colors.primary,
                         contentColor = MaterialTheme.colors.background,
-                        elevation = 10.dp
+                        elevation = 10.dp,
                     )
                     Box {
                         Surface(
