@@ -22,7 +22,7 @@ data class Player (
     private var balance: Int = 0,
     private var ownedLocations: List<InGameLocation> = listOf(),
     private var roundLost: Int? = null,
-    val mutableState: MutableState<PlayerState> = mutableStateOf(PlayerState.INIT)
+    var playerState: MutableState<PlayerState> = mutableStateOf(PlayerState.INIT)
 ) : Comparable<Player> {
 
     /**

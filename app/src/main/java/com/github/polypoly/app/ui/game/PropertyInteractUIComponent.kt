@@ -15,8 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
 /**
  * Manage the building info dialog and the bet dialog.
@@ -30,8 +30,10 @@ fun PropertyInteractUIComponent() {
         BetDialog(onBuy = {
             // TODO: Handle the buy action with the entered amount here
             showBetDialog.value = false
+            mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
         }, onClose = {
             showBetDialog.value = false
+            mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
         })
     }
 }
@@ -80,7 +82,10 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
             Text(text = "Bet")
         }
         Button(
-            onClick = { interactingWithProperty.value = false },
+            onClick = {
+                interactingWithProperty.value = false
+                mapViewModel.currentPlayer!!.playerState.value = PlayerState.INTERACTING
+            },
             modifier = Modifier.testTag("closeButton")
         ) {
             Text(text = "Close")

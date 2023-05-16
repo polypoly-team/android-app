@@ -35,9 +35,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
@@ -50,6 +52,9 @@ fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location
     HudPlayer(playerData)
     HudOtherPlayersAndGame(otherPlayersData, round)
     HudLocation(location)
+    if (playerData.playerState.value == PlayerState.MOVING) {
+        HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp))
+    }
     HudGameMenu()
 }
 
@@ -57,7 +62,7 @@ fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location
  * The HUD for the current nearby location (a text at the top of the screen)
  */
 @Composable
-fun HudLocation(location: String) {
+fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp)) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,7 +74,7 @@ fun HudLocation(location: String) {
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .testTag("location_text")
-                    .offset(y = 10.dp)
+                    .offset(offset.x, offset.y)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,

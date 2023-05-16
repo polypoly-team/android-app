@@ -62,7 +62,11 @@ fun RollDiceDialog() {
                     Column {
                         val rollDice = rollDiceLocations()
                         for (i in 0..2)
-                            Button(onClick = { }) {
+                            Button(onClick = {
+                                showRollDiceDialog.value = false
+                                mapViewModel.currentPlayer!!.playerState.value = PlayerState.MOVING
+                                mapViewModel.goingToLocationProperty = rollDice[i]
+                            }) {
                                 Text(rollDice[i].name)
                             }
                     }
