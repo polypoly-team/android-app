@@ -30,7 +30,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true, true) {
     fun releaseIntents() { Intents.release() }
 
     @Test
-    fun launchActivityComponentsDisplayed() {
+    fun launchActivityComponentsDisplayed() { 
         composeTestRule.onNodeWithTag("gameLobbyCodeField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("noGameLobbyCodeText").assertIsDisplayed()
