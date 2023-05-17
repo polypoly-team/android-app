@@ -84,6 +84,18 @@ class GameViewModel(
         gameEndedData.value = gameData.value?.isGameFinished() ?: false
     }
 
+    fun diceRolled() {
+        if (playerStateData.value != PlayerState.ROLLING_DICE)
+            return
+        playerStateData.value = PlayerState.MOVING
+    }
+
+    fun locationReached() {
+        if (playerStateData.value != PlayerState.MOVING)
+            return
+        playerStateData.value = PlayerState.INTERACTING
+    }
+
     companion object {
         /**
          * Factory object for the GameLobbyWaitingViewModel

@@ -62,8 +62,8 @@ fun RollDiceDialog(gameViewModel: GameViewModel) {
                         for (i in 0..2)
                             Button(onClick = {
                                 showRollDiceDialog.value = false
-//                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING TODO: use gameViewModel to advance in the turn
                                 mapViewModel.goingToLocationProperty = rollDice[i]
+                                gameViewModel.diceRolled()
                             }) {
                                 Text(rollDice[i].name)
                             }

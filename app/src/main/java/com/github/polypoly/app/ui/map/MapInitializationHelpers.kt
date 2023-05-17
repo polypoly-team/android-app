@@ -134,7 +134,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
             if (mapViewModel.currentPlayer != null
                 && gameViewModel?.getPlayerState()?.value == PlayerState.MOVING
                 && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty) {
-//                mapViewModel.currentPlayer?.playerState!!.value = PlayerState.INTERACTING // TODO: use gameViewModel to change turn state
+                gameViewModel.locationReached()
                 mapViewModel.goingToLocationProperty = null
             }
         }
