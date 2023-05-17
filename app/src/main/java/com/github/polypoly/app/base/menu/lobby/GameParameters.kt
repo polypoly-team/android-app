@@ -30,7 +30,7 @@ data class GameParameters (
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration <= 0 || roundDuration >= GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
+        if (roundDuration <= 0 || roundDuration > GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 

@@ -22,15 +22,15 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
@@ -50,6 +50,7 @@ class SignInActivity : ComponentActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
         if (firebaseAuth!!.currentUser != null) {
+            addFakeDataToDB()
             launchWelcome()
         }
         setContent { SignInContent() }
@@ -221,10 +222,10 @@ class SignInActivity : ComponentActivity() {
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val ALL_TEST_USERS = listOf(currentUser, TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 8, 8,
+            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
             60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(

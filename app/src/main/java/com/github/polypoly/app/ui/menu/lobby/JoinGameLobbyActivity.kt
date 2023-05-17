@@ -530,17 +530,17 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
     private fun joinGameLobbyRoom(mContext: Context) {
-        val currentLobbyKey = gameLobbyCode
-        remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
+        remoteDB.getValue<GameLobby>(gameLobbyCode).thenAccept { gameLobby ->
             gameLobby.addUser(currentUser)
 
             //launch the gameLobby room activity
-            remoteDB.updateValue(gameLobby)
-            val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-            GameRepository.gameCode = gameLobbyCode
+            remoteDB.updateValue(gameLobby).thenAccept{
+                val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+                GameRepository.gameCode = gameLobbyCode
 
-            startActivity(gameLobbyIntent)
-            finish()
+                startActivity(gameLobbyIntent)
+                finish()
+            }
         }
     }
 

@@ -17,7 +17,7 @@ class GameLobbyConstants {
         /**
          * Constants for game lobby settings
          */
-        const val GAME_LOBBY_MAX_NAME_LENGTH = 15
+        const val GAME_LOBBY_MAX_NAME_LENGTH = 9
         const val GAME_LOBBY_PRIVATE_DEFAULT = false
         const val GAME_LOBBY_MAX_PLAYERS = 8
         const val GAME_LOBBY_MIN_PLAYERS = 2
