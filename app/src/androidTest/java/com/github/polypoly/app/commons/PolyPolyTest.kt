@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
@@ -110,7 +110,7 @@ abstract class PolyPolyTest(
             }
 
             FirebaseAuth.getInstance().signOut()
-            currentFBUser = null
+            currentUser = null
             isSignedIn = false
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
@@ -161,7 +161,7 @@ abstract class PolyPolyTest(
     }
     @After
     fun cleanUp() {
-        currentFBUser = null
+        currentUser = null
         isSignedIn = false
     }
 

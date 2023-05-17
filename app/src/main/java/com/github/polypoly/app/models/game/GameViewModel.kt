@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.menu.lobby.GameLobby
@@ -59,11 +58,11 @@ class GameViewModel(
                 // TODO: Remove this when the game is created from the lobby
                 GameRepository.game = Game.launchFromPendingGame(
                     GameLobby(
-                        admin = GlobalInstances.currentUser
+                        admin = GlobalInstances.currentUser!!
                     )
                 )
                 GameRepository.player = Player(
-                    GlobalInstances.currentUser,
+                    GlobalInstances.currentUser!!,
                     3000
                 )
                 GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE

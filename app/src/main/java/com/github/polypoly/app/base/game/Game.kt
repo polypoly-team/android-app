@@ -72,7 +72,7 @@ class Game private constructor(
      * Return the ranking of the players
      * @return a [Map] of the [Player]s' [User] id and their rank
      */
-    fun ranking(): Map<Long, Int> {
+    fun ranking(): Map<String, Int> {
         val playersSorted = players.sortedDescending()
         val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
         for(i in 1 until (players.size)) {
@@ -114,7 +114,7 @@ class Game private constructor(
      * @param userId the id of the user
      * @return the player associated to the user id
      */
-    fun getPlayer(userId: Long): Player? {
+    fun getPlayer(userId: String): Player? {
         return players.find { it.user.id == userId }
     }
 
