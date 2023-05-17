@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI

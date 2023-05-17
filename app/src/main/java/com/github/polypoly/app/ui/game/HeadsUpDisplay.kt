@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -40,6 +39,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding

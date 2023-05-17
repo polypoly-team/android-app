@@ -12,7 +12,7 @@ import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.ui.map.MapUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

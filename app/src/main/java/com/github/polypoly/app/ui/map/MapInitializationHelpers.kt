@@ -13,7 +13,7 @@ import android.location.Location
 import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
-import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.base.game.PlayerState
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE

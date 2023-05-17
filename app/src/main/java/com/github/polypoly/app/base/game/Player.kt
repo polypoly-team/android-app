@@ -6,7 +6,6 @@ import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.ui.game.PlayerState
 import kotlin.random.Random
 
 /**

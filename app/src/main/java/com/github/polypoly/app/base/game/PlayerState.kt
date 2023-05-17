@@ -1,4 +1,4 @@
-package com.github.polypoly.app.ui.game
+package com.github.polypoly.app.base.game
 
 enum class PlayerState {
     INIT, // initial state, before the game starts

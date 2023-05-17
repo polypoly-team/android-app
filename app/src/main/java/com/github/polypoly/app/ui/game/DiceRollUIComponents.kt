@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 

@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 

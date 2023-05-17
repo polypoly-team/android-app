@@ -3,16 +3,17 @@ package com.github.polypoly.app.models.game
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.utils.global.GlobalInstances
+import kotlinx.coroutines.launch
 
 class GameViewModel(
     game: Game,
