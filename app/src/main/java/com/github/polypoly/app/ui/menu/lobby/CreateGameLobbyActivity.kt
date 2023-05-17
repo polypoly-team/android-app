@@ -196,7 +196,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = getString(R.string.create_game_lobby_game_code, futureGameCode.getNow("")), // FIXME: always displays a blank code
+                    text = getString(R.string.create_game_lobby_game_code, futureGameCode.getNow("")),
                     Modifier.padding(bottom = 20.dp),
                 )
                 BigButton(
