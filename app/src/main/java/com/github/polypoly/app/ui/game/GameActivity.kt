@@ -49,7 +49,7 @@ class GameActivity : ComponentActivity() {
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
         val playerState = gameModel.getPlayerState().observeAsState().value
 
-        if (player != null && game != null && gameTurn != null && gameEnded != null && playerState != null) {
+        if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -57,15 +57,17 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, gameModel, interactingWithProperty)
                     PropertyInteractUIComponent()
+
                     if (playerState == PlayerState.ROLLING_DICE) {
-                        RollDiceDialog()
-                        RollDiceButton()
+                        RollDiceButton(gameModel)
+                        RollDiceDialog(gameModel)
                     }
+
                     NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents()
                     Hud(
                         player,
-                        playerState,
+                        gameModel,
                         game.players,
                         gameTurn,
                         mapViewModel.interactableProperty.value?.name ?: ""

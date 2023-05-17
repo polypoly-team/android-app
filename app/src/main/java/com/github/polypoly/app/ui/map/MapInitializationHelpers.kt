@@ -151,5 +151,6 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
         }
         mapViewModel.resetDistanceWalked()
     }
+
     return locationOverlay
 }

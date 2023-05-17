@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
@@ -49,13 +51,16 @@ import com.github.polypoly.app.ui.theme.Shapes
  * The heads-up display with player and game stats that is displayed on top of the map
  */
 @Composable
-fun Hud(playerData: Player, playerState: PlayerState, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(playerData: Player, gameViewModel: GameViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+    val playerState = gameViewModel.getPlayerState().observeAsState().value
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerState == PlayerState.MOVING)
-            HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
+            HudLocation(playerPosition, DpOffset(0.dp, 80.dp), "going_to_location_text")
         HudGameMenu()
     }
 }

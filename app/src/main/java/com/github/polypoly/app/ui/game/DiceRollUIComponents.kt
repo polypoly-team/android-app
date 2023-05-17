@@ -1,10 +1,6 @@
 package com.github.polypoly.app.ui.game
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -19,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import org.osmdroid.util.GeoPoint
 
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
@@ -31,7 +27,7 @@ val showRollDiceDialog = mutableStateOf(false)
  * Button for rolling the dice.
  */
 @Composable
-fun RollDiceButton() {
+fun RollDiceButton(gameViewModel: GameViewModel) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Button(
             modifier = Modifier
@@ -54,7 +50,7 @@ fun RollDiceButton() {
  * Dice roll dialog, shows the result of 3 dice rolls in a column.
  */
 @Composable
-fun RollDiceDialog() {
+fun RollDiceDialog(gameViewModel: GameViewModel) {
     if (showRollDiceDialog.value) {
         Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
             AlertDialog(
@@ -93,9 +89,12 @@ private fun rollDiceLocations(): List<LocationProperty> {
     val locationsToVisit = mutableListOf<LocationProperty>()
     for (i in 1..3) {
         val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
+
+        val currentLocation = mapViewModel.interactableProperty.value?.position() ?: GeoPoint(0.toDouble(), 0.toDouble())
+
         val closestLocations = mapViewModel.markerToLocationProperty.entries
             .filter { !locationsNotToVisitName.contains(it.value.name) }
-            .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.interactableProperty.value!!.position()) }
+            .sortedBy { it.key.position.distanceToAsDouble(currentLocation) }
             .take(11)
 
         locationsToVisit.add(closestLocations[diceRollsSum].value)

@@ -14,6 +14,11 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,10 +65,11 @@ class GameViewModel(
     }
 
     suspend fun gameLoop() {
-        playerStateData.value = PlayerState.ROLLING_DICE
         var currentGame = gameData.value
 
         while (currentGame != null && !currentGame.isGameFinished()) {
+            playerStateData.value = PlayerState.ROLLING_DICE
+
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
             nextTurn()
