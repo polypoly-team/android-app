@@ -14,6 +14,8 @@ class MockDB: IRemoteStorage {
     private val keysHierarchy: MutableMap<String, MutableList<String>> = mutableMapOf()
     private val data: MutableMap<String, Any> = mutableMapOf()
 
+    private val listeners: MutableMap<String, MutableList<Pair<String, (Any) -> Unit>>> = mutableMapOf()
+
     private fun cleanKey(key: String): String {
         return key.removePrefix("/").removeSuffix("/")
     }
@@ -88,6 +90,11 @@ class MockDB: IRemoteStorage {
             keysHierarchy[parent]!!.add(child)
         }
         data[keyCleaned] = value.toDBObject()
+
+        for (listener in listeners[keyCleaned] ?: listOf()) {
+            listener.second(value)
+        }
+
         return CompletableFuture.completedFuture(true)
     }
 
@@ -98,15 +105,21 @@ class MockDB: IRemoteStorage {
     // ========================================================================== LISTENERS
 
     override fun <T : StorableObject<*>> addOnChangeListener(key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        val listenersFound = listeners[key] ?: mutableListOf()
+        @Suppress("UNCHECKED_CAST")
+        listenersFound.add(Pair(tag, action as (Any) -> Unit))
+        listeners[key] = listenersFound
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteOnChangeListener(key: String, tag: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        listeners[key]?.removeIf { listener -> listener.first == tag }
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        listeners.remove(key)
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> addOnRootChangeListener(
