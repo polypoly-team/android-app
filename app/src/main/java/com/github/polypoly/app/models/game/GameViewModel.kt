@@ -5,24 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.IRemoteStorage
-import com.github.polypoly.app.network.RemoteDB
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.utils.global.GlobalInstances
 
 class GameViewModel(
-    private val game: Game,
-    private val player: Player,
-    storage: IRemoteStorage
+    game: Game,
+    player: Player
 ): LoadingModel() {
 
     private val gameData: MutableLiveData<Game> = MutableLiveData(game)
@@ -62,12 +56,22 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
+                // TODO: Remove this when the game is created from the lobby
+                GameRepository.game = Game.launchFromPendingGame(
+                    GameLobby(
+                        admin = GlobalInstances.currentUser
+                    )
+                )
+                GameRepository.player = Player(
+                    GlobalInstances.currentUser,
+                    3000
+                )
+                GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
                 GameViewModel(
                     GameRepository.game!!,
-                    GameRepository.player!!,
-                    remoteDB
+                    GameRepository.player!!
                 )
             }
         }

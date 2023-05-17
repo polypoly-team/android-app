@@ -10,12 +10,11 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +56,9 @@ abstract class PolyPolyTest(
             trophiesDisplay = mutableListOf(0, 4)
         )
         val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_1_BIS = User(12,"Carter", "IT IS me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_2_BIS = User(123,"Harry", "Kachow!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
@@ -120,29 +121,25 @@ abstract class PolyPolyTest(
         }
     }
 
-    private fun <T> requestAddDataToDB(data: List<T>, keys: List<String>, root: String): List<CompletableFuture<Boolean>> {
+    private fun <T : StorableObject<*>> requestAddDataToDB(data: List<T>): List<CompletableFuture<Boolean>> {
         val timeouts = mutableListOf<CompletableFuture<Boolean>>()
         for (i in data.indices) {
-            timeouts.add(remoteDB.setValue(root + keys[i], data[i]))
+            timeouts.add(remoteDB.setValue(data[i]))
         }
         return timeouts
     }
 
-    fun <T> addDataToDB(data: List<T>, keys: List<String>, root: String = "") {
-        requestAddDataToDB(data, keys, root).map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
+    fun <T : StorableObject<*>> addDataToDB(data: List<T>) {
+        requestAddDataToDB(data).map{ timeout -> timeout.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
-    fun <T> addDataToDB(data: T, key: String) {
-        addDataToDB(listOf(data), listOf(key))
-    }
+    fun <T: StorableObject<*>> addDataToDB(data: T) = addDataToDB(listOf(data))
 
-    fun addUsersToDB(users: List<User>) = addDataToDB(users,
-        users.map{user ->  user.id.toString()}, DB_USERS_PROFILES_PATH)
+    fun addUsersToDB(users: List<User>) = addDataToDB(users)
 
     fun addUserToDB(users: User) = addUsersToDB(listOf(users))
 
-    fun addGameLobbiesToDB(gameLobby: List<GameLobby>) = addDataToDB(gameLobby,
-        gameLobby.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
+    fun addGameLobbiesToDB(gameLobby: List<GameLobby>) = addDataToDB(gameLobby)
 
     fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
@@ -174,12 +171,8 @@ abstract class PolyPolyTest(
 
     fun fillWithFakeData() {
         val allRequests = mutableListOf<CompletableFuture<Boolean>>()
-        allRequests.addAll(
-            requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()}, DB_USERS_PROFILES_PATH)
-        )
-        allRequests.addAll(
-            requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code), DB_GAME_LOBBIES_PATH)
-        )
+        allRequests.addAll(requestAddDataToDB(ALL_TEST_USERS))
+        allRequests.addAll(requestAddDataToDB(ALL_TEST_GAME_LOBBIES))
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 

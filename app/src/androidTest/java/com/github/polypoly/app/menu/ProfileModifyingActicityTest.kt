@@ -11,7 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.LoggedInTest
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Assert.assertEquals
@@ -69,7 +68,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // Clicking on button
         button.performClick()
 
-        val userKey = Settings.DB_USERS_PROFILES_PATH + userLoggedIn.id
+        val userKey = userLoggedIn.id.toString()
         Thread.sleep(TIMEOUT_DURATION * 2000) // TODO: fixme ugly but easiest workaround until we can listen to the DB
         val nameFound = remoteDB.getValue<User>(userKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS).name
 
@@ -96,7 +95,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // Clicking on button
         button.performClick()
 
-        val userKey = Settings.DB_USERS_PROFILES_PATH + userLoggedIn.id
+        val userKey = userLoggedIn.id.toString()
         Thread.sleep(TIMEOUT_DURATION * 2000) // TODO: fixme ugly but easiest workaround until we can listen to the DB
         val bioFound = remoteDB.getValue<User>(userKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS).bio
 

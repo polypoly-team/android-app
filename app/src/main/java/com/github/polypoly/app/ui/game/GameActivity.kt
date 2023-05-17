@@ -17,8 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
@@ -44,11 +42,12 @@ class GameActivity : ComponentActivity() {
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
+        mapViewModel.currentPlayer = player
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
-        if (player != null && game != null && gameTurn != null && gameEnded != null) {
+        if (game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -56,9 +55,11 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, interactingWithProperty)
                     PropertyInteractUIComponent()
-                    RollDiceDialog()
-                    RollDiceButton()
-                    nextTurnButton(gameEnded)
+                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
+                        RollDiceDialog()
+                        RollDiceButton()
+                    }
+                    NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents()
                     Hud(
                         player,
@@ -66,14 +67,14 @@ class GameActivity : ComponentActivity() {
                         gameTurn,
                         mapViewModel.interactableProperty.value?.name ?: ""
                     )
-                    gameEndedLabel(gameEnded)
+                    GameEndedLabel(gameEnded)
                 }
             }
         }
     }
 
     @Composable
-    fun nextTurnButton(gameEnded: Boolean) {
+    fun NextTurnButton(gameEnded: Boolean) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Button(
                 modifier = Modifier
@@ -94,7 +95,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun gameEndedLabel(gameEnded: Boolean) {
+    fun GameEndedLabel(gameEnded: Boolean) {
         if (gameEnded) {
             Box(
                 modifier = Modifier
@@ -131,6 +132,7 @@ class GameActivity : ComponentActivity() {
             fun markersOf(mapView: MapView): List<Marker> {
                 return mapView.overlays.filterIsInstance<Marker>()
             }
+
             var closestLocationProperty = null as LocationProperty?
             for (marker in markersOf(mapView)) {
                 val markerLocation = mapViewModel.markerToLocationProperty[marker]!!

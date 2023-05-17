@@ -28,7 +28,6 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.Padding
@@ -69,7 +68,7 @@ class ProfileActivity : MenuActivity("Profile") {
     fun ProfileAndStats() {
 
         var user by remember { mutableStateOf(User()) }
-        remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + userId).thenAccept{userFound ->
+        remoteDB.getValue<User>(userId.toString()).thenAccept{userFound ->
             user = userFound
         }
 
@@ -129,7 +128,7 @@ class ProfileActivity : MenuActivity("Profile") {
     }
 
     /**
-     * A button to go to the page where the user can modify his/her profile
+     * A button to go to the page where the user can modify their profile
      */
     @Composable
     fun ModifyProfileButton() {

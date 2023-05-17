@@ -1,10 +1,10 @@
 package com.github.polypoly.app.network
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.network.storable.StorableObject
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CompletableFuture
 
 class StorableObjectTest: PolyPolyTest(true, false) {
 
@@ -30,7 +30,7 @@ class StorableObjectTest: PolyPolyTest(true, false) {
     }
 
     @Test
-    fun dbPathGetWithReifiedWorks() {
+    fun getPathWithReifiedWorks() {
         DummySubclass1()
         assertTrue(DB_TEST_PERSON_PATH == StorableObject.getPath<TestPerson>())
         assertTrue(DB_DUMMY_PATH_1 == StorableObject.getPath<DummySubclass1>())
@@ -38,12 +38,36 @@ class StorableObjectTest: PolyPolyTest(true, false) {
 
     @Test
     fun convertersAreWellStored() {
-        assertTrue(TEST_PERSON_1.equalsPerson(StorableObject.convertToLocal(TestPerson::class, TEST_PERSON_DB_1)))
+        assertTrue(TEST_PERSON_1.equalsPerson(StorableObject.convertToLocal(TestPerson::class, TEST_PERSON_DB_1).get()))
     }
 
     @Test
     fun convertWithReifiedWorks() {
-        assertTrue(TEST_PERSON_1.equalsPerson(StorableObject.convertToLocal(TEST_PERSON_DB_1)))
+        assertTrue(TEST_PERSON_1.equalsPerson(StorableObject.convertToLocal<TestPerson>(TEST_PERSON_DB_1).get()))
+    }
+
+    @Test
+    fun convertAnObjectWithWrongClassFails() {
+        assertThrows(IllegalArgumentException::class.java) { StorableObject.convertToLocal<TestPerson>(DummySubclass1()).get() }
+    }
+
+    @Test
+    fun dbClassesAreWellStored() {
+        DummySubclass1()
+        assertTrue(TestPersonDB::class.toString() == StorableObject.getDBClass(TestPerson::class).toString())
+        assertTrue(TestPersonDB::class.toString() == StorableObject.getDBClass(DummySubclass1::class).toString())
+    }
+
+    @Test
+    fun getDBClassWithReifiedWorks() {
+        DummySubclass1()
+        assertTrue(TestPersonDB::class.toString() == StorableObject.getDBClass<TestPerson>().toString())
+        assertTrue(TestPersonDB::class.toString() == StorableObject.getDBClass<DummySubclass1>().toString())
+    }
+
+    @Test
+    fun getAbsoluteKeyWorks() {
+        assertTrue(TEST_PERSON_1.getAbsoluteKey() == DB_TEST_PERSON_PATH + TEST_PERSON_1.key)
     }
 
 }
@@ -57,7 +81,7 @@ class TestPerson(
     private val id: String = "",
     val name: String = "",
     val birth: Int = 2003
-): StorableObject<TestPersonDB>(DB_TEST_PERSON_PATH, id) {
+): StorableObject<TestPersonDB>(TestPersonDB::class, DB_TEST_PERSON_PATH, id) {
 
     fun equalsPerson(other: TestPerson): Boolean {
         return id == other.id && name == other.name && birth == other.birth
@@ -67,8 +91,9 @@ class TestPerson(
         return TestPersonDB(id, name, 2023 - birth)
     }
 
-    override fun toLocalObject(dbObject: TestPersonDB): StorableObject<TestPersonDB> {
-        return TestPerson(dbObject.key, dbObject.name, 2023 - dbObject.age)
+    override fun toLocalObject(dbObject: TestPersonDB): CompletableFuture<StorableObject<TestPersonDB>> {
+        val person = TestPerson(dbObject.key, dbObject.name, 2023 - dbObject.age)
+        return CompletableFuture.completedFuture(person)
     }
 }
 
@@ -80,12 +105,12 @@ data class TestPersonDB(val key: String = "", val name: String = "", val age: In
 const val DB_DUMMY_PATH_1 = "dummy_1/"
 const val DB_DUMMY_PATH_2 = "dummy_2/"
 
-class DummySubclass1(id: String = ""): StorableObject<TestPersonDB>(DB_DUMMY_PATH_1, id) {
+class DummySubclass1(id: String = ""): StorableObject<TestPersonDB>(TestPersonDB::class, DB_DUMMY_PATH_1, id) {
     override fun toDBObject(): TestPersonDB { TODO("Not yet implemented") }
-    override fun toLocalObject(dbObject: TestPersonDB): StorableObject<TestPersonDB> { TODO("Not yet implemented") }
+    override fun toLocalObject(dbObject: TestPersonDB): CompletableFuture<StorableObject<TestPersonDB>> { TODO("Not yet implemented") }
 }
 
-class DummySubclass2(id: String = ""): StorableObject<TestPersonDB>(DB_DUMMY_PATH_2, id) {
+class DummySubclass2(id: String = ""): StorableObject<TestPersonDB>(TestPersonDB::class, DB_DUMMY_PATH_2, id) {
     override fun toDBObject(): TestPersonDB { TODO("Not yet implemented") }
-    override fun toLocalObject(dbObject: TestPersonDB): StorableObject<TestPersonDB> { TODO("Not yet implemented") }
+    override fun toLocalObject(dbObject: TestPersonDB): CompletableFuture<StorableObject<TestPersonDB>> { TODO("Not yet implemented") }
 }

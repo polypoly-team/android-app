@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,9 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.People
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
@@ -33,11 +37,11 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.CompletableFuture
@@ -200,7 +204,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 LaunchedEffect(Unit) {
                     while (openList) {
                         // TODO: only to this once and then subscribe to events instead of polling
-                        remoteDB.getAllValues<GameLobby>(DB_GAME_LOBBIES_PATH).thenAccept{ lobbies ->
+                        remoteDB.getAllValues<GameLobby>().thenAccept { lobbies ->
                             gameLobbies = lobbies.filter { lobby -> !lobby.private && !gameLobbyIsFull(lobby) }
                         }
                         Timber.tag("GameLobbyList")
@@ -271,7 +275,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     .clickable { onOpenChange(!isOpen) }
             ) {
                 GameLobbyCardHeader(gameLobby)
-                if (isOpen) {
+                AnimatedVisibility(visible = isOpen) {
                     GameLobbyCardDetails(gameLobby)
                 }
             }
@@ -308,12 +312,13 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     private fun GameLobbyCardPlayerCount(gameLobby: GameLobby) {
         Row {
             Image(
-                painter = painterResource(id = R.drawable.avatar),
+                imageVector = Icons.Default.People,
                 contentDescription = "people icon",
                 modifier = Modifier
                     .size(30.dp)
                     .testTag("${gameLobby.name}/peopleIcon")
-                    .padding(top = 5.dp)
+                    .padding(top = 5.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
             )
             Text(
                 text = "${gameLobby.usersRegistered.size}/${gameLobby.rules.maximumNumberOfPlayers}",
@@ -502,8 +507,8 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         if (gameLobbyCode.isEmpty()) {
             warningState.value = getString(R.string.game_lobby_code_is_empty)
         } else {
-            val lobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
-            remoteDB.keyExists(lobbyKey).thenCompose { keyExists ->
+            val lobbyKey = gameLobbyCode
+            remoteDB.keyExists<GameLobby>(lobbyKey).thenCompose { keyExists ->
                 if (!keyExists) {
                     warningState.value = getString(R.string.game_lobby_does_not_exist)
                     CompletableFuture.failedFuture(IllegalAccessException())
@@ -525,12 +530,12 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
     private fun joinGameLobbyRoom(mContext: Context) {
-        val currentLobbyKey = DB_GAME_LOBBIES_PATH + gameLobbyCode
+        val currentLobbyKey = gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
             gameLobby.addUser(currentUser)
 
             //launch the gameLobby room activity
-            remoteDB.updateValue(currentLobbyKey, gameLobby)
+            remoteDB.updateValue(gameLobby)
             val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
             GameRepository.gameCode = gameLobbyCode
 

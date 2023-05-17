@@ -36,7 +36,7 @@ fun RollDiceButton() {
                 .size(80.dp)
                 .align(BottomCenter)
                 .offset(y = (-80).dp)
-                .testTag("rollDiceButton"),
+                .testTag("roll_dice_button"),
             onClick = {
                 if (mapViewModel.interactableProperty.value != null)
                     showRollDiceDialog.value = true
@@ -62,7 +62,11 @@ fun RollDiceDialog() {
                     Column {
                         val rollDice = rollDiceLocations()
                         for (i in 0..2)
-                            Button(onClick = { }) {
+                            Button(onClick = {
+                                showRollDiceDialog.value = false
+                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING
+                                mapViewModel.goingToLocationProperty = rollDice[i]
+                            }) {
                                 Text(rollDice[i].name)
                             }
                     }

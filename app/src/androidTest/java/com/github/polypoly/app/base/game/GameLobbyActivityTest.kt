@@ -1,19 +1,28 @@
 package com.github.polypoly.app.base.game
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.utils.global.Settings
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class GameLobbyActivityTest: PolyPolyTest(true, false) {
 
     val lobbyCode = "default-lobby"
-    val lobbyKey = Settings.DB_GAME_LOBBIES_PATH + lobbyCode
+    val lobbyKey = lobbyCode
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<GameLobbyActivity>()
@@ -29,6 +38,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
     fun releaseIntents() { Intents.release() }
 
     // Composables used in tests
+    private val goButton = composeTestRule.onNodeWithTag("go_button")
 
     // TODO: use framework for dependency injection as it fails on cirrus
 //    @Test
@@ -48,4 +58,14 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
 //        Intents.intended(IntentMatchers.hasComponent(GameActivity::class.java.name))
 //    }
 
+    @Test // FIXME: Go Button isn't displayed
+    fun goButtonIsDisabledWhenGameCannotStart() {
+        // Setup game lobby not ready for start
+        /*addDataToDB(TEST_GAME_LOBBY_AVAILABLE_2)
+
+        composeTestRule.waitForIdle()
+
+        goButton.assertIsDisplayed()
+        //goButton.assertIsNotEnabled()*/
+    }
 }
