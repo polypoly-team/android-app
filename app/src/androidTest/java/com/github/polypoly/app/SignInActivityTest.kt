@@ -21,9 +21,7 @@ class SignInActivityTest : PolyPolyTest(false, false, false){
     val composeTestRule = createAndroidComposeRule<SignInActivity>()
 
     @Before
-    fun startIntents() {
-        Intents.init()
-    }
+    fun startIntents() { Intents.init() }
 
     @After
     fun releaseIntents() { Intents.release() }

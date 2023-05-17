@@ -29,12 +29,12 @@ class ProfileModifyingActivity : ComponentActivity() {
     /**
      * The temporary value of nickname of the player
      */
-    private var nickname: String = ""
+    private var nickname: String = currentUser?.name ?: ""
 
     /**
      * The temporary value of description of the player profile
      */
-    private var description: String = ""
+    private var description: String = currentUser?.bio ?: ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,17 +139,19 @@ class ProfileModifyingActivity : ComponentActivity() {
             if(nickname.isEmpty()) {
                 onError()
             } else {
-                remoteDB.getValue<User>(currentUser!!.key).thenCompose { user ->
-                    remoteDB.updateValue(User(
-                        id = currentUser!!.key,
-                        name = nickname,
-                        bio = description,
-                        skin = user.skin,
-                        stats = user.stats,
-                        trophiesWon = user.trophiesWon,
-                        trophiesDisplay = trophiesDisplay
-                    ))
-                }.thenApply {
+                val oldUser = currentUser!!
+                val newUser = User(
+                    id = oldUser.key,
+                    name = nickname,
+                    bio = description,
+                    skin = oldUser.skin,
+                    stats = oldUser.stats,
+                    trophiesWon = oldUser.trophiesWon,
+                    trophiesDisplay = trophiesDisplay
+                )
+
+                remoteDB.updateValue(newUser).thenAccept {
+                    currentUser = newUser
                     val profileIntent = Intent(mContext, ProfileActivity::class.java)
                     finish()
                     startActivity(profileIntent)

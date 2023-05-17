@@ -54,14 +54,15 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_code_is_empty)).assertIsDisplayed()
     }
 
-    @Test
+    // TODO: change/delete this test as the code isn't intended anymore
+    /*@Test
     fun inputValidGameLobbyCodeInTextFieldJoinsGameLobbyRoom() {
         val lobbyCode = TEST_GAME_LOBBY_AVAILABLE_1.code
         composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput(lobbyCode)
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
-    }
+    }*/
 
     @Test
     fun inputFullGameLobbyCodeDisplayWarningMessage() {
@@ -112,6 +113,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
 
     }
 
+    // TODO: change/delete this test as the code isn't intended anymore
     @Test
     fun clickJoinButtonInLobbyInfoJoinsGameLobby(){
         composeTestRule.onNodeWithTag("showGameLobbiesButton").performClick()

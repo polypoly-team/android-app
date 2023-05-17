@@ -29,7 +29,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
     }
 
     @get:Rule

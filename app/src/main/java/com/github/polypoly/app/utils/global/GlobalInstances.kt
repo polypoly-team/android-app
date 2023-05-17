@@ -27,7 +27,7 @@ class GlobalInstances {
 
         lateinit var remoteDB: IRemoteStorage
         var remoteDBInitialized = false
-        private const val rootDB = "live-victor"
+        private const val rootDB = "live"
 
         fun initRemoteDB() {
             if(!remoteDBInitialized) {
