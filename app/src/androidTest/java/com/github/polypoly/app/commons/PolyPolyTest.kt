@@ -154,6 +154,9 @@ abstract class PolyPolyTest(
         if (clearRemoteStorage) {
             clearMockDB()
         }
+        if(signFakeUserIn) {
+            currentUser = TEST_USER_1
+        }
         if (fillWithFakeData) {
             fillWithFakeData()
         }

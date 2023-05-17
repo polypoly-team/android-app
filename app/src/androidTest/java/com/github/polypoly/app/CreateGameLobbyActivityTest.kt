@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class CreateGameLobbyActivityTest: PolyPolyTest(false, false) {
+class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<CreateGameLobbyActivity>()
