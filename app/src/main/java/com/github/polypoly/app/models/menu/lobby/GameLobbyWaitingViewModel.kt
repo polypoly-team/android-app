@@ -30,7 +30,7 @@ class GameLobbyWaitingViewModel(
     init {
         setLoading(true)
         viewModelScope.launch {
-            pollGameLobby()
+            listenGameLobby()
         }
     }
 
@@ -50,43 +50,17 @@ class GameLobbyWaitingViewModel(
         return readyForStartData
     }
 
-    private fun setGameLobby(gameLobby: GameLobby){
+    private fun setGameLobby(gameLobby: GameLobby) {
+        // TODO: here we "force" the value change to make sure that it toggles the recomposition
+        gameLobbyData.value = GameLobby()
         gameLobbyData.value = gameLobby
         readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
         setLoading(false)
     }
 
-    private fun pollGameLobby() {
-        // Polls the storage for updates every [pollingDelay] millisecs until coroutine is terminated
-        // TODO: replace this with listening to the storage once available
-
+    private fun listenGameLobby() {
         storage.addOnChangeListener(lobbyCode, "game_lobby_waiting_view_model", ::setGameLobby)
         storage.getValue<GameLobby>(lobbyCode).thenAccept(::setGameLobby)
-        //storage.getAllValues<GameLobby>().thenAccept { lobbies ->
-        //    lobbies.filter { it.code == lobbyCode }.forEach { setGameLobby(it)
-        //}
-        //}
-
-//        while (true) {
-//            val pollingFuture = storage.getValue<GameLobby>(lobbyCode)
-
-//            pollingFuture.thenApply { gameLobby ->
-//                gameLobbyData.value = gameLobby
-//                readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
-
-//                for (future in waitingForSyncPromise) {
-//                    future.complete(true)
-//                }
-//                waitingForSyncPromise.clear()
-
-//                setLoading(false)
-//            }
-
-//            delay(POLLING_DELAY)
-
-//            if (!pollingFuture.isDone)
-//                pollingFuture.cancel(true)
-//        }
     }
 
     /**

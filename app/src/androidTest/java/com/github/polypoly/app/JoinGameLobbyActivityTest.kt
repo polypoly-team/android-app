@@ -4,15 +4,10 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import kotlinx.coroutines.delay
 import org.junit.After
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +16,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
-    val ALL_JOINABLE_LOBBIES = ALL_TEST_GAME_LOBBIES.filter { !it.private && it.usersRegistered.size < it.rules.maximumNumberOfPlayers && it.name != TEST_GAME_LOBBY_AVAILABLE_4.name}
+    val ALL_JOINABLE_LOBBIES = ALL_TEST_GAME_LOBBIES.filter { !it.private && it.currentUsersRegistered.size < it.rules.maximumNumberOfPlayers && it.name != TEST_GAME_LOBBY_AVAILABLE_4.name}
 
     @Before
     fun startIntents() { Intents.init() }
@@ -97,9 +92,9 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
             lobbyHeader.performClick()
             composeTestRule.onNode(hasTestTag("${lobby.name}/gameLobbyCardDetails"), useUnmergedTree = true).performScrollTo().assertExists()
             composeTestRule.onNode(hasTestTag("${lobby.name}/players_title"), useUnmergedTree = true).assertExists()
-            composeTestRule.onAllNodesWithTag("${lobby.name}/player_name", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
-            composeTestRule.onAllNodesWithTag("${lobby.name}/playerIcon", useUnmergedTree = true).assertCountEquals(lobby.usersRegistered.size)
-            for (player in lobby.usersRegistered) {
+            composeTestRule.onAllNodesWithTag("${lobby.name}/player_name", useUnmergedTree = true).assertCountEquals(lobby.currentUsersRegistered.size)
+            composeTestRule.onAllNodesWithTag("${lobby.name}/playerIcon", useUnmergedTree = true).assertCountEquals(lobby.currentUsersRegistered.size)
+            for (player in lobby.currentUsersRegistered) {
                 composeTestRule.onNodeWithText(player.name).assertIsDisplayed()
                 composeTestRule.onNodeWithContentDescription("${lobby.name}/${player.name} icon").assertIsDisplayed()
             }

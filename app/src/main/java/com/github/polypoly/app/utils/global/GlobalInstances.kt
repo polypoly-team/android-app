@@ -25,7 +25,7 @@ class GlobalInstances {
 
         lateinit var remoteDB: IRemoteStorage
         var remoteDBInitialized = false
-        private const val rootDB = "live"
+        private const val rootDB = "live-maxime"
 
         fun initRemoteDB() {
             if(!remoteDBInitialized) {
@@ -34,7 +34,7 @@ class GlobalInstances {
             }
         }
 
-        var currentUser : User = User(7, "fake_user", "I am fake until google db is fully setup", Skin.default(),
+        var currentUser : User = User(6118948, "tabita", "makumbo", Skin.default(),
             Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
         )
         var currentFBUser : FirebaseUser? = null

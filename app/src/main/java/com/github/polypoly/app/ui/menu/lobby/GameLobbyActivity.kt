@@ -41,12 +41,14 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
+import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 
@@ -70,8 +72,6 @@ class GameLobbyActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     private fun GameLobbyPreview() { GameLobbyContent() }
-
-
 
     /**
      * Displays all the UI of the GameLobby
@@ -139,7 +139,7 @@ class GameLobbyActivity : ComponentActivity() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column() {
+            Column {
                 SettingsMenu(gameLobby.rules)
                 Spacer(modifier = Modifier.padding(Padding.large))
                 PlayersList(gameLobby.usersRegistered, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)

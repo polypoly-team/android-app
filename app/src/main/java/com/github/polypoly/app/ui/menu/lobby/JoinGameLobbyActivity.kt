@@ -534,7 +534,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
             gameLobby.addUser(currentUser)
 
             //launch the gameLobby room activity
-            remoteDB.updateValue(gameLobby).thenAccept{
+            remoteDB.updateValue(gameLobby).thenAccept {
                 val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
                 GameRepository.gameCode = gameLobbyCode
 

@@ -114,7 +114,7 @@ class GameLobbyTest {
         gameLobby.addUser(u3)
         gameLobby.addUser(u4)
 
-        val users = gameLobby.usersRegistered
+        val users = gameLobby.currentUsersRegistered
         assertTrue(users.any {
             it.id == u1.id
         })
@@ -147,7 +147,7 @@ class GameLobbyTest {
         gameLobby.removeUser(u1.id)
         gameLobby.removeUser(u3.id)
 
-        val users = gameLobby.usersRegistered
+        val users = gameLobby.currentUsersRegistered
         assertFalse(users.any {
             it.id == u1.id
         })
@@ -171,7 +171,7 @@ class GameLobbyTest {
         gameLobby.addUser(User(42042050, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf()))
 
         val game = gameLobby.start()
-        val usersRegistered = gameLobby.usersRegistered
+        val usersRegistered = gameLobby.currentUsersRegistered
 
         val user = usersRegistered.find {
             it.id == testUser.id

@@ -51,7 +51,7 @@ data class GameLobby(
     fun addUser(user: User) {
         if (currentUsersRegistered.size >= rules.maximumNumberOfPlayers)
             throw IllegalStateException("The game is already full")
-        if (currentUsersRegistered.any{u -> u.id == user.id})
+        if (currentUsersRegistered.any{ u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
         currentUsersRegistered.add(user)
     }
