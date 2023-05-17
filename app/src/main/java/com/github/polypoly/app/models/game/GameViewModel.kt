@@ -1,5 +1,7 @@
 package com.github.polypoly.app.models.game
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +30,8 @@ class GameViewModel(
 
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
     fun getGameData(): LiveData<Game> {
         return gameData
     }
@@ -42,6 +46,10 @@ class GameViewModel(
 
     fun getGameFinishedData(): LiveData<Boolean> {
         return gameEndedData
+    }
+
+    fun getPlayerState(): LiveData<PlayerState> {
+        return playerStateData
     }
 
     fun nextTurn() {
@@ -67,7 +75,6 @@ class GameViewModel(
                     GlobalInstances.currentUser,
                     3000
                 )
-                GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
                 GameViewModel(

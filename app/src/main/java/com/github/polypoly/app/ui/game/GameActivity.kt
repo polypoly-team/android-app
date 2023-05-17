@@ -47,8 +47,9 @@ class GameActivity : ComponentActivity() {
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
+        val playerState = gameModel.getPlayerState().observeAsState().value
 
-        if (game != null && gameTurn != null && gameEnded != null) {
+        if (player != null && game != null && gameTurn != null && gameEnded != null && playerState != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -56,7 +57,7 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, interactingWithProperty)
                     PropertyInteractUIComponent()
-                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
+                    if (playerState == PlayerState.ROLLING_DICE) {
                         RollDiceDialog()
                         RollDiceButton()
                     }

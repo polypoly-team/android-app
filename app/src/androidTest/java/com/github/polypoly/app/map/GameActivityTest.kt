@@ -146,9 +146,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
         return GameActivity.mapViewModel.markerToLocationProperty[getRandomMarker()]!!
     }
 
-    private fun setCurrentPlayerState(state: PlayerState) {
-        GameActivity.mapViewModel.currentPlayer!!.playerState.value = state
-    }
+//    private fun setCurrentPlayerState(state: PlayerState) {
+//        GameActivity.mapViewModel.currentPlayer!!.playerState.value = state
+//    }
 
     private fun getRandomMarker(): Marker {
         val mapView = MapUI.mapView
