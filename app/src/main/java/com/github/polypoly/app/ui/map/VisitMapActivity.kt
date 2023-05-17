@@ -40,8 +40,11 @@ class VisitMapActivity : ComponentActivity()  {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            MapUI.MapView(mapViewModel = mapViewModel,
-                interactingWithProperty = interactingWithProperty)
+            MapUI.MapView(
+                mapViewModel = mapViewModel,
+                interactingWithProperty = interactingWithProperty,
+                gameViewModel = null
+            )
             ShowPopup()
         }
     }

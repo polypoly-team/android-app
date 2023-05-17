@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
@@ -89,5 +90,5 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
 
 private fun leaveBetDialog() {
     interactingWithProperty.value = false
-    mapViewModel.currentPlayer?.playerState?.value = PlayerState.INTERACTING
+//    mapViewModel.currentPlayer?.playerState?.value = PlayerState.INTERACTING TODO: use gameViewModel to change state
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.models.game.GameViewModel
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -74,10 +75,11 @@ fun initMapView(context: Context): MapView {
  * @param title the title of the marker
  * @param zoneColor the color of the marker
  * @param mapViewModel the view model of the map
+ * @param gameViewModel related game view model. Null if no game is going on
  * @return the marker that was added
  */
 fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int,
-                mapViewModel: MapViewModel, interactingWithProperty: MutableState<Boolean>
+                mapViewModel: MapViewModel, gameViewModel: GameViewModel?, interactingWithProperty: MutableState<Boolean>
 ): Marker {
     fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_pin)
@@ -100,10 +102,10 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
     marker.setOnMarkerClickListener { _, _ ->
-        if (mapViewModel.currentPlayer?.playerState?.value == PlayerState.INTERACTING) {
+        if (gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING) {
             mapViewModel.selectedMarker = marker
             interactingWithProperty.value = true
-            mapViewModel.currentPlayer?.playerState?.value = PlayerState.BETTING
+//            mapViewModel.currentPlayer?.playerState?.value = PlayerState.BETTING TODO: use gameViewModel to to change turn state
         }
         true
     }
@@ -117,7 +119,7 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
  * @param mapViewModel the view model of the map
  * @return the location overlay that was added
  */
-fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocationNewOverlay {
+fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewModel: GameViewModel?): MyLocationNewOverlay {
     val locationProvider = GpsMyLocationProvider(mapView.context)
     var lastLocation = Location("")
 
@@ -130,9 +132,9 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocatio
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
-                && mapViewModel.currentPlayer?.playerState!!.value == PlayerState.MOVING
+                && gameViewModel?.getPlayerState()?.value == PlayerState.MOVING
                 && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty) {
-                mapViewModel.currentPlayer?.playerState!!.value = PlayerState.INTERACTING
+//                mapViewModel.currentPlayer?.playerState!!.value = PlayerState.INTERACTING // TODO: use gameViewModel to change turn state
                 mapViewModel.goingToLocationProperty = null
             }
         }

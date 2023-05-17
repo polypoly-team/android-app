@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
 // flag to show the roll dice dialog
@@ -65,7 +66,7 @@ fun RollDiceDialog() {
                         for (i in 0..2)
                             Button(onClick = {
                                 showRollDiceDialog.value = false
-                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING
+//                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING TODO: use gameViewModel to advance in the turn
                                 mapViewModel.goingToLocationProperty = rollDice[i]
                             }) {
                                 Text(rollDice[i].name)

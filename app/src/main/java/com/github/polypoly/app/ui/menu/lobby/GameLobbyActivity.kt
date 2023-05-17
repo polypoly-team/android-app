@@ -46,7 +46,7 @@ val PLAYER_ICON_SIZE = IntSize(50, 60)
  */
 class GameLobbyActivity : ComponentActivity() {
 
-    val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
+    private val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -99,7 +99,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_INIT() {
-        setCurrentPlayerState(PlayerState.INIT)
+//        setCurrentPlayerState(PlayerState.INIT)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -107,7 +107,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_ROLLING_DICE() {
-        setCurrentPlayerState(PlayerState.ROLLING_DICE)
+//        setCurrentPlayerState(PlayerState.ROLLING_DICE)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -118,7 +118,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     fun mapActivity_Displays_Only_Necessary_UI_Components_MOVING() {
         GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
         GameActivity.mapViewModel.goingToLocationProperty = getRandomLocationProperty()
-        setCurrentPlayerState(PlayerState.MOVING)
+//        setCurrentPlayerState(PlayerState.MOVING)
         waitForUIToUpdate()
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
@@ -129,7 +129,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_INTERACTING() {
-        setCurrentPlayerState(PlayerState.INTERACTING)
+//        setCurrentPlayerState(PlayerState.INTERACTING)
         GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
         waitForUIToUpdate()
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()

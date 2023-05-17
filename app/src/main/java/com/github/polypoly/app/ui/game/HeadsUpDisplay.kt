@@ -49,12 +49,12 @@ import com.github.polypoly.app.ui.theme.Shapes
  * The heads-up display with player and game stats that is displayed on top of the map
  */
 @Composable
-fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(playerData: Player, playerState: PlayerState, otherPlayersData: List<Player>, round: Int, location: String) {
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
-        if (playerData.playerState.value == PlayerState.MOVING)
+        if (playerState == PlayerState.MOVING)
             HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
         HudGameMenu()
     }

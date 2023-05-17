@@ -55,7 +55,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapUI.MapView(mapViewModel, interactingWithProperty)
+                    MapUI.MapView(mapViewModel, gameModel, interactingWithProperty)
                     PropertyInteractUIComponent()
                     if (playerState == PlayerState.ROLLING_DICE) {
                         RollDiceDialog()
@@ -65,6 +65,7 @@ class GameActivity : ComponentActivity() {
                     DistanceWalkedUIComponents()
                     Hud(
                         player,
+                        playerState,
                         game.players,
                         gameTurn,
                         mapViewModel.interactableProperty.value?.name ?: ""

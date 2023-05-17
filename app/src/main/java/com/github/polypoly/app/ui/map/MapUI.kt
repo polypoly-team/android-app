@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.models.game.GameViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
@@ -20,7 +21,7 @@ object MapUI {
      * @param mapViewModel The view model for the map.
      */
     @Composable
-    fun MapView(mapViewModel: MapViewModel, interactingWithProperty: MutableState<Boolean>) {
+    fun MapView(mapViewModel: MapViewModel, gameViewModel: GameViewModel?, interactingWithProperty: MutableState<Boolean>) {
         AndroidView(
             factory = { context ->
                 Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
@@ -29,10 +30,10 @@ object MapUI {
                     for (location in zone.locationProperties) {
                         val marker =
                             addMarkerTo(mapView, location.position(), location.name, zone.color,
-                                mapViewModel, interactingWithProperty)
+                                mapViewModel, gameViewModel, interactingWithProperty)
                         mapViewModel.markerToLocationProperty[marker] = location
                     }
-                val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel)
+                val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel, gameViewModel)
                 mapView.overlays.add(currentLocationOverlay)
                 this.mapView = mapView
                 mapView

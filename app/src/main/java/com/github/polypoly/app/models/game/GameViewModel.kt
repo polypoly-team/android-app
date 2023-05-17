@@ -15,6 +15,7 @@ import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.utils.global.GlobalInstances
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GameViewModel(
@@ -31,6 +32,12 @@ class GameViewModel(
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
+    init {
+        viewModelScope.launch {
+            gameLoop()
+        }
+    }
 
     fun getGameData(): LiveData<Game> {
         return gameData
@@ -52,6 +59,19 @@ class GameViewModel(
         return playerStateData
     }
 
+    suspend fun gameLoop() {
+        playerStateData.value = PlayerState.ROLLING_DICE
+        var currentGame = gameData.value
+
+        while (currentGame != null && !currentGame.isGameFinished()) {
+            delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
+
+            nextTurn()
+
+            currentGame = gameData.value
+        }
+    }
+
     fun nextTurn() {
         gameData.value?.nextTurn()
         roundTurnData.value = gameData.value?.currentRound ?: -1
@@ -65,15 +85,9 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                // TODO: Remove this when the game is created from the lobby
-                GameRepository.game = Game.launchFromPendingGame(
-                    GameLobby(
-                        admin = GlobalInstances.currentUser
-                    )
-                )
                 GameRepository.player = Player(
                     GlobalInstances.currentUser,
-                    3000
+                    GameRepository.game?.rules?.initialPlayerBalance ?: -1
                 )
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
