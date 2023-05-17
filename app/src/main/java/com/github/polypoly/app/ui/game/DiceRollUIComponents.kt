@@ -9,12 +9,14 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
@@ -23,11 +25,21 @@ import org.osmdroid.util.GeoPoint
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
 
+@Composable
+fun DiceRollUI(gameViewModel: GameViewModel) {
+    val playerState = gameViewModel.getPlayerState().observeAsState().value
+
+    if (playerState == PlayerState.ROLLING_DICE) {
+        RollDiceButton()
+        RollDiceDialog(gameViewModel)
+    }
+}
+
 /**
  * Button for rolling the dice.
  */
 @Composable
-fun RollDiceButton(gameViewModel: GameViewModel) {
+fun RollDiceButton() {
     Box(modifier = Modifier.fillMaxWidth()) {
         Button(
             modifier = Modifier
