@@ -4,13 +4,11 @@ import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
@@ -56,7 +54,7 @@ class GameLobbyWaitingViewModel(
         // Polls the storage for updates every [pollingDelay] millisecs until coroutine is terminated
         // TODO: replace this with listening to the storage once available
         while (true) {
-            val pollingFuture = storage.getValue<GameLobby>(DB_GAME_LOBBIES_PATH + lobbyCode)
+            val pollingFuture = storage.getValue<GameLobby>(lobbyCode)
 
             pollingFuture.thenApply { gameLobby ->
                 gameLobbyData.value = gameLobby

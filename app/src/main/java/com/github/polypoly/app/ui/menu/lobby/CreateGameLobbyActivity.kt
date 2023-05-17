@@ -45,6 +45,7 @@ import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
+import java.util.concurrent.CompletableFuture
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +58,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         }
     }
 
-    var gameCode = uniqueCodeGenerator.generateUniqueGameLobbyCode()
+    private val futureGameCode = uniqueCodeGenerator.generateUniqueGameLobbyCode()
 
     @Composable
     fun CreateGameLobbyContent() {
@@ -193,7 +194,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = getString(R.string.create_game_lobby_game_code, gameCode), Modifier.padding(bottom = 20.dp),
+                Text(
+                    text = getString(R.string.create_game_lobby_game_code, futureGameCode.getNow("")), // FIXME: always displays a blank code
+                    Modifier.padding(bottom = 20.dp),
                 )
                 BigButton(
                     onClick = {
@@ -205,8 +208,10 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             maxRound = numRounds,
                             initialPlayerBalance = initialPlayerBalance
                         )
-                        createGameLobby(mContext, rules, gameName, isPrivateGame, gameCode)
-                              },
+                        futureGameCode.thenApply { code ->
+                            createGameLobby(mContext, rules, gameName, isPrivateGame, code)
+                        }
+                    },
                     text = getString(R.string.create_game_lobby_create_game),
                     enabled = createGameEnabled,
                     testTag = "create_game_lobby_button"

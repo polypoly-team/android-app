@@ -11,7 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Before
@@ -106,7 +105,7 @@ class ProfileActivityTest: PolyPolyTest(true, true) {
         userLoggedIn.trophiesDisplay.clear()
         userLoggedIn.trophiesDisplay.add(allTrophies.first().getId())
 
-        remoteDB.updateValue(DB_USERS_PROFILES_PATH + userLoggedIn.id, userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        remoteDB.updateValue(userLoggedIn).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         val profileSurface = composeTestRule.onNodeWithTag("profileSurface")
         Thread.sleep(1000)

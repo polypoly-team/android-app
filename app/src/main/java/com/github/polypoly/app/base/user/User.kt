@@ -1,6 +1,8 @@
 package com.github.polypoly.app.base.user
 
-import java.io.Serializable
+import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
+import java.util.concurrent.CompletableFuture
 
 /**
  * Implementation of a User
@@ -22,7 +24,8 @@ data class User(
     val trophiesWon: List<Int> = listOf(),
     val trophiesDisplay: MutableList<Int> = mutableListOf(),
     val currentUser: Boolean = false,
-) {
+): StorableObject<User>(User::class, DB_USERS_PROFILES_PATH, id.toString()) {
+
     override fun toString(): String {
         return "User{$id: $name}"
     }
@@ -34,5 +37,14 @@ data class User(
      */
     fun hasTrophy(trophyId: Int): Boolean {
         return trophiesWon.contains(trophyId)
+    }
+
+    // ====================================================================== STORABLE
+    override fun toDBObject(): User {
+        return User(id, name, bio, skin, stats, trophiesWon, trophiesDisplay, currentUser)
+    }
+
+    override fun toLocalObject(dbObject: User): CompletableFuture<StorableObject<User>> {
+        return CompletableFuture.completedFuture(dbObject)
     }
 }

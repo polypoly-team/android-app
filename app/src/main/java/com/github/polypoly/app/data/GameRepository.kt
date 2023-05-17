@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.game.Player
 class GameRepository {
     companion object {
         /**
-         * Game code used across the application
+         * Game code used across the application (for [Game] and creating a [GameLobby])
          */
         var gameCode: String? = null
 

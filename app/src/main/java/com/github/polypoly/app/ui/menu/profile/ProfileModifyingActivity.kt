@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
@@ -59,7 +58,7 @@ class ProfileModifyingActivity : ComponentActivity() {
 
         var user by remember { mutableStateOf(User()) }
 
-        remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + id).thenAccept{userFound ->
+        remoteDB.getValue<User>(id.toString()).thenAccept{userFound ->
             nickname = user.name
             description = user.bio
             user = userFound
@@ -150,8 +149,8 @@ class ProfileModifyingActivity : ComponentActivity() {
                 onError()
             } else {
                 val id = intent.getLongExtra("userId", 0)
-                remoteDB.getValue<User>(DB_USERS_PROFILES_PATH + id).thenCompose { user ->
-                    remoteDB.updateValue(DB_USERS_PROFILES_PATH + id, User(
+                remoteDB.getValue<User>(id.toString()).thenCompose { user ->
+                    remoteDB.updateValue(User(
                         id = id,
                         name = nickname,
                         bio = description,

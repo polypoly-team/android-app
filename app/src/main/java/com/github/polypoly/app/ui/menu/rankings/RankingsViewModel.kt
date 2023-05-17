@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 
 /**
  * The view model of the rankings activity
@@ -32,7 +31,7 @@ class RankingsViewModel: ViewModel() {
     fun fetchUsers() {
         // Request all registered users from the database
         // TODO: Update this call on the DB operations are encapsulated
-        remoteDB.getAllValues<User>(DB_USERS_PROFILES_PATH).thenAccept {
+        remoteDB.getAllValues<User>().thenAccept {
             users = it
             // Recompute the users' rankings on reply
             computeRankings()
