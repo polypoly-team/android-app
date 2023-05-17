@@ -47,7 +47,6 @@ import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
-import java.util.concurrent.CompletableFuture
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +101,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             newText
                         else gameName
                 },
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone),
                 keyboardActions = KeyboardActions(onDone = {
                     focusManager.clearFocus()
                 }),
@@ -210,7 +209,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             maxRound = numRounds,
                             initialPlayerBalance = initialPlayerBalance
                         )
-                        futureGameCode.thenApply { code ->
+                        futureGameCode.thenAccept { code ->
                             createGameLobby(mContext, rules, gameName, isPrivateGame, code)
                         }
                     },
@@ -343,11 +342,10 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
 
         val lobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
 
-        //TODO : create game in database and navigate to game lobby screen
         val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-        //remoteDB.updateValue(gameCode, lobby)
+        GameRepository.gameCode = gameCode
+        remoteDB.setValue(lobby)
         startActivity(gameLobbyIntent)
-        GameRepository.gameCode = "1234"
         finish()
     }
 }

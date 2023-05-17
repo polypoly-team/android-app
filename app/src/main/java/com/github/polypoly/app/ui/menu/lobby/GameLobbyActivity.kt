@@ -42,6 +42,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
+import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
@@ -51,6 +52,7 @@ import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
@@ -73,6 +75,8 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     private fun GameLobbyPreview() { GameLobbyContent() }
 
+
+
     /**
      * Displays all the UI of the GameLobby
      */
@@ -83,10 +87,9 @@ class GameLobbyActivity : ComponentActivity() {
         val dataLoading = gameLobbyWaitingModel.getIsLoading().observeAsState().value
 
         if (gameLobby != null && readyForStart != null) {
-            val playersList = remember{mutableStateOf(gameLobby.usersRegistered)}
             PolypolyTheme {
                 Column {
-                    GameLobbyAppBar(lobbyName = gameLobby.name)
+                    GameLobbyAppBar(gameLobby)
 
                     Box {
                         Surface(
@@ -95,7 +98,7 @@ class GameLobbyActivity : ComponentActivity() {
                         ) {
                             when (dataLoading) {
                                 true -> LoadingContent()
-                                false -> GameLobbyBody(gameLobby, playersList)
+                                false -> GameLobbyBody(gameLobby)
                                 else -> {}
                             }
                         }
@@ -106,13 +109,13 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GameLobbyAppBar(lobbyName: String) {
+    fun GameLobbyAppBar(gameLobby: GameLobby) {
         TopAppBar(
-            title = { Text(text = lobbyName) },
+            title = { Text(text = gameLobby.name) },
             navigationIcon = {
                 IconButton(
                     onClick = {
-                        leaveLobby()
+                        leaveLobby(gameLobby)
                     },
                     modifier = Modifier.rotate(180f)
                 ) {
@@ -133,7 +136,7 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GameLobbyBody(gameLobby: GameLobby, playersList: MutableState<List<User>>) {
+    fun GameLobbyBody(gameLobby: GameLobby) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -143,7 +146,7 @@ class GameLobbyActivity : ComponentActivity() {
             Column() {
                 SettingsMenu(gameLobby.rules)
                 Spacer(modifier = Modifier.padding(Padding.large))
-                PlayersList(playersList, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)
+                PlayersList(gameLobby.usersRegistered, gameLobby.rules.maximumNumberOfPlayers, gameLobby.admin.id)
             }
 
             StartGameButton(
@@ -235,7 +238,7 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun PlayersList(players: MutableState<List<User>>, maximumNumberOfPlayers: Int, adminId: Long) {
+    fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: Long) {
         Column {
             PlayerHeader(players, maximumNumberOfPlayers)
             PlayerRows(players, adminId)
@@ -244,7 +247,7 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun PlayerHeader(players: MutableState<List<User>>, maximumNumberOfPlayers: Int) {
+    fun PlayerHeader(players: List<User>, maximumNumberOfPlayers: Int) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -265,7 +268,7 @@ class GameLobbyActivity : ComponentActivity() {
                 )
 
                 Text(
-                    text = "${players.value.size}/$maximumNumberOfPlayers",
+                    text = "${players.size}/$maximumNumberOfPlayers",
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(Padding.small),
                     color = MaterialTheme.colors.primary,
@@ -275,8 +278,8 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun PlayerRows(players: MutableState<List<User>>, adminId: Long) {
-        for (player in players.value) {
+    fun PlayerRows(players: List<User>, adminId: Long) {
+        for (player in players) {
             PlayerRow(player, adminId)
         }
     }
@@ -352,8 +355,8 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun EmptyPlayerSlots(players: MutableState<List<User>>, maximumNumberOfPlayers: Int) {
-        repeat(maximumNumberOfPlayers - players.value.size) {
+    fun EmptyPlayerSlots(players: List<User>, maximumNumberOfPlayers: Int) {
+        repeat(maximumNumberOfPlayers - players.size) {
             EmptyPlayerSlot()
         }
     }
@@ -500,12 +503,13 @@ class GameLobbyActivity : ComponentActivity() {
      * Leave the lobby and return to the main menu.
      * Makes sure that the admin is replaced by another user if the admin leaves.
      */
-    private fun leaveLobby() {
-        val currentLobby = gameLobbyWaitingModel.getGameLobby().value!!
-        val currentLobbyKey = currentLobby.code
-        GlobalInstances.remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-            gameLobby.removeUser(currentUser.id)
-            val newAdmin = if (currentUser.id == gameLobby.admin.id) gameLobby.usersRegistered.random() else currentUser
+    private fun leaveLobby(gameLobby: GameLobby) {
+        val newUsersRegistered = gameLobby.usersRegistered.filter {it.id != currentUser.id}
+        if (newUsersRegistered.isEmpty()){
+            remoteDB.removeValue<GameLobby>(gameLobby.code, GameLobby::class)
+        } else {
+            val newAdmin =
+                if (currentUser.id == gameLobby.admin.id) newUsersRegistered.random() else gameLobby.admin
             val newGameLobby = GameLobby(
                 newAdmin,
                 gameLobby.rules,
@@ -513,12 +517,13 @@ class GameLobbyActivity : ComponentActivity() {
                 gameLobby.code,
                 gameLobby.private
             )
-            for ( user in gameLobby.usersRegistered.filter { it.id != newAdmin.id }) {
+            for (user in newUsersRegistered.filter { it.id != newAdmin.id }) {
                 newGameLobby.addUser(user)
             }
-            GlobalInstances.remoteDB.updateValue(currentLobbyKey, gameLobby)
-            GameRepository.gameCode = null
+            remoteDB.updateValue(newGameLobby)
         }
+
+        GameRepository.gameCode = null
         finish()
     }
 
