@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, false, true) {
 
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)

@@ -62,7 +62,8 @@ abstract class PolyPolyTest(
         val TEST_USER_3 = User("1234","James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_4 = User("12345","Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_5 = User("123456", "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val TEST_USER_NOT_IN_LOBBY = User("8888", "BIGFLO", "& CARLITO", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5, TEST_USER_NOT_IN_LOBBY)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
@@ -155,7 +156,7 @@ abstract class PolyPolyTest(
             clearMockDB()
         }
         if(signFakeUserIn) {
-            currentUser = TEST_USER_1
+            currentUser = TEST_USER_NOT_IN_LOBBY
         }
         if (fillWithFakeData) {
             fillWithFakeData()
