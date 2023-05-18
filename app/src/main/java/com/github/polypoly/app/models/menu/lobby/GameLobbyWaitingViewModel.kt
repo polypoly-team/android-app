@@ -25,8 +25,6 @@ class GameLobbyWaitingViewModel(
 
     private val readyForStartData: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val waitingForSyncPromise: ArrayList<CompletableFuture<Boolean>> = arrayListOf()
-
     init {
         setLoading(true)
         viewModelScope.launch {
@@ -60,11 +58,6 @@ class GameLobbyWaitingViewModel(
                 gameLobbyData.value = gameLobby
                 readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
 
-                for (future in waitingForSyncPromise) {
-                    future.complete(true)
-                }
-                waitingForSyncPromise.clear()
-
                 setLoading(false)
             }
 
@@ -73,16 +66,6 @@ class GameLobbyWaitingViewModel(
             if (!pollingFuture.isDone)
                 pollingFuture.cancel(true)
         }
-    }
-
-    /**
-     * Registers a callback that will be called next time a data is synchronized with the storage
-     * This function is primarily but not exclusively aimed for used in unit tests
-     * @return a promise that completes when the data is synced again with the storage
-     */
-    fun waitForSync(): CompletableFuture<Boolean> {
-        waitingForSyncPromise.add(CompletableFuture())
-        return waitingForSyncPromise.last()
     }
 
     companion object {

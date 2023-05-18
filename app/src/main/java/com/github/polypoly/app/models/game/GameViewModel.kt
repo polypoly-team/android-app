@@ -39,6 +39,7 @@ class GameViewModel(
     private val MAX_INTERACT_DISTANCE = 10.0 // meters
 
     init {
+        setLoading(true)
         viewModelScope.launch {
             gameLoop()
         }
@@ -69,11 +70,13 @@ class GameViewModel(
 
         while (currentGame != null && !currentGame.isGameFinished()) {
             playerStateData.value = PlayerState.ROLLING_DICE
+            setLoading(false)
 
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
             playerStateData.value = PlayerState.TURN_FINISHED
 
+            setLoading(true)
             nextTurn()
 
             currentGame = gameData.value
