@@ -17,13 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
-import com.github.polypoly.app.R
 import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.rankings.RankingsActivity
@@ -63,7 +61,7 @@ object MenuComposable {
             }
             OptionButton(
                 onClick = { display = !display },
-                iconId = if(display) R.drawable.tmp_sadsmile else R.drawable.tmp_happysmile,
+                icon = if(display) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
                 description = "display_options"
             )
         }
@@ -144,7 +142,7 @@ object MenuComposable {
     private fun RankingsButton() {
         ActivityOptionButton(
             destinationActivity = RankingsActivity::class.java,
-            icon = Icons.Default.Person,
+            icon = Icons.Default.Equalizer,
             description = "Open Rankings",
             testTag = "rankings_button"
         )
@@ -166,7 +164,7 @@ object MenuComposable {
      * Creates a button with a small image that'll be used to open other pop-ups or activities.
      */
     @Composable
-    private fun OptionButton(onClick: () -> Unit, iconId: Int, description: String) {
+    private fun OptionButton(onClick: () -> Unit, icon: ImageVector, description: String) {
         Button(
             onClick = onClick,
             modifier = Modifier
@@ -176,7 +174,7 @@ object MenuComposable {
             contentPadding = PaddingValues(0.dp)
         ) {
             Image(
-                painter = painterResource(iconId),
+                imageVector = icon,
                 contentDescription = "",
                 modifier = Modifier.size(50.dp)
             )
