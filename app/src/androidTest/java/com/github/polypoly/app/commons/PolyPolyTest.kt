@@ -33,6 +33,8 @@ abstract class PolyPolyTest(
     private val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
     private val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
+
+    // ======================================================================= COMPANION OBJECT
     companion object {
         // Global tests constants
         const val TIMEOUT_DURATION = 15L
@@ -104,6 +106,9 @@ abstract class PolyPolyTest(
 
         private val mockDB = MockDB()
 
+        /**
+         * Every code here is executed once during the runtime
+         */
         init {
             if (!remoteDBInitialized) {
                 remoteDB = mockDB
@@ -111,8 +116,6 @@ abstract class PolyPolyTest(
             }
 
             FirebaseAuth.getInstance().signOut()
-            currentUser = null
-            isSignedIn = false
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
@@ -122,6 +125,41 @@ abstract class PolyPolyTest(
         }
     }
 
+
+    // ======================================================================= TEST PREPARATION
+    init {
+        remoteDB = mockDB
+        isSignedIn = signFakeUserIn
+        if(signFakeUserIn) {
+            currentUser = TEST_USER_NOT_IN_LOBBY
+        }
+    }
+
+    @Before
+    fun prepareTest() {
+        remoteDB = mockDB
+        if (clearRemoteStorage) {
+            mockDB.clear()
+        }
+        if(signFakeUserIn) {
+            currentUser = TEST_USER_NOT_IN_LOBBY
+        }
+        if (fillWithFakeData) {
+            fillWithFakeData()
+        }
+        _prepareTest()
+    }
+
+    /**
+     * Function always called after the preparation of the test is completed
+     */
+    open fun _prepareTest() {}
+
+    @After
+    fun cleanUp() {}
+
+
+    // ======================================================================= DB DATA HELPERS
     private fun <T : StorableObject<*>> requestAddDataToDB(data: List<T>): List<CompletableFuture<Boolean>> {
         val timeouts = mutableListOf<CompletableFuture<Boolean>>()
         for (i in data.indices) {
@@ -144,36 +182,6 @@ abstract class PolyPolyTest(
 
     fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
-    /**
-     * Function always called after the preparation of the test is completed
-     */
-    open fun _prepareTest() {}
-
-    @Before
-    fun prepareTest() {
-        remoteDB = mockDB
-        if (clearRemoteStorage) {
-            clearMockDB()
-        }
-        if(signFakeUserIn) {
-            isSignedIn = true
-            currentUser = TEST_USER_NOT_IN_LOBBY
-        }
-        if (fillWithFakeData) {
-            fillWithFakeData()
-        }
-        _prepareTest()
-    }
-    @After
-    fun cleanUp() {
-        currentUser = null
-        isSignedIn = false
-    }
-
-    private fun clearMockDB() {
-        mockDB.clear()
-    }
-
     fun fillWithFakeData() {
         val allRequests = mutableListOf<CompletableFuture<Boolean>>()
         allRequests.addAll(requestAddDataToDB(ALL_TEST_USERS))
@@ -181,6 +189,7 @@ abstract class PolyPolyTest(
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
+    // ======================================================================= TEST HELPERS
     /**
      * Observes a live data until it updates its value and returns the new value
      * @param liveData data to observe
