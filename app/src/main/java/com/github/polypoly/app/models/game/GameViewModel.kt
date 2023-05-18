@@ -10,7 +10,6 @@ import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
@@ -140,17 +139,17 @@ class GameViewModel(
     }
 
     /**
-     * Ends INTERACTING state and moves to BETTING
+     * Ends INTERACTING state and moves to BIDDING
      */
-    fun startBetting() {
-        playerStateFSMTransition(PlayerState.INTERACTING, PlayerState.BETTING)
+    fun startBidding() {
+        playerStateFSMTransition(PlayerState.INTERACTING, PlayerState.BIDDING)
     }
 
     /**
-     * Ends BETTING state and moves back to INTERACTING
+     * Ends BIDDING state and moves back to INTERACTING
      */
-    fun cancelBetting() {
-        playerStateFSMTransition(PlayerState.BETTING, PlayerState.INTERACTING)
+    fun cancelBidding() {
+        playerStateFSMTransition(PlayerState.BIDDING, PlayerState.INTERACTING)
     }
 
     /**

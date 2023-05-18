@@ -40,10 +40,10 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
 
-        execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
+        execInMainThread { model.startBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
 
-        execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        execInMainThread { model.cancelBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
 
         execInMainThread { model.resetTurnState() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -66,12 +66,12 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.startBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.cancelBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
@@ -83,12 +83,12 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.startBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
         assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.cancelBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
         assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
 
@@ -105,27 +105,27 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.cancelBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
 
-        execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
+        execInMainThread { model.startBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
             execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
-        assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
+        assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
             execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
-        assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
+        assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
 
         assertThrows(ExecutionException::class.java) {
-            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            execInMainThread { model.startBidding() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         }
-        assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
+        assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
     }
 
     @Test

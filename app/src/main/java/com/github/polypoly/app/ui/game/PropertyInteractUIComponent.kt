@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
@@ -31,7 +30,7 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
 
     PropertyInteractDialog(locationSelected, gameViewModel, mapViewModel)
 
-    if (playerState == PlayerState.BETTING) {
+    if (playerState == PlayerState.BIDDING) {
         BetDialog(
             onBuy = { valueBet ->
                 onBuy(valueBet, gameViewModel)
@@ -84,7 +83,7 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
         horizontalArrangement = SpaceEvenly
     ) {
         Button(
-            onClick = { gameViewModel.startBetting() },
+            onClick = { gameViewModel.startBidding() },
             modifier = Modifier.testTag("betButton")
         ) {
             Text(text = "Bet")
@@ -99,7 +98,7 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
 }
 
 private fun leaveInteractionDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
-    gameViewModel.cancelBetting()
+    gameViewModel.cancelBidding()
     mapViewModel.selectLocation(null)
 }
 

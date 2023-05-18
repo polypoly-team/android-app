@@ -13,8 +13,6 @@ import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -75,7 +73,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     @Test
     fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        forceChangePlayerState(PlayerState.BETTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.BIDDING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         composeTestRule.onNodeWithTag("betButton").performClick()
 
@@ -90,7 +88,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     @Test // could be looped for extensive testing
     fun mapActivity_Displays_Success_On_Valid_Bet_Amount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        forceChangePlayerState(PlayerState.BETTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.BIDDING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         composeTestRule.onNodeWithTag("betButton").performClick()
         // TODO: Replace by future MAX_BET or similar
@@ -160,8 +158,8 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         gameViewModel.locationReached()
         if (playerState == PlayerState.INTERACTING) return
 
-        if (playerState == PlayerState.BETTING) {
-            gameViewModel.startBetting()
+        if (playerState == PlayerState.BIDDING) {
+            gameViewModel.startBidding()
             return
         }
 

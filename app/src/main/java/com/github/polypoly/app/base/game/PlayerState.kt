@@ -5,7 +5,7 @@ enum class PlayerState {
     ROLLING_DICE,
     MOVING,
     INTERACTING,
-    BETTING,
+    BIDDING,
     TRADING,
     TURN_FINISHED // mainly used by game to force the players to be ready for the next turn
 }
