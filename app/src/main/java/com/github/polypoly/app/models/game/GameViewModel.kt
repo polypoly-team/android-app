@@ -72,7 +72,16 @@ class GameViewModel(
                         Game.gameInProgress?.getInGameLocation()?.get(1)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(2)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(5)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(8)!!,),
+                        Game.gameInProgress?.getInGameLocation()?.get(8)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(9)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(10)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(11)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(12)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(13)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(14)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(15)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(16)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(17)!!,),
                 )
                 GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)
