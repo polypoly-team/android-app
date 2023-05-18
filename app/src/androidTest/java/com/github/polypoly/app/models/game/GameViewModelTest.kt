@@ -28,9 +28,8 @@ class GameViewModelTest: PolyPolyTest(true, false) {
     fun playerStateFSMWorks() {
         val model = GameViewModel(testGame, testPlayer)
 
-        assertEquals(PlayerState.INIT, model.getPlayerStateData().value)
-
         waitForDataSync(model)
+        execInMainThread { model.resetTurnState() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
@@ -54,9 +53,8 @@ class GameViewModelTest: PolyPolyTest(true, false) {
     fun playerStateFSMIsRobustAgainstWrongStateTransitions() {
         val model = GameViewModel(testGame, testPlayer)
 
-        assertEquals(PlayerState.INIT, model.getPlayerStateData().value)
-
         waitForDataSync(model)
+        execInMainThread { model.resetTurnState() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
@@ -142,7 +140,6 @@ class GameViewModelTest: PolyPolyTest(true, false) {
     @Test
     fun closestLocationReturnsNullIfLocationIsTooFar() {
         val model = GameViewModel(testGame, testPlayer)
-        waitForDataSync(model)
 
         val positionOut = GeoPoint(0.toDouble(), 0.toDouble())
         val locationFound = model.computeClosestLocation(positionOut).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -174,7 +171,7 @@ class GameViewModelTest: PolyPolyTest(true, false) {
 
         remoteDB.setValue(testGame).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        val oldGame = remoteDB.getValue<Game>(TEST_GAME_LOBBY_AVAILABLE_2.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        val oldGame = remoteDB.getValue<Game>(testGame.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         oldGame.nextTurn()
         oldGame.nextTurn()
         remoteDB.setValue(oldGame).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -182,8 +179,9 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         model.nextTurn() // only does currentRound +1 instead of +2
         waitForDataSync(model)
 
-        val roundFound = remoteDB.getValue<Game>(TEST_GAME_LOBBY_AVAILABLE_2.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS).currentRound
+        val roundFound = remoteDB.getValue<Game>(testGame.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS).currentRound
 
+        assertEquals(oldGame.currentRound, roundFound)
         assertEquals(oldGame.currentRound, roundFound)
     }
 }

@@ -41,7 +41,11 @@ abstract class LoadingModel: ViewModel() {
      * @return a promise that completes when the data is synced again with the storage
      */
     fun waitForSync(): CompletableFuture<Boolean> {
-        waitingForSyncPromise.add(CompletableFuture())
-        return waitingForSyncPromise.last()
+        return if (isLoading.value == false) {
+            CompletableFuture.completedFuture(true)
+        } else {
+            waitingForSyncPromise.add(CompletableFuture())
+            waitingForSyncPromise.last()
+        }
     }
 }
