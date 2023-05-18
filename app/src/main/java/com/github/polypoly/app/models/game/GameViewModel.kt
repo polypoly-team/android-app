@@ -72,6 +72,8 @@ class GameViewModel(
 
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
+            playerStateData.value = PlayerState.TURN_FINISHED
+
             nextTurn()
 
             currentGame = gameData.value
@@ -92,6 +94,18 @@ class GameViewModel(
 
     fun locationReached() {
         if (playerStateData.value != PlayerState.MOVING)
+            return
+        playerStateData.value = PlayerState.INTERACTING
+    }
+
+    fun startBetting() {
+        if (playerStateData.value != PlayerState.MOVING)
+            return
+        playerStateData.value = PlayerState.BETTING
+    }
+
+    fun cancelBetting() {
+        if (playerStateData.value != PlayerState.BETTING)
             return
         playerStateData.value = PlayerState.INTERACTING
     }

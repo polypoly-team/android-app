@@ -10,6 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,15 +25,16 @@ import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
  * Manage the building info dialog and the bet dialog.
  */
 @Composable
-fun PropertyInteractUIComponent() {
+fun PropertyInteractUIComponent(gameViewModel: GameViewModel) {
     val showBetDialog = remember { mutableStateOf(false) }
-    if (interactingWithProperty.value) PropertyInteractDialog(showBetDialog)
+    val playerState = gameViewModel.getPlayerState().observeAsState().value
 
-    if (showBetDialog.value) {
-        BetDialog(onBuy = {
-            // TODO: Handle the buy action with the entered amount here
-            leaveBetDialog()
-        }, onClose = { leaveBetDialog() })
+    if (interactingWithProperty.value) PropertyInteractDialog(showBetDialog, gameViewModel)
+
+    if (showBetDialog.value && playerState == PlayerState.BETTING) {
+        BetDialog(onBuy = { valueBet ->
+            onBuy(valueBet, gameViewModel)
+        }, onClose = { leaveBetDialog(gameViewModel) })
     }
 }
 
@@ -40,7 +42,7 @@ fun PropertyInteractUIComponent() {
  * Building Info popup dialog.
  */
 @Composable
-private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
+private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>, gameViewModel: GameViewModel) {
     AlertDialog(
         onDismissRequest = { interactingWithProperty.value = false },
         modifier = Modifier.testTag("buildingInfoDialog"),
@@ -57,7 +59,7 @@ private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
             Text(text = "This is some trivia related to the building and or some info related to it.")
         },
         buttons = {
-            PropertyInteractButtons(showBuyDialog)
+            PropertyInteractButtons(showBuyDialog, gameViewModel)
         }
     )
 }
@@ -66,7 +68,7 @@ private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
  * Building Info popup dialog buttons.
  */
 @Composable
-private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
+private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>, gameViewModel: GameViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -80,7 +82,7 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
             Text(text = "Bet")
         }
         Button(
-            onClick = { leaveBetDialog() },
+            onClick = { leaveBetDialog(gameViewModel) },
             modifier = Modifier.testTag("closeButton")
         ) {
             Text(text = "Close")
@@ -88,7 +90,11 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
     }
 }
 
-private fun leaveBetDialog() {
+private fun leaveBetDialog(gameViewModel: GameViewModel) {
     interactingWithProperty.value = false
-//    mapViewModel.currentPlayer?.playerState?.value = PlayerState.INTERACTING TODO: use gameViewModel to change state
+    gameViewModel.cancelBetting()
+}
+
+private fun onBuy(valueBet: Float, gameViewModel: GameViewModel) {
+    leaveBetDialog(gameViewModel)
 }

@@ -100,7 +100,7 @@ private fun BetDialogButtons(
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
 ) {
-    val minBet = mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]?.basePrice!!
+    val minBet = mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]?.basePrice ?: 0
     Row(
         modifier = Modifier
             .fillMaxWidth()

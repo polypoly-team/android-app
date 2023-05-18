@@ -55,7 +55,7 @@ class GameActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     MapUI.MapView(mapViewModel, gameModel, interactingWithProperty)
-                    PropertyInteractUIComponent()
+                    PropertyInteractUIComponent(gameModel)
                     DiceRollUI(gameModel)
                     NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents()

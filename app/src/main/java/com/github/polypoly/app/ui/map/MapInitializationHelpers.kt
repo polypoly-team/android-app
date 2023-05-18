@@ -105,7 +105,7 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
         if (gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING) {
             mapViewModel.selectedMarker = marker
             interactingWithProperty.value = true
-//            mapViewModel.currentPlayer?.playerState?.value = PlayerState.BETTING TODO: use gameViewModel to to change turn state
+            gameViewModel.startBetting()
         }
         true
     }
