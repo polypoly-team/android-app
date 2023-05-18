@@ -45,30 +45,27 @@ fun ProposeTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean
  * @param openDialog A mutable state to open and close the dialog.
  * @param locationGiven The location given by the player
  * @param locationReceived The location received by the player
- * @param currentOtherPlayerAcceptation A mutable state to know if the other player accept the trade
+ * @param currentPlayerAcceptation A mutable state to know if the current player accept the trade
  */
 @Composable
 fun AcceptTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>,
                       locationGiven: InGameLocation, locationReceived: InGameLocation,
-                        currentOtherPlayerAcceptation: MutableState<Boolean?>) {
+                        currentPlayerAcceptation: MutableState<Boolean?>) {
     AlertDialog(
         onDismissRequest = {},
         title = { Text(text = "Do you want to trade ${locationGiven.locationProperty.name} against" +
-                " ${locationReceived.locationProperty.name}?") },
+                " ${locationReceived.locationProperty.name} with ${playerApplicant.user.name}?") },
         text = {},
         buttons = {
             Row {
                 Button(onClick = {
+                    currentPlayerAcceptation.value = true
                     openDialog.value = false
-                    if(currentOtherPlayerAcceptation.value == null) {
-
-                    } else {
-
-                    }
                 }) {
                     Text(text = "Accept")
                 }
                 Button(onClick = {
+                    currentPlayerAcceptation.value = false
                     openDialog.value = false
                 }) {
                     Text(text = "Refuse")
