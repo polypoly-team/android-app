@@ -17,10 +17,13 @@ import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class GameViewModel(
     game: Game,
@@ -204,15 +207,14 @@ class GameViewModel(
             val allLocations = gameData.value?.allLocations ?: listOf()
 
             val locationsToVisit = mutableListOf<LocationProperty>()
-            for (i in 1..3) {
-                val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
-
+            for (i in 1..NUMBER_OF_LOCATIONS_ROLLED) {
                 val closestLocations = allLocations
                     .filter { !locationsNotToVisitName.contains(it.name) }
                     .sortedBy { it.position().distanceToAsDouble(currentLocation?.position() ?: it.position()) }
+                val diceRoll = Random.Default.nextInt(allLocations.indices)
 
-                locationsToVisit.add(closestLocations[diceRollsSum])
-                locationsNotToVisitName.add(closestLocations[diceRollsSum].name)
+                locationsToVisit.add(closestLocations[diceRoll])
+                locationsNotToVisitName.add(closestLocations[diceRoll].name)
             }
 
             result.complete(locationsToVisit)

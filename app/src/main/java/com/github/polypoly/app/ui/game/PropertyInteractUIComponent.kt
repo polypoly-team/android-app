@@ -17,6 +17,7 @@ import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
+import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Manage the building info dialog and the bet dialog.
@@ -79,7 +80,7 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(Padding.medium),
         horizontalArrangement = SpaceEvenly
     ) {
         Button(
