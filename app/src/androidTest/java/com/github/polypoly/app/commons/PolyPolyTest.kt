@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock
 abstract class PolyPolyTest(
     private val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
     private val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
-    val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
+    private val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
     companion object {
         // Global tests constants
@@ -156,6 +156,7 @@ abstract class PolyPolyTest(
             clearMockDB()
         }
         if(signFakeUserIn) {
+            isSignedIn = true
             currentUser = TEST_USER_NOT_IN_LOBBY
         }
         if (fillWithFakeData) {

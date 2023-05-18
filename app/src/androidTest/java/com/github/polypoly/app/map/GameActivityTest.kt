@@ -14,6 +14,8 @@ import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
