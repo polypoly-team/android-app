@@ -40,12 +40,12 @@ class GlobalInstances {
         var currentUser : User? = null
         var isSignedIn = false
 
-        fun initCurrentUser(key: String) {
+        fun initCurrentUser(key: String, name: String) {
             remoteDB.keyExists<User>(key).thenAccept { exists ->
                 if(exists) {
                     remoteDB.getValue<User>(key).thenAccept { currentUser = it }
                 } else {
-                    currentUser = User(id = key)
+                    currentUser = User(id = key, name = name)
                     remoteDB.registerValue(currentUser!!)
                 }
             }

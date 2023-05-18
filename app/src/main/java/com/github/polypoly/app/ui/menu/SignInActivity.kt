@@ -2,6 +2,7 @@ package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -25,6 +26,7 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
@@ -70,7 +72,7 @@ class SignInActivity : ComponentActivity() {
     private fun launchWelcomeIfReady() {
         val user = firebaseAuth?.currentUser
         if (user != null) {
-            initCurrentUser(user.uid)
+            initCurrentUser(user.uid, user.displayName ?: "default")
 
             val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
             isSignedIn = true
