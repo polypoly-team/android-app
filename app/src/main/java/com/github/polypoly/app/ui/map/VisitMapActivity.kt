@@ -1,11 +1,13 @@
 package com.github.polypoly.app.ui.map
 
+import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -19,9 +21,6 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
  */
 class VisitMapActivity : ComponentActivity()  {
     val mapViewModel: MapViewModel = MapViewModel()
-
-    // flag to show the building info dialog
-    val interactingWithProperty = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +41,6 @@ class VisitMapActivity : ComponentActivity()  {
         ) {
             MapUI.MapView(
                 mapViewModel = mapViewModel,
-                interactingWithProperty = interactingWithProperty,
                 gameViewModel = null
             )
             ShowPopup()
@@ -54,26 +52,25 @@ class VisitMapActivity : ComponentActivity()  {
      */
     @Composable
     private fun ShowPopup() {
-        if (interactingWithProperty.value) {
-            PopupBuildingDescription()
-        }
+        val markerSelected = mapViewModel.getSelectedMarkerData().observeAsState().value ?: return
+        val locationSelected = mapViewModel.markerToLocationProperty[markerSelected] ?: LocationProperty()
+
+        PopupBuildingDescription(locationSelected)
     }
 
     /**
      * Building Info popup dialog with description, positive point and negative point.
      */
     @Composable
-    private fun PopupBuildingDescription() {
-        val currentProperty =
-            mapViewModel.markerToLocationProperty[mapViewModel.selectedMarker]
+    private fun PopupBuildingDescription(locationSelected: LocationProperty) {
         AlertDialog(
-            onDismissRequest = { interactingWithProperty.value = false },
+            onDismissRequest = { mapViewModel.selectMarker(null) },
             modifier = Modifier.testTag("building_description_dialog"),
             title = {
-                Text(text = currentProperty?.name ?: "")
+                Text(text = locationSelected.name ?: "")
             },
             text = {
-                if(currentProperty != null) BuildingDescription(currentProperty)
+                BuildingDescription(locationSelected)
             },
             buttons = {
                 CloseButton()
@@ -112,8 +109,7 @@ class VisitMapActivity : ComponentActivity()  {
     @Composable
     private fun CloseButton() {
         Button(
-            onClick = {
-                interactingWithProperty.value = false },
+            onClick = { mapViewModel.selectMarker(null) },
             modifier = Modifier
                 .testTag("close_building_description_dialog")
                 .padding(Padding.large),

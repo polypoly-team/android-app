@@ -54,8 +54,8 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapUI.MapView(mapViewModel, gameModel, interactingWithProperty)
-                    PropertyInteractUIComponent(gameModel)
+                    MapUI.MapView(mapViewModel, gameModel)
+                    PropertyInteractUIComponent(gameModel, mapViewModel)
                     DiceRollUI(gameModel)
                     NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents()
@@ -112,9 +112,6 @@ class GameActivity : ComponentActivity() {
 
     companion object {
         val mapViewModel: MapViewModel = MapViewModel()
-
-        // flag to show the building info dialog
-        val interactingWithProperty = mutableStateOf(false)
 
         //used to determine if the player is close enough to a location to interact with it
         private const val MAX_INTERACT_DISTANCE = 10.0 // meters

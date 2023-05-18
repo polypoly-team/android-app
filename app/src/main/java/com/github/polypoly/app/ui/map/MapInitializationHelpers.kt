@@ -79,7 +79,7 @@ fun initMapView(context: Context): MapView {
  * @return the marker that was added
  */
 fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int,
-                mapViewModel: MapViewModel, gameViewModel: GameViewModel?, interactingWithProperty: MutableState<Boolean>
+                mapViewModel: MapViewModel, gameViewModel: GameViewModel?
 ): Marker {
     fun buildMarkerIcon(context: Context, color: Int): Drawable {
         val markerIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_pin)
@@ -96,20 +96,23 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
     }
 
     val marker = Marker(mapView)
+
     marker.position = position
     marker.title = title
     marker.isDraggable = false
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
+
     marker.setOnMarkerClickListener { _, _ ->
-        if (gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING) {
-            mapViewModel.selectedMarker = marker
-            interactingWithProperty.value = true
-            gameViewModel.startBetting()
+        val interactionAllowed = gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING || gameViewModel == null
+        if (interactionAllowed && mapViewModel.getSelectedMarkerData().value == null) {
+            mapViewModel.selectMarker(marker)
         }
         true
     }
+
     mapView.overlays.add(marker)
+
     return marker
 }
 

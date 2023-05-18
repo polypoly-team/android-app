@@ -21,18 +21,21 @@ object MapUI {
      * @param mapViewModel The view model for the map.
      */
     @Composable
-    fun MapView(mapViewModel: MapViewModel, gameViewModel: GameViewModel?, interactingWithProperty: MutableState<Boolean>) {
+    fun MapView(mapViewModel: MapViewModel, gameViewModel: GameViewModel?) {
         AndroidView(
             factory = { context ->
                 Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
                 val mapView = initMapView(context)
-                for (zone in LocationPropertyRepository.getZones())
+                for (zone in LocationPropertyRepository.getZones()) {
                     for (location in zone.locationProperties) {
                         val marker =
-                            addMarkerTo(mapView, location.position(), location.name, zone.color,
-                                mapViewModel, gameViewModel, interactingWithProperty)
+                            addMarkerTo(
+                                mapView, location.position(), location.name, zone.color,
+                                mapViewModel, gameViewModel
+                            )
                         mapViewModel.markerToLocationProperty[marker] = location
                     }
+                }
                 val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel, gameViewModel)
                 mapView.overlays.add(currentLocationOverlay)
                 this.mapView = mapView

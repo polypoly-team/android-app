@@ -2,6 +2,8 @@ package com.github.polypoly.app.ui.map
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.polypoly.app.base.game.Player
@@ -25,7 +27,7 @@ class MapViewModel(
     private var _interactableProperty = mutableStateOf(null as LocationProperty?)
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    lateinit var selectedMarker: Marker
+    private var selectedMarkerData = MutableLiveData<Marker>(null)
 
     var goingToLocationProperty: LocationProperty? = null
 
@@ -62,5 +64,13 @@ class MapViewModel(
         viewModelScope.launch(dispatcher) {
             _interactableProperty.value = locationProperty
         }
+    }
+
+    fun selectMarker(marker: Marker?) {
+        selectedMarkerData.value = marker
+    }
+
+    fun getSelectedMarkerData(): LiveData<Marker> {
+        return selectedMarkerData
     }
 }

@@ -99,7 +99,7 @@ class GameViewModel(
     }
 
     fun startBetting() {
-        if (playerStateData.value != PlayerState.MOVING)
+        if (playerStateData.value != PlayerState.INTERACTING)
             return
         playerStateData.value = PlayerState.BETTING
     }
