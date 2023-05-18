@@ -45,17 +45,18 @@ class VisitMapActivityTest {
     @Test
     fun openCorrectDialogWithLocationWithDescription() {
         val locationWithDescription = LocationPropertyRepository.getZones()
-            .first { zone -> zone.locationProperties.any { location -> location.description != "" } }
-            .locationProperties.first {location -> location.description != ""}
+            .first { zone -> zone.locationProperties.any { location -> location.description != 0 } }
+            .locationProperties.first {location -> location.description != 0}
         val locationName = locationWithDescription.name
         val marker = MapUI.mapView.overlays.first { it is Marker && it.title == locationName } as Marker
         composeTestRule.activity.mapViewModel.selectedMarker = marker
         composeTestRule.activity.interactingWithProperty.value = true
         runBlocking { delay(500) }
         composeTestRule.onNodeWithText(locationName)
-        composeTestRule.onNodeWithText(locationWithDescription.description)
-        composeTestRule.onNodeWithText(locationWithDescription.positivePoint)
-        composeTestRule.onNodeWithText(locationWithDescription.negativePoint)
+        val context = composeTestRule.activity.applicationContext
+        composeTestRule.onNodeWithText(context.getString(locationWithDescription.description))
+        composeTestRule.onNodeWithText(context.getString(locationWithDescription.positivePoint))
+        composeTestRule.onNodeWithText(context.getString(locationWithDescription.negativePoint))
     }
 
     @Test
@@ -63,8 +64,8 @@ class VisitMapActivityTest {
         // try catch because maybe all locations will have a description
         try {
             val locationWithoutDescription = LocationPropertyRepository.getZones()
-                .first { zone -> zone.locationProperties.any { location -> location.description == "" } }
-                .locationProperties.first { location -> location.description == "" }
+                .first { zone -> zone.locationProperties.any { location -> location.description == 0 } }
+                .locationProperties.first { location -> location.description == 0 }
             val locationName = locationWithoutDescription.name
             val marker =
                 MapUI.mapView.overlays.first { it is Marker && it.title == locationName } as Marker
