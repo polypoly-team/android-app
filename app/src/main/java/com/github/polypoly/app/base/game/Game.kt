@@ -1,11 +1,12 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.PropertyLevel
+import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.user.User
 
 /**
@@ -25,12 +26,15 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
 ) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locationProperties.map { location ->
-        InGameLocation(
-            locationProperty = location,
-            owner = null,
-            level = PropertyLevel.LEVEL_0,
-        ) } }
+    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone ->
+        zone.locationProperties.map { location ->
+            InGameLocation(
+                locationProperty = location,
+                owner = null,
+                level = PropertyLevel.LEVEL_0,
+            )
+        }
+    }
     var currentRound: Int = 1
 
     /**
@@ -39,7 +43,7 @@ class Game private constructor(
     fun nextTurn() {
         // TODO update the data with the DB
         ++currentRound
-        if(isGameFinished()) {
+        if (isGameFinished()) {
             val pastGame = endGame()
             // TODO send the pastGame to the DB
         }
@@ -51,17 +55,19 @@ class Game private constructor(
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
     fun isGameFinished(): Boolean {
-        return when(rules.gameMode) {
+        return when (rules.gameMode) {
             GameMode.LAST_STANDING -> {
                 players.filter { !it.hasLost() }.size <= 1
             }
+
             GameMode.RICHEST_PLAYER -> {
-                if(rules.maxRound == null)
+                if (rules.maxRound == null)
                     throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
                 currentRound > rules.maxRound
             }
+
             GameMode.LANDLORD -> {
-                if(rules.maxRound == null)
+                if (rules.maxRound == null)
                     throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
                 currentRound > rules.maxRound
             }
@@ -74,12 +80,13 @@ class Game private constructor(
      */
     fun ranking(): Map<Long, Int> {
         val playersSorted = players.sortedDescending()
-        val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
-        for(i in 1 until (players.size)) {
+        val map = playersSorted.mapIndexed { index, player -> player.user.id to index + 1 }.toMap()
+            .toMutableMap()
+        for (i in 1 until (players.size)) {
             val currentPlayer = playersSorted[i]
-            val previousPlayer = playersSorted[i-1]
-            if(currentPlayer.compareTo(previousPlayer) == 0) {
-                map[previousPlayer.user.id]?.let{ map[currentPlayer.user.id] = it }
+            val previousPlayer = playersSorted[i - 1]
+            if (currentPlayer.compareTo(previousPlayer) == 0) {
+                map[previousPlayer.user.id]?.let { map[currentPlayer.user.id] = it }
             }
         }
         return map
@@ -91,7 +98,7 @@ class Game private constructor(
      * @throws IllegalStateException if the game is not finished
      */
     fun endGame(): PastGame {
-        if(!isGameFinished()) throw IllegalStateException("can't end the game now")
+        if (!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
             users = players.map(Player::user),
             usersRank = ranking().map { it.key to it.value }.toMap(),
@@ -125,9 +132,9 @@ class Game private constructor(
     fun computeAllWinnersOfBets() {
         inGameLocations.forEach {
             val winningBet = it.computeWinningBid()
-            if(winningBet != null) {
+            if (winningBet != null) {
                 val winner = winningBet.player
-                if(winner.user.currentUser) {
+                if (winner.user.currentUser) {
                     winner.loseMoney(winningBet.amount)
                     // TODO : notify the player that he has won and the other players in the bets
                     //  that they have lost
@@ -144,18 +151,46 @@ class Game private constructor(
          * @return the new game created from the lobby
          */
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
+            val players = gameLobby.usersRegistered.map {
+                Player(it, gameLobby.rules.initialPlayerBalance, listOf())
+            }
             val game = Game(
                 admin = gameLobby.admin,
-                players = gameLobby.usersRegistered.map { Player(
-                    user = it,
-                    balance = gameLobby.rules.initialPlayerBalance,
-                    ownedLocations = listOf(),
-                ) },
+                players =
+                if (gameLobby.rules.gameMode == GameMode.LANDLORD)
+                    landLordPlayers(
+                        gameLobby,
+                        players
+                    )
+                else players,
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )
             gameInProgress = game
             return game
+        }
+
+        private fun landLordPlayers(gameLobby: GameLobby, players: List<Player>): List<Player> {
+            fun generateRandomLocations(
+                gameMapLocations: List<LocationProperty>,
+                n: Int
+            ): List<LocationProperty> =
+                gameMapLocations.shuffled().take(n)
+
+            val allProperties = gameLobby.rules.gameMap.flatMap { zone -> zone.locationProperties }
+            val assignedProperties = mutableSetOf<LocationProperty>()
+
+            return players.map { player ->
+                val randomLocationsToGive = generateRandomLocations(
+                    allProperties - assignedProperties,
+                    gameLobby.rules.maxBuildingPerLandlord
+                )
+                assignedProperties += randomLocationsToGive
+                player.copy(
+                    ownedLocations = randomLocationsToGive
+                        .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
+                )
+            }
         }
 
         /**

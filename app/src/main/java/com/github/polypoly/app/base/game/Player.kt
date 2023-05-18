@@ -20,7 +20,7 @@ import kotlin.random.Random
 data class Player (
     val user: User = User(),
     private var balance: Int = 0,
-    private var ownedLocations: List<InGameLocation> = listOf(),
+    var ownedLocations: List<InGameLocation> = listOf(),
     private var roundLost: Int? = null,
     var playerState: MutableState<PlayerState> = mutableStateOf(PlayerState.INIT)
 ) : Comparable<Player> {
