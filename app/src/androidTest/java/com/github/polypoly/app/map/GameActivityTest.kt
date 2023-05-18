@@ -89,7 +89,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
         composeTestRule.onNodeWithTag("betErrorMessage", true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
-        // composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
 
     @Test // could be looped for extensive testing
@@ -101,7 +101,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
         // TODO: Replace by future MAX_BET or similar
         composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
         composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
-        // composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
 
     // While it may be better for grades to have a test for each component,
@@ -160,12 +160,15 @@ class GameActivityTest : PolyPolyTest(true, false) {
     }
 
     fun applyPlayerStateChange(gameViewModel: GameViewModel, playerState: PlayerState) {
-        if (playerState == PlayerState.INIT) return
-        gameViewModel.diceRolled()
         if (playerState == PlayerState.ROLLING_DICE) return
+        gameViewModel.diceRolled()
+
+        if (playerState == PlayerState.MOVING) return
+        gameViewModel.locationReached()
 
         if (playerState == PlayerState.BETTING) {
             gameViewModel.startBetting()
+            return
         }
 
         // TODO add other states support when needed
