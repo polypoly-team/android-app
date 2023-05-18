@@ -42,7 +42,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Before
     fun setUp() {
-        forceChangePlayerState(PlayerState.INIT).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.ROLLING_DICE).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     @Before
@@ -160,11 +160,14 @@ class GameActivityTest : PolyPolyTest(true, false) {
     }
 
     fun applyPlayerStateChange(gameViewModel: GameViewModel, playerState: PlayerState) {
+        gameViewModel.resetTurnState()
         if (playerState == PlayerState.ROLLING_DICE) return
-        gameViewModel.diceRolled()
 
+        gameViewModel.diceRolled()
         if (playerState == PlayerState.MOVING) return
+
         gameViewModel.locationReached()
+        if (playerState == PlayerState.INTERACTING) return
 
         if (playerState == PlayerState.BETTING) {
             gameViewModel.startBetting()

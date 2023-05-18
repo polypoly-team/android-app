@@ -143,6 +143,10 @@ class GameViewModel(
         playerStateData.value = PlayerState.INTERACTING
     }
 
+    fun resetTurnState() {
+        playerStateData.value = PlayerState.ROLLING_DICE
+    }
+
     fun computeClosestLocation(position: GeoPoint): CompletableFuture<LocationProperty?> {
         val result = CompletableFuture<LocationProperty?>()
 
