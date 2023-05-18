@@ -532,7 +532,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
     private fun joinGameLobbyRoom(mContext: Context) {
         val currentLobbyKey = gameLobbyCode
         remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
-            gameLobby.addUser(currentUser)
+            gameLobby.addUser(currentUser!!)
 
             //launch the gameLobby room activity
             remoteDB.updateValue(gameLobby)

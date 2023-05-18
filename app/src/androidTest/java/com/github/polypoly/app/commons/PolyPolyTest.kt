@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
@@ -31,8 +31,10 @@ import java.util.concurrent.locks.ReentrantLock
 abstract class PolyPolyTest(
     private val clearRemoteStorage: Boolean, //> clear remote storage at the beginning of every test
     private val fillWithFakeData: Boolean, //> fill remote storage with fake data at the beginning of every test
-    val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
+    private val signFakeUserIn: Boolean = false //> sign a fake user in at the beginning of every test
 ) {
+
+    // ======================================================================= COMPANION OBJECT
     companion object {
         // Global tests constants
         const val TIMEOUT_DURATION = 15L
@@ -45,9 +47,9 @@ abstract class PolyPolyTest(
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val CURRENT_USER = User(1000,"test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val CURRENT_USER = User("1000","test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(
-            id = 0,
+            id = "0",
             name = "John",
             bio = "Hi, this is my bio :)",
             skin = Skin(0,0,0),
@@ -55,14 +57,15 @@ abstract class PolyPolyTest(
             trophiesWon = listOf(0, 4, 8, 11, 12, 14),
             trophiesDisplay = mutableListOf(0, 4)
         )
-        val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_1_BIS = User(12,"Carter", "IT IS me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2_BIS = User(123,"Harry", "Kachow!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val TEST_USER_1 = User("12","Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_1_BIS = User("12","Carter", "IT IS me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_2 = User("123","Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_2_BIS = User("123","Harry", "Kachow!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_3 = User("1234","James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_4 = User("12345","Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_5 = User("123456", "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_NOT_IN_LOBBY = User("8888", "BIGFLO", "& CARLITO", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5, TEST_USER_NOT_IN_LOBBY)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
@@ -103,6 +106,9 @@ abstract class PolyPolyTest(
 
         private val mockDB = MockDB()
 
+        /**
+         * Every code here is executed once during the runtime
+         */
         init {
             if (!remoteDBInitialized) {
                 remoteDB = mockDB
@@ -110,8 +116,6 @@ abstract class PolyPolyTest(
             }
 
             FirebaseAuth.getInstance().signOut()
-            currentFBUser = null
-            isSignedIn = false
 
             TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
             TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
@@ -121,6 +125,41 @@ abstract class PolyPolyTest(
         }
     }
 
+
+    // ======================================================================= TEST PREPARATION
+    init {
+        remoteDB = mockDB
+        isSignedIn = signFakeUserIn
+        if(signFakeUserIn) {
+            currentUser = TEST_USER_NOT_IN_LOBBY
+        }
+    }
+
+    @Before
+    fun prepareTest() {
+        remoteDB = mockDB
+        if (clearRemoteStorage) {
+            mockDB.clear()
+        }
+        if(signFakeUserIn) {
+            currentUser = TEST_USER_NOT_IN_LOBBY
+        }
+        if (fillWithFakeData) {
+            fillWithFakeData()
+        }
+        _prepareTest()
+    }
+
+    /**
+     * Function always called after the preparation of the test is completed
+     */
+    open fun _prepareTest() {}
+
+    @After
+    fun cleanUp() {}
+
+
+    // ======================================================================= DB DATA HELPERS
     private fun <T : StorableObject<*>> requestAddDataToDB(data: List<T>): List<CompletableFuture<Boolean>> {
         val timeouts = mutableListOf<CompletableFuture<Boolean>>()
         for (i in data.indices) {
@@ -143,32 +182,6 @@ abstract class PolyPolyTest(
 
     fun addGameLobbyToDB(gameLobby: GameLobby) = addGameLobbiesToDB(listOf(gameLobby))
 
-    /**
-     * Function always called after the preparation of the test is completed
-     */
-    open fun _prepareTest() {}
-
-    @Before
-    fun prepareTest() {
-        remoteDB = mockDB
-        if (clearRemoteStorage) {
-            clearMockDB()
-        }
-        if (fillWithFakeData) {
-            fillWithFakeData()
-        }
-        _prepareTest()
-    }
-    @After
-    fun cleanUp() {
-        currentFBUser = null
-        isSignedIn = false
-    }
-
-    private fun clearMockDB() {
-        mockDB.clear()
-    }
-
     fun fillWithFakeData() {
         val allRequests = mutableListOf<CompletableFuture<Boolean>>()
         allRequests.addAll(requestAddDataToDB(ALL_TEST_USERS))
@@ -176,6 +189,7 @@ abstract class PolyPolyTest(
         allRequests.map{promise -> promise.get(TIMEOUT_DURATION, TimeUnit.SECONDS)}
     }
 
+    // ======================================================================= TEST HELPERS
     /**
      * Observes a live data until it updates its value and returns the new value
      * @param liveData data to observe

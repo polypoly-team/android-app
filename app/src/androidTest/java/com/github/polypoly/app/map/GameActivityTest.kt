@@ -14,6 +14,8 @@ import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -24,12 +26,12 @@ import org.junit.runner.RunWith
 import org.osmdroid.views.overlay.Marker
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, false, true) {
 
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
     }
 
     @get:Rule

@@ -17,12 +17,12 @@ class GameTest {
 
     private val emptySkin = Skin(0,0,0)
     private val zeroStats = Stats(0,0,0,0,0)
-    private val testUser1 = User(42042042, "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testUser2 = User(42042043, "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testUser3 = User(42042044, "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testUser4 = User(42042045, "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testUser5 = User(42042046, "test_user5", "", emptySkin, zeroStats, listOf(), mutableListOf())
-    private val testUser6 = User(42042047, "test_user6", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser1 = User("42042042", "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser2 = User("42042043", "test_user2", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser3 = User("42042044", "test_user3", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser4 = User("42042045", "test_user4", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser5 = User("42042046", "test_user5", "", emptySkin, zeroStats, listOf(), mutableListOf())
+    private val testUser6 = User("42042047", "test_user6", "", emptySkin, zeroStats, listOf(), mutableListOf())
     private val testDuration = 2
     private val gameRules = GameParameters(GameMode.RICHEST_PLAYER, 3, 7,
         testDuration, 10, LocationPropertyRepository.getZones(), 200)

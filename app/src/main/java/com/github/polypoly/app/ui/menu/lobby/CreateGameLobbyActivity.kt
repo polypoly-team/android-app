@@ -339,7 +339,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
      */
     private fun createGameLobby(mContext : Context, rules: GameParameters, name: String, isPrivate: Boolean, gameCode: String) {
 
-        val lobby = GameLobby(currentUser, rules, name, gameCode, isPrivate)
+        val lobby = GameLobby(currentUser!!, rules, name, gameCode, isPrivate)
 
         //TODO : create game in database and navigate to game lobby screen
         val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
