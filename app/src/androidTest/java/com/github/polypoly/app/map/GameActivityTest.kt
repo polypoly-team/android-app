@@ -8,14 +8,11 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.base.game.PlayerState
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.models.game.GameViewModel
-import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.ui.game.GameActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -23,10 +20,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.osmdroid.views.overlay.Marker
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 class GameActivityTest : PolyPolyTest(true, false) {
@@ -159,7 +154,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
         }
     }
 
-    fun applyPlayerStateChange(gameViewModel: GameViewModel, playerState: PlayerState) {
+    private fun applyPlayerStateChange(gameViewModel: GameViewModel, playerState: PlayerState) {
         gameViewModel.resetTurnState()
         if (playerState == PlayerState.ROLLING_DICE) return
 

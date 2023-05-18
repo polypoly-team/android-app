@@ -14,7 +14,6 @@ import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
-import com.github.polypoly.app.ui.game.GameActivity
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -74,8 +73,8 @@ fun initMapView(context: Context): MapView {
  * @param position the position of the marker
  * @param title the title of the marker
  * @param zoneColor the color of the marker
- * @param mapViewModel the view model of the map
- * @param gameViewModel related game view model. Null if no game is going on
+ * @param mapViewModel GameViewModel to use for map business logic.
+ * @param gameViewModel GameViewModel to use for game business logic. Null if no game is going on.
  * @return the marker that was added
  */
 fun addMarkerTo(mapView: MapView, location: LocationProperty, zoneColor: Int,
@@ -104,7 +103,7 @@ fun addMarkerTo(mapView: MapView, location: LocationProperty, zoneColor: Int,
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
 
     marker.setOnMarkerClickListener { _, _ ->
-        val interactionAllowed = gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING || gameViewModel == null
+        val interactionAllowed = gameViewModel?.getPlayerStateData()?.value == PlayerState.INTERACTING || gameViewModel == null
         if (interactionAllowed && mapViewModel.getLocationSelected().value == null) {
             mapViewModel.selectLocation(location)
         }
@@ -118,8 +117,8 @@ fun addMarkerTo(mapView: MapView, location: LocationProperty, zoneColor: Int,
 
 /**
  * Initializes the location overlay and sets the location listener.
- * @param mapView the map view to add the location overlay to
- * @param mapViewModel the view model of the map
+ * @param mapViewModel GameViewModel to use for map business logic
+ * @param gameViewModel GameViewModel to use for game business logic. Null if no game is going on
  * @return the location overlay that was added
  */
 fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewModel: GameViewModel?): MyLocationNewOverlay {
@@ -139,7 +138,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
-                && gameViewModel?.getPlayerState()?.value == PlayerState.MOVING
+                && gameViewModel?.getPlayerStateData()?.value == PlayerState.MOVING
                 && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty) {
                 gameViewModel.locationReached()
                 mapViewModel.goingToLocationProperty = null

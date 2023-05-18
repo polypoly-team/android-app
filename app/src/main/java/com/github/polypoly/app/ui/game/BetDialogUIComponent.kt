@@ -25,6 +25,9 @@ import com.github.polypoly.app.base.game.location.LocationProperty
 
 /**
  * Bet popup dialog
+ * @param onBuy lambda to execute when a valid bet is set
+ * @param onClose lambda to execute when the bet is canceled
+ * @param locationOnBet location to bid for
  */
 @Composable
 fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: LocationProperty) {
@@ -100,7 +103,7 @@ private fun BetDialogButtons(
     onBuy: (Float) -> Unit,
     onClose: () -> Unit,
     inputPrice: MutableState<String>,
-    showError: MutableState<Boolean>,
+    showError: MutableState<Boolean>
 ) {
     Row(
         modifier = Modifier

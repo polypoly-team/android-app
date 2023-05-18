@@ -17,19 +17,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
 
+/**
+ * UI for dice button and dialog
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
+ */
 @Composable
 fun DiceRollUI(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
-    val playerState = gameViewModel.getPlayerState().observeAsState().value
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
 
     if (playerState == PlayerState.ROLLING_DICE) {
-        RollDiceButton(mapViewModel)
+        RollDiceButton()
         RollDiceDialog(gameViewModel, mapViewModel)
     }
 }
@@ -38,7 +42,7 @@ fun DiceRollUI(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
  * Button for rolling the dice.
  */
 @Composable
-fun RollDiceButton(mapViewModel: MapViewModel) {
+fun RollDiceButton() {
     Box(modifier = Modifier.fillMaxWidth()) {
         Button(
             modifier = Modifier
@@ -56,6 +60,8 @@ fun RollDiceButton(mapViewModel: MapViewModel) {
 
 /**
  * Dice roll dialog, shows the result of 3 dice rolls in a column.
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
 fun RollDiceDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {

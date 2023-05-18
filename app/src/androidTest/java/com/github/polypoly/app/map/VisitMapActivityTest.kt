@@ -7,8 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.VisitMapActivity
 import kotlinx.coroutines.*
 import org.junit.After
@@ -16,7 +14,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.osmdroid.views.overlay.Marker
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
@@ -69,7 +66,6 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
                 .first { zone -> zone.locationProperties.any { location -> location.description == "" } }
                 .locationProperties.first { location -> location.description == "" }
             val locationName = locationWithoutDescription.name
-                MapUI.mapView.overlays.first { it is Marker && it.title == locationName } as Marker
 
             setLocationInMapViewModel(locationWithoutDescription).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
@@ -90,6 +86,6 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
     }
 
     private fun setLocationInMapViewModel(location: LocationProperty): CompletableFuture<Boolean> {
-        return execInMainThread { composeTestRule.activity.mapViewModel.selectLocation(getRandomLocation()) }
+        return execInMainThread { composeTestRule.activity.mapViewModel.selectLocation(location) }
     }
 }

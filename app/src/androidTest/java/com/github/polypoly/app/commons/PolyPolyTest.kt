@@ -6,7 +6,6 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
-import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -201,10 +200,21 @@ abstract class PolyPolyTest(
         return result
     }
 
+    /**
+     * Picks a random location among the locations provided
+     * @param amongLocations list of locations to pick from
+     * @return a random location in the list
+     */
     fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties }): LocationProperty {
         return amongLocations[Random.nextInt().absoluteValue % amongLocations.size]
     }
 
+    /**
+     * Executes the given lambda in the main thread. This is intended for assignations to MutableLiveData
+     * (generally in ViewModel classes) that have this constraint.
+     * @param action Lambda to execute in the main thread
+     * @return a future that completes once the lambda is completed
+     */
     fun execInMainThread(action: () -> Unit): CompletableFuture<Boolean> {
         val scope = CoroutineScope(Dispatchers.Main + Job())
         val future = CompletableFuture<Boolean>()

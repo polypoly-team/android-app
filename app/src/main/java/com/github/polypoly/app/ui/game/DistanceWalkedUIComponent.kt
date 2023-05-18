@@ -22,6 +22,7 @@ import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Displays the distance walked and a button to reset it.
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
 fun DistanceWalkedUIComponents(mapViewModel: MapViewModel) {

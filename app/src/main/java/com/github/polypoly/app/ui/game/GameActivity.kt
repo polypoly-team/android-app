@@ -40,6 +40,9 @@ class GameActivity : ComponentActivity() {
         setContent { GameActivityContent() }
     }
 
+    /**
+     * Component for the entire game activity content
+     */
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
@@ -74,7 +77,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NextTurnButton(gameEnded: Boolean) {
+    private fun NextTurnButton(gameEnded: Boolean) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Button(
                 modifier = Modifier
@@ -84,7 +87,7 @@ class GameActivity : ComponentActivity() {
                     .testTag("next_turn_button"),
                 onClick = {
                     if (!gameEnded) {
-//                        gameModel.nextTurn()
+                        gameModel.nextTurn()
                     }
                 },
                 shape = CircleShape
@@ -95,7 +98,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GameEndedLabel(gameEnded: Boolean) {
+    private fun GameEndedLabel(gameEnded: Boolean) {
         if (gameEnded) {
             Box(
                 modifier = Modifier

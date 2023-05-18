@@ -1,7 +1,5 @@
 package com.github.polypoly.app.models.game
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -10,24 +8,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.RemoteDB
+import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -73,11 +60,11 @@ class GameViewModel(
         return gameEndedData
     }
 
-    fun getPlayerState(): LiveData<PlayerState> {
+    fun getPlayerStateData(): LiveData<PlayerState> {
         return playerStateData
     }
 
-    suspend fun gameLoop() {
+    private suspend fun gameLoop() {
         var currentGame = gameData.value
 
         while (currentGame != null && !currentGame.isGameFinished()) {
@@ -93,7 +80,10 @@ class GameViewModel(
         }
     }
 
-    private fun nextTurn() {
+    /**
+     * Computes the next turn state and synchronizes with the other players
+     */
+    fun nextTurn() {
         viewModelScope.launch {
             gameData.value?.nextTurn()
 
@@ -119,34 +109,52 @@ class GameViewModel(
         }
     }
 
+    private fun playerStateFSMTransition(expectedFrom: PlayerState, to: PlayerState) {
+        if (playerStateData.value != expectedFrom)
+            return
+        playerStateData.value = to
+    }
+
+    /**
+     * Ends ROLLING_DICE state and moves to MOVING
+     */
     fun diceRolled() {
-        if (playerStateData.value != PlayerState.ROLLING_DICE)
-            return
-        playerStateData.value = PlayerState.MOVING
+        playerStateFSMTransition(PlayerState.ROLLING_DICE, PlayerState.MOVING)
     }
 
+    /**
+     * Ends MOVING state and moves to INTERACTING
+     */
     fun locationReached() {
-        if (playerStateData.value != PlayerState.MOVING)
-            return
-        playerStateData.value = PlayerState.INTERACTING
+        playerStateFSMTransition(PlayerState.MOVING, PlayerState.INTERACTING)
     }
 
+    /**
+     * Ends INTERACTING state and moves to BETTING
+     */
     fun startBetting() {
-        if (playerStateData.value != PlayerState.INTERACTING)
-            return
-        playerStateData.value = PlayerState.BETTING
+        playerStateFSMTransition(PlayerState.INTERACTING, PlayerState.BETTING)
     }
 
+    /**
+     * Ends BETTING state and moves back to INTERACTING
+     */
     fun cancelBetting() {
-        if (playerStateData.value != PlayerState.BETTING)
-            return
-        playerStateData.value = PlayerState.INTERACTING
+        playerStateFSMTransition(PlayerState.BETTING, PlayerState.INTERACTING)
     }
 
+    /**
+     * Resets player state back to the beginning of a turn (ie ROLLING_DICE)
+     */
     fun resetTurnState() {
         playerStateData.value = PlayerState.ROLLING_DICE
     }
 
+    /**
+     * Computes the closest location to the given position among the existing locations in the game.
+     * @param position Reference position
+     * @return A future holding the closest location found or null if the closest location is farther than MAX_INTERACT_DISTANCE
+     */
     fun computeClosestLocation(position: GeoPoint): CompletableFuture<LocationProperty?> {
         val result = CompletableFuture<LocationProperty?>()
 

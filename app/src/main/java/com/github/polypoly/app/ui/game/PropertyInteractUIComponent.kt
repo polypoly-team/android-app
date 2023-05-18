@@ -20,10 +20,12 @@ import com.github.polypoly.app.ui.map.MapViewModel
 
 /**
  * Manage the building info dialog and the bet dialog.
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
 fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
-    val playerState = gameViewModel.getPlayerState().observeAsState().value
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
     val locationSelected = mapViewModel.getLocationSelected().observeAsState().value ?: return
 
     PropertyInteractDialog(locationSelected, gameViewModel, mapViewModel)
@@ -42,6 +44,9 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
 
 /**
  * Building Info popup dialog.
+ * @param locationSelected location selected by the player
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
 private fun PropertyInteractDialog(locationSelected: LocationProperty, gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
@@ -66,6 +71,8 @@ private fun PropertyInteractDialog(locationSelected: LocationProperty, gameViewM
 
 /**
  * Building Info popup dialog buttons.
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
 private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {

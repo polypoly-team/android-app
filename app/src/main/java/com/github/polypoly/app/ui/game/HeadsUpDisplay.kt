@@ -49,10 +49,16 @@ import com.github.polypoly.app.ui.theme.Shapes
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
+ * @param playerData current player of the game
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
+ * @param otherPlayersData other players in the game
+ * @param round current round of the game
+ * @param location current location of the player
  */
 @Composable
 fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
-    val playerState = gameViewModel.getPlayerState().observeAsState().value
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
     val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
     Column(modifier = Modifier.testTag("hud")) {
