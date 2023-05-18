@@ -27,13 +27,11 @@ class MapViewModel(
     private var _interactableProperty = mutableStateOf(null as LocationProperty?)
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    private var selectedMarkerData = MutableLiveData<Marker>(null)
-
     var goingToLocationProperty: LocationProperty? = null
 
     var currentPlayer: Player? = null
 
-    val markerToLocationProperty = mutableMapOf<Marker, LocationProperty>()
+    private var locationSelectedData = MutableLiveData<LocationProperty>(null)
 
     /**
      * Updates the distance walked by the user by adding the given value to the current value.
@@ -66,11 +64,11 @@ class MapViewModel(
         }
     }
 
-    fun selectMarker(marker: Marker?) {
-        selectedMarkerData.value = marker
+    fun selectLocation(location: LocationProperty?) {
+        locationSelectedData.value = location
     }
 
-    fun getSelectedMarkerData(): LiveData<Marker> {
-        return selectedMarkerData
+    fun getLocationSelected(): LiveData<LocationProperty> {
+        return locationSelectedData
     }
 }

@@ -52,9 +52,7 @@ class VisitMapActivity : ComponentActivity()  {
      */
     @Composable
     private fun ShowPopup() {
-        val markerSelected = mapViewModel.getSelectedMarkerData().observeAsState().value ?: return
-        val locationSelected = mapViewModel.markerToLocationProperty[markerSelected] ?: LocationProperty()
-
+        val locationSelected = mapViewModel.getLocationSelected().observeAsState().value ?: return
         PopupBuildingDescription(locationSelected)
     }
 
@@ -64,7 +62,7 @@ class VisitMapActivity : ComponentActivity()  {
     @Composable
     private fun PopupBuildingDescription(locationSelected: LocationProperty) {
         AlertDialog(
-            onDismissRequest = { mapViewModel.selectMarker(null) },
+            onDismissRequest = { mapViewModel.selectLocation(null) },
             modifier = Modifier.testTag("building_description_dialog"),
             title = {
                 Text(text = locationSelected.name ?: "")
@@ -109,7 +107,7 @@ class VisitMapActivity : ComponentActivity()  {
     @Composable
     private fun CloseButton() {
         Button(
-            onClick = { mapViewModel.selectMarker(null) },
+            onClick = { mapViewModel.selectLocation(null) },
             modifier = Modifier
                 .testTag("close_building_description_dialog")
                 .padding(Padding.large),

@@ -42,7 +42,7 @@ import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.models.game.GameViewModel
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
@@ -51,7 +51,7 @@ import com.github.polypoly.app.ui.theme.Shapes
  * The heads-up display with player and game stats that is displayed on top of the map
  */
 @Composable
-fun Hud(playerData: Player, gameViewModel: GameViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
     val playerState = gameViewModel.getPlayerState().observeAsState().value
     val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 

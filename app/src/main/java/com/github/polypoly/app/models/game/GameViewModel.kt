@@ -14,6 +14,8 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
@@ -21,12 +23,14 @@ import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
 
 class GameViewModel(
@@ -43,6 +47,9 @@ class GameViewModel(
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
+    //used to determine if the player is close enough to a location to interact with it
+    private val MAX_INTERACT_DISTANCE = 10.0 // meters
 
     init {
         viewModelScope.launch {
@@ -134,6 +141,64 @@ class GameViewModel(
         if (playerStateData.value != PlayerState.BETTING)
             return
         playerStateData.value = PlayerState.INTERACTING
+    }
+
+    fun computeClosestLocation(position: GeoPoint): CompletableFuture<LocationProperty?> {
+        val result = CompletableFuture<LocationProperty?>()
+
+        viewModelScope.launch {
+            var closestLocation: LocationProperty? = null
+            var closestDistance = Double.MAX_VALUE
+
+            val allLocations = gameData.value?.rules?.gameMap?.flatMap { zone -> zone.locationProperties } ?: listOf()
+            for (location in allLocations) {
+                val distance = position.distanceToAsDouble(location.position())
+                if (distance < closestDistance) {
+                    closestLocation = location
+                    closestDistance = distance
+                }
+            }
+
+            if (closestDistance > MAX_INTERACT_DISTANCE) {
+                closestLocation = null
+            }
+
+            result.complete(closestLocation)
+        }
+
+        return result
+    }
+
+    /**
+     * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
+     * ensuring that the player does not visit the same location twice.
+     */
+    fun rollDiceLocations(currentLocation: LocationProperty?): CompletableFuture<List<LocationProperty>> {
+        val result = CompletableFuture<List<LocationProperty>>()
+
+        viewModelScope.launch {
+            val locationsNotToVisitName = mutableListOf<String>()
+            if (currentLocation != null)
+                locationsNotToVisitName.add(currentLocation.name)
+
+            val allLocations = gameData.value?.rules?.gameMap?.flatMap { zone -> zone.locationProperties } ?: listOf()
+
+            val locationsToVisit = mutableListOf<LocationProperty>()
+            for (i in 1..3) {
+                val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
+
+                val closestLocations = allLocations
+                    .filter { !locationsNotToVisitName.contains(it.name) }
+                    .sortedBy { it.position().distanceToAsDouble(currentLocation?.position() ?: it.position()) }
+
+                locationsToVisit.add(closestLocations[diceRollsSum])
+                locationsNotToVisitName.add(closestLocations[diceRollsSum].name)
+            }
+
+            result.complete(locationsToVisit)
+        }
+
+        return result
     }
 
     companion object {

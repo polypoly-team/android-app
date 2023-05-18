@@ -33,9 +33,6 @@ private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
 private const val INITIAL_ZOOM = 18.0
 private const val MARKER_SIDE_LENGTH = 100
 
-//used to determine if the player is close enough to a location to interact with it
-private const val MAX_INTERACT_DISTANCE = 10.0 // meters
-
 /**
  * Tile source for EPFL campus map.
  * @param floorId the floor of the map to display
@@ -81,7 +78,7 @@ fun initMapView(context: Context): MapView {
  * @param gameViewModel related game view model. Null if no game is going on
  * @return the marker that was added
  */
-fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: Int,
+fun addMarkerTo(mapView: MapView, location: LocationProperty, zoneColor: Int,
                 mapViewModel: MapViewModel, gameViewModel: GameViewModel?
 ): Marker {
     fun buildMarkerIcon(context: Context, color: Int): Drawable {
@@ -100,16 +97,16 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
 
     val marker = Marker(mapView)
 
-    marker.position = position
-    marker.title = title
+    marker.position = location.position()
+    marker.title = location.name
     marker.isDraggable = false
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
 
     marker.setOnMarkerClickListener { _, _ ->
         val interactionAllowed = gameViewModel?.getPlayerState()?.value == PlayerState.INTERACTING || gameViewModel == null
-        if (interactionAllowed && mapViewModel.getSelectedMarkerData().value == null) {
-            mapViewModel.selectMarker(marker)
+        if (interactionAllowed && mapViewModel.getLocationSelected().value == null) {
+            mapViewModel.selectLocation(location)
         }
         true
     }
@@ -129,12 +126,16 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     val locationProvider = GpsMyLocationProvider(mapView.context)
     var lastLocation = Location("")
 
+    val onClosestLocationFound = { closestLocation: LocationProperty? ->
+        if (closestLocation != null) {
+            mapViewModel.setInteractableLocation(closestLocation)
+        }
+    }
+
     val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {
         override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
             super.onLocationChanged(location, provider)
-            mapViewModel.setInteractableLocation(
-                updateAllDistancesAndFindClosest(mapView, GeoPoint(location), mapViewModel)
-            )
+            gameViewModel?.computeClosestLocation(GeoPoint(location))?.thenApply(onClosestLocationFound)
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
@@ -149,9 +150,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     locationOverlay.enableMyLocation()
     locationOverlay.enableFollowLocation()
     locationOverlay.runOnFirstFix {
-        mapViewModel.setInteractableLocation(
-            updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation), mapViewModel)
-        )
+        gameViewModel?.computeClosestLocation(GeoPoint(locationOverlay.myLocation))?.thenApply(onClosestLocationFound)
         mapView.post {
             mapView.controller.animateTo(locationOverlay.myLocation)
         }
@@ -159,35 +158,4 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     }
 
     return locationOverlay
-}
-
-/**
- * Updates the distance of all markers and returns the closest one.
- *
- * @return the closest location or null if there are no locations close enough to the player
- */
-fun updateAllDistancesAndFindClosest(
-    mapView: MapView,
-    myLocation: GeoPoint,
-    mapViewModel: MapViewModel
-): LocationProperty? {
-    fun markersOf(mapView: MapView): List<Marker> {
-        return mapView.overlays.filterIsInstance<Marker>()
-    }
-
-    var closestLocationProperty = null as LocationProperty?
-    for (marker in markersOf(mapView)) {
-        val markerLocation = mapViewModel.markerToLocationProperty[marker]
-        if (closestLocationProperty == null ||
-            markerLocation == null ||
-            myLocation.distanceToAsDouble(markerLocation.position()) <
-                myLocation.distanceToAsDouble(closestLocationProperty.position())
-        ) {
-            closestLocationProperty = markerLocation
-        }
-    }
-    if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_INTERACT_DISTANCE)
-        closestLocationProperty = null
-
-    return closestLocationProperty
 }

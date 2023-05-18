@@ -28,12 +28,7 @@ object MapUI {
                 val mapView = initMapView(context)
                 for (zone in LocationPropertyRepository.getZones()) {
                     for (location in zone.locationProperties) {
-                        val marker =
-                            addMarkerTo(
-                                mapView, location.position(), location.name, zone.color,
-                                mapViewModel, gameViewModel
-                            )
-                        mapViewModel.markerToLocationProperty[marker] = location
+                        addMarkerTo(mapView, location, zone.color, mapViewModel, gameViewModel)
                     }
                 }
                 val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel, gameViewModel)

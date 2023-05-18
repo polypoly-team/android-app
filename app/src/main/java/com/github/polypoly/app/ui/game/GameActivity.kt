@@ -56,12 +56,13 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, gameModel)
                     PropertyInteractUIComponent(gameModel, mapViewModel)
-                    DiceRollUI(gameModel)
+                    DiceRollUI(gameModel, mapViewModel)
                     NextTurnButton(gameEnded)
-                    DistanceWalkedUIComponents()
+                    DistanceWalkedUIComponents(mapViewModel)
                     Hud(
                         player,
                         gameModel,
+                        mapViewModel,
                         game.players,
                         gameTurn,
                         mapViewModel.interactableProperty.value?.name ?: ""
@@ -83,7 +84,7 @@ class GameActivity : ComponentActivity() {
                     .testTag("next_turn_button"),
                 onClick = {
                     if (!gameEnded) {
-                        gameModel.nextTurn()
+//                        gameModel.nextTurn()
                     }
                 },
                 shape = CircleShape
@@ -111,6 +112,6 @@ class GameActivity : ComponentActivity() {
     }
 
     companion object {
-        val mapViewModel: MapViewModel = MapViewModel()
+        private val mapViewModel: MapViewModel = MapViewModel()
     }
 }

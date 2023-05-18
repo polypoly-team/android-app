@@ -24,9 +24,7 @@ import com.github.polypoly.app.ui.map.MapViewModel
 @Composable
 fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
     val playerState = gameViewModel.getPlayerState().observeAsState().value
-
-    val markerSelected = mapViewModel.getSelectedMarkerData().observeAsState().value ?: return
-    val locationSelected = mapViewModel.markerToLocationProperty[markerSelected] ?: LocationProperty()
+    val locationSelected = mapViewModel.getLocationSelected().observeAsState().value ?: return
 
     PropertyInteractDialog(locationSelected, gameViewModel, mapViewModel)
 
@@ -34,7 +32,7 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
         BetDialog(
             onBuy = { valueBet ->
                 onBuy(valueBet, gameViewModel)
-                leaveInteractionDialog(gameViewModel, GameActivity.mapViewModel)
+                leaveInteractionDialog(gameViewModel, mapViewModel)
             },
             onClose = { leaveInteractionDialog(gameViewModel, mapViewModel) },
             locationOnBet = locationSelected
@@ -94,7 +92,7 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
 
 private fun leaveInteractionDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
     gameViewModel.cancelBetting()
-    mapViewModel.selectMarker(null)
+    mapViewModel.selectLocation(null)
 }
 
 private fun onBuy(valueBet: Float, gameViewModel: GameViewModel) {
