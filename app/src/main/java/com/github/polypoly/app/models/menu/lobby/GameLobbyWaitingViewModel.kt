@@ -52,10 +52,13 @@ class GameLobbyWaitingViewModel(
 
     fun setGameLobby(gameLobby: GameLobby) {
         // TODO: here we "force" the value change to make sure that it toggles the recomposition
-        gameLobbyData.value = GameLobby()
-        gameLobbyData.value = gameLobby
-        readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
+        gameLobbyData.postValue(GameLobby())
+        gameLobbyData.postValue(gameLobby)
+        readyForStartData.postValue(gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers)
         setLoading(false)
+        for (future in waitingForSyncPromise)
+            future.complete(true)
+        waitingForSyncPromise.clear()
     }
 
     private fun listenGameLobby() {

@@ -20,6 +20,10 @@ class MockDB: IRemoteStorage {
         return key.removePrefix("/").removeSuffix("/")
     }
 
+    private fun <T: StorableObject<*>> computeAbsoluteKey(key: String, clazz: KClass<T>): String {
+        return cleanKey(StorableObject.getPath(clazz) + key)
+    }
+
     // ====================================================================================
     // ========================================================================== OVERRIDES
     // ====================================================================================
@@ -30,7 +34,7 @@ class MockDB: IRemoteStorage {
         key: String,
         clazz: KClass<T>
     ): CompletableFuture<T> {
-        val keyCleaned = cleanKey(StorableObject.getPath(clazz) + key)
+        val keyCleaned = computeAbsoluteKey(key, clazz)
         if (!data.containsKey(keyCleaned)) {
             val failedFuture = CompletableFuture<T>()
             failedFuture.completeExceptionally(NoSuchElementException("Invalid key $keyCleaned"))
@@ -105,20 +109,21 @@ class MockDB: IRemoteStorage {
     // ========================================================================== LISTENERS
 
     override fun <T : StorableObject<*>> addOnChangeListener(key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
-        val listenersFound = listeners[key] ?: mutableListOf()
+        val absoluteKey = computeAbsoluteKey(key, clazz)
+        val listenersFound = listeners[absoluteKey] ?: mutableListOf()
         @Suppress("UNCHECKED_CAST")
         listenersFound.add(Pair(tag, action as (Any) -> Unit))
-        listeners[key] = listenersFound
+        listeners[absoluteKey] = listenersFound
         return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteOnChangeListener(key: String, tag: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        listeners[key]?.removeIf { listener -> listener.first == tag }
+        listeners[computeAbsoluteKey(key, clazz)]?.removeIf { listener -> listener.first == tag }
         return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        listeners.remove(key)
+        listeners.remove(computeAbsoluteKey(key, clazz))
         return CompletableFuture.completedFuture(true)
     }
 
