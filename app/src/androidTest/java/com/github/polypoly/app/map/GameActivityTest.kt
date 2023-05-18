@@ -142,10 +142,6 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
 
-    private fun waitForUIToUpdate() {
-        runBlocking { delay(500) }
-    }
-
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())

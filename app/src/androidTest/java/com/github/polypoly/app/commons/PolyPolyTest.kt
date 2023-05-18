@@ -18,10 +18,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -233,9 +230,20 @@ abstract class PolyPolyTest(
         val scope = CoroutineScope(Dispatchers.Main + Job())
         val future = CompletableFuture<Boolean>()
         scope.launch {
-            action()
-            future.complete(true)
+            try {
+                action()
+                future.complete(true)
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
+            }
         }
         return future
+    }
+
+    /**
+     * Waits for an update of the UI to start
+     */
+    fun waitForUIToUpdate() {
+        runBlocking { delay(500) }
     }
 }

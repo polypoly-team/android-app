@@ -37,7 +37,7 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
     @Test
     fun openDialogWhenInteractingWithPropertyTrue() {
         setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        runBlocking { delay(500) }
+        waitForUIToUpdate()
 
         composeTestRule.onNodeWithTag("building_description_dialog").assertIsDisplayed()
     }
@@ -50,7 +50,7 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
         val locationName = locationWithDescription.name
 
         setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        runBlocking { delay(500) }
+        waitForUIToUpdate()
 
         composeTestRule.onNodeWithText(locationName)
         composeTestRule.onNodeWithText(locationWithDescription.description)
@@ -69,7 +69,7 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
 
             setLocationInMapViewModel(locationWithoutDescription).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-            runBlocking { delay(500) }
+            waitForUIToUpdate()
             composeTestRule.onNodeWithText(locationName)
             composeTestRule.onNodeWithText("No Info about this building")
         } catch (_: NoSuchElementException) {}
@@ -78,10 +78,10 @@ class VisitMapActivityTest : PolyPolyTest(true, true) {
     @Test
     fun clickOnCloseButtonCloseTheDialog() {
         setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        runBlocking { delay(500) }
+        waitForUIToUpdate()
         composeTestRule.onNodeWithTag("building_description_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithTag("close_building_description_dialog").performClick()
-        runBlocking { delay(500) }
+        waitForUIToUpdate()
         composeTestRule.onNodeWithTag("building_description_dialog").assertDoesNotExist()
     }
 

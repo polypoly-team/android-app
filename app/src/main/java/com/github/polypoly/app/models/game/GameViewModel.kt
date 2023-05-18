@@ -116,8 +116,9 @@ class GameViewModel(
     }
 
     private fun playerStateFSMTransition(expectedFrom: PlayerState, to: PlayerState) {
-        if (playerStateData.value != expectedFrom)
-            return
+        if (playerStateData.value != expectedFrom) {
+            throw IllegalStateException("Illegal state transition from ${playerStateData.value} instead of $expectedFrom to $to")
+        }
         playerStateData.value = to
     }
 
@@ -190,6 +191,7 @@ class GameViewModel(
     /**
      * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
      * ensuring that the player does not visit the same location twice.
+     * @param currentLocation current location that the player can interact with. May be null if no such location exist
      */
     fun rollDiceLocations(currentLocation: LocationProperty?): CompletableFuture<List<LocationProperty>> {
         val result = CompletableFuture<List<LocationProperty>>()

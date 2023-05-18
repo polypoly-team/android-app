@@ -9,8 +9,10 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.osmdroid.util.GeoPoint
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class GameViewModelTest: PolyPolyTest(true, false) {
@@ -58,39 +60,71 @@ class GameViewModelTest: PolyPolyTest(true, false) {
 
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
+
+        execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
+        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
+
         execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
-        execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
-        execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
 
-        execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-
-        execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
-        execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
-        execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        assertEquals(PlayerState.MOVING, model.getPlayerStateData().value)
-
-        execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-
-        execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
-        execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
-        execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.cancelBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.INTERACTING, model.getPlayerStateData().value)
 
         execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
 
-        execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.diceRolled() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
-        execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.locationReached() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
-        execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+        assertThrows(ExecutionException::class.java) {
+            execInMainThread { model.startBetting() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        }
         assertEquals(PlayerState.BETTING, model.getPlayerStateData().value)
     }
 
