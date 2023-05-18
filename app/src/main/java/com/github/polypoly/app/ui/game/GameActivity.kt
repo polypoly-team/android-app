@@ -54,7 +54,6 @@ class GameActivity : ComponentActivity() {
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
         if (game != null && gameTurn != null && gameEnded != null) {
-            val openLocationsDialog = remember { mutableStateOf(true) }
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -75,9 +74,6 @@ class GameActivity : ComponentActivity() {
                         mapViewModel.interactableProperty.value?.name ?: ""
                     )
                     GameEndedLabel(gameEnded)
-                    if (openLocationsDialog.value) {
-                        LocationsDialog(title = "Choose a location", openLocationsDialog, player.getOwnedLocations())
-                    }
                 }
             }
         }

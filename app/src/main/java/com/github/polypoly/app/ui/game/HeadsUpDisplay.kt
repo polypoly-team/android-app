@@ -3,14 +3,7 @@ package com.github.polypoly.app.ui.game
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -40,6 +33,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.data.GameRepository.Companion.player
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
@@ -238,6 +232,11 @@ fun HudOtherPlayer(playerData: Player) {
         }
     }
 
+    val openLocationsDialog =  remember{ mutableStateOf(false) }
+    if (openLocationsDialog.value) {
+        player?.let { LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) }
+    }
+
     if (openOtherPlayerInfo) {
         Dialog(
             onDismissRequest = { openOtherPlayerInfo = false },
@@ -250,7 +249,20 @@ fun HudOtherPlayer(playerData: Player) {
                     .fillMaxWidth()
             ) {
                 // TODO: Add information about other players
-                Text(text = "Other player info")
+                Column(
+                    modifier = Modifier
+                        .padding(Padding.large),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "Do you want to trade with this player?")
+                    Spacer(modifier = Modifier.height(Padding.medium))
+                    Button(onClick = {
+                        openLocationsDialog.value = true
+                        openOtherPlayerInfo = false
+                    }) {
+                        Text(text = "Trade")
+                    }
+                }
             }
         }
     }

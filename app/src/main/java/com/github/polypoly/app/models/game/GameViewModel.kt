@@ -1,5 +1,7 @@
 package com.github.polypoly.app.models.game
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +30,8 @@ class GameViewModel(
     private val roundTurnData: MutableLiveData<Int> = MutableLiveData(game.currentRound)
 
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    val openLocationsDialog: MutableState<Boolean> = mutableStateOf(false)
 
     fun getGameData(): LiveData<Game> {
         return gameData

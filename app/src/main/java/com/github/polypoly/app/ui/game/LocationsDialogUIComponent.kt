@@ -57,7 +57,7 @@ fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open:
     Column {
         Text(text = title,
             color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.h6,
             modifier = Modifier
                 .padding(Padding.medium)
         )
