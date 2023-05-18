@@ -1,17 +1,20 @@
 package com.github.polypoly.app.base.game
 
+import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+
 @RunWith(JUnit4::class)
 class GameTest {
 
@@ -87,5 +90,58 @@ class GameTest {
         assertEquals(5, ranking?.get(testUser5.id))
         assertEquals(3, ranking?.get(testUser6.id))
 
+    }
+
+    @Test
+    fun whenGameStartEveryPlayerHasTheCorrectLocation() {
+        gameLobby.start()
+        for (player in Game.gameInProgress?.players!!) {
+            assertEquals(0, player.ownedLocations.size)
+        }
+    }
+
+    @Test
+    fun whenGameStartEveryPlayerHasTheCorrectLocationLandlordMode() {
+        for (i in 1..GameLobbyConstants.maxBuildingPerLandlord) {
+            val gameRules = GameParameters(
+                GameMode.LANDLORD, 3, 7,
+                testDuration, 10, LocationPropertyRepository.getZones(), 200, i
+            )
+            val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
+            gameLobby.addUser(testUser2)
+            gameLobby.addUser(testUser3)
+            gameLobby.addUser(testUser4)
+            gameLobby.addUser(testUser5)
+            gameLobby.addUser(testUser6)
+            gameLobby.start()
+            for (player in Game.gameInProgress?.players!!) {
+                assertEquals(i, player.ownedLocations.size)
+            }
+        }
+    }
+
+    @Test
+    fun noLocationsOverlapLandlordMode() {
+        for (i in 1..GameLobbyConstants.maxBuildingPerLandlord) {
+            val gameRules = GameParameters(
+                GameMode.LANDLORD, 3, 7,
+                testDuration, 10, LocationPropertyRepository.getZones(), 200, i
+            )
+            val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
+            gameLobby.addUser(testUser2)
+            gameLobby.addUser(testUser3)
+            gameLobby.addUser(testUser4)
+            gameLobby.addUser(testUser5)
+            gameLobby.addUser(testUser6)
+            gameLobby.start()
+            val ownedLocationsSet = mutableSetOf<InGameLocation>()
+
+            for (player in Game.gameInProgress?.players!!)
+                for (location in player.ownedLocations) {
+                    if (ownedLocationsSet.contains(location))
+                        fail("Location $location is duplicated.")
+                    ownedLocationsSet.add(location)
+                }
+        }
     }
 }

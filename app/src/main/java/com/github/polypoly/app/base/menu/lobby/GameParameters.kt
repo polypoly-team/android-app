@@ -1,5 +1,6 @@
 package com.github.polypoly.app.base.menu.lobby
 
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
@@ -15,7 +16,7 @@ import com.github.polypoly.app.base.game.location.LocationPropertyRepository
  * @property gameMap The map of the game whit the different zones available
  * @property initialPlayerBalance The initial balance of money of the players
  */
-data class GameParameters (
+data class GameParameters(
     val gameMode: GameMode = GameMode.RICHEST_PLAYER,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
@@ -23,6 +24,7 @@ data class GameParameters (
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationPropertyRepository.getZones(),
     val initialPlayerBalance: Int = 500,
+    val maxBuildingPerLandlord: Int = GameLobbyConstants.maxBuildingPerLandlord
 ) {
 
     init {

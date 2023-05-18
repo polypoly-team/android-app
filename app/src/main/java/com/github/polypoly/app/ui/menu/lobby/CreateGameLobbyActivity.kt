@@ -34,18 +34,19 @@ import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_L
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_PLAYERS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_ROUNDS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MENU_PICKER_WIDTH
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_BUILDINGS_PER_LANDLORD
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_PLAYERS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_ROUNDS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.maxBuildingPerLandlord
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
-import java.util.concurrent.CompletableFuture
 
 class CreateGameLobbyActivity :  MenuActivity("Create a game") {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,13 +84,15 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         var roundDuration by remember { mutableStateOf(GameLobbyConstants.RoundDurations.getDefaultValue()) }
         var gameMode by remember { mutableStateOf(GameMode.RICHEST_PLAYER) }
         var initialPlayerBalance by remember { mutableStateOf(GAME_LOBBY_INITIAL_BALANCE_DEFAULT) }
+        var numberOfBuildingsPerLandlord by remember { mutableStateOf(GAME_LOBBY_MIN_BUILDINGS_PER_LANDLORD) }
 
         val createGameEnabled : Boolean = gameName.isNotBlank()
 
         val focusManager = LocalFocusManager.current
 
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 25.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 25.dp)
                 .testTag("create_game_menu"),
         ) {
             OutlinedTextField(
@@ -106,23 +109,33 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 }),
                 singleLine = true,
                 label = { Text(getString(R.string.create_game_lobby_choose_game_name)) },
-                modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally).testTag("game_name_text_field"),
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally)
+                    .testTag("game_name_text_field"),
                 colors = UIElements.outlineTextFieldColors()
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth().testTag("private_game_row"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("private_game_row"),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(getString(R.string.create_game_lobby_private_game), modifier = Modifier.weight(1f).testTag("private_game_text"))
+                Text(getString(R.string.create_game_lobby_private_game), modifier = Modifier
+                    .weight(1f)
+                    .testTag("private_game_text"))
 
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.weight(1f).fillMaxWidth()
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
                 ) {
                     Checkbox(
-                        modifier = Modifier.offset(x = 14.dp)
+                        modifier = Modifier
+                            .offset(x = 14.dp)
                             .testTag("private_game_checkbox"),
                         checked = isPrivateGame,
                         onCheckedChange = {isPrivateGame = !isPrivateGame},
@@ -183,13 +196,27 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
 
             Divider(
-                modifier = Modifier.padding(vertical = Padding.large).fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .padding(vertical = Padding.large)
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally),
                 thickness = 1.dp,
                 color = androidx.compose.ui.graphics.Color.Black
             )
 
+            if (gameMode == GameMode.LANDLORD) {
+                NumberPickerField(
+                    title = getString(R.string.create_game_lobby_landlord_num_properties),
+                    value = numberOfBuildingsPerLandlord,
+                    onValueChange = { numberOfBuildingsPerLandlord = it },
+                    minValue = GAME_LOBBY_MIN_BUILDINGS_PER_LANDLORD,
+                    maxValue = maxBuildingPerLandlord,
+                )
+            }
+
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .testTag("create_game_lobby_column"),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -240,7 +267,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         step: Int = 1,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().testTag("${title}number_picker_row"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("${title}number_picker_row"),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = title, modifier = Modifier.weight(1f))
@@ -287,7 +316,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
         val currentIndex = items.indexOf(value)
 
         Row(
-            modifier = Modifier.fillMaxWidth().testTag("${title}list_picker_row"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("${title}list_picker_row"),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = title, modifier = Modifier.weight(1f))
@@ -303,7 +334,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             )
             Text(
                 text = value.toString(),
-                modifier = Modifier.width(width).wrapContentWidth(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .width(width)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
                     .testTag("${title}list_picker_field"),
                 textAlign = TextAlign.Center
             )
@@ -329,7 +362,9 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = (if(leftArrow) "left_" else "right_") +"arrow",
-                modifier = Modifier.size(24.dp).rotate(if (leftArrow) 180f else 0f)
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(if (leftArrow) 180f else 0f)
             )
         }
     }
