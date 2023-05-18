@@ -6,6 +6,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.InGameLocation
 
@@ -19,6 +21,7 @@ import com.github.polypoly.app.base.game.location.InGameLocation
 fun ProposeTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>,
                        openDialogChooseLocation: MutableState<Boolean>) {
     AlertDialog(
+        modifier = Modifier.testTag("propose_trade_dialog"),
         onDismissRequest = { openDialog.value = false },
         title = { Text(text = "Player ${playerApplicant.user.name} propose you a trade !") },
         text = { Text(text = "Do you accept ?") },
@@ -52,6 +55,7 @@ fun AcceptTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>
                       locationGiven: InGameLocation, locationReceived: InGameLocation,
                         currentPlayerAcceptation: MutableState<Boolean?>) {
     AlertDialog(
+        modifier = Modifier.testTag("accept_trade_dialog"),
         onDismissRequest = {},
         title = { Text(text = "Do you want to trade ${locationGiven.locationProperty.name} against" +
                 " ${locationReceived.locationProperty.name} with ${playerApplicant.user.name}?") },
@@ -81,6 +85,7 @@ fun AcceptTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>
 @Composable
 fun WaitingForTheOtherPlayerDecisionDialog() {
     AlertDialog(
+        modifier = Modifier.testTag("waiting_for_the_other_player_decision_dialog"),
         onDismissRequest = {},
         title = { Text(text = "Waiting for the other player decision ... ") },
         text = {},
@@ -96,6 +101,7 @@ fun WaitingForTheOtherPlayerDecisionDialog() {
 @Composable
 fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>) {
     AlertDialog(
+        modifier = Modifier.testTag("the_trade_is_done_dialog"),
         onDismissRequest = {
             openDialog.value = false
         },
