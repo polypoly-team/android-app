@@ -59,11 +59,11 @@ class GameViewModel(
                 // TODO: Remove this when the game is created from the lobby
                 GameRepository.game = Game.launchFromPendingGame(
                     GameLobby(
-                        admin = GlobalInstances.currentUser!!
+                        admin = GlobalInstances.currentUser ?: User()
                     )
                 )
                 GameRepository.player = Player(
-                    GlobalInstances.currentUser!!,
+                    GlobalInstances.currentUser ?: User(),
                     3000
                 )
                 GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
