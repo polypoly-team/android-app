@@ -18,5 +18,7 @@ class Settings {
         const val DB_USER_SKIN_DIRECTORY = "skin"
 
         const val DB_USER_STATS_DIRECTORY = "stats"
+
+        const val DB_TRADE_REQUESTS_PATH = "trade_requests/"
     }
 }

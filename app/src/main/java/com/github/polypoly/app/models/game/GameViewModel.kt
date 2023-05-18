@@ -1,22 +1,31 @@
 package com.github.polypoly.app.models.game
 
+import android.content.BroadcastReceiver
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
+import com.github.polypoly.app.network.getAllValues
+import com.github.polypoly.app.network.getValues
 import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.CompletableFuture
 
 class GameViewModel(
     game: Game,
@@ -31,7 +40,17 @@ class GameViewModel(
 
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    val openLocationsDialog: MutableState<Boolean> = mutableStateOf(false)
+    private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
+
+    init {
+        viewModelScope.launch {
+            listenToTradeRequest()
+        }
+    }
+
+    fun getTradeRequestData(): LiveData<TradeRequest> {
+        return tradeRequestData
+    }
 
     fun getGameData(): LiveData<Game> {
         return gameData
@@ -53,6 +72,33 @@ class GameViewModel(
         gameData.value?.nextTurn()
         roundTurnData.value = gameData.value?.currentRound ?: -1
         gameEndedData.value = gameData.value?.isGameFinished() ?: false
+    }
+
+    suspend fun listenToTradeRequest() {
+        while (gameData.value?.isGameFinished() == true) {
+            remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
+                tradeRequests.forEach { tradeRequest ->
+                    if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name) {
+                        tradeRequestData.value = tradeRequest
+                    }
+                }
+            }
+            delay(2500)
+        }
+    }
+
+    fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation): CompletableFuture<Boolean> {
+        val playerDataValue = playerData.value ?: return CompletableFuture.completedFuture(false)
+        val tradeRequest = TradeRequest(
+            playerApplicant = playerDataValue,
+            playerReceiver = playerReceiver,
+            locationGiven = locationGiven,
+            locationReceived = null,
+            currentPlayerApplicantAcceptation = null,
+            currentPlayerReceiverAcceptation = null,
+            code = "${playerReceiver.user.name}${playerDataValue.user.name}",
+        )
+        return remoteDB.setValue(tradeRequest)
     }
 
     companion object {

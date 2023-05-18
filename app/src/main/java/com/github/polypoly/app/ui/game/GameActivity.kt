@@ -52,6 +52,7 @@ class GameActivity : ComponentActivity() {
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
+        val trade = gameModel.getTradeRequestData().observeAsState().value
 
         if (game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
@@ -74,6 +75,8 @@ class GameActivity : ComponentActivity() {
                         mapViewModel.interactableProperty.value?.name ?: ""
                     )
                     GameEndedLabel(gameEnded)
+                    if(trade != null) {
+                    }
                 }
             }
         }
