@@ -234,7 +234,10 @@ fun HudOtherPlayer(playerData: Player) {
 
     val openLocationsDialog =  remember{ mutableStateOf(false) }
     if (openLocationsDialog.value) {
-        player?.let { LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) }
+        player?.let { LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) {
+            openLocationsDialog.value = false
+            // TODO : Put in the DB the trade
+        } }
     }
 
     if (openOtherPlayerInfo) {

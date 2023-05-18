@@ -33,7 +33,8 @@ import com.github.polypoly.app.ui.theme.Padding
  * @param locationsOwnByPlayer The locations the current player owns.
  */
 @Composable
-fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPlayer: List<InGameLocation>) {
+fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPlayer: List<InGameLocation>,
+    onClick: (InGameLocation) -> Unit) {
     Dialog (
         onDismissRequest = { open.value = false },
     ) {
@@ -43,7 +44,7 @@ fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPl
                 .testTag("locationsDialog")
                 .fillMaxWidth(0.95f)
         ) {
-            LocationsDialogBody(locationList = locationsOwnByPlayer, title, open )
+            LocationsDialogBody(locationList = locationsOwnByPlayer, title, open, onClick)
         }
     }
 }
@@ -53,7 +54,8 @@ fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPl
  * @param locationList The list of locations to show.
  */
 @Composable
-fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open: MutableState<Boolean>) {
+fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open: MutableState<Boolean>,
+    onClick: (InGameLocation) -> Unit) {
     Column {
         Text(text = title,
             color = MaterialTheme.colors.onPrimary,
@@ -73,9 +75,9 @@ fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open:
                     enabled = true
                 )
             ) {
-                items(items = locationList, itemContent = { item ->
-                    LocationInList(item)
-                })
+                items(items = locationList) { item ->
+                    LocationInList(item) { onClick(item) }
+                }
             }
         }
         Spacer(modifier = Modifier.height(Padding.medium))
@@ -95,9 +97,11 @@ fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open:
  * @param location The location to show.
  */
 @Composable
-fun LocationInList(location: InGameLocation) {
+fun LocationInList(location: InGameLocation, onClick: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = {
+            onClick()
+        },
         modifier = Modifier
             .fillMaxWidth(),
         shape = RectangleShape,
