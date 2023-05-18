@@ -6,17 +6,37 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
@@ -31,7 +51,7 @@ import com.google.firebase.auth.FirebaseAuth
  *
  * TODO: edit this when adding more settings
  */
-class SettingsActivity : MenuActivity("Settings") {
+class SettingsActivity : MenuActivity(R.string.title_activity_settings) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +79,7 @@ class SettingsActivity : MenuActivity("Settings") {
                     .padding(10.dp)
             ) {
                 Column {
-                    Text(text = "Song settings")
+                    Text(text = stringResource(R.string.settings_song))
                     MusicSlider()
                     if(isSignedIn) {
                         SignOutButton()
@@ -168,7 +188,7 @@ class SettingsActivity : MenuActivity("Settings") {
                         .width(100.dp)
                         .height(50.dp),
                 ) {
-                    Text(text = "Sign out")
+                    Text(text = stringResource(R.string.settings_sign_out))
                 }
             }
         }

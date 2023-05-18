@@ -16,8 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
@@ -89,7 +91,7 @@ class GameActivity : ComponentActivity() {
                 },
                 shape = CircleShape
             ) {
-                Icon(Icons.Filled.ArrowForward, contentDescription = "Next turn")
+                Icon(Icons.Filled.ArrowForward, contentDescription = stringResource(R.string.next_turn_icon_description))
             }
         }
     }
@@ -104,7 +106,7 @@ class GameActivity : ComponentActivity() {
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
-                    text = "The game ended !!",
+                    text = stringResource(R.string.game_ended_label),
                     fontWeight = FontWeight(1000)
                 )
             }

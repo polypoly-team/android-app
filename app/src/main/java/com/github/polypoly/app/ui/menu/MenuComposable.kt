@@ -2,7 +2,16 @@ package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,17 +20,28 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Equalizer
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.RulesObject
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.rankings.RankingsActivity
@@ -89,7 +109,7 @@ object MenuComposable {
         IconRoundButton(
             onClick = { openRules = true },
             icon = Icons.Default.ReceiptLong,
-            iconDescription = "Show Rules",
+            iconDescription = stringResource(R.string.rules_button_description),
             testTag = "rules_button"
         )
 
@@ -133,7 +153,7 @@ object MenuComposable {
         ActivityOptionButton(
             destinationActivity = ProfileActivity::class.java,
             icon = Icons.Default.Person,
-            description = "Open Profile",
+            description = stringResource(R.string.profile_button_description),
             testTag = "profile_button"
         )
     }
@@ -143,7 +163,7 @@ object MenuComposable {
         ActivityOptionButton(
             destinationActivity = RankingsActivity::class.java,
             icon = Icons.Default.Equalizer,
-            description = "Open Rankings",
+            description = stringResource(R.string.rankings_button_description),
             testTag = "rankings_button"
         )
     }
@@ -153,7 +173,7 @@ object MenuComposable {
         ActivityOptionButton(
             destinationActivity = SettingsActivity::class.java,
             icon = Icons.Default.Settings,
-            description = "Open Settings",
+            description = stringResource(R.string.settings_button_description),
             testTag = "settings_button"
         )
     }

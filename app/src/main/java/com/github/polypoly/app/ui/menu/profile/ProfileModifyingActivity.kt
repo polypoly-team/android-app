@@ -13,15 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 
 class ProfileModifyingActivity : ComponentActivity() {
@@ -70,7 +69,7 @@ class ProfileModifyingActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Write your info", style = MaterialTheme.typography.h5,
+            Text(stringResource(R.string.profile_form_prompt), style = MaterialTheme.typography.h5,
                 textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(10.dp))
             NicknameTextField(user.name)
@@ -79,7 +78,8 @@ class ProfileModifyingActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(40.dp))
             TrophiesSelection(trophiesDisplay, user)
             Spacer(modifier = Modifier.height(40.dp))
-            ValidationButton ({ warningText = "You can't have an empty nickname!" }, trophiesDisplay)
+            val nicknameWarningText = stringResource(R.string.profile_form_nickname_warning)
+            ValidationButton ({ warningText = nicknameWarningText }, trophiesDisplay)
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 modifier = Modifier.offset(y = 200.dp),
@@ -97,7 +97,7 @@ class ProfileModifyingActivity : ComponentActivity() {
     @Composable
     fun TrophiesSelection(trophiesDisplay: MutableList<Int>, user: User) {
         val maxSelected = 3
-        Text("Select displayed trophies", style = MaterialTheme.typography.h5,
+        Text(stringResource(R.string.profile_trophies_selection_prompt), style = MaterialTheme.typography.h5,
             textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(20.dp))
         TrophiesView(
@@ -123,7 +123,7 @@ class ProfileModifyingActivity : ComponentActivity() {
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.secondaryVariant),
         ) {
-            Text("Clear")
+            Text(stringResource(R.string.profile_trophies_selection_clear_button))
         }
     }
 
@@ -164,7 +164,7 @@ class ProfileModifyingActivity : ComponentActivity() {
             modifier = Modifier.testTag("registerInfoButton"),
             onClick = onButtonClick
         ) {
-            Text(text = "Validate profile")
+            Text(text = stringResource(R.string.profile_validate_button))
         }
     }
 

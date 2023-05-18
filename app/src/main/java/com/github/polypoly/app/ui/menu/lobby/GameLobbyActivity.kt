@@ -23,9 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
@@ -83,10 +85,10 @@ class GameLobbyActivity : ComponentActivity() {
                         if (dataLoading == true) {
                             CircularLoader()
                         } else {
-                            Text("Game Lobby name: ${gameLobby.name}")
+                            Text(stringResource(R.string.game_lobby_name, gameLobby.name))
                             PlayerGrid(gameLobby.usersRegistered)
                             GoButton(readyForStart)
-                            Text("${gameLobby.usersRegistered.size} users (min ${gameLobby.rules.minimumNumberOfPlayers} to start)")
+                            Text(stringResource(R.string.game_lobby_registered_users, gameLobby.usersRegistered.size, gameLobby.rules.minimumNumberOfPlayers))
                             QuitButton()
                         }
                     }
@@ -204,9 +206,9 @@ class GameLobbyActivity : ComponentActivity() {
                 onClick = { launchGameActivity(mContext) })
             {
                 if (enabled) {
-                    Text(text = "GO!")
+                    Text(text = stringResource(R.string.create_game_lobby_go_button_enabled))
                 } else {
-                    Text(text = "Still waiting for more players before starting...")
+                    Text(text = stringResource(R.string.create_game_lobby_go_button_disabled))
                 }
             }
         }
@@ -225,7 +227,7 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     private fun QuitButton() {
         Button(onClick = { /*TODO*/ }) {
-            Text(text = "QUIT")
+            Text(text = stringResource(R.string.create_game_lobby_quit_button))
         }
     }
 }

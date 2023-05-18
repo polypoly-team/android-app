@@ -34,7 +34,7 @@
         <activity
             android:name=".ui.menu.lobby.CreateGameLobbyActivity"
             android:exported="false"
-            android:label="@string/title_create_game_lobby"
+            android:label="@string/game_lobby_create_title"
             android:theme="@style/Theme.Polypoly" />
         <activity
             android:name=".ui.menu.settings.SettingsActivity"

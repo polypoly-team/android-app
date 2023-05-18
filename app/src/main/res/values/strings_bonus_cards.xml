@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="teaching_assistant_payday_title">Teaching assistant payday</string>
+    <string name="teaching_assistant_payday_description">You finally got your student assistant salary you\'ve been waiting for after spending hours helping BA1s debug their code. Collect 100CHF!</string>
+    <string name="tuition_fees_to_pay_title">Tuition fees to pay!</string>
+    <string name="tuition_fees_to_pay_description">It\'s time to pay your tuition fees: you have passed the is academia deadline for far too long… Lose 100CHF.</string>
+</resources>

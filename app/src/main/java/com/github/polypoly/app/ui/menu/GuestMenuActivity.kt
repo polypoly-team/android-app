@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,12 +67,12 @@ class GuestMenuActivity : ComponentActivity()  {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Welcome $nickname",
+                text = stringResource(R.string.guest_menu_greetings, nickname),
                 style = MaterialTheme.typography.h4
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "As a guest, you can only visit the map without playing.",
+                text = stringResource(R.string.guest_menu_description),
                 style = MaterialTheme.typography.body1,
                 textAlign = TextAlign.Center,
             )
@@ -93,7 +94,7 @@ class GuestMenuActivity : ComponentActivity()  {
                 finish()
                 startActivity(signInIntent) },
             testTag = "return_sign_in_button",
-            text = "Return to sign in",
+            text = stringResource(R.string.guest_menu_return_to_sign_in_button),
             width = 180,
         )
     }
@@ -111,7 +112,7 @@ class GuestMenuActivity : ComponentActivity()  {
                 startActivity(visitedMapIntent)
             },
             testTag = "discover_map_button",
-            text = "Discover the map",
+            text = stringResource(R.string.guest_menu_discover_the_map_button),
             enabled = true,
         )
     }

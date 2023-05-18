@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_close">Close</string>
+    // Bet dialog
+    <string name="bet_dialog_prompt">Enter your bet</string>
+    <string name="bet_dialog_text_field_placeholder">Enter amount</string>
+    <string name="bet_dialog_error">You cannot bet less than the base price!</string>
+    <string name="bet_dialog_confirm">Confirm</string>
+    // Roll dice
+    <string name="roll_dice_icon_description">Roll Dice</string>
+    <string name="roll_dice_dialog_title">Dice Roll</string>
+    // HUD
+    <string name="distance_walked_icon_description">Distance Walked</string>
+    <string name="next_turn_icon_description">Next turn</string>
+    <string name="player_info_button_description">See player information</string>
+    <string name="other_players_and_game_info_button_description">Expand or collapse the stats for other players and the game</string>
+    <string name="game_info_button_description">See game information</string>
+    <string name="other_player_button_description">See other player information</string>
+    <string name="game_menu_button_description">Expand or collapse the game menu</string>
+    // Announcements
+    <string name="game_ended_label">The game ended !!</string>
+    <string name="property_interact_dialog">This is some trivia related to the building and or some info related to it.</string>
+    <string name="property_interact_bet_button">Bet</string>
+    // Building descriptions
+    <string name="building_description_negative_point">"Negative point: "</string>
+    <string name="building_description_positive_point">"Positive point: "</string>
+    <string name="building_description_no_info">No info about this building</string>
+</resources>

@@ -2,7 +2,6 @@ package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -13,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -23,15 +23,14 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initCurrentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
@@ -186,7 +185,7 @@ class SignInActivity : ComponentActivity() {
                     .build()
                 signInLauncher.launch(signInIntent)
             },
-            text = "Sign in to play!",
+            text = stringResource(R.string.sign_in_button_description),
             testTag = "sign_in_button",
             enabled = true,
         )
@@ -201,7 +200,7 @@ class SignInActivity : ComponentActivity() {
             onClick = {
                 launchCreateProfile(false)
             },
-            text = "Play as guest",
+            text = stringResource(R.string.guest_button_description),
             testTag = "guest_button",
             enabled = true,
         )

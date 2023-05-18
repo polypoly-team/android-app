@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,7 @@ private const val maxRankingEntries: Int = 100
  * The rankings activity, displaying a row of rankings lists tabs of [User]s according to
  * different [RankingCategory]s
  */
-class RankingsActivity : MenuActivity("Rankings") {
+class RankingsActivity : MenuActivity(R.string.rankings_activity_name) {
     /**
      * The [RankingsViewModel] used to fetch the users from the database and compute the rankings
      */
@@ -79,7 +80,7 @@ class RankingsActivity : MenuActivity("Rankings") {
             // The background of the rankings view, displaying the game map
             Image(
                 painter = painterResource(id = R.drawable.epfl_osm_2),
-                contentDescription = "A background image of the game map",
+                contentDescription = stringResource(R.string.rankings_background_description),
                 modifier = Modifier
                     .fillMaxSize(),
                 contentScale = ContentScale.FillBounds
@@ -91,7 +92,7 @@ class RankingsActivity : MenuActivity("Rankings") {
                     .background(color = Color.Black.copy(alpha = 0.4f))
             ) {
                 CustomTabRow(
-                    tabs = tabs.map { it.description },
+                    tabs = tabs.map { stringResource(it.description) },
                     state = state
                 )
 

@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -85,20 +87,20 @@ class VisitMapActivity : ComponentActivity()  {
     @Composable
     private fun BuildingDescription(currentProperty: LocationProperty) {
         Column {
-            if(currentProperty.description != "") {
-                Text(text = currentProperty.description)
+            if(currentProperty.description != 0) {
+                Text(text = stringResource(currentProperty.description))
             } else {
-                Text(text ="No Info about this building")
+                Text(text = stringResource(R.string.building_description_no_info))
             }
             Spacer(modifier = Modifier.height(Padding.medium))
-            if(currentProperty.positivePoint != "") {
-                Text(text = "Positive point: ", color = MaterialTheme.colors.primary)
-                Text(text = currentProperty.positivePoint)
+            if(currentProperty.positivePoint != 0) {
+                Text(text = stringResource(R.string.building_description_positive_point), color = MaterialTheme.colors.primary)
+                Text(text = stringResource(currentProperty.positivePoint))
                 Spacer(modifier = Modifier.height(Padding.medium))
             }
-            if(currentProperty.negativePoint != "") {
-                Text(text = "Negative point: ", color = MaterialTheme.colors.primary)
-                Text(text = currentProperty.negativePoint)
+            if(currentProperty.negativePoint != 0) {
+                Text(text = stringResource(R.string.building_description_negative_point), color = MaterialTheme.colors.primary)
+                Text(text = stringResource(currentProperty.negativePoint))
             }
         }
     }
@@ -115,7 +117,7 @@ class VisitMapActivity : ComponentActivity()  {
                 .testTag("close_building_description_dialog")
                 .padding(Padding.large),
         ) {
-            Text(text = "Close")
+            Text(text = stringResource(R.string.dialog_close))
         }
     }
 

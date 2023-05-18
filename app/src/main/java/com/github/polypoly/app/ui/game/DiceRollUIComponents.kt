@@ -17,8 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
@@ -43,7 +45,7 @@ fun RollDiceButton() {
             },
             shape = CircleShape
         ) {
-            Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
+            Icon(Icons.Filled.Casino, contentDescription = stringResource(R.string.roll_dice_icon_description))
         }
     }
 }
@@ -57,7 +59,7 @@ fun RollDiceDialog() {
         Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
             AlertDialog(
                 onDismissRequest = { showRollDiceDialog.value = false },
-                title = { Text("Dice Roll") },
+                title = { Text(stringResource(R.string.roll_dice_dialog_title)) },
                 text = {
                     Column {
                         val rollDice = rollDiceLocations()
@@ -73,7 +75,7 @@ fun RollDiceDialog() {
                 },
                 confirmButton = {
                     Button(onClick = { showRollDiceDialog.value = false }) {
-                        Text("Quit")
+                        Text(stringResource(R.string.dialog_close))
                     }
                 }
             )

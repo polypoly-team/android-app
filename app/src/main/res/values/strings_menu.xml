@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // Game lobby
+    <string name="game_lobby_name">"Game lobby name: %s"</string>
+    <string name="game_lobby_registered_users">"%d users (min %d to start)"</string>
+    <string name="game_lobby_duration_min">"%d min</string>
+    <string name="game_lobby_duration_hour">"%d hour</string>
+    <string name="game_lobby_duration_hours">"%d hours</string>
+    <string name="game_lobby_duration_day">"%d day</string>
+    <string name="game_lobby_duration_days">"%d days</string>
+    <string name="game_lobby_create_title">CreateLobby</string>
+    <string name="game_lobby_join_button_text">Join</string>
+    <string name="game_lobby_does_not_exist">Lobby does not exist</string>
+    <string name="game_lobby_code_is_empty">Lobby code is empty</string>
+    <string name="game_lobby_is_full">Lobby is full</string>
+    <string name="game_lobby_joined_with_code">Joined lobby with code: </string>
+    <string name="game_lobby_list_title">Join a lobby! </string>
+    <string name="game_lobby_join_game">Join a game</string>
+    <string name="game_lobby_logo_description">polypoly logo</string>
+    <string name="game_lobby_code_prompt">Enter a lobby code</string>
+    <string name="game_lobby_list_button_description">Show GameLobbies</string>
+    <string name="game_lobby_list_no_lobby_code">Don\'t have a lobby code?</string>
+    <string name="game_lobby_card_icon">people icon</string>
+    <string name="game_lobby_card_players">Players:</string>
+    <string name="game_lobby_card_updating">Updating in a few seconds</string>
+    <string name="game_lobby_card_round_duration">"Round duration: "</string>
+    <string name="game_lobby_card_game_mode">"Game mode: "</string>
+    // Create game lobby
+    <string name="create_game_lobby_choose_game_name">Choose a game name</string>
+    <string name="create_game_lobby_private_game">Private game :</string>
+    <string name="create_game_lobby_min_num_players">Min number of players :</string>
+    <string name="create_game_lobby_max_num_players">Max number of players :</string>
+    <string name="create_game_lobby_num_rounds">Number of rounds :</string>
+    <string name="create_game_lobby_round_duration">Round duration :</string>
+    <string name="create_game_lobby_game_mode">Game mode :</string>
+    <string name="create_game_lobby_initial_balance">Initial player balance:</string>
+    <string name="create_game_lobby_game_code">Game code is: %s</string>
+    <string name="create_game_lobby_create_game">Create game</string>
+    <string name="create_game_lobby_landlord_num_properties">Initial number of buildings per Landlord:</string>
+    <string name="create_game_lobby_activity_name">Create a game</string>
+    <string name="create_game_lobby_go_button_enabled">GO!</string>
+    <string name="create_game_lobby_go_button_disabled">Still waiting for more players before starting…</string>
+    <string name="create_game_lobby_quit_button">QUIT</string>
+    // Create profile
+    <string name="create_profile_prompt">How do you want\nto be named?</string>
+    <string name="create_profile_go_back_button_description">Return Arrow</string>
+    <string name="create_profile_validate_button">Let\'s go with this nickname!</string>
+    // Profile
+    <string name="profile_activity_name">Profile</string>
+    <string name="profile_stats_games_played">Games played</string>
+    <string name="profile_stats_games_won">Games won</string>
+    <string name="profile_stats_km_traveled">Kilometers traveled</string>
+    <string name="profile_stats_trophies_won">Trophies won</string>
+    <string name="profile_form_nickname_warning">You can\'t have an empty nickname!</string>
+    <string name="profile_form_prompt">Write your info</string>
+    <string name="profile_trophies_selection_prompt">Select displayed trophies</string>
+    <string name="profile_trophies_selection_clear_button">Clear</string>
+    <string name="profile_validate_button">Validate profile</string>
+    <string name="profile_trophy_icon_description">Trophy Icon</string>
+    // Rankings
+    <string name="rankings_ranking_category_wins">Most Wins</string>
+    <string name="rankings_ranking_category_trophies">Most Trophies</string>
+    <string name="rankings_ranking_category_games">Most Games</string>
+    <string name="rankings_activity_name">Rankings</string>
+    <string name="rankings_background_description">A background image of the game map</string>
+    // Guest menu
+    <string name="guest_menu_greetings">Welcome %s</string>
+    <string name="guest_menu_description">As a guest, you can only visit the map without playing.</string>
+    <string name="guest_menu_return_to_sign_in_button">Return to sign in</string>
+    <string name="guest_menu_discover_the_map_button">Discover the map</string>
+    // Menu
+    <string name="rules_button_description">Show Rules</string>
+    <string name="profile_button_description">Open Profile</string>
+    <string name="rankings_button_description">Open Rankings</string>
+    <string name="settings_button_description">Open Settings</string>
+    <string name="sign_in_button_description">Sign in to play!</string>
+    <string name="guest_button_description">Play as guest</string>
+    <string name="join_game_button">Join Game!</string>
+    <string name="create_game_button">Create Game?</string>
+    // Settings
+    <string name="settings_song">Song settings</string>
+    <string name="settings_sign_out">Sign out</string>
+    <string name="profile_statistics">Statistics</string>
+</resources>

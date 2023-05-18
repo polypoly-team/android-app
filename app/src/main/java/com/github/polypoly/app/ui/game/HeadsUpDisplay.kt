@@ -32,13 +32,14 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
@@ -107,7 +108,7 @@ fun HudPlayer(playerData: Player) {
                 name = "playerInfoButton",
                 onClick = { openPlayerInfo = true },
                 icon = Icons.Filled.Person,
-                description = "See player information"
+                description = stringResource(R.string.player_info_button_description)
             )
         }
     }
@@ -150,7 +151,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                 // the game
                 ToggleIconButton(
                     "otherPlayersAndGameDropDownButton",
-                    "Expand or collapse the stats for other players and the game",
+                    stringResource(R.string.other_players_and_game_info_button_description),
                     { isExpanded = !isExpanded },
                     isExpanded,
                     Icons.Filled.ArrowDropUp,
@@ -194,7 +195,7 @@ fun HudGame(round: Int) {
             name = "gameInfoButton",
             onClick = { openGameInfo = true },
             icon = Icons.Filled.Info,
-            description = "See game information"
+            description = stringResource(R.string.game_info_button_description)
         )
         Column(Modifier.padding(Padding.medium)) {
             HudText("gameRound", text = "Round $round")
@@ -231,7 +232,7 @@ fun HudOtherPlayer(playerData: Player) {
             name = "otherPlayerInfoButton",
             onClick = { openOtherPlayerInfo = true },
             icon = Icons.Filled.Person,
-            description = "See other player information"
+            description = stringResource(R.string.other_player_button_description)
         )
         Column(Modifier.padding(Padding.medium)) {
             HudText("playerBalance", "${playerData.getBalance()} $")
@@ -288,7 +289,7 @@ fun HudGameMenu() {
                     name = "gameMenuDropDownButton",
                     onClick = { openGameMenu = !openGameMenu },
                     icon = Icons.Filled.Menu,
-                    description = "Expand or collapse the game menu"
+                    description = stringResource(R.string.game_menu_button_description)
                 )
             }
         }

@@ -18,9 +18,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
 /**
@@ -34,7 +36,7 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit) {
     AlertDialog(
         onDismissRequest = onClose,
         title = {
-            Text(text = "Enter your bet")
+            Text(text = stringResource(R.string.bet_dialog_prompt))
         },
         modifier = Modifier.testTag("betDialog"),
         text = {
@@ -66,7 +68,7 @@ private fun BetDialogBody(
         TextField(
             value = inputPrice.value,
             onValueChange = { newValue -> inputPrice.value = newValue },
-            placeholder = { Text(text = "Enter amount") },
+            placeholder = { Text(text = stringResource(R.string.bet_dialog_text_field_placeholder)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -79,7 +81,7 @@ private fun BetDialogBody(
         )
         if (showError.value) {
             Text(
-                text = "You cannot bet less than the base price!",
+                text = stringResource(R.string.bet_dialog_error),
                 color = colors.error,
                 style = typography.caption,
                 modifier = Modifier
@@ -118,7 +120,7 @@ private fun BetDialogButtons(
             }
         ) {
             Text(
-                text = "Confirm",
+                text = stringResource(R.string.bet_dialog_confirm),
                 modifier = Modifier.testTag("confirmBetButton")
             )
         }
@@ -127,7 +129,7 @@ private fun BetDialogButtons(
             onClick = onClose
         ) {
             Text(
-                text = "Close",
+                text = stringResource(R.string.dialog_close),
                 modifier = Modifier.testTag("closeBetButton")
             )
         }

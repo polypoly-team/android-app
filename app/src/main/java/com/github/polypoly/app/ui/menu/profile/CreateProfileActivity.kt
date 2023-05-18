@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,15 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.menu.GuestMenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding.large
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
-import com.github.polypoly.app.ui.theme.grey1
-import com.github.polypoly.app.ui.theme.grey2
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 
 /**
@@ -63,7 +61,7 @@ class CreateProfileActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "How do you want\nto be named?",
+                    text = stringResource(R.string.create_profile_prompt),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.h4,
                 )
@@ -92,7 +90,7 @@ class CreateProfileActivity : ComponentActivity() {
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Return Arrow",
+                contentDescription = stringResource(R.string.create_profile_go_back_button_description),
                 tint = MaterialTheme.colors.secondary,
                 modifier = Modifier.padding(large)
                     .size(60.dp)
@@ -133,7 +131,7 @@ class CreateProfileActivity : ComponentActivity() {
                     startActivity(guestMenuIntent)
                 }
             },
-            text = "Let's go with this nickname!",
+            text = stringResource(R.string.create_profile_validate_button),
             enabled = nickname.value.isNotEmpty(),
             testTag = "validate_button",
             width = 300,

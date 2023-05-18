@@ -1,7 +1,9 @@
 package com.github.polypoly.app.ui.menu.lobby
 
+import android.content.Context
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
+import com.github.polypoly.app.R
 
 /**
  * Constants used in the app
@@ -76,12 +78,23 @@ class GameLobbyConstants {
 
         /**
          * Converts the duration to a string
+         *
+         * @param context the context to get the localized string from
          */
-        override fun toString(): String {
+        fun getStringRepresentation(context: Context): String {
             return when (durationType) {
-                DurationType.MINUTE -> "$value min"
-                DurationType.HOUR -> "$value hour${if (value > 1) "s" else ""}"
-                DurationType.DAY -> "$value day${if (value > 1) "s" else ""}"
+                DurationType.MINUTE ->
+                    context.getString(R.string.game_lobby_duration_min, value)
+                DurationType.HOUR ->
+                    if (value == 1)
+                        context.getString(R.string.game_lobby_duration_hour, value)
+                    else
+                        context.getString(R.string.game_lobby_duration_hours, value)
+                DurationType.DAY ->
+                    if (value == 1)
+                        context.getString(R.string.game_lobby_duration_day, value)
+                    else
+                        context.getString(R.string.game_lobby_duration_days, value)
             }
         }
 

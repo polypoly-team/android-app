@@ -48,7 +48,7 @@ import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.uniqueCodeGenerator
 
-class CreateGameLobbyActivity :  MenuActivity("Create a game") {
+class CreateGameLobbyActivity :  MenuActivity(R.string.create_game_lobby_activity_name) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -14,7 +14,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.base.user.Trophy
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
 import com.github.polypoly.app.base.user.User
@@ -67,7 +69,7 @@ fun TrophyView(trophy: Trophy, won: Boolean, selected: Boolean = false,
         if (won)
             Icon(
                 imageVector = trophy.getIcon(),
-                contentDescription = "Trophy Icon",
+                contentDescription = stringResource(R.string.profile_trophy_icon_description),
                 tint = MaterialTheme.colors.onPrimary)
         else
             Text(

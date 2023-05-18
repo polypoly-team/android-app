@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -49,7 +50,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Activity where the user can join a gameLobby
  */
-class JoinGameLobbyActivity : MenuActivity("Join a game") {
+class JoinGameLobbyActivity : MenuActivity(R.string.game_lobby_join_game) {
     companion object {
         const val POLLING_INTERVAL = 5000L
     }
@@ -75,7 +76,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                         Spacer(modifier = Modifier.height(100.dp))
                         Image(
                             painter = painterResource(id = R.drawable.super_cool_logo),
-                            contentDescription = "polypoly logo",
+                            contentDescription = getString(R.string.game_lobby_logo_description),
                             modifier = Modifier
                                 .testTag("logo"),
                         )
@@ -111,7 +112,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     onClick = {
                         gameLobbyCodeButtonOnClick(warningState, mContext)
                     }
-                    , description = getString(R.string.join_game_lobby_button_text)
+                    , description = getString(R.string.game_lobby_join_button_text)
                     , testTag = "JoinGameLobbyButton")
                 Text(
                     text = warningState.value,
@@ -151,7 +152,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 focusManager.clearFocus()
                 gameLobbyCodeButtonOnClick(warningState, mContext)
             }),
-            label = { Text("Enter a lobby code") },
+            label = { Text(stringResource(R.string.game_lobby_code_prompt)) },
             singleLine = true,
             // text can only be letters and numbers (avoids ghost characters as the Enter key)
             onValueChange = { newText : String ->
@@ -181,14 +182,14 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 .padding(30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Text(text = "Don't have a lobby code?"
+            Text(text = stringResource(R.string.game_lobby_list_no_lobby_code)
                 , style = MaterialTheme.typography.body2
                 , modifier = Modifier.testTag("noGameLobbyCodeText"))
             RectangleButton(
                 onClick = {
                     openList = true
                 },
-                description = "Show GameLobbies",
+                description = stringResource(R.string.game_lobby_list_button_description),
                 testTag = "showGameLobbiesButton"
             )
         }
@@ -313,7 +314,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         Row {
             Image(
                 imageVector = Icons.Default.People,
-                contentDescription = "people icon",
+                contentDescription = stringResource(R.string.game_lobby_card_icon),
                 modifier = Modifier
                     .size(30.dp)
                     .testTag("${gameLobby.name}/peopleIcon")
@@ -346,7 +347,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 color = androidx.compose.ui.graphics.Color.Black
             )
             Text(
-                text = "Players:",
+                text = stringResource(R.string.game_lobby_card_players),
                 style = MaterialTheme.typography.h6,
                 fontSize = 16.sp,
                 modifier = Modifier.testTag("${gameLobby.name}/players_title")
@@ -390,7 +391,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
         ) {
             RectangleButton(
                 onClick = { gameLobbyCodeButtonOnClick(warningState,mContext)},
-                description = getString(R.string.join_game_lobby_button_text),
+                description = getString(R.string.game_lobby_join_button_text),
                 testTag = "${gameLobby.name}/joinGameLobbyButton"
             )
             if(warningState.value != "") {
@@ -401,7 +402,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                         .testTag("warningMessage")
                         .padding(bottom = 5.dp)
                 )
-                Text(text = "Updating in a few seconds")
+                Text(text = stringResource(R.string.game_lobby_card_updating))
             }
         }
     }
@@ -442,7 +443,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 .fillMaxWidth(),
         ) {
             Text(
-                text = "Round duration: ",
+                text = stringResource(R.string.game_lobby_card_round_duration),
                 style = MaterialTheme.typography.h6,
                 fontSize = 16.sp
             )
@@ -464,7 +465,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 .fillMaxWidth(),
         ) {
             Text(
-                text = "Game mode: ",
+                text = stringResource(R.string.game_lobby_card_game_mode),
                 style = MaterialTheme.typography.h6,
                 fontSize = 16.sp
             )

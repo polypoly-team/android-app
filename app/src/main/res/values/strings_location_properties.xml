@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bc_description">The BC is a building for the Computer Science and Communication Systems (IC) faculty. You can see IC students enjoying the daylight, worldly events that take up the whole hall during revision period, piano players and students complaining about the piano players. If you\'re looking for luxury and beautiful architecture, this is a good second choice when the Rolex is full.</string>
+    <string name="bc_positive_point">It seems that there is air conditioning in summer</string>
+    <string name="bc_negative_point">The toilet lights all turn off at the same time when the switch is pressed</string>
+
+    <string name="inm_description">A building of the computer section, composed of a rather dark library, a cafeteria and some small exercise rooms. It is the junction between the other IN buildings. You will find a beautiful and completely unused relaxation room below the library, which you can just stare at with envy since you will surely be denied access to it.</string>
+    <string name="inm_positive_point">Three microwaves in the cafeteria, which is a rare opportunity</string>
+    <string name="inm_negative_point">There is no longer a restaurant owner in the cafeteria, and everyone misses the days when there were 5,5 CHF sandwiches.</string>
+
+    <string name="inf_description">This building, cherished by computer science students, consists of three mythical classrooms, without daylight, a museum that only students on break from studying visit and offices.</string>
+    <string name="inf_positive_point">Very large working room open all the time</string>
+    <string name="inf_negative_point">Risk of vitamin D deficiency</string>
+
+    <string name="inj_description">Computer building mainly composed of offices. To this day no one knows the difference between this building, INN and INR. It seems that there are classrooms lost in the offices, but these are only accessed by the most adventurous students.</string>
+    <string name="inj_positive_point">Our team did not find anything positive about this building despite our good will</string>
+    <string name="inj_negative_point">No noise should be made when accessing classrooms next to offices</string>
+</resources>

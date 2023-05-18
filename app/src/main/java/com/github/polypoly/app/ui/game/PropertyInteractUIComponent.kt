@@ -14,7 +14,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 
@@ -52,7 +54,7 @@ private fun PropertyInteractDialog(showBuyDialog: MutableState<Boolean>) {
             }
         },
         text = {
-            Text(text = "This is some trivia related to the building and or some info related to it.")
+            Text(text = stringResource(R.string.property_interact_dialog))
         },
         buttons = {
             PropertyInteractButtons(showBuyDialog)
@@ -75,13 +77,13 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
             onClick = { showBuyDialog.value = true },
             modifier = Modifier.testTag("betButton")
         ) {
-            Text(text = "Bet")
+            Text(text = stringResource(R.string.property_interact_bet_button))
         }
         Button(
             onClick = { leaveBetDialog() },
             modifier = Modifier.testTag("closeButton")
         ) {
-            Text(text = "Close")
+            Text(text = stringResource(R.string.dialog_close))
         }
     }
 }

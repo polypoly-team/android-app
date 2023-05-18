@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
@@ -44,7 +46,7 @@ fun DistanceWalkedUIComponents() {
         ) {
             Icon(
                 Icons.Filled.DirectionsWalk,
-                contentDescription = "Distance Walked",
+                contentDescription = stringResource(R.string.distance_walked_icon_description),
                 tint = MaterialTheme.colors.onPrimary,
                 modifier = Modifier
                     .padding(Padding.medium)

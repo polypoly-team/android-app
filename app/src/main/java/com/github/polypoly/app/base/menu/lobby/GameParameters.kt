@@ -3,7 +3,6 @@ package com.github.polypoly.app.base.menu.lobby
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 
 /**
  * A class that represent the parameters of a [Game]
