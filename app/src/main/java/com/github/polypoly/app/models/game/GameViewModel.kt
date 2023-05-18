@@ -19,9 +19,15 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.RemoteDB
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.CompletableFuture
 
 class GameViewModel(
     game: Game,
@@ -80,10 +86,30 @@ class GameViewModel(
         }
     }
 
-    fun nextTurn() {
-        gameData.value?.nextTurn()
-        roundTurnData.value = gameData.value?.currentRound ?: -1
-        gameEndedData.value = gameData.value?.isGameFinished() ?: false
+    private fun nextTurn() {
+        viewModelScope.launch {
+            gameData.value?.nextTurn()
+
+            synchronizeGame().thenApply { syncSucceeded ->
+                if (syncSucceeded) {
+                    roundTurnData.value = gameData.value?.currentRound ?: -1
+                    gameEndedData.value = gameData.value?.isGameFinished() ?: false
+                }
+            }
+        }
+    }
+
+    private fun synchronizeGame(): CompletableFuture<Boolean> {
+        val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
+        return remoteDB.getValue<Game>(gameUpdated.key).thenCompose { gameFound ->
+            if (gameFound.currentRound < gameUpdated.currentRound) {
+                gameData.value = gameUpdated
+                remoteDB.setValue(gameUpdated)
+            } else { // up to date version already on live db
+                gameData.value = gameFound
+                CompletableFuture.completedFuture(true)
+            }
+        }
     }
 
     fun diceRolled() {
@@ -123,6 +149,9 @@ class GameViewModel(
                 )
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
+
+                remoteDB.setValue(GameRepository.game!!)
+
                 GameViewModel(
                     GameRepository.game!!,
                     GameRepository.player!!
