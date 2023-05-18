@@ -1,6 +1,7 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.PropertyLevel
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
@@ -29,12 +30,14 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locationProperties.map { location ->
+    val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
+
+    private val inGameLocations: List<InGameLocation> = allLocations.map { location ->
         InGameLocation(
             locationProperty = location,
             owner = null,
             level = PropertyLevel.LEVEL_0,
-        ) } }
+        ) }
     var currentRound: Int = 1
 
     /**

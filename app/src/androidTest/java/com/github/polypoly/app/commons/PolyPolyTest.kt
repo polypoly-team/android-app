@@ -3,7 +3,10 @@ package com.github.polypoly.app.commons
 import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
+import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -26,6 +29,8 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
@@ -194,5 +199,19 @@ abstract class PolyPolyTest(
         scope.launch { liveData.removeObserver(observer) }
 
         return result
+    }
+
+    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties }): LocationProperty {
+        return amongLocations[Random.nextInt().absoluteValue % amongLocations.size]
+    }
+
+    fun execInMainThread(action: () -> Unit): CompletableFuture<Boolean> {
+        val scope = CoroutineScope(Dispatchers.Main + Job())
+        val future = CompletableFuture<Boolean>()
+        scope.launch {
+            action()
+            future.complete(true)
+        }
+        return future
     }
 }

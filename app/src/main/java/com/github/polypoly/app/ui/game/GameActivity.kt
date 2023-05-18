@@ -33,7 +33,7 @@ import org.osmdroid.views.overlay.Marker
  */
 class GameActivity : ComponentActivity() {
 
-    private val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
+    val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +65,7 @@ class GameActivity : ComponentActivity() {
                         mapViewModel,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: ""
+                        mapViewModel.interactableProperty.value?.name ?: "EPFL"
                     )
                     GameEndedLabel(gameEnded)
                 }
@@ -112,6 +112,6 @@ class GameActivity : ComponentActivity() {
     }
 
     companion object {
-        private val mapViewModel: MapViewModel = MapViewModel()
+        val mapViewModel: MapViewModel = MapViewModel()
     }
 }
