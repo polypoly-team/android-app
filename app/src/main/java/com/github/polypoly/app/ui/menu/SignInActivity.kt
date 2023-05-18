@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.polypoly.app.R
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -32,6 +33,8 @@ import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -228,8 +231,8 @@ class SignInActivity : ComponentActivity() {
             60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_FAST = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-                1, 20, emptyList(), 100), "Fast gameLobby", "fast"
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
+                1, 20, getZones(), 100), "Fast gameLobby", "fast"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
@@ -256,7 +259,6 @@ class SignInActivity : ComponentActivity() {
             TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
 
         TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
-        TEST_GAME_LOBBY_FAST.addUser(TEST_USER_1)
         TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
         TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
         TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
@@ -268,6 +270,7 @@ class SignInActivity : ComponentActivity() {
         }
 
         // Add data to DB
+        Firebase.database.getReference("live").removeValue()
         requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()})
         requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code))
     }
