@@ -61,7 +61,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
  */
 class GameLobbyActivity : ComponentActivity() {
 
-    val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
+    private val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +71,9 @@ class GameLobbyActivity : ComponentActivity() {
 
     @Preview(showBackground = true)
     @Composable
-    private fun GameLobbyPreview() { GameLobbyContent() }
+    private fun GameLobbyPreview() {
+        GameLobbyContent()
+    }
 
     /**
      * Displays all the UI of the GameLobby

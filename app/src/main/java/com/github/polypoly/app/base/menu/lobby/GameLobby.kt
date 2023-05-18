@@ -82,7 +82,7 @@ data class GameLobby(
      * @param withId the id of the user to remove
      * @throws IllegalArgumentException if no user with the given id is not in the lobby
      */
-    fun removeUser(withId: Long) {
+    fun removeUser(withId: String) {
         for (i in 0 until currentUsersRegistered.size) {
             if (currentUsersRegistered[i].id == withId) {
                 currentUsersRegistered.removeAt(i)

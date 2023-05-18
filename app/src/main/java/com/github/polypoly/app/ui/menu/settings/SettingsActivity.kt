@@ -8,19 +8,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.R
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.base.GameMusic
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity
 import com.github.polypoly.app.ui.theme.Padding
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.google.firebase.auth.FirebaseAuth
 
@@ -123,13 +124,13 @@ class SettingsActivity : MenuActivity("Settings") {
                 .testTag("music_muter")
         ) {
             Image(
-                painter = painterResource(
-                    id = if (isMute) {
-                        R.drawable.tmp_sadsmile
+                imageVector =
+                    if (isMute) {
+                        Icons.Default.VolumeOff
                     } else {
-                        R.drawable.tmp_happysmile
+                        Icons.Default.VolumeUp
                     }
-                ),
+                ,
                 contentDescription = "mute_icon",
                 modifier = Modifier.size(30.dp)
             )
@@ -155,10 +156,10 @@ class SettingsActivity : MenuActivity("Settings") {
             ) {
                 Button(
                     onClick = {
-                       if (FirebaseAuth.getInstance().currentUser != null){
-                           FirebaseAuth.getInstance().signOut()
-                       }
-                        currentFBUser = null
+                        if (FirebaseAuth.getInstance().currentUser != null){
+                            FirebaseAuth.getInstance().signOut()
+                        }
+                        currentUser = null
                         finish()
                         val backToSignIn = Intent(mContext, SignInActivity::class.java)
                         startActivity(backToSignIn)

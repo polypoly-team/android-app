@@ -29,7 +29,7 @@ class RankingsActivityTest : PolyPolyTest(false, false, true) {
     }
 
     private fun mockUser(name: String, numberOfGame: Int, numberOfWin: Int, trophyCount: Int): User {
-        return User(0, name, "", NO_SKIN,
+        return User("0", name, "", NO_SKIN,
             Stats(0, 0, numberOfGame, numberOfWin, 0),
             List(trophyCount) { 1 }, mutableListOf())
     }

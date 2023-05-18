@@ -16,7 +16,7 @@ class GameRepository {
         var gameCode: String? = null
 
         /**
-         * Game used accross the application
+         * Game used across the application
          */
         var game: Game? = null
 
