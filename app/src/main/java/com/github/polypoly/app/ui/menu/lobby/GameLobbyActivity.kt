@@ -56,7 +56,9 @@ class GameLobbyActivity : ComponentActivity() {
 
     @Preview(showBackground = true)
     @Composable
-    private fun GameLobbyPreview() { GameLobbyContent() }
+    private fun GameLobbyPreview() {
+        GameLobbyContent()
+    }
 
     // ===================================================== MAIN CONTENT
 
@@ -106,7 +108,7 @@ class GameLobbyActivity : ComponentActivity() {
         val interPadding = 10
 
         val numberOfPlayers = players.size
-        var playersPerRow by remember { mutableStateOf(3)}
+        var playersPerRow by remember { mutableStateOf(3) }
         var numberOfRows by remember { mutableStateOf(1) }
 
         Row(
@@ -146,12 +148,12 @@ class GameLobbyActivity : ComponentActivity() {
                                 PlayerIcon(user = players[playerIdx])
                             }
                             playerIdx++
-                            if(itCol != playersPerRow - 1) {
+                            if (itCol != playersPerRow - 1) {
                                 Spacer(modifier = Modifier.width(interPadding.dp))
                             }
                         }
                     }
-                    if(itRow != numberOfRows - 1) {
+                    if (itRow != numberOfRows - 1) {
                         Spacer(modifier = Modifier.height(interPadding.dp))
                     }
                 }
@@ -181,7 +183,7 @@ class GameLobbyActivity : ComponentActivity() {
                     .padding(20.dp)
                     .size(30.dp)
             )
-            if(user != null) {
+            if (user != null) {
                 Text(text = user.name)
             }
         }

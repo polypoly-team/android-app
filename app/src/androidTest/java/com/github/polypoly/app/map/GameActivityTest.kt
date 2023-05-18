@@ -24,12 +24,12 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, false, true) {
 
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
     }
 
     @get:Rule

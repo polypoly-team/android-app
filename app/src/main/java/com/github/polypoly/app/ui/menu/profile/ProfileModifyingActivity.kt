@@ -22,18 +22,19 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 
 class ProfileModifyingActivity : ComponentActivity() {
 
     /**
      * The temporary value of nickname of the player
      */
-    private var nickname: String = ""
+    private var nickname: String = currentUser?.name ?: ""
 
     /**
      * The temporary value of description of the player profile
      */
-    private var description: String = ""
+    private var description: String = currentUser?.bio ?: ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,17 +55,7 @@ class ProfileModifyingActivity : ComponentActivity() {
      */
     @Composable
     fun ProfileForm() {
-        val id = intent.getLongExtra("userId", 0)
-
-        var user by remember { mutableStateOf(User()) }
-
-        remoteDB.getValue<User>(id.toString()).thenAccept{userFound ->
-            nickname = user.name
-            description = user.bio
-            user = userFound
-        }
-
-        ProfileFormOfUser(user)
+        ProfileFormOfUser(currentUser!!)
     }
 
     @Composable
@@ -148,18 +139,19 @@ class ProfileModifyingActivity : ComponentActivity() {
             if(nickname.isEmpty()) {
                 onError()
             } else {
-                val id = intent.getLongExtra("userId", 0)
-                remoteDB.getValue<User>(id.toString()).thenCompose { user ->
-                    remoteDB.updateValue(User(
-                        id = id,
-                        name = nickname,
-                        bio = description,
-                        skin = user.skin,
-                        stats = user.stats,
-                        trophiesWon = user.trophiesWon,
-                        trophiesDisplay = trophiesDisplay
-                    ))
-                }.thenApply {
+                val oldUser = currentUser!!
+                val newUser = User(
+                    id = oldUser.key,
+                    name = nickname,
+                    bio = description,
+                    skin = oldUser.skin,
+                    stats = oldUser.stats,
+                    trophiesWon = oldUser.trophiesWon,
+                    trophiesDisplay = trophiesDisplay
+                )
+
+                remoteDB.updateValue(newUser).thenAccept {
+                    currentUser = newUser
                     val profileIntent = Intent(mContext, ProfileActivity::class.java)
                     finish()
                     startActivity(profileIntent)

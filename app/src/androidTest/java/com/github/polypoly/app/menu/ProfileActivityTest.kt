@@ -10,9 +10,11 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.base.user.Trophy.Companion.allTrophies
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,19 +22,23 @@ import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class ProfileActivityTest: PolyPolyTest(true, true) {
+class ProfileActivityTest: PolyPolyTest(true, true, true) {
+
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ProfileActivity>()
 
     private val button = composeTestRule.onNodeWithTag("modify_profile_button")
 
-    private val userLoggedIn = TEST_USER_0 // TODO: effectively log in the user before any test
+    private lateinit var userLoggedIn : User
 
     @Before
     fun setUp() {
-        userLoggedIn.trophiesDisplay.clear()
-        userLoggedIn.trophiesDisplay.add(0)
-        userLoggedIn.trophiesDisplay.add(4)
+        currentUser = TEST_USER_0
+        currentUser!!.trophiesDisplay.clear()
+        currentUser!!.trophiesDisplay.add(0)
+        currentUser!!.trophiesDisplay.add(4)
+
+        userLoggedIn = currentUser!!
         Thread.sleep(1000)
     }
 

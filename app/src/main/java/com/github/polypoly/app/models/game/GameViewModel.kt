@@ -10,6 +10,8 @@ import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getValue
@@ -225,9 +227,9 @@ class GameViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 GameRepository.player = Player(
-                    GlobalInstances.currentUser,
-                    GameRepository.game?.rules?.initialPlayerBalance ?: -1
-                )
+                    GlobalInstances.currentUser ?: User(),
+                    GameRepository.game?.rules?.initialPlayerBalance ?: -1)
+
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
 

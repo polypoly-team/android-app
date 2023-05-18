@@ -2,6 +2,7 @@ package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -23,14 +24,14 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.getAllValues
+import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initCurrentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
@@ -43,31 +44,49 @@ import java.util.concurrent.CompletableFuture
 class SignInActivity : ComponentActivity() {
 
     private var firebaseAuth: FirebaseAuth? = null
-    private var mAuthListener: FirebaseAuth.AuthStateListener? = FirebaseAuth.AuthStateListener {}
+    private val mAuthListener: FirebaseAuth.AuthStateListener = FirebaseAuth.AuthStateListener {
+        launchWelcomeIfReady()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Global initialization of the database
         initRemoteDB()
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
-        if (firebaseAuth!!.currentUser != null) {
-            launchWelcome()
-        }
+
+        addFakeDataToDB()
+
+        launchWelcomeIfReady()
         setContent { SignInContent() }
     }
 
     override fun onResume() {
         super.onResume()
-        firebaseAuth!!.addAuthStateListener(mAuthListener!!)
+        firebaseAuth!!.addAuthStateListener(mAuthListener)
     }
 
     override fun onStop() {
         super.onStop()
-        firebaseAuth!!.removeAuthStateListener(mAuthListener!!)
+        firebaseAuth!!.removeAuthStateListener(mAuthListener)
     }
 
+    /**
+     * If the user is correctly signed in Firebase, gets the user and launches [WelcomeActivity]
+     */
+    private fun launchWelcomeIfReady() {
+        val user = firebaseAuth?.currentUser
+        if (user != null) {
+            initCurrentUser(user.uid, user.displayName ?: "default")
+
+            val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
+            isSignedIn = true
+            startActivity(welcomeActivityIntent)
+            finish()
+        }
+    }
+
+    @Deprecated("Prefer to use launchWelcomeIfReady")
     /**
      * starts the WelcomeActivity and sets the isSignedIn flag to true
      */
@@ -100,14 +119,6 @@ class SignInActivity : ComponentActivity() {
      */
     @Composable
     fun SignInContent() {
-        mAuthListener = FirebaseAuth.AuthStateListener {
-            val user = firebaseAuth?.currentUser
-            if (user != null) {
-                currentFBUser = user
-                launchWelcome()
-            }
-        }
-
         PolypolyTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -211,7 +222,7 @@ class SignInActivity : ComponentActivity() {
         val NO_SKIN = Skin(0,0,0)
 
         val TEST_USER_0 = User(
-            id = 0,
+            id = "0",
             name = "John",
             bio = "Hi, this is my bio :)",
             skin = Skin(0,0,0),
@@ -219,11 +230,11 @@ class SignInActivity : ComponentActivity() {
             trophiesWon = listOf(0, 4, 8, 11, 12, 14),
             trophiesDisplay = mutableListOf(0, 4)
         )
-        val TEST_USER_1 = User(12,"Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2 = User(123,"Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_1 = User("12","Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_2 = User("123","Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_3 = User("1234","James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_4 = User("12345","Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_5 = User("123456", "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
@@ -271,7 +282,7 @@ class SignInActivity : ComponentActivity() {
 
         // Add data to DB
         Firebase.database.getReference("live").removeValue()
-        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()})
+        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id })
         requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code))
     }
 
