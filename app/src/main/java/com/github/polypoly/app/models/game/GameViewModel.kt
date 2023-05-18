@@ -76,7 +76,6 @@ class GameViewModel(
 
             playerStateData.value = PlayerState.TURN_FINISHED
 
-            setLoading(true)
             nextTurn()
 
             currentGame = gameData.value
@@ -87,6 +86,7 @@ class GameViewModel(
      * Computes the next turn state and synchronizes with the other players
      */
     fun nextTurn() {
+        setLoading(true)
         viewModelScope.launch {
             gameData.value?.nextTurn()
 
@@ -95,6 +95,7 @@ class GameViewModel(
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
                 }
+                setLoading(false)
             }
         }
     }

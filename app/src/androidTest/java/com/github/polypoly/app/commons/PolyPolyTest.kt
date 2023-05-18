@@ -70,27 +70,27 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-            60, 20, emptyList(), 100), "Full gameLobby", "lobby1234"
+            60, 20, getZones(), 100), "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            360, 20, emptyList(), 300), "Private gameLobby", "lobbyabc123", true
+            360, 20, getZones(), 300), "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
-            600, null, emptyList(), 1000), "Joinable 1", "lobbyabcd"
+            600, null, getZones(), 1000), "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 10, 25,
-            3600, 20, emptyList(), 2000), "Joinable 2", "lobby123abc"
+            3600, 20, getZones(), 2000), "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
-            720, 20, emptyList(), 3000), "Joinable 3", "lobby1234abc"
+            720, 20, getZones(), 3000), "Joinable 3", "lobby1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            1080, 20, emptyList(), 4000), "Joinable 4", "lobbyabc1234"
+            1080, 20, getZones(), 4000), "Joinable 4", "lobbyabc1234"
         )
 
         val testPlayer1 = Player(TEST_USER_1, 100, listOf())
