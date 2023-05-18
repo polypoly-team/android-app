@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -51,6 +52,7 @@ import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeoutException
@@ -88,14 +90,11 @@ class GameLobbyActivity : ComponentActivity() {
 
         if (gameLobby != null && readyForStart != null){
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
-                if (it.isStarted) {
+                if (it.started && it.admin.id != currentUser.id) {
                     navigateToGame(context, gameLobby)
                 }
             }
             PolypolyTheme {
-                if (gameLobby.isStarted) {
-                    navigateToGame(context, gameLobby)
-                }
                 Column {
                     GameLobbyAppBar(gameLobby)
 

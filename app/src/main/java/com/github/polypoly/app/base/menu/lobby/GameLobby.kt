@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @property name The name of the [GameLobby]
  * @property code The (secret) code of the [GameLobby]
  * @property private If the [GameLobby] is private or not
+ * @property isStarted If the [Game] has started or not
  */
 data class GameLobby(
     val admin: User = User(),
@@ -23,7 +24,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-    val isStarted: Boolean = false,
+    val started: Boolean = false
 ): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -114,7 +115,7 @@ data class GameLobby(
             rules,
             currentUsersRegistered.map { user -> user.id.toString() },
             admin.id.toString(),
-            isStarted
+            started = started
         )
     }
 
@@ -126,7 +127,7 @@ data class GameLobby(
                 dbObject.name,
                 dbObject.code,
                 dbObject.private,
-                dbObject.isStarted
+                started = dbObject.started
             )
             lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
             lobby
@@ -142,7 +143,7 @@ data class GameLobbyDB(
     val parameters: GameParameters = GameParameters(),
     val userIds: List<String> = listOf(""),
     val adminId: String = "",
-    val isStarted: Boolean = false,
+    val started: Boolean = false
 ) {
     init {
         if(!userIds.contains(adminId)) {
