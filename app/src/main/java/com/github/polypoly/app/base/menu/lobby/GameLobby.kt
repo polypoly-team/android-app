@@ -23,6 +23,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
+    val isStarted: Boolean = false,
 ): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -112,7 +113,8 @@ data class GameLobby(
             private,
             rules,
             currentUsersRegistered.map { user -> user.id.toString() },
-            admin.id.toString()
+            admin.id.toString(),
+            isStarted
         )
     }
 
@@ -123,7 +125,8 @@ data class GameLobby(
                 dbObject.parameters,
                 dbObject.name,
                 dbObject.code,
-                dbObject.private
+                dbObject.private,
+                dbObject.isStarted
             )
             lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
             lobby
@@ -138,7 +141,8 @@ data class GameLobbyDB(
     val private: Boolean = false,
     val parameters: GameParameters = GameParameters(),
     val userIds: List<String> = listOf(""),
-    val adminId: String = ""
+    val adminId: String = "",
+    val isStarted: Boolean = false,
 ) {
     init {
         if(!userIds.contains(adminId)) {

@@ -50,7 +50,7 @@ class GameLobbyWaitingViewModel(
         return readyForStartData
     }
 
-    private fun setGameLobby(gameLobby: GameLobby) {
+    fun setGameLobby(gameLobby: GameLobby) {
         // TODO: here we "force" the value change to make sure that it toggles the recomposition
         gameLobbyData.value = GameLobby()
         gameLobbyData.value = gameLobby

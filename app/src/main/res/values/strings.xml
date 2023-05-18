@@ -29,5 +29,17 @@
     <string name="create_game_lobby_game_code">Game code is: %s</string>
     <string name="create_game_lobby_create_game">Create game</string>
 
+    // game lobby
+    <string name="game_lobby_players_title">"Players: "</string>
+    <string name="game_lobby_players_count">%s / %s</string>
+    <string name="game_lobby_more_players_prefix">"At least "</string>
+    <string name="game_lobby_more_players_count">%s more</string>
+    <string name="game_lobby_more_players_suffix">" players needed to start…"</string>
+    <string name="game_lobby_can_start_game">Start Game!</string>
+    <string name="game_lobby_cannot_start_game">Can\'t start Game :(</string>
+    <string name="game_lobby_admin_can_start_game">Admin can start!</string>
+    <string name="game_lobby_admin_cannot_start_game">Admin can\'t start…</string>
+    <string name="game_lobby_group_code_title">"Group code is: "</string>
+    <string name="game_lobby_settings_title">"Game Settings"</string>
     // =========================================================================
 </resources>

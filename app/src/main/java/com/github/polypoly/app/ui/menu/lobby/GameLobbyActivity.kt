@@ -8,8 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +51,9 @@ import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeoutException
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
@@ -61,7 +64,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
  */
 class GameLobbyActivity : ComponentActivity() {
 
-    private val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
+    val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,18 +84,27 @@ class GameLobbyActivity : ComponentActivity() {
         val gameLobby = gameLobbyWaitingModel.getGameLobby().observeAsState().value
         val readyForStart = gameLobbyWaitingModel.getReadyForStart().observeAsState().value
         val dataLoading = gameLobbyWaitingModel.getIsLoading().observeAsState().value
+        val context = LocalContext.current
 
-        if (gameLobby != null && readyForStart != null) {
+        if (gameLobby != null && readyForStart != null){
+            remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
+                if (it.isStarted) {
+                    navigateToGame(context, gameLobby)
+                }
+            }
             PolypolyTheme {
+                if (gameLobby.isStarted) {
+                    navigateToGame(context, gameLobby)
+                }
                 Column {
                     GameLobbyAppBar(gameLobby)
 
                     Box {
                         Surface(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().testTag("game_lobby_background"),
                             color = MaterialTheme.colors.background
                         ) {
-                            when (dataLoading) {
+                            when (dataLoading == true) {
                                 true -> LoadingContent()
                                 false -> GameLobbyBody(gameLobby)
                                 else -> {}
@@ -106,8 +118,10 @@ class GameLobbyActivity : ComponentActivity() {
 
     @Composable
     fun GameLobbyAppBar(gameLobby: GameLobby) {
+        val gameLobbyName = gameLobby.name
         TopAppBar(
-            title = { Text(text = gameLobby.name) },
+            title = { Text(text = gameLobbyName) },
+            modifier = Modifier.testTag("game_lobby_app_bar"),
             navigationIcon = {
                 IconButton(
                     onClick = {
@@ -115,7 +129,7 @@ class GameLobbyActivity : ComponentActivity() {
                     },
                     modifier = Modifier.rotate(180f)
                 ) {
-                    Icon(Icons.Filled.Logout, "leave_lobby_icon")
+                    Icon(Icons.Filled.Logout,"leave_lobby_icon", modifier = Modifier.testTag("game_lobby_leave_button"))
                 }
             },
             backgroundColor = MaterialTheme.colors.primary,
@@ -136,7 +150,8 @@ class GameLobbyActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag("game_lobby_body"),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
@@ -174,9 +189,12 @@ class GameLobbyActivity : ComponentActivity() {
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(8.dp)
+                    .testTag("game_lobby_settings_menu")
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("game_lobby_settings_menu_row"),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val icon: ImageVector = Icons.Default.ArrowCircleRight
@@ -185,20 +203,23 @@ class GameLobbyActivity : ComponentActivity() {
                         contentDescription = "Settings Arrow",
                         modifier = Modifier
                             .size(30.dp)
-                            .rotate(arrowRotation.value),
+                            .rotate(arrowRotation.value)
+                            .testTag("game_lobby_settings_menu_arrow"),
                         colorFilter = tint(MaterialTheme.colors.onPrimary)
                     )
 
                     Text(
-                        text = "Game Settings",
+                        text = getString(R.string.game_lobby_settings_title),
                         style = MaterialTheme.typography.h6,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("game_lobby_settings_menu_title"),
                         textAlign = TextAlign.Center
                     )
                 }
 
                 AnimatedVisibility(visible = expanded) {
-                    Column {
+                    Column(modifier = Modifier.testTag("game_lobby_settings_menu_expanded")) {
                         Divider(modifier = Modifier.padding(Padding.medium), thickness = Padding.small)
 
                         SettingsItem(title = getString(R.string.create_game_lobby_game_mode), value = gameParameters.gameMode.toString())
@@ -222,12 +243,16 @@ class GameLobbyActivity : ComponentActivity() {
             Text(
                 text = title,
                 style = MaterialTheme.typography.body1,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("${title}_game_lobby_settings_menu_item_title")
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.body1,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("${title}_game_lobby_settings_menu_item_value"),
                 textAlign = TextAlign.End
             )
         }
@@ -235,7 +260,7 @@ class GameLobbyActivity : ComponentActivity() {
 
     @Composable
     fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: Long) {
-        Column {
+        Column ( modifier = Modifier.testTag("game_lobby_players_list")) {
             PlayerHeader(players, maximumNumberOfPlayers)
             PlayerRows(players, adminId)
             EmptyPlayerSlots(players, maximumNumberOfPlayers)
@@ -245,28 +270,36 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     fun PlayerHeader(players: List<User>, maximumNumberOfPlayers: Int) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("game_lobby_players_header"),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Players:",
+                text = getString(R.string.game_lobby_players_title),
                 style = MaterialTheme.typography.h6,
                 color = MaterialTheme.colors.primary,
-                modifier = Modifier.padding(vertical = Padding.small)
+                modifier = Modifier
+                    .padding(vertical = Padding.small)
+                    .testTag("game_lobby_players_header_title")
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.People,
                     contentDescription = "Player Count Icon",
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .testTag("game_lobby_players_header_icon"),
                     tint = MaterialTheme.colors.primary
                 )
 
                 Text(
-                    text = "${players.size}/$maximumNumberOfPlayers",
+                    text = getString(R.string.game_lobby_players_count, players.size.toString(), maximumNumberOfPlayers.toString()),
                     style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(Padding.small),
+                    modifier = Modifier
+                        .padding(Padding.small)
+                        .testTag("game_lobby_players_header_count"),
                     color = MaterialTheme.colors.primary,
                 )
             }
@@ -298,7 +331,14 @@ class GameLobbyActivity : ComponentActivity() {
             textSize = 1f
             flashColor = backGround
         }
-        AnimatedVisibility(visibleState = remember { MutableTransitionState(false).apply { targetState = true } }){
+        AnimatedVisibility(
+            visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
+            enter = fadeIn() + expandVertically(
+                expandFrom = Alignment.Top
+            ) + expandHorizontally(
+                expandFrom = Alignment.Start
+            )
+        ){
             SinglePlayerRow(player, adminId, animatedColor)
         }
     }
@@ -321,20 +361,25 @@ class GameLobbyActivity : ComponentActivity() {
                         startX = 0f
                     )
                 )
-                .padding(vertical = Padding.small),
+                .padding(vertical = Padding.small)
+                .testTag("${player.name}_game_lobby_player_row"),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = R.drawable.tmp_happysmile),
                 contentDescription = "${player.name} icon",
-                modifier = Modifier.size(smallIconSize)
+                modifier = Modifier
+                    .size(smallIconSize)
+                    .testTag("${player.name}_game_lobby_player_row_icon")
             )
 
             Spacer(modifier = Modifier.width(Padding.medium))
 
             Text(
                 text = player.name,
-                style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize)
+                style = MaterialTheme.typography.body1.copy(fontSize = MaterialTheme.typography.body1.fontSize),
+                modifier = Modifier
+                    .testTag("${player.name}_game_lobby_player_row_name")
             )
 
             Spacer(modifier = Modifier.width(Padding.medium))
@@ -343,8 +388,10 @@ class GameLobbyActivity : ComponentActivity() {
                 Image(
                     imageVector = Icons.Filled.Stars,
                     contentDescription = "admin star",
-                    modifier = Modifier.size(smallIconSize),
-                    colorFilter = tint(secondary)
+                    modifier = Modifier
+                        .size(smallIconSize)
+                        .testTag("${player.name}_game_lobby_player_row_admin"),
+                    colorFilter = tint(secondary),
                 )
             }
         }
@@ -353,7 +400,17 @@ class GameLobbyActivity : ComponentActivity() {
     @Composable
     fun EmptyPlayerSlots(players: List<User>, maximumNumberOfPlayers: Int) {
         repeat(maximumNumberOfPlayers - players.size) {
-            EmptyPlayerSlot()
+            AnimatedVisibility(
+                visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
+                enter = fadeIn() + expandVertically(
+                    expandFrom = Alignment.Bottom
+                ) + expandHorizontally(
+                    expandFrom = Alignment.Start
+                )
+            )
+            {
+                EmptyPlayerSlot()
+            }
         }
     }
 
@@ -362,13 +419,16 @@ class GameLobbyActivity : ComponentActivity() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = Padding.small),
+                .padding(vertical = Padding.small)
+                .testTag("game_lobby_empty_player_slot"),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 imageVector = Icons.Default.PermIdentity,
                 contentDescription = "free_player_slot",
-                modifier = Modifier.size(smallIconSize)
+                modifier = Modifier
+                    .size(smallIconSize)
+                    .testTag("game_lobby_empty_player_slot_icon")
             )
         }
     }
@@ -381,7 +441,9 @@ class GameLobbyActivity : ComponentActivity() {
         val isAdmin = currentUser.id == adminId
 
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("game_lobby_start_game_button_content"),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LobbyCodeDisplay(lobbyCode)
@@ -394,7 +456,8 @@ class GameLobbyActivity : ComponentActivity() {
             BigButton(
                 onClick = onClickAction,
                 enabled = players.size >= minRequiredPlayers,
-                text = buttonText
+                text = buttonText,
+                testTag = ("game_lobby_start_game_button_button")
             )
 
             Spacer(modifier = Modifier.height(Padding.small))
@@ -407,28 +470,32 @@ class GameLobbyActivity : ComponentActivity() {
     fun LobbyCodeDisplay(lobbyCode: String) {
         Row {
             Text(
-                text = "Group code is: ",
-                style = MaterialTheme.typography.body1
+                text = getString(R.string.game_lobby_group_code_title),
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_lobby_code_title")
             )
             Text(
                 text = lobbyCode,
                 style = MaterialTheme.typography.body1.copy(
                     color = MaterialTheme.colors.primary,
                     fontWeight = FontWeight.Bold
-                )
+                ),
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_lobby_code")
             )
         }
     }
 
-    fun getButtonText(isAdmin: Boolean, playerCount: Int, minRequiredPlayers: Int): String {
+    private fun getButtonText(isAdmin: Boolean, playerCount: Int, minRequiredPlayers: Int): String {
         return if (isAdmin) {
-            if (playerCount >= minRequiredPlayers) "Start Game!" else "Can't start Game :("
+            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_can_start_game) else getString(R.string.game_lobby_cannot_start_game)
         } else {
-            if (playerCount >= minRequiredPlayers) "Admin can start!" else "Admin can't start..."
+            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_admin_can_start_game) else getString(R.string.game_lobby_admin_cannot_start_game)
         }
     }
 
-    fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
+    private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
         return if (isAdmin) {
             { launchGameActivity(mContext) }
         } else {
@@ -449,19 +516,25 @@ class GameLobbyActivity : ComponentActivity() {
     fun MorePlayersNeededDisplay(morePlayersNeeded: Int) {
         Row {
             Text(
-                text = "At least ",
-                style = MaterialTheme.typography.body1
+                text = getString(R.string.game_lobby_more_players_prefix),
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_more_players_needed_prefix")
             )
             Text(
-                text = "$morePlayersNeeded more",
+                text = getString(R.string.game_lobby_more_players_count, morePlayersNeeded.toString()),
                 style = MaterialTheme.typography.body1.copy(
                     color = MaterialTheme.colors.primary,
                     fontWeight = FontWeight.Bold
-                )
+                ),
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_more_players_needed_count")
             )
             Text(
-                text = " players needed to start...",
-                style = MaterialTheme.typography.body1
+                text = getString(R.string.game_lobby_more_players_suffix),
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_more_players_needed_suffix")
             )
         }
     }
@@ -470,28 +543,64 @@ class GameLobbyActivity : ComponentActivity() {
     fun CurrentPlayerCountDisplay(players: List<User>, maxPlayers: Int) {
         Row {
             Text(
-                text = "Players: ",
-                style = MaterialTheme.typography.body1
+                text = getString(R.string.game_lobby_players_title),
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_current_player_count_title")
             )
             Text(
-                text = "${players.size} / $maxPlayers",
+                text =  getString(R.string.game_lobby_players_count, players.size.toString(), maxPlayers.toString()),
                 style = MaterialTheme.typography.body1.copy(
                     color = MaterialTheme.colors.primary
-                )
+                ),
+                modifier = Modifier
+                    .testTag("game_lobby_start_game_button_current_player_count")
             )
         }
     }
 
     /**
-     * Launch the game activity and finish this activity.
+     * Launch the game activity and finish this activity. Only available to the admin
      */
     private fun launchGameActivity(packageContext: Context) {
         val completedLobby = gameLobbyWaitingModel.getGameLobby().value
         if (completedLobby != null) {
-            GameRepository.game = Game.launchFromPendingGame(completedLobby)
-            val gameIntent = Intent(packageContext, GameActivity::class.java)
-            startActivity(gameIntent)
-            finish()
+
+            val newGameLobby = GameLobby(
+                completedLobby.admin,
+                completedLobby.rules,
+                completedLobby.name,
+                completedLobby.code,
+                completedLobby.private,
+                true
+            )
+            remoteDB.updateValue(newGameLobby)
+
+            runBlocking {
+                waitForEveryoneToLeave(
+                    condition = {
+                        gameLobbyWaitingModel.getGameLobby().value?.usersRegistered?.size == 1
+                    },
+                    timeoutMillis = 10000,
+                    checkIntervalMillis = 10
+                )
+            }
+
+            navigateToGame(packageContext, newGameLobby)
+        }
+    }
+
+    private suspend fun waitForEveryoneToLeave(
+        condition: suspend () -> Boolean,
+        timeoutMillis: Long = 5000,
+        checkIntervalMillis: Long = 10
+    ) {
+        val startTime = System.currentTimeMillis()
+        while (!condition()) {
+            if ((System.currentTimeMillis() - startTime) > timeoutMillis) {
+                throw TimeoutException("Condition not met within $timeoutMillis milliseconds")
+            }
+            delay(checkIntervalMillis)
         }
     }
 
@@ -521,6 +630,13 @@ class GameLobbyActivity : ComponentActivity() {
 
         GameRepository.gameCode = null
         finish()
+    }
+
+    private fun navigateToGame(packageContext: Context, gameLobby: GameLobby){
+        GameRepository.game = Game.launchFromPendingGame(gameLobby)
+        val gameIntent = Intent(packageContext, GameActivity::class.java)
+        startActivity(gameIntent)
+        leaveLobby(gameLobby)
     }
 
 }

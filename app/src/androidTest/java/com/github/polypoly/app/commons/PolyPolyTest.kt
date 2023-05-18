@@ -82,7 +82,7 @@ abstract class PolyPolyTest(
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
-            900, 20, emptyList(), 3000), "Joinable 3", "lobby1234abc"
+            900, 20, emptyList(), 3000), "Joinable 3", "default-lobby"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,

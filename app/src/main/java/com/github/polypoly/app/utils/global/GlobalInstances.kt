@@ -34,7 +34,7 @@ class GlobalInstances {
             }
         }
 
-        var currentUser : User = User(6118948, "tabita", "makumbo", Skin.default(),
+        var currentUser : User = User(6969, "maxoubilouzzz", "yoyo jsuis super cool", Skin.default(),
             Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
         )
         var currentFBUser : FirebaseUser? = null
