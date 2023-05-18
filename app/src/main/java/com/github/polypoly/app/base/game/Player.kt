@@ -140,6 +140,14 @@ data class Player (
     }
 
     /**
+     * Get the list of the owned locations of the player
+     * @return the list of the owned locations of the player
+     */
+    fun getOwnedLocations(): List<InGameLocation> {
+        return ownedLocations
+    }
+
+    /**
      * Update the state of the player with all the new data
      * @param newBalance the new balance of the player
      * @param newOwnedLocations the new list of the owned locations of the player

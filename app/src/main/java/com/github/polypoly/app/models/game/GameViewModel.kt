@@ -8,6 +8,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
@@ -64,7 +66,13 @@ class GameViewModel(
                 )
                 GameRepository.player = Player(
                     GlobalInstances.currentUser,
-                    3000
+                    // hardcoded values for the testing
+                    3000,
+                    ownedLocations = listOf(Game.gameInProgress?.getInGameLocation()?.get(0)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(1)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(2)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(5)!!,
+                        Game.gameInProgress?.getInGameLocation()?.get(8)!!,),
                 )
                 GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)

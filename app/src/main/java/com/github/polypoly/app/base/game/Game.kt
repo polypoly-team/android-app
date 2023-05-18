@@ -34,6 +34,13 @@ class Game private constructor(
     var currentRound: Int = 1
 
     /**
+     * Return the [InGameLocation] of the current [Game]
+     */
+    fun getInGameLocation(): List<InGameLocation> {
+        return inGameLocations;
+    }
+
+    /**
      * Go to the next turn
      */
     fun nextTurn() {

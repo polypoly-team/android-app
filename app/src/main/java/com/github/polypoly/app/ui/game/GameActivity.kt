@@ -1,5 +1,7 @@
 package com.github.polypoly.app.ui.game
 
+import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,12 +13,15 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
@@ -39,6 +44,7 @@ class GameActivity : ComponentActivity() {
         setContent { GameActivityContent() }
     }
 
+
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
@@ -48,6 +54,7 @@ class GameActivity : ComponentActivity() {
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
         if (game != null && gameTurn != null && gameEnded != null) {
+            val openLocationsDialog = remember { mutableStateOf(true) }
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -68,6 +75,9 @@ class GameActivity : ComponentActivity() {
                         mapViewModel.interactableProperty.value?.name ?: ""
                     )
                     GameEndedLabel(gameEnded)
+                    if (openLocationsDialog.value) {
+                        LocationsDialog(title = "Choose a location", openLocationsDialog, player.getOwnedLocations())
+                    }
                 }
             }
         }
@@ -109,6 +119,19 @@ class GameActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    // =================================== PREVIEW ==============
+    @Preview(
+        name = "Light Mode"
+    )
+    @Preview(
+        name = "Dark Mode",
+        uiMode = Configuration.UI_MODE_NIGHT_YES
+    )
+    @Composable
+    fun GameActivityPreview() {
+        setContent { GameActivityContent() }
     }
 
     companion object {
