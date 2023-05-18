@@ -10,11 +10,11 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Location
-import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
-import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.ui.game.GameActivity
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -32,6 +32,9 @@ import kotlin.random.Random
 private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
 private const val INITIAL_ZOOM = 18.0
 private const val MARKER_SIDE_LENGTH = 100
+
+//used to determine if the player is close enough to a location to interact with it
+private const val MAX_INTERACT_DISTANCE = 10.0 // meters
 
 /**
  * Tile source for EPFL campus map.
@@ -130,7 +133,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
         override fun onLocationChanged(location: Location?, provider: IMyLocationProvider?) {
             super.onLocationChanged(location, provider)
             mapViewModel.setInteractableLocation(
-                updateAllDistancesAndFindClosest(mapView, GeoPoint(location))
+                updateAllDistancesAndFindClosest(mapView, GeoPoint(location), mapViewModel)
             )
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
@@ -147,7 +150,7 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     locationOverlay.enableFollowLocation()
     locationOverlay.runOnFirstFix {
         mapViewModel.setInteractableLocation(
-            updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation))
+            updateAllDistancesAndFindClosest(mapView, GeoPoint(locationOverlay.myLocation), mapViewModel)
         )
         mapView.post {
             mapView.controller.animateTo(locationOverlay.myLocation)
@@ -156,4 +159,35 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     }
 
     return locationOverlay
+}
+
+/**
+ * Updates the distance of all markers and returns the closest one.
+ *
+ * @return the closest location or null if there are no locations close enough to the player
+ */
+fun updateAllDistancesAndFindClosest(
+    mapView: MapView,
+    myLocation: GeoPoint,
+    mapViewModel: MapViewModel
+): LocationProperty? {
+    fun markersOf(mapView: MapView): List<Marker> {
+        return mapView.overlays.filterIsInstance<Marker>()
+    }
+
+    var closestLocationProperty = null as LocationProperty?
+    for (marker in markersOf(mapView)) {
+        val markerLocation = mapViewModel.markerToLocationProperty[marker]
+        if (closestLocationProperty == null ||
+            markerLocation == null ||
+            myLocation.distanceToAsDouble(markerLocation.position()) <
+                myLocation.distanceToAsDouble(closestLocationProperty.position())
+        ) {
+            closestLocationProperty = markerLocation
+        }
+    }
+    if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_INTERACT_DISTANCE)
+        closestLocationProperty = null
+
+    return closestLocationProperty
 }

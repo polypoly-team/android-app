@@ -112,37 +112,5 @@ class GameActivity : ComponentActivity() {
 
     companion object {
         val mapViewModel: MapViewModel = MapViewModel()
-
-        //used to determine if the player is close enough to a location to interact with it
-        private const val MAX_INTERACT_DISTANCE = 10.0 // meters
-
-        /**
-         * Updates the distance of all markers and returns the closest one.
-         *
-         * @return the closest location or null if there are no locations close enough to the player
-         */
-        fun updateAllDistancesAndFindClosest(
-            mapView: MapView,
-            myLocation: GeoPoint
-        ): LocationProperty? {
-            fun markersOf(mapView: MapView): List<Marker> {
-                return mapView.overlays.filterIsInstance<Marker>()
-            }
-
-            var closestLocationProperty = null as LocationProperty?
-            for (marker in markersOf(mapView)) {
-                val markerLocation = mapViewModel.markerToLocationProperty[marker]!!
-                if (closestLocationProperty == null ||
-                    myLocation.distanceToAsDouble(markerLocation.position())
-                    < myLocation.distanceToAsDouble(closestLocationProperty.position())
-                ) {
-                    closestLocationProperty = markerLocation
-                }
-            }
-            if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_INTERACT_DISTANCE)
-                closestLocationProperty = null
-
-            return closestLocationProperty
-        }
     }
 }
