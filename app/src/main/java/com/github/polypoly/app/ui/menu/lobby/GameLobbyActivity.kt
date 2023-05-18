@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -43,19 +42,15 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
 import com.github.polypoly.app.network.addOnChangeListener
+import com.github.polypoly.app.network.removeValue
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
 import com.github.polypoly.app.ui.theme.UIElements.smallIconSize
-import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import java.util.concurrent.TimeoutException
 
 /**
  * A game lobby is the place the user sees before beginning a game. One is able to see the players
@@ -89,6 +84,7 @@ class GameLobbyActivity : ComponentActivity() {
         val context = LocalContext.current
 
         if (gameLobby != null && readyForStart != null){
+
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
                 if (it.started && it.admin.id != currentUser.id) {
                     navigateToGame(context, gameLobby)
@@ -100,13 +96,14 @@ class GameLobbyActivity : ComponentActivity() {
 
                     Box {
                         Surface(
-                            modifier = Modifier.fillMaxSize().testTag("game_lobby_background"),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag("game_lobby_background"),
                             color = MaterialTheme.colors.background
                         ) {
                             when (dataLoading == true) {
                                 true -> LoadingContent()
                                 false -> GameLobbyBody(gameLobby)
-                                else -> {}
                             }
                         }
                     }
@@ -115,6 +112,10 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * wraps the body in top app bar display and sets the leave lobby button
+     * @param gameLobby the game lobby to display
+     */
     @Composable
     fun GameLobbyAppBar(gameLobby: GameLobby) {
         val gameLobbyName = gameLobby.name
@@ -144,6 +145,10 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The game lobby menu UI structure
+     * @param gameLobby the game lobby to display
+     */
     @Composable
     fun GameLobbyBody(gameLobby: GameLobby) {
         Column(
@@ -257,6 +262,12 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Displays the list of players in the game and its title
+     * @param players the list of players in the game
+     * @param maximumNumberOfPlayers the maximum number of players allowed in the game
+     * @param adminId the id of the admin of the game
+     */
     @Composable
     fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: Long) {
         Column ( modifier = Modifier.testTag("game_lobby_players_list")) {
@@ -266,6 +277,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Displays the Players list title and the number of players in the game, with the maximum number of players
+     * @param players the list of players in the game
+     * @param maximumNumberOfPlayers the maximum number of players allowed in the game
+     */
     @Composable
     fun PlayerHeader(players: List<User>, maximumNumberOfPlayers: Int) {
         Row(
@@ -305,6 +321,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes players rows
+     * @param players the players to display
+     * @param adminId the id of the admin of the game
+     */
     @Composable
     fun PlayerRows(players: List<User>, adminId: Long) {
         for (player in players) {
@@ -312,6 +333,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes a player's row and its animations
+     * @param player the player to display
+     * @param adminId the id of the admin of the game
+     */
     @Composable
     fun PlayerRow(player: User, adminId: Long) {
         val secondary = MaterialTheme.colors.secondary
@@ -342,6 +368,13 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Row for a single player in the game lobby
+     * if the player is admin, he will have a star icon next to his name
+     * @param player the player to display
+     * @param adminId the id of the admin of the game lobby
+     * @param animatedColor the color to flash when a player joins or leaves the game lobby
+     */
     @Composable
     fun SinglePlayerRow(player: User, adminId: Long, animatedColor: Color) {
 
@@ -396,6 +429,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes and displays empty player slots
+     * @param players the list of players in the game
+     * @param maximumNumberOfPlayers the maximum number of players in the game
+     */
     @Composable
     fun EmptyPlayerSlots(players: List<User>, maximumNumberOfPlayers: Int) {
         repeat(maximumNumberOfPlayers - players.size) {
@@ -413,6 +451,9 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Displays an empty player slot
+     */
     @Composable
     fun EmptyPlayerSlot() {
         Row(
@@ -432,6 +473,14 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Displays the button to start the game and the text around it
+     * @param players the list of players in the lobby
+     * @param minRequiredPlayers the minimum number of players required to start the game
+     * @param maxPlayers the maximum number of players allowed in the game
+     * @param lobbyCode the code of the lobby
+     * @param adminId the id of the admin of the lobby
+     */
     @Composable
     fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: Long,) {
         val morePlayersNeeded = minRequiredPlayers - players.size
@@ -465,6 +514,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes the text to display above the button
+     * Displays the group code
+     * @param lobbyCode the lobby code
+     */
     @Composable
     fun LobbyCodeDisplay(lobbyCode: String) {
         Row {
@@ -486,6 +540,12 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes the text to display in the button
+     * @param isAdmin true if the user is the admin of the lobby
+     * @param playerCount the number of players in the lobby
+     * @param minRequiredPlayers the minimum number of players required to start the game
+     */
     private fun getButtonText(isAdmin: Boolean, playerCount: Int, minRequiredPlayers: Int): String {
         return if (isAdmin) {
             if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_can_start_game) else getString(R.string.game_lobby_cannot_start_game)
@@ -494,6 +554,13 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes the action to perform when the button is clicked
+     * If the user is not the admin, the button should do nothing
+     * If the user is the admin, the button should launch the game activity
+     * @param isAdmin true if the user is the admin of the lobby
+     * @param mContext the context of the activity
+     */
     private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
         return if (isAdmin) {
             { launchGameActivity(mContext) }
@@ -502,6 +569,12 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes the message to display under the button
+     * @param morePlayersNeeded the number of players needed to start the game
+     * @param players the list of players in the lobby
+     * @param maxPlayers the maximum number of players allowed in the lobby
+     */
     @Composable
     fun PlayerStatusDisplay(morePlayersNeeded: Int, players: List<User>, maxPlayers: Int) {
         if (morePlayersNeeded > 0) {
@@ -511,6 +584,9 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Computes the message to display if there are not enough players to start the game
+     */
     @Composable
     fun MorePlayersNeededDisplay(morePlayersNeeded: Int) {
         Row {
@@ -538,6 +614,11 @@ class GameLobbyActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Display the current player count in relation to the maximum player count.
+     * @param players the list of players in the game lobby.
+     * @param maxPlayers the maximum number of players allowed in the game lobby.
+     */
     @Composable
     fun CurrentPlayerCountDisplay(players: List<User>, maxPlayers: Int) {
         Row {
@@ -559,7 +640,8 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     /**
-     * Launch the game activity and finish this activity. Only available to the admin
+     * Launch the game activity and finish this activity. Only available to the admin.
+     * will set the game lobby as started in the database.
      */
     private fun launchGameActivity(packageContext: Context) {
         val completedLobby = gameLobbyWaitingModel.getGameLobby().value
@@ -575,31 +657,7 @@ class GameLobbyActivity : ComponentActivity() {
             )
             remoteDB.updateValue(newGameLobby)
 
-            runBlocking {
-                waitForEveryoneToLeave(
-                    condition = {
-                        gameLobbyWaitingModel.getGameLobby().value?.usersRegistered?.size == 1
-                    },
-                    timeoutMillis = 10000,
-                    checkIntervalMillis = 10
-                )
-            }
-
             navigateToGame(packageContext, newGameLobby)
-        }
-    }
-
-    private suspend fun waitForEveryoneToLeave(
-        condition: suspend () -> Boolean,
-        timeoutMillis: Long = 5000,
-        checkIntervalMillis: Long = 10
-    ) {
-        val startTime = System.currentTimeMillis()
-        while (!condition()) {
-            if ((System.currentTimeMillis() - startTime) > timeoutMillis) {
-                throw TimeoutException("Condition not met within $timeoutMillis milliseconds")
-            }
-            delay(checkIntervalMillis)
         }
     }
 
@@ -610,16 +668,17 @@ class GameLobbyActivity : ComponentActivity() {
     private fun leaveLobby(gameLobby: GameLobby) {
         val newUsersRegistered = gameLobby.usersRegistered.filter {it.id != currentUser.id}
         if (newUsersRegistered.isEmpty()){
-            remoteDB.removeValue<GameLobby>(gameLobby.code, GameLobby::class)
+            remoteDB.removeValue<GameLobby>(gameLobby.code)
         } else {
             val newAdmin =
-                if (currentUser.id == gameLobby.admin.id) newUsersRegistered.random() else gameLobby.admin
+                if (currentUser.id == gameLobby.admin.id && !gameLobby.started) newUsersRegistered.random() else gameLobby.admin
             val newGameLobby = GameLobby(
                 newAdmin,
                 gameLobby.rules,
                 gameLobby.name,
                 gameLobby.code,
-                gameLobby.private
+                gameLobby.private,
+                gameLobby.started
             )
             for (user in newUsersRegistered.filter { it.id != newAdmin.id }) {
                 newGameLobby.addUser(user)
@@ -631,6 +690,9 @@ class GameLobbyActivity : ComponentActivity() {
         finish()
     }
 
+    /**
+     * Navigate to the game activity and finish this activity.
+     */
     private fun navigateToGame(packageContext: Context, gameLobby: GameLobby){
         GameRepository.game = Game.launchFromPendingGame(gameLobby)
         val gameIntent = Intent(packageContext, GameActivity::class.java)

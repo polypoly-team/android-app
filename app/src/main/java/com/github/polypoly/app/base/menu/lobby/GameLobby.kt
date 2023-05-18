@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @property name The name of the [GameLobby]
  * @property code The (secret) code of the [GameLobby]
  * @property private If the [GameLobby] is private or not
- * @property isStarted If the [Game] has started or not
+ * @property started If the [Game] has started or not
  */
 data class GameLobby(
     val admin: User = User(),
@@ -115,7 +115,7 @@ data class GameLobby(
             rules,
             currentUsersRegistered.map { user -> user.id.toString() },
             admin.id.toString(),
-            started = started
+            started
         )
     }
 
@@ -127,7 +127,7 @@ data class GameLobby(
                 dbObject.name,
                 dbObject.code,
                 dbObject.private,
-                started = dbObject.started
+                dbObject.started
             )
             lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
             lobby
