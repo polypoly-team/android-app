@@ -84,6 +84,8 @@ fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean
                 }
                 Spacer(modifier = Modifier.width(Padding.medium))
                 Button(onClick = {
+                    trade.currentPlayerReceiverAcceptation = false
+                    gameModel.updateTradeRequest(trade)
                     openDialog.value = false
                 }) {
                     Text(text = "No")

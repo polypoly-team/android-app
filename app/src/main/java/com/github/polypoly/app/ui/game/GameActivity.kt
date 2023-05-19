@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
@@ -78,43 +79,63 @@ class GameActivity : ComponentActivity() {
                     GameEndedLabel(gameEnded)
 
                     // pop-ups for trades:
-
-                    // Pop up when a player ask for a trade
-                    if (trade != null && trade.playerReceiver.user.id == player.user.id
-                        && trade.locationReceived == null) {
-                        val tradeDialog = remember {
-                            mutableStateOf(true)
-                        }
-                        ProposeTradeDialog(trade, tradeDialog, gameModel)
-                    }
-
-                    // Pop up when the player has to accept or refuse a trade
-                    if(trade?.locationReceived != null
-                        && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
-                                (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation == null))) {
-                        AcceptTradeDialog(trade, trade.playerApplicant.user.id == player.user.id, gameModel)
-                    }
-
-                    //Pop up when the player has to wait for the other player decision
-                    if(trade?.locationReceived != null
-                        && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation != null
-                                && trade.currentPlayerApplicantAcceptation == null) ||
-                                (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation != null
-                                        && trade.currentPlayerReceiverAcceptation == null))) {
-                        WaitingForTheOtherPlayerDecisionDialog()
-                    }
-
-                    //Pop up when the trade is done
-                    if(trade?.locationReceived != null
-                        && (trade.currentPlayerApplicantAcceptation == false || trade.currentPlayerReceiverAcceptation == false)) {
-                        val tradeDialog = remember {
-                            mutableStateOf(true)
-                        }
-                        if(tradeDialog.value) {
-                            TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade)
-                        }
-                    }
+                    DialogsForTrade(trade, player)
                 }
+            }
+        }
+    }
+
+    /**
+     * This function is used to display the pop-ups for the trades
+     * @param trade the trade request
+     * @param player the current player
+     */
+    @Composable
+    fun DialogsForTrade(trade: TradeRequest?, player: Player) {
+        // Pop up when a player ask for a trade
+        if (trade != null && trade.playerReceiver.user.id == player.user.id
+            && trade.locationReceived == null) {
+            val tradeDialog = remember {
+                mutableStateOf(true)
+            }
+            ProposeTradeDialog(trade, tradeDialog, gameModel)
+        }
+
+        // Pop up when the player has to accept or refuse a trade
+        if(trade?.locationReceived != null
+            && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
+                    (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation == null))) {
+            AcceptTradeDialog(trade, trade.playerApplicant.user.id == player.user.id, gameModel)
+        }
+
+        //Pop up when the player has to wait for the other player decision
+        if(trade?.locationReceived != null
+            && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation != null
+                    && trade.currentPlayerApplicantAcceptation == null) ||
+                    (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation != null
+                            && trade.currentPlayerReceiverAcceptation == null))) {
+            WaitingForTheOtherPlayerDecisionDialog()
+        }
+
+        //Pop up when the trade is cancelled
+        if(trade != null
+            && (trade.currentPlayerApplicantAcceptation == false || trade.currentPlayerReceiverAcceptation == false)) {
+            val tradeDialog = remember {
+                mutableStateOf(true)
+            }
+            if(tradeDialog.value) {
+                TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade)
+            }
+        }
+
+        //Pop up when the trade is accepted
+        if(trade != null
+            && (trade.currentPlayerApplicantAcceptation == true && trade.currentPlayerReceiverAcceptation == true)) {
+            val tradeDialog = remember {
+                mutableStateOf(true)
+            }
+            if(tradeDialog.value) {
+                TheTradeIsDoneDialog(true, tradeDialog, gameModel, trade)
             }
         }
     }
