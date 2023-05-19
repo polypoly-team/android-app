@@ -17,8 +17,7 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
@@ -26,7 +25,9 @@ import kotlin.random.nextInt
 
 class GameViewModel(
     game: Game,
-    player: Player
+    player: Player,
+    private val coroutineScope: CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 ): LoadingModel() {
 
     private val gameData: MutableLiveData<Game> = MutableLiveData(game)
@@ -44,7 +45,7 @@ class GameViewModel(
 
     init {
         setLoading(true)
-        viewModelScope.launch {
+        coroutineScope.launch {
             gameLoop()
         }
     }
@@ -73,12 +74,12 @@ class GameViewModel(
         var currentGame = gameData.value
 
         while (currentGame != null && !currentGame.isGameFinished()) {
-            playerStateData.value = PlayerState.ROLLING_DICE
+            playerStateData.postValue(PlayerState.ROLLING_DICE)
             setLoading(false)
 
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
-            playerStateData.value = PlayerState.TURN_FINISHED
+            playerStateData.postValue(PlayerState.TURN_FINISHED)
 
             nextTurn()
 
@@ -88,20 +89,26 @@ class GameViewModel(
 
     /**
      * Computes the next turn state and synchronizes with the other players
+     * @return a future that completes when the turn is synced with the other players
      */
-    fun nextTurn() {
+    fun nextTurn(): CompletableFuture<Boolean> {
         setLoading(true)
-        viewModelScope.launch {
+        val completionFuture = CompletableFuture<Boolean>()
+
+        coroutineScope.launch {
             gameData.value?.nextTurn()
 
-            synchronizeGame().thenApply { syncSucceeded ->
+            synchronizeGame().thenAccept { syncSucceeded ->
                 if (syncSucceeded) {
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
                 }
                 setLoading(false)
+                completionFuture.complete(syncSucceeded)
             }
         }
+
+        return completionFuture
     }
 
     private fun synchronizeGame(): CompletableFuture<Boolean> {
@@ -167,7 +174,7 @@ class GameViewModel(
     fun computeClosestLocation(position: GeoPoint): CompletableFuture<LocationProperty?> {
         val result = CompletableFuture<LocationProperty?>()
 
-        viewModelScope.launch {
+        coroutineScope.launch {
             var closestLocation: LocationProperty? = null
             var closestDistance = Double.MAX_VALUE
 
@@ -198,7 +205,7 @@ class GameViewModel(
     fun rollDiceLocations(currentLocation: LocationProperty?): CompletableFuture<List<LocationProperty>> {
         val result = CompletableFuture<List<LocationProperty>>()
 
-        viewModelScope.launch {
+        coroutineScope.launch {
             val locationsNotToVisitName = mutableListOf<String>()
             if (currentLocation != null)
                 locationsNotToVisitName.add(currentLocation.name)

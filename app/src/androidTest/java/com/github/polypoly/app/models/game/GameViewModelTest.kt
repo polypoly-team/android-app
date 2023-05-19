@@ -8,6 +8,9 @@ import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import junit.framework.TestCase.assertNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -17,18 +20,20 @@ import java.util.concurrent.TimeUnit
 
 class GameViewModelTest: PolyPolyTest(true, false) {
 
-    private val testGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_2)
+    private val testGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_2.copy(rules =
+        TEST_GAME_LOBBY_AVAILABLE_2.rules.copy(roundDuration = 1000)))
     private val testPlayer = Player(TEST_USER_0)
 
     private fun waitForDataSync(model: LoadingModel) {
         model.waitForSync().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun playerStateFSMWorks() {
-        val model = GameViewModel(testGame, testPlayer)
+    fun playerStateFSMWorks() = runTest(UnconfinedTestDispatcher()) {
+        val model = GameViewModel(testGame, testPlayer, coroutineScope = this)
 
-        waitForDataSync(model)
         execInMainThread { model.resetTurnState() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
@@ -49,9 +54,11 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(PlayerState.ROLLING_DICE, model.getPlayerStateData().value)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun playerStateFSMIsRobustAgainstWrongStateTransitions() {
-        val model = GameViewModel(testGame, testPlayer)
+    fun playerStateFSMIsRobustAgainstWrongStateTransitions() = runTest(UnconfinedTestDispatcher()) {
+        val model = GameViewModel(testGame, testPlayer, coroutineScope = this)
 
         waitForDataSync(model)
         execInMainThread { model.resetTurnState() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -126,10 +133,11 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(PlayerState.BIDDING, model.getPlayerStateData().value)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun closestLocationWorks() {
-        val model = GameViewModel(testGame, testPlayer)
-        waitForDataSync(model)
+    fun closestLocationWorks() = runTest(UnconfinedTestDispatcher()) {
+        val model = GameViewModel(testGame, testPlayer, coroutineScope = this)
 
         val location = getRandomLocation()
         val locationFound = model.computeClosestLocation(location.position()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -137,9 +145,11 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         assertEquals(location, locationFound)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun closestLocationReturnsNullIfLocationIsTooFar() {
-        val model = GameViewModel(testGame, testPlayer)
+    fun closestLocationReturnsNullIfLocationIsTooFar() = runTest(UnconfinedTestDispatcher()) {
+        val model = GameViewModel(testGame, testPlayer, coroutineScope = this)
 
         val positionOut = GeoPoint(0.toDouble(), 0.toDouble())
         val locationFound = model.computeClosestLocation(positionOut).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -150,14 +160,13 @@ class GameViewModelTest: PolyPolyTest(true, false) {
     @Test
     fun nexTurnSyncsDB() {
         val model = GameViewModel(testGame, testPlayer)
-        waitForDataSync(model)
 
         remoteDB.setValue(testGame).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         val oldRound = remoteDB.getValue<Game>(TEST_GAME_LOBBY_AVAILABLE_2.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS).currentRound
 
         model.nextTurn()
-        waitForDataSync(model)
+        waitForUIToUpdate()
 
         val updatedRound = remoteDB.getValue<Game>(TEST_GAME_LOBBY_AVAILABLE_2.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS).currentRound
 
@@ -167,7 +176,6 @@ class GameViewModelTest: PolyPolyTest(true, false) {
     @Test
     fun nexTurnDoesNotSyncsDBIfUpToDateGameIsPresent() {
         val model = GameViewModel(testGame, testPlayer)
-        waitForDataSync(model)
 
         remoteDB.setValue(testGame).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
@@ -177,7 +185,7 @@ class GameViewModelTest: PolyPolyTest(true, false) {
         remoteDB.setValue(oldGame).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         model.nextTurn() // only does currentRound +1 instead of +2
-        waitForDataSync(model)
+        waitForUIToUpdate()
 
         val roundFound = remoteDB.getValue<Game>(testGame.key).get(TIMEOUT_DURATION, TimeUnit.SECONDS).currentRound
 

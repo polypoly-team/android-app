@@ -23,6 +23,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.absoluteValue
