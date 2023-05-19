@@ -20,7 +20,7 @@ import com.github.polypoly.app.ui.theme.Padding
  * Dialog to that propose a trade to the player
  * @param trade The trade to propose
  * @param openDialog A mutable state to open and close the dialog.
- * @param gameModel The game model
+ * @param gameModel The game view model
  */
 @Composable
 fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, gameModel: GameViewModel) {
@@ -42,36 +42,55 @@ fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, g
             }
         }
         if(openDialog.value) {
-            AlertDialog(
-                modifier = Modifier.testTag("propose_trade_dialog"),
-                onDismissRequest = { openDialog.value = false },
-                title = { Text(text = "Player ${trade.playerApplicant.user.name} propose you a trade !") },
-                text = { Text(text = "Do you accept ?") },
-                buttons = {
-                    Row(
-                        modifier = Modifier
-                            .padding(Padding.medium)
-                            .fillMaxWidth()
-                    ) {
-                        Button(
-                            onClick = {
-                                openDialogChooseLocation.value = true
-                                openDialog.value = false
-                            }
-                        ) {
-                            Text(text = "Yes")
-                        }
-                        Spacer(modifier = Modifier.width(Padding.medium))
-                        Button(onClick = {
-                            openDialog.value = false
-                        }) {
-                            Text(text = "No")
-                        }
-                    }
-                }
-            )
+            PropositionTradeDialog(trade, openDialog, gameModel, openDialogChooseLocation)
         }
     }
+}
+
+/**
+ * Dialog to know if the player accept the trade
+ * @param trade The trade to accept
+ * @param openDialog A mutable state to open and close the dialog.
+ * @param gameModel The game view model
+ * @param openDialogChooseLocation A mutable state to open and close the dialog to choose a location
+ */
+@Composable
+fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, gameModel: GameViewModel,
+                           openDialogChooseLocation: MutableState<Boolean>){
+    AlertDialog(
+        modifier = Modifier.testTag("propose_trade_dialog"),
+        onDismissRequest = { openDialog.value = false },
+        title = { Text(text = "Player ${trade.playerApplicant.user.name} propose you a trade !") },
+        text = { Text(text = "Do you accept ?") },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .fillMaxWidth()
+            ) {
+                Button(
+                    onClick = {
+                        // test if you can accept the trade, i.e. if you have a location to trade
+                        if(trade.playerReceiver.getOwnedLocations().isNotEmpty()) {
+                            openDialogChooseLocation.value = true
+                        } else {
+                            trade.currentPlayerReceiverAcceptation = false
+                            gameModel.updateTradeRequest(trade)
+                        }
+                        openDialog.value = false
+                    }
+                ) {
+                    Text(text = "Yes")
+                }
+                Spacer(modifier = Modifier.width(Padding.medium))
+                Button(onClick = {
+                    openDialog.value = false
+                }) {
+                    Text(text = "No")
+                }
+            }
+        }
+    )
 }
 
 /**
@@ -89,7 +108,8 @@ fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: Game
         text = {},
         buttons = {
             Row (
-                modifier = Modifier.padding(Padding.medium)
+                modifier = Modifier
+                    .padding(Padding.medium)
                     .fillMaxWidth()
             ) {
                 Button(onClick = {

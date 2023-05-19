@@ -76,6 +76,10 @@ class GameActivity : ComponentActivity() {
                         gameModel
                     )
                     GameEndedLabel(gameEnded)
+
+                    // pop-ups for trades:
+
+                    // Pop up when a player ask for a trade
                     if (trade != null && trade.playerReceiver.user.id == player.user.id
                         && trade.locationReceived == null) {
                         val tradeDialog = remember {
@@ -83,11 +87,15 @@ class GameActivity : ComponentActivity() {
                         }
                         ProposeTradeDialog(trade, tradeDialog, gameModel)
                     }
+
+                    // Pop up when the player has to accept or refuse a trade
                     if(trade?.locationReceived != null
                         && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
                                 (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation == null))) {
                         AcceptTradeDialog(trade, trade.playerApplicant.user.id == player.user.id, gameModel)
                     }
+
+                    //Pop up when the player has to wait for the other player decision
                     if(trade?.locationReceived != null
                         && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation != null
                                 && trade.currentPlayerApplicantAcceptation == null) ||
@@ -95,6 +103,8 @@ class GameActivity : ComponentActivity() {
                                         && trade.currentPlayerReceiverAcceptation == null))) {
                         WaitingForTheOtherPlayerDecisionDialog()
                     }
+
+                    //Pop up when the trade is done
                     if(trade?.locationReceived != null
                         && (trade.currentPlayerApplicantAcceptation == false || trade.currentPlayerReceiverAcceptation == false)) {
                         val tradeDialog = remember {
