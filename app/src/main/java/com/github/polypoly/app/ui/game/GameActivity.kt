@@ -55,7 +55,7 @@ import timber.log.Timber
  * Activity for displaying the map used in the game.
  */
 class GameActivity : ComponentActivity() {
-    private val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
+    val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
     private lateinit var taxService: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
