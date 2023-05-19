@@ -26,7 +26,7 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
 ) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone ->
+    val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone ->
         zone.locationProperties.map { location ->
             InGameLocation(
                 locationProperty = location,
