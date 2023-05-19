@@ -1,8 +1,8 @@
 package com.github.polypoly.app.base.menu.lobby
 
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 
 /**
  * A class that represent the parameters of a [Game]
@@ -35,6 +35,7 @@ data class GameParameters (
     }
 
     fun getRoundDurationValue(): GameLobbyConstants.RoundDurations {
-        return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }!!
+        return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }
+            ?: throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }

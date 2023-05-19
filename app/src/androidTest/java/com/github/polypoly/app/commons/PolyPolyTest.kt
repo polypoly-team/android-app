@@ -12,6 +12,7 @@ import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentFBUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
@@ -62,31 +63,35 @@ abstract class PolyPolyTest(
         val TEST_USER_3 = User(1234,"James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_4 = User(12345,"Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_5 = User(123456, "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
+        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5, currentUser)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
+            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
             60, 20, emptyList(), 100), "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
+            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
             360, 20, emptyList(), 300), "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
+            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 2, 8,
             600, null, emptyList(), 1000), "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 10, 25,
+            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 7,
             4320, 20, emptyList(), 2000), "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
-            900, 20, emptyList(), 3000), "Joinable 3", "default-lobby"
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
+            900, 20, emptyList(), 3000), "Joinable 3", "lobbyacd1234"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
             7200, 20, emptyList(), 4000), "Joinable 4", "lobbyabc1234"
+        )
+        val TEST_GAME_LOBBY_CURRENT_USER_ADMIN = GameLobby(
+            currentUser, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
+                7200, 20, emptyList(), 4000), "Joinable 4", "default-lobby"
         )
 
         val testPlayer1 = Player(TEST_USER_1, 100, listOf())
@@ -99,7 +104,7 @@ abstract class PolyPolyTest(
             2, 10, LocationPropertyRepository.getZones(), 200)
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
-        TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+        TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4, TEST_GAME_LOBBY_CURRENT_USER_ADMIN)
 
         private val mockDB = MockDB()
 

@@ -101,6 +101,7 @@ data class GameLobby(
         if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
+
         return Game.launchFromPendingGame(this)
     }
 

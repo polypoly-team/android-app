@@ -85,6 +85,7 @@ class GameLobbyActivity : ComponentActivity() {
 
         if (gameLobby != null && readyForStart != null){
 
+            //TODO: implement as advised in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198327499
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
                 if (it.started && it.admin.id != currentUser.id) {
                     navigateToGame(context, gameLobby)
@@ -101,9 +102,10 @@ class GameLobbyActivity : ComponentActivity() {
                                 .testTag("game_lobby_background"),
                             color = MaterialTheme.colors.background
                         ) {
-                            when (dataLoading == true) {
+                            when (dataLoading) {
                                 true -> LoadingContent()
                                 false -> GameLobbyBody(gameLobby)
+                                else -> {}
                             }
                         }
                     }
@@ -548,9 +550,11 @@ class GameLobbyActivity : ComponentActivity() {
      */
     private fun getButtonText(isAdmin: Boolean, playerCount: Int, minRequiredPlayers: Int): String {
         return if (isAdmin) {
-            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_can_start_game) else getString(R.string.game_lobby_cannot_start_game)
+            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_can_start_game)
+            else getString(R.string.game_lobby_cannot_start_game)
         } else {
-            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_admin_can_start_game) else getString(R.string.game_lobby_admin_cannot_start_game)
+            if (playerCount >= minRequiredPlayers) getString(R.string.game_lobby_admin_can_start_game)
+            else getString(R.string.game_lobby_admin_cannot_start_game)
         }
     }
 
@@ -562,11 +566,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param mContext the context of the activity
      */
     private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
-        return if (isAdmin) {
-            { launchGameActivity(mContext) }
-        } else {
-            {}
-        }
+        return  { if (isAdmin) launchGameActivity(mContext) }
     }
 
     /**
@@ -646,15 +646,8 @@ class GameLobbyActivity : ComponentActivity() {
     private fun launchGameActivity(packageContext: Context) {
         val completedLobby = gameLobbyWaitingModel.getGameLobby().value
         if (completedLobby != null) {
-
-            val newGameLobby = GameLobby(
-                completedLobby.admin,
-                completedLobby.rules,
-                completedLobby.name,
-                completedLobby.code,
-                completedLobby.private,
-                true
-            )
+            //TODO adapt start() in GameLobby as adviser in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198335312
+            val newGameLobby = completedLobby.copy(started = true)
             remoteDB.updateValue(newGameLobby)
 
             navigateToGame(packageContext, newGameLobby)
@@ -672,21 +665,14 @@ class GameLobbyActivity : ComponentActivity() {
         } else {
             val newAdmin =
                 if (currentUser.id == gameLobby.admin.id && !gameLobby.started) newUsersRegistered.random() else gameLobby.admin
-            val newGameLobby = GameLobby(
-                newAdmin,
-                gameLobby.rules,
-                gameLobby.name,
-                gameLobby.code,
-                gameLobby.private,
-                gameLobby.started
-            )
+            val newGameLobby = gameLobby.copy(admin = newAdmin)
             for (user in newUsersRegistered.filter { it.id != newAdmin.id }) {
                 newGameLobby.addUser(user)
             }
             remoteDB.updateValue(newGameLobby)
         }
 
-        GameRepository.gameCode = null
+        GameRepository.gameCode = if (gameLobby.started) gameLobby.code else null
         finish()
     }
 

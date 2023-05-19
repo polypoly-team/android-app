@@ -2,7 +2,6 @@ package com.github.polypoly.app.commons
 
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.StorableObject
-import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -103,7 +102,8 @@ class MockDB: IRemoteStorage {
     }
 
     override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        data.remove(computeAbsoluteKey(key, clazz))
+        return CompletableFuture.completedFuture(true)
     }
 
     // ========================================================================== LISTENERS
