@@ -122,7 +122,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param gameLobby the game lobby to display
      */
     @Composable
-    fun GameLobbyAppBar(gameLobby: GameLobby) {
+    private fun GameLobbyAppBar(gameLobby: GameLobby) {
         val gameLobbyName = gameLobby.name
         TopAppBar(
             title = { Text(text = gameLobbyName) },
@@ -144,7 +144,7 @@ class GameLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun LoadingContent() {
+    private fun LoadingContent() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularLoader()
         }
@@ -155,7 +155,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param gameLobby the game lobby to display
      */
     @Composable
-    fun GameLobbyBody(gameLobby: GameLobby) {
+    private fun GameLobbyBody(gameLobby: GameLobby) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -184,7 +184,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param gameParameters the game parameters to display
      */
     @Composable
-    fun SettingsMenu(gameParameters: GameParameters) {
+    private fun SettingsMenu(gameParameters: GameParameters) {
         var expanded by remember { mutableStateOf(false) }
         val arrowRotation by animateDpAsState(targetValue = if (expanded) 90.dp else 0.dp)
 
@@ -247,7 +247,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param value the value of the setting
      */
     @Composable
-    fun SettingsItem(title: String, value: String) {
+    private fun SettingsItem(title: String, value: String) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = title,
@@ -274,7 +274,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: String) {
+    private fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: String) {
         Column ( modifier = Modifier.testTag("game_lobby_players_list")) {
             PlayerHeader(players, maximumNumberOfPlayers)
             PlayerRows(players, adminId)
@@ -288,7 +288,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param maximumNumberOfPlayers the maximum number of players allowed in the game
      */
     @Composable
-    fun PlayerHeader(players: List<User>, maximumNumberOfPlayers: Int) {
+    private fun PlayerHeader(players: List<User>, maximumNumberOfPlayers: Int) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -332,7 +332,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayerRows(players: List<User>, adminId: String) {
+    private fun PlayerRows(players: List<User>, adminId: String) {
         for (player in players) {
             PlayerRow(player, adminId)
         }
@@ -344,7 +344,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayerRow(player: User, adminId: String) {
+    private fun PlayerRow(player: User, adminId: String) {
         val secondary = MaterialTheme.colors.secondary
         val backGround = MaterialTheme.colors.background
         var flashColor by remember { mutableStateOf(secondary) }
@@ -381,7 +381,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param animatedColor the color to flash when a player joins or leaves the game lobby
      */
     @Composable
-    fun SinglePlayerRow(player: User, adminId: String, animatedColor: Color) {
+    private fun SinglePlayerRow(player: User, adminId: String, animatedColor: Color) {
 
         val secondary = MaterialTheme.colors.secondary
 
@@ -440,7 +440,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param maximumNumberOfPlayers the maximum number of players in the game
      */
     @Composable
-    fun EmptyPlayerSlots(players: List<User>, maximumNumberOfPlayers: Int) {
+    private fun EmptyPlayerSlots(players: List<User>, maximumNumberOfPlayers: Int) {
         repeat(maximumNumberOfPlayers - players.size) {
             AnimatedVisibility(
                 visibleState = remember { MutableTransitionState(false).apply { targetState = true } },
@@ -460,7 +460,7 @@ class GameLobbyActivity : ComponentActivity() {
      * Displays an empty player slot
      */
     @Composable
-    fun EmptyPlayerSlot() {
+    private fun EmptyPlayerSlot() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -487,7 +487,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the lobby
      */
     @Composable
-    fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: String,) {
+    private fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: String,) {
         val morePlayersNeeded = minRequiredPlayers - players.size
         val mContext = LocalContext.current
 
@@ -525,7 +525,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param lobbyCode the lobby code
      */
     @Composable
-    fun LobbyCodeDisplay(lobbyCode: String) {
+    private fun LobbyCodeDisplay(lobbyCode: String) {
         Row {
             Text(
                 text = getString(R.string.game_lobby_group_code_title),
@@ -579,7 +579,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param maxPlayers the maximum number of players allowed in the lobby
      */
     @Composable
-    fun PlayerStatusDisplay(morePlayersNeeded: Int, players: List<User>, maxPlayers: Int) {
+    private fun PlayerStatusDisplay(morePlayersNeeded: Int, players: List<User>, maxPlayers: Int) {
         if (morePlayersNeeded > 0) {
             MorePlayersNeededDisplay(morePlayersNeeded)
         } else {
@@ -591,7 +591,7 @@ class GameLobbyActivity : ComponentActivity() {
      * Computes the message to display if there are not enough players to start the game
      */
     @Composable
-    fun MorePlayersNeededDisplay(morePlayersNeeded: Int) {
+    private fun MorePlayersNeededDisplay(morePlayersNeeded: Int) {
         Row {
             Text(
                 text = getString(R.string.game_lobby_more_players_prefix),
@@ -623,7 +623,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param maxPlayers the maximum number of players allowed in the game lobby.
      */
     @Composable
-    fun CurrentPlayerCountDisplay(players: List<User>, maxPlayers: Int) {
+    private fun CurrentPlayerCountDisplay(players: List<User>, maxPlayers: Int) {
         Row {
             Text(
                 text = getString(R.string.game_lobby_players_title),
