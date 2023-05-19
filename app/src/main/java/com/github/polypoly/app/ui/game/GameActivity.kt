@@ -72,10 +72,11 @@ class GameActivity : ComponentActivity() {
                         player,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: ""
+                        mapViewModel.interactableProperty.value?.name ?: "",
+                        gameModel
                     )
                     GameEndedLabel(gameEnded)
-                    if(trade != null) {
+                    if (trade != null) {
                     }
                 }
             }

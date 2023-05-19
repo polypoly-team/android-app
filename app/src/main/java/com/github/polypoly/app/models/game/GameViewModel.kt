@@ -74,7 +74,7 @@ class GameViewModel(
         gameEndedData.value = gameData.value?.isGameFinished() ?: false
     }
 
-    suspend fun listenToTradeRequest() {
+    private suspend fun listenToTradeRequest() {
         while (gameData.value?.isGameFinished() == true) {
             remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
                 tradeRequests.forEach { tradeRequest ->

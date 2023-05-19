@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.data.GameRepository.Companion.player
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
@@ -43,10 +44,10 @@ import com.github.polypoly.app.ui.theme.Shapes
  * The heads-up display with player and game stats that is displayed on top of the map
  */
 @Composable
-fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String, gameModel: GameViewModel) {
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round)
+        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerData.playerState.value == PlayerState.MOVING)
             HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
@@ -130,7 +131,7 @@ fun HudPlayer(playerData: Player) {
  * players
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
+fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -165,7 +166,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                         Column(Modifier.padding(Padding.medium)) {
                             HudGame(round)
                             otherPlayersData.forEach {
-                                HudOtherPlayer(it)
+                                HudOtherPlayer(it, gameModel)
                             }
                         }
                     }
@@ -216,9 +217,11 @@ fun HudGame(round: Int) {
 /**
  * The HUD for the stats of other players, it displays basic information such as their balance,
  * and a button shows complete information on click
+ * @param playerData The data of the player to display
+ * @param gameModel The game view model
  */
 @Composable
-fun HudOtherPlayer(playerData: Player) {
+fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     var openOtherPlayerInfo by remember { mutableStateOf(false) }
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
@@ -234,9 +237,10 @@ fun HudOtherPlayer(playerData: Player) {
 
     val openLocationsDialog =  remember{ mutableStateOf(false) }
     if (openLocationsDialog.value) {
-        player?.let { LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) {
+        player?.let { it ->
+            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
             openLocationsDialog.value = false
-            // TODO : Put in the DB the trade
+            gameModel.createATradeRequest(playerData, location)
         } }
     }
 
