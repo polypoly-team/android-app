@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
  * Object where all the common UI elements are stored, as long as their properties
  */
 object UIElements {
+
+    val smallIconSize = 20.dp
+
     /**
      * All the TextFields of polypoly should have these colors
      */

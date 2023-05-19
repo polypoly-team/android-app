@@ -2,7 +2,6 @@ package com.github.polypoly.app.ui.menu
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -23,15 +22,14 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initCurrentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
@@ -250,6 +248,7 @@ class SignInActivity : ComponentActivity() {
             trophiesWon = listOf(0, 4, 8, 11, 12, 14),
             trophiesDisplay = mutableListOf(0, 4)
         )
+
         val TEST_USER_1 = User("12","Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_2 = User("123","Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_3 = User("1234","James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
@@ -258,28 +257,28 @@ class SignInActivity : ComponentActivity() {
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
+            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
             60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            360, 20, emptyList(), 300), "Private gameLobby", "abc123", true
+            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
+            900, 20, emptyList(), 120), "Private gameLobby", "abc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
-            600, null, emptyList(), 1000), "Joinable 1", "abcd"
+            600, null, emptyList(), 1500), "Joinable 1", "abcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 10, 25,
-            3600, 20, emptyList(), 2000), "Joinable 2", "123abc"
+            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 5,
+            30, 20, emptyList(), 5000), "Joinable 2", "123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
-            720, 20, emptyList(), 3000), "Joinable 3", "1234abc"
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
+            10080, 20, emptyList(), 3000), "Joinable 3", "1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            1080, 20, emptyList(), 4000), "Joinable 4", "abc1234"
+            300, 20, emptyList(), 4000), "Joinable 4", "abc1234"
         )
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,

@@ -3,7 +3,6 @@ package com.github.polypoly.app.base.menu.lobby
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 
 /**
  * A class that represent the parameters of a [Game]
@@ -34,5 +33,10 @@ data class GameParameters(
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
         if (roundDuration <= 0 || roundDuration > GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
+    }
+
+    fun getRoundDurationValue(): GameLobbyConstants.RoundDurations {
+        return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }
+            ?: throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }

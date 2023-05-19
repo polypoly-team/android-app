@@ -2,7 +2,6 @@ package com.github.polypoly.app.commons
 
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.StorableObject
-import com.google.firebase.database.ValueEventListener
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
@@ -14,8 +13,14 @@ class MockDB: IRemoteStorage {
     private val keysHierarchy: MutableMap<String, MutableList<String>> = mutableMapOf()
     private val data: MutableMap<String, Any> = mutableMapOf()
 
+    private val listeners: MutableMap<String, MutableList<Pair<String, (Any) -> Unit>>> = mutableMapOf()
+
     private fun cleanKey(key: String): String {
         return key.removePrefix("/").removeSuffix("/")
+    }
+
+    private fun <T: StorableObject<*>> computeAbsoluteKey(key: String, clazz: KClass<T>): String {
+        return cleanKey(StorableObject.getPath(clazz) + key)
     }
 
     // ====================================================================================
@@ -28,7 +33,7 @@ class MockDB: IRemoteStorage {
         key: String,
         clazz: KClass<T>
     ): CompletableFuture<T> {
-        val keyCleaned = cleanKey(StorableObject.getPath(clazz) + key)
+        val keyCleaned = computeAbsoluteKey(key, clazz)
         if (!data.containsKey(keyCleaned)) {
             val failedFuture = CompletableFuture<T>()
             failedFuture.completeExceptionally(NoSuchElementException("Invalid key $keyCleaned"))
@@ -88,25 +93,38 @@ class MockDB: IRemoteStorage {
             keysHierarchy[parent]!!.add(child)
         }
         data[keyCleaned] = value.toDBObject()
+
+        for (listener in listeners[keyCleaned] ?: listOf()) {
+            listener.second(value)
+        }
+
         return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> removeValue(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        data.remove(computeAbsoluteKey(key, clazz))
+        return CompletableFuture.completedFuture(true)
     }
 
     // ========================================================================== LISTENERS
 
     override fun <T : StorableObject<*>> addOnChangeListener(key: String, tag: String, action: (newObj: T) -> Unit, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        val absoluteKey = computeAbsoluteKey(key, clazz)
+        val listenersFound = listeners[absoluteKey] ?: mutableListOf()
+        @Suppress("UNCHECKED_CAST")
+        listenersFound.add(Pair(tag, action as (Any) -> Unit))
+        listeners[absoluteKey] = listenersFound
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteOnChangeListener(key: String, tag: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        listeners[computeAbsoluteKey(key, clazz)]?.removeIf { listener -> listener.first == tag }
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> deleteAllOnChangeListeners(key: String, clazz: KClass<T>): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        listeners.remove(computeAbsoluteKey(key, clazz))
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun <T : StorableObject<*>> addOnRootChangeListener(
