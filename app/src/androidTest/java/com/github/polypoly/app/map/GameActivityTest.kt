@@ -73,7 +73,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     @Test
     fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        forceChangePlayerState(PlayerState.BIDDING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         composeTestRule.onNodeWithTag("betButton").performClick()
 
@@ -88,7 +88,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     @Test // could be looped for extensive testing
     fun mapActivity_Displays_Success_On_Valid_Bet_Amount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        forceChangePlayerState(PlayerState.BIDDING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         composeTestRule.onNodeWithTag("betButton").performClick()
         // TODO: Replace by future MAX_BET or similar

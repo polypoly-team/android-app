@@ -98,7 +98,9 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
 }
 
 private fun leaveInteractionDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
-    gameViewModel.cancelBidding()
+    if (gameViewModel.getPlayerStateData().value == PlayerState.BIDDING) {
+        gameViewModel.cancelBidding()
+    }
     mapViewModel.selectLocation(null)
 }
 
