@@ -95,12 +95,6 @@ class GameActivity : ComponentActivity() {
                     if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
                         BackgroundLocationPermissionHandler { startTaxService() }
                     }
-                    MapUI.MapView(mapViewModel, interactingWithProperty)
-                    PropertyInteractUIComponent()
-                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
-                        RollDiceDialog()
-                        RollDiceButton()
-                    }
                     MapUI.MapView(mapViewModel, gameModel)
                     PropertyInteractUIComponent(gameModel, mapViewModel)
                     DiceRollUI(gameModel, mapViewModel)
@@ -164,34 +158,6 @@ class GameActivity : ComponentActivity() {
         // flag to show the building info dialog
         val interactingWithProperty = mutableStateOf(false)
 
-        /**
-         * Updates the distance of all markers and returns the closest one.
-         *
-         * @return the closest location or null if there are no locations close enough to the player
-         */
-        fun updateAllDistancesAndFindClosest(
-            mapView: MapView,
-            myLocation: GeoPoint
-        ): LocationProperty? {
-            fun markersOf(mapView: MapView): List<Marker> {
-                return mapView.overlays.filterIsInstance<Marker>()
-            }
-
-            var closestLocationProperty = null as LocationProperty?
-            for (marker in markersOf(mapView)) {
-                val markerLocation = mapViewModel.markerToLocationProperty[marker]!!
-                if (closestLocationProperty == null ||
-                    myLocation.distanceToAsDouble(markerLocation.position())
-                    < myLocation.distanceToAsDouble(closestLocationProperty.position())
-                ) {
-                    closestLocationProperty = markerLocation
-                }
-            }
-            if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > Constants.MAX_INTERACT_DISTANCE)
-                closestLocationProperty = null
-
-            return closestLocationProperty
-        }
     }
 
     @Composable
