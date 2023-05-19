@@ -34,4 +34,9 @@ data class GameParameters(
         if (roundDuration <= 0 || roundDuration > GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
+
+    fun getRoundDurationValue(): GameLobbyConstants.RoundDurations {
+        return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }
+            ?: throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
+    }
 }

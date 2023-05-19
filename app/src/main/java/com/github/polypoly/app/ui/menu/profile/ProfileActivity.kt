@@ -51,6 +51,7 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 
@@ -194,7 +195,7 @@ class ProfileActivity : MenuActivity(R.string.profile_activity_name) {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.background,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .padding(20.dp)
         ) {
@@ -283,7 +284,7 @@ class ProfileActivity : MenuActivity(R.string.profile_activity_name) {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.secondaryVariant,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .fillMaxWidth()
                 .padding(15.dp)

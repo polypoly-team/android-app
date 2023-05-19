@@ -419,7 +419,7 @@ class JoinGameLobbyActivity : MenuActivity(R.string.game_lobby_join_game) {
                     painter = painterResource(id = R.drawable.tmp_happysmile),
                     contentDescription = "${gameLobby.name}/${player.name} icon",
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(UIElements.smallIconSize)
                         .testTag("${gameLobby.name}/playerIcon")
                 )
                 Spacer(modifier = Modifier.width(10.dp))
@@ -448,7 +448,7 @@ class JoinGameLobbyActivity : MenuActivity(R.string.game_lobby_join_game) {
                 fontSize = 16.sp
             )
             Text(
-                text = "${gameLobby.rules.roundDuration}",
+                text = "${gameLobby.rules.getRoundDurationValue()}",
                 style = MaterialTheme.typography.body1
             )
         }
@@ -531,17 +531,17 @@ class JoinGameLobbyActivity : MenuActivity(R.string.game_lobby_join_game) {
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
      */
     private fun joinGameLobbyRoom(mContext: Context) {
-        val currentLobbyKey = gameLobbyCode
-        remoteDB.getValue<GameLobby>(currentLobbyKey).thenAccept { gameLobby ->
+        remoteDB.getValue<GameLobby>(gameLobbyCode).thenAccept { gameLobby ->
             gameLobby.addUser(currentUser!!)
 
             //launch the gameLobby room activity
-            remoteDB.updateValue(gameLobby)
-            val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
-            GameRepository.gameCode = gameLobbyCode
+            remoteDB.updateValue(gameLobby).thenAccept {
+                val gameLobbyIntent = Intent(mContext, GameLobbyActivity::class.java)
+                GameRepository.gameCode = gameLobbyCode
 
-            startActivity(gameLobbyIntent)
-            finish()
+                startActivity(gameLobbyIntent)
+                finish()
+            }
         }
     }
 
