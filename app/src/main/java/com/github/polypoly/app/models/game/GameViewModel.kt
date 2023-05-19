@@ -1,25 +1,20 @@
 package com.github.polypoly.app.models.game
 
-import android.content.BroadcastReceiver
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.firebase.ui.auth.data.model.User
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getAllValues
-import com.github.polypoly.app.network.getValues
+import com.github.polypoly.app.network.removeValue
 import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
@@ -74,6 +69,25 @@ class GameViewModel(
         gameEndedData.value = gameData.value?.isGameFinished() ?: false
     }
 
+    /**
+     * Close a trade request
+     * @param trade The trade request to close
+     */
+    fun closeTradeRequest(trade: TradeRequest) {
+        remoteDB.removeValue<TradeRequest>(trade.code)
+    }
+
+    /**
+     * Update a trade request
+     * @param trade The trade request to update
+     */
+    fun updateTradeRequest(trade: TradeRequest) {
+        remoteDB.updateValue(trade)
+    }
+
+    /**
+     * Listen to the trade request that are sent to the current player
+     */
     private suspend fun listenToTradeRequest() {
         while (gameData.value?.isGameFinished() == true) {
             remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->

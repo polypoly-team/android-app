@@ -241,7 +241,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
         player?.let { it ->
             LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
             openLocationsDialog.value = false
-            gameModel.createATradeRequest(playerData, location)
+            gameModel.createATradeRequest(it, location)
         } }
     }
 

@@ -76,11 +76,33 @@ class GameActivity : ComponentActivity() {
                         gameModel
                     )
                     GameEndedLabel(gameEnded)
-                    if (trade != null && trade.playerReceiver.user.id == player.user.id) {
+                    if (trade != null && trade.playerReceiver.user.id == player.user.id
+                        && trade.locationReceived == null) {
                         val tradeDialog = remember {
                             mutableStateOf(true)
                         }
                         ProposeTradeDialog(trade, tradeDialog)
+                    }
+                    if(trade?.locationReceived != null
+                        && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
+                                (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation == null))) {
+                        AcceptTradeDialog(trade, trade.playerApplicant.user.id == player.user.id, gameModel)
+                    }
+                    if(trade?.locationReceived != null
+                        && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation != null
+                                && trade.currentPlayerApplicantAcceptation == null) ||
+                                (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation != null
+                                        && trade.currentPlayerReceiverAcceptation == null))) {
+                        WaitingForTheOtherPlayerDecisionDialog()
+                    }
+                    if(trade?.locationReceived != null
+                        && (trade.currentPlayerApplicantAcceptation == false || trade.currentPlayerReceiverAcceptation == false)) {
+                        val tradeDialog = remember {
+                            mutableStateOf(true)
+                        }
+                        if(tradeDialog.value) {
+                            TheTradeIsDoneDialog(false, tradeDialog)
+                        }
                     }
                 }
             }

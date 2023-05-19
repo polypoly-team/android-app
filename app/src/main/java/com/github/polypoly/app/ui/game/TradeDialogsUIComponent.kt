@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
 /**
@@ -77,33 +78,38 @@ fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>) {
 
 /**
  * Dialog to know if the player accept the trade
- * @param playerApplicant The player that propose the trade
- * @param openDialog A mutable state to open and close the dialog.
- * @param locationGiven The location given by the player
- * @param locationReceived The location received by the player
- * @param currentPlayerAcceptation A mutable state to know if the current player accept the trade
+ * @param trade The trade to accept
+ * @param isApplicant A boolean to know if the player is the applicant or the receiver
  */
 @Composable
-fun AcceptTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>,
-                      locationGiven: InGameLocation, locationReceived: InGameLocation,
-                        currentPlayerAcceptation: MutableState<Boolean?>) {
+fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: GameViewModel) {
     AlertDialog(
         modifier = Modifier.testTag("accept_trade_dialog"),
         onDismissRequest = {},
-        title = { Text(text = "Do you want to trade ${locationGiven.locationProperty.name} against" +
-                " ${locationReceived.locationProperty.name} with ${playerApplicant.user.name}?") },
+        title = { Text(text = "Do you want to trade ${trade.locationGiven?.locationProperty?.name} against" +
+                " ${trade.locationReceived?.locationProperty?.name} with ${trade.playerApplicant.user.name}?") },
         text = {},
         buttons = {
             Row {
                 Button(onClick = {
-                    currentPlayerAcceptation.value = true
-                    openDialog.value = false
+                    if(isApplicant) {
+                        trade.currentPlayerApplicantAcceptation = true
+                        gameModel.updateTradeRequest(trade)
+                    } else {
+                        trade.currentPlayerReceiverAcceptation = true
+                        gameModel.updateTradeRequest(trade)
+                    }
                 }) {
                     Text(text = "Accept")
                 }
                 Button(onClick = {
-                    currentPlayerAcceptation.value = false
-                    openDialog.value = false
+                    if(isApplicant) {
+                        trade.currentPlayerApplicantAcceptation = false
+                        gameModel.updateTradeRequest(trade)
+                    } else {
+                        trade.currentPlayerReceiverAcceptation = false
+                        gameModel.updateTradeRequest(trade)
+                    }
                 }) {
                     Text(text = "Refuse")
                 }

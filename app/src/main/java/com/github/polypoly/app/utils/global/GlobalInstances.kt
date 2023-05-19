@@ -38,7 +38,7 @@ class GlobalInstances {
             }
         }
 
-        var currentUser : User = User(7, "fake_user", "I am fake until google db is fully setup", Skin.default(),
+        var currentUser : User = User(8, "fake_user2", "I am fake until google db is fully setup", Skin.default(),
             Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
         )
         var currentFBUser : FirebaseUser? = null

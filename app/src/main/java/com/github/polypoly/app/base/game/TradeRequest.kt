@@ -20,8 +20,8 @@ data class TradeRequest(
     val playerReceiver: Player = Player(),
     val locationGiven: InGameLocation? = null,
     var locationReceived: InGameLocation? = null,
-    val currentPlayerApplicantAcceptation: Boolean? = null,
-    val currentPlayerReceiverAcceptation: Boolean? = null,
+    var currentPlayerApplicantAcceptation: Boolean? = null,
+    var currentPlayerReceiverAcceptation: Boolean? = null,
     val code: String = "defaultCode",
 ) : StorableObject<TradeRequest>(TradeRequest::class, Settings.DB_TRADE_REQUESTS_PATH, code) {
 
