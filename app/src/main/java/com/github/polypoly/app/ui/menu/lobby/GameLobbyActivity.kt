@@ -62,6 +62,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 class GameLobbyActivity : ComponentActivity() {
 
     val gameLobbyWaitingModel: GameLobbyWaitingViewModel by viewModels { GameLobbyWaitingViewModel.Factory }
+    val user = currentUser!!
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +72,9 @@ class GameLobbyActivity : ComponentActivity() {
 
     @Preview(showBackground = true)
     @Composable
-    private fun GameLobbyPreview() { GameLobbyContent() }
+    private fun GameLobbyPreview() {
+        GameLobbyContent()
+    }
 
     /**
      * Displays all the UI of the GameLobby
@@ -87,7 +90,7 @@ class GameLobbyActivity : ComponentActivity() {
 
             //TODO: implement as advised in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198327499
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
-                if (it.started && it.admin.id != currentUser.id) {
+                if (it.started && it.admin.id != user.id) {
                     navigateToGame(context, gameLobby)
                 }
             }
@@ -271,7 +274,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: Long) {
+    fun PlayersList(players: List<User>, maximumNumberOfPlayers: Int, adminId: String) {
         Column ( modifier = Modifier.testTag("game_lobby_players_list")) {
             PlayerHeader(players, maximumNumberOfPlayers)
             PlayerRows(players, adminId)
@@ -329,7 +332,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayerRows(players: List<User>, adminId: Long) {
+    fun PlayerRows(players: List<User>, adminId: String) {
         for (player in players) {
             PlayerRow(player, adminId)
         }
@@ -341,7 +344,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the game
      */
     @Composable
-    fun PlayerRow(player: User, adminId: Long) {
+    fun PlayerRow(player: User, adminId: String) {
         val secondary = MaterialTheme.colors.secondary
         val backGround = MaterialTheme.colors.background
         var flashColor by remember { mutableStateOf(secondary) }
@@ -378,7 +381,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param animatedColor the color to flash when a player joins or leaves the game lobby
      */
     @Composable
-    fun SinglePlayerRow(player: User, adminId: Long, animatedColor: Color) {
+    fun SinglePlayerRow(player: User, adminId: String, animatedColor: Color) {
 
         val secondary = MaterialTheme.colors.secondary
 
@@ -484,11 +487,11 @@ class GameLobbyActivity : ComponentActivity() {
      * @param adminId the id of the admin of the lobby
      */
     @Composable
-    fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: Long,) {
+    fun StartGameButton(players: List<User>, minRequiredPlayers: Int, maxPlayers: Int, lobbyCode: String, adminId: String,) {
         val morePlayersNeeded = minRequiredPlayers - players.size
         val mContext = LocalContext.current
 
-        val isAdmin = currentUser.id == adminId
+        val isAdmin = user.id == adminId
 
         Column(
             modifier = Modifier
@@ -659,12 +662,12 @@ class GameLobbyActivity : ComponentActivity() {
      * Makes sure that the admin is replaced by another user if the admin leaves.
      */
     private fun leaveLobby(gameLobby: GameLobby) {
-        val newUsersRegistered = gameLobby.usersRegistered.filter {it.id != currentUser.id}
+        val newUsersRegistered = gameLobby.usersRegistered.filter {it.id != user.id}
         if (newUsersRegistered.isEmpty()){
             remoteDB.removeValue<GameLobby>(gameLobby.code)
         } else {
             val newAdmin =
-                if (currentUser.id == gameLobby.admin.id && !gameLobby.started) newUsersRegistered.random() else gameLobby.admin
+                if (user.id == gameLobby.admin.id && !gameLobby.started) newUsersRegistered.random() else gameLobby.admin
             val newGameLobby = gameLobby.copy(admin = newAdmin)
             for (user in newUsersRegistered.filter { it.id != newAdmin.id }) {
                 newGameLobby.addUser(user)

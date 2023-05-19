@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @property currentUser If the user is the user currently logged in
  */
 data class User(
-    val id: Long = 0,
+    val id: String = "no-id",
     val name: String = "default",
     val bio: String = "",
     val skin: Skin = Skin(),
@@ -24,7 +24,7 @@ data class User(
     val trophiesWon: List<Int> = listOf(),
     val trophiesDisplay: MutableList<Int> = mutableListOf(),
     val currentUser: Boolean = false,
-): StorableObject<User>(User::class, DB_USERS_PROFILES_PATH, id.toString()) {
+): StorableObject<User>(User::class, DB_USERS_PROFILES_PATH, id) {
 
     override fun toString(): String {
         return "User{$id: $name}"

@@ -531,7 +531,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      */
     private fun joinGameLobbyRoom(mContext: Context) {
         remoteDB.getValue<GameLobby>(gameLobbyCode).thenAccept { gameLobby ->
-            gameLobby.addUser(currentUser)
+            gameLobby.addUser(currentUser!!)
 
             //launch the gameLobby room activity
             remoteDB.updateValue(gameLobby).thenAccept {

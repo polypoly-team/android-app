@@ -28,6 +28,7 @@
     <string name="create_game_lobby_initial_balance">Initial player balance:</string>
     <string name="create_game_lobby_game_code">Game code is: %s</string>
     <string name="create_game_lobby_create_game">Create game</string>
+    <string name="create_game_lobby_landlord_num_properties">Initial number of buildings per Landlord:</string>
 
     // game lobby
     <string name="game_lobby_players_title">"Players: "</string>

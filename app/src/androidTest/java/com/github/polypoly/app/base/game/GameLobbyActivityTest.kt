@@ -5,6 +5,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.R
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
@@ -19,15 +22,19 @@ import org.junit.runners.JUnit4
 import java.util.concurrent.TimeUnit
 
 @RunWith(JUnit4::class)
-class GameLobbyActivityTest: PolyPolyTest(true, false) {
+class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<GameLobbyActivity>()
 
     private var gameSettingsDisplayedTitles = listOf<String>()
-    private val baseGameLobby = TEST_GAME_LOBBY_CURRENT_USER_ADMIN
+    private val baseGameLobby = GameLobby(
+        TEST_USER_NOT_IN_LOBBY, GameParameters(
+            GameMode.RICHEST_PLAYER, 5, 6,
+            7200, 20, emptyList(), 4000), "Joinable 4", "default-lobby"
+    )
     private val lobbyCode = baseGameLobby.code
-    private val users = listOf(currentUser, TEST_USER_1, TEST_USER_2, TEST_USER_4)
+    private var users = listOf(currentUser!!, TEST_USER_1, TEST_USER_2, TEST_USER_4)
 
     override fun _prepareTest() {
         gameSettingsDisplayedTitles = listOf(
@@ -149,7 +156,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
 
         composeTestRule.onNodeWithTag("game_lobby_background").assertDoesNotExist()
         for (player in gameLobbyAfterClick.usersRegistered) {
-            if(player.id == currentUser.id){
+            if(player.id == currentUser!!.id){
                 assert(!gameLobbyAfterClick.usersRegistered.contains(player))
             } else  {
                 assert(gameLobbyAfterClick.usersRegistered.contains(player))
@@ -166,7 +173,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false) {
         composeTestRule.waitForIdle()
 
         val gameLobbyBeforeLeave = composeTestRule.activity.gameLobbyWaitingModel.getGameLobby().value!!
-        assert(gameLobbyBeforeLeave.admin.id == currentUser.id)
+        assert(gameLobbyBeforeLeave.admin.id == currentUser!!.id)
         assert(gameLobbyBeforeLeave.usersRegistered.contains(currentUser))
 
         composeTestRule.onNodeWithTag("game_lobby_leave_button", useUnmergedTree = true)

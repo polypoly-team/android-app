@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.user.User
  */
 data class PastGame(
     private val users: List<User> = listOf(),
-    private val usersRank: Map<Long, Int> = mapOf(),
+    private val usersRank: Map<String, Int> = mapOf(),
     val date: Long = 0,
     val duration: Long = 0,
 ) {
@@ -21,7 +21,7 @@ data class PastGame(
      * @param userId the id of the [User]
      * @return true if the user has won the [Game], false otherwise
      */
-    fun hasWon(userId: Long): Boolean {
+    fun hasWon(userId: String): Boolean {
         return usersRank[userId] == 1
     }
 
@@ -29,7 +29,7 @@ data class PastGame(
      * get the [User] id of the winner
      * @return the [User] id of the winner
      */
-    fun getWinnerId(): Long {
+    fun getWinnerId(): String {
         return usersRank.filterValues { it == 1 }.keys.first()
     }
 
@@ -47,7 +47,7 @@ data class PastGame(
      * @return the rank of the [User]
      * @throws IllegalArgumentException if the [User] is not in the [Game]
      */
-    fun getRank(userId: Long): Int {
+    fun getRank(userId: String): Int {
         return usersRank[userId] ?: throw IllegalArgumentException("User not in game")
     }
 

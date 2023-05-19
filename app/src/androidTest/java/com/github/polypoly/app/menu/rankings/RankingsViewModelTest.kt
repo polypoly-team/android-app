@@ -25,7 +25,7 @@ class RankingsViewModelTest {
     }
 
     private fun mockUser(id: Long, numberOfGame: Int, numberOfWin: Int, trophyCount: Int): User {
-        return User(id, id.toString(), "", NO_SKIN,
+        return User(id.toString(), id.toString(), "", NO_SKIN,
             Stats(0, 0, numberOfGame, numberOfWin, 0),
             List(trophyCount) { 1 }, mutableListOf())
     }
