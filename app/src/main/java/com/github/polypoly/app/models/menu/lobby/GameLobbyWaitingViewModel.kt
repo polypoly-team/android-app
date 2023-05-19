@@ -10,6 +10,7 @@ import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
@@ -51,8 +52,10 @@ class GameLobbyWaitingViewModel(
     fun setGameLobby(gameLobby: GameLobby) {
         setLoading(false)
         // TODO: here we "force" the value change to make sure that it toggles the recomposition
-        gameLobbyData.postValue(GameLobby())
-        gameLobbyData.postValue(gameLobby)
+        MainScope().launch {
+            gameLobbyData.value = GameLobby()
+            gameLobbyData.value = gameLobby
+        }
         readyForStartData.postValue(gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers)
     }
 
