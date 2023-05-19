@@ -10,24 +10,16 @@ import com.github.polypoly.app.utils.Constants
  */
 class TaxService: LocationService() {
     override fun processLocationUpdate(location: Location) {
-        val playerLocation = location // For clarity
+        val playerLocation = location
 
         // Iterate through all the locations and check if the player is close enough to interact
         for (inGameLocation in GameRepository.game?.inGameLocations!!) {
-            // Create a location object from the in-game location
-            val propertyLocation = Location("").apply {
-                latitude = inGameLocation.locationProperty.latitude
-                longitude = inGameLocation.locationProperty.longitude
-            }
-
             // Compute distance between player and location in meters
-            val distance = playerLocation.distanceTo(propertyLocation)
+            val distance = inGameLocation.locationProperty.distanceTo(playerLocation)
 
             if (inGameLocation.owner != null && inGameLocation.owner != GameRepository.player && distance <= Constants.MAX_INTERACT_DISTANCE) {
-                /**
-                 * Perform tax payment and money transfer if the player is close enough to a location
-                 * that is owned by another player.
-                 */
+                /* Perform tax payment and money transfer if the player is close enough to a location
+                 * that is owned by another player. */
                 val taxAmount = inGameLocation.currentTax()
                 GameRepository.player?.loseMoney(taxAmount)
                 inGameLocation.owner?.earnMoney(taxAmount)
