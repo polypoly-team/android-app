@@ -215,7 +215,6 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
 
         adminCLickOnButtonLaunchesGame()
     }
-
     @Test
     fun adminCLickOnButtonLaunchesGame(){
         val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
