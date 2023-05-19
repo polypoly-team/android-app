@@ -1,12 +1,9 @@
 package com.github.polypoly.app.base.game
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.ui.game.PlayerState
 import kotlin.random.Random
 
 /**
@@ -20,7 +17,7 @@ import kotlin.random.Random
 data class Player (
     val user: User = User(),
     private var balance: Int = 0,
-    private var ownedLocations: List<InGameLocation> = listOf(),
+    private var ownedLocations: MutableList<InGameLocation> = mutableListOf(),
     private var roundLost: Int? = null,
 ) : Comparable<Player> {
 
@@ -157,7 +154,7 @@ data class Player (
      * Get the list of the owned locations of the player
      * @return the list of the owned locations of the player
      */
-    fun getOwnedLocations(): List<InGameLocation> {
+    fun getOwnedLocations(): MutableList<InGameLocation> {
         return ownedLocations
     }
 
@@ -175,7 +172,7 @@ data class Player (
         if(ownedLocations.isNotEmpty() && roundLost != null)
             throw IllegalArgumentException("If the player has lost the game, the player can't owned locations")
         balance = newBalance
-        ownedLocations = newOwnedLocations
+        ownedLocations = newOwnedLocations.toMutableList()
         roundLost = newRoundLost
     }
 

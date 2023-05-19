@@ -41,7 +41,7 @@ fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPl
         Surface(
             color = MaterialTheme.colors.onBackground,
             modifier = Modifier
-                .testTag("locationsDialog")
+                .testTag("locations_list_dialog")
                 .fillMaxWidth(0.95f)
         ) {
             LocationsDialogBody(locationList = locationsOwnByPlayer, title, open, onClick)

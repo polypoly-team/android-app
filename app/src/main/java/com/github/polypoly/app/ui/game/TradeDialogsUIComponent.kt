@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.theme.Padding
@@ -195,7 +196,9 @@ fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>?, ga
  * @param openLocationsDialog A mutable state to open and close the dialog to choose a location
  */
 @Composable
-fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDialog: MutableState<Boolean>) {
+fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDialog: MutableState<Boolean>,
+                player: Player
+) {
     Dialog(
         onDismissRequest = { openOtherPlayerInfo.value = false },
     ) {
@@ -216,7 +219,9 @@ fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDia
                 Spacer(modifier = Modifier.height(Padding.medium))
                 Button(
                     onClick = {
-                        openLocationsDialog.value = true
+                        if(player.getOwnedLocations().isNotEmpty()) {
+                            openLocationsDialog.value = true
+                        }
                         openOtherPlayerInfo.value = false
                     },
                     modifier = Modifier.testTag("trade_button")

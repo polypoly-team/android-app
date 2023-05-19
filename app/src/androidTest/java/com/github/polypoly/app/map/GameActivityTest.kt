@@ -150,12 +150,50 @@ class GameActivityTest : PolyPolyTest(true, false) {
     }
 
     @Test
-    fun whenClickingOnTradeYouCanChooseSeeTheListOfBuildingsYouOwn() {
+    fun whenClickingOnTradeYouCanSeeAPopUpWithBuildingsToChoose() {
+        // give some location to the player
+        GameRepository.player?.getOwnedLocations()?.clear()
+        for(i in 0..2) {
+            val inGameLocation = GameRepository.game?.getInGameLocation()?.get(i)!!
+            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
+        }
+
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
-        
+        composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
     }
+
+    @Test
+    fun whenClickingOnTradeYouCanSeeTheEntirePopUpEvenWithALotOfBuildings() {
+        // give some location to the player
+        GameRepository.player?.getOwnedLocations()?.clear()
+        for(i in 0..15) {
+            val inGameLocation = GameRepository.game?.getInGameLocation()?.get(i)!!
+            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
+        }
+
+        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
+        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onNodeWithTag("trade_button").performClick()
+        composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
+    }
+
+    @Test
+    fun whenClickingOnTradeYouCantSeeThePopUpIfYouDoNotHaveBuildings() {
+        // give no location to the player
+        GameRepository.player?.getOwnedLocations()?.clear()
+
+        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
+        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onNodeWithTag("trade_button").performClick()
+        composeTestRule.onNodeWithTag("locations_list_dialog").assertDoesNotExist()
+    }
+    
 
     // --- Utility functions --- //
 
