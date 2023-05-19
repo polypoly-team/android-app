@@ -1,6 +1,5 @@
 package com.github.polypoly.app.ui.game
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,7 +12,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,11 +21,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -47,7 +47,7 @@ class GameActivity : ComponentActivity() {
 
     @Composable
     fun GameActivityContent() {
-        val player = gameModel.getPlayerData().observeAsState().value
+        val player: Player = gameModel.getPlayerData().observeAsState().value!!
         mapViewModel.currentPlayer = player
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
@@ -62,7 +62,7 @@ class GameActivity : ComponentActivity() {
                 ) {
                     MapUI.MapView(mapViewModel, interactingWithProperty)
                     PropertyInteractUIComponent()
-                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
+                    if (GlobalInstances.playerState.value == PlayerState.ROLLING_DICE) {
                         RollDiceDialog()
                         RollDiceButton()
                     }
@@ -76,7 +76,11 @@ class GameActivity : ComponentActivity() {
                         gameModel
                     )
                     GameEndedLabel(gameEnded)
-                    if (trade != null) {
+                    if (trade != null && trade.playerReceiver.user.id == player.user.id) {
+                        val tradeDialog = remember {
+                            mutableStateOf(true)
+                        }
+                        ProposeTradeDialog(trade, tradeDialog)
                     }
                 }
             }

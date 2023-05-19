@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.utils.global.GlobalInstances
 
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
@@ -64,7 +65,7 @@ fun RollDiceDialog() {
                         for (i in 0..2)
                             Button(onClick = {
                                 showRollDiceDialog.value = false
-                                mapViewModel.currentPlayer?.playerState?.value = PlayerState.MOVING
+                                GlobalInstances.playerState.value = PlayerState.MOVING
                                 mapViewModel.goingToLocationProperty = rollDice[i]
                             }) {
                                 Text(rollDice[i].name)

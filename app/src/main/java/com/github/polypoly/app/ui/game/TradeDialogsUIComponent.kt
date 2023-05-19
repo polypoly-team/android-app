@@ -1,45 +1,78 @@
 package com.github.polypoly.app.ui.game
 
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Dialog to that propose a trade to the player
  * @param playerApplicant The player that propose the trade
+ * @param playerReceiver The player that receive the trade
  * @param openDialog A mutable state to open and close the dialog.
- * @param openDialogChooseLocation A mutable state to open and close the dialog to choose the location
  */
 @Composable
-fun ProposeTradeDialog(playerApplicant: Player, openDialog: MutableState<Boolean>,
-                       openDialogChooseLocation: MutableState<Boolean>) {
-    AlertDialog(
-        modifier = Modifier.testTag("propose_trade_dialog"),
-        onDismissRequest = { openDialog.value = false },
-        title = { Text(text = "Player ${playerApplicant.user.name} propose you a trade !") },
-        text = { Text(text = "Do you accept ?") },
-        buttons = {
-            Row {
-                Button(onClick = {
-                    openDialogChooseLocation.value = true
-                }) {
-                    Text(text = "Yes")
-                }
-                Button(onClick = {
-                    openDialog.value = false
-                }) {
-                    Text(text = "No")
-                }
+fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>) {
+    val openDialogChooseLocation = remember {
+        mutableStateOf(false)
+    }
+    Surface(
+        color = Color.Transparent,
+    ) {
+        if (openDialogChooseLocation.value) {
+            LocationsDialog(
+                "Choose a location to trade2",
+                openDialogChooseLocation,
+                trade.playerReceiver.getOwnedLocations()
+            ) {
+                trade.locationReceived = it
+                openDialogChooseLocation.value = false
             }
         }
-    )
+        if(openDialog.value) {
+            AlertDialog(
+                modifier = Modifier.testTag("propose_trade_dialog"),
+                onDismissRequest = { openDialog.value = false },
+                title = { Text(text = "Player ${trade.playerApplicant.user.name} propose you a trade !") },
+                text = { Text(text = "Do you accept ?") },
+                buttons = {
+                    Row(
+                        modifier = Modifier
+                            .padding(Padding.medium)
+                            .fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = {
+                                openDialogChooseLocation.value = true
+                                openDialog.value = false
+                            }
+                        ) {
+                            Text(text = "Yes")
+                        }
+                        Spacer(modifier = Modifier.width(Padding.medium))
+                        Button(onClick = {
+                            openDialog.value = false
+                        }) {
+                            Text(text = "No")
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
 /**

@@ -14,6 +14,7 @@ import androidx.compose.runtime.MutableState
 import com.github.polypoly.app.R
 import com.github.polypoly.app.ui.game.GameActivity.Companion.updateAllDistancesAndFindClosest
 import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory.DEFAULT_TILE_SOURCE
@@ -100,10 +101,10 @@ fun addMarkerTo(mapView: MapView, position: GeoPoint, title: String, zoneColor: 
     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
     marker.icon = buildMarkerIcon(mapView.context, zoneColor)
     marker.setOnMarkerClickListener { _, _ ->
-        if (mapViewModel.currentPlayer?.playerState?.value == PlayerState.INTERACTING) {
+        if (GlobalInstances.playerState.value == PlayerState.INTERACTING) {
             mapViewModel.selectedMarker = marker
             interactingWithProperty.value = true
-            mapViewModel.currentPlayer?.playerState?.value = PlayerState.BETTING
+            GlobalInstances.playerState.value = PlayerState.BETTING
         }
         true
     }
@@ -130,9 +131,9 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel): MyLocatio
             mapViewModel.addDistanceWalked(lastLocation.distanceTo(location!!))
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
-                && mapViewModel.currentPlayer?.playerState!!.value == PlayerState.MOVING
+                && GlobalInstances.playerState.value == PlayerState.MOVING
                 && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty) {
-                mapViewModel.currentPlayer?.playerState!!.value = PlayerState.INTERACTING
+                GlobalInstances.playerState.value = PlayerState.INTERACTING
                 mapViewModel.goingToLocationProperty = null
             }
         }

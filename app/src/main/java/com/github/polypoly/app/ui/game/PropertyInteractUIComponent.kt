@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.ui.game.GameActivity.Companion.interactingWithProperty
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.utils.global.GlobalInstances
 
 /**
  * Manage the building info dialog and the bet dialog.
@@ -88,5 +89,5 @@ private fun PropertyInteractButtons(showBuyDialog: MutableState<Boolean>) {
 
 private fun leaveBetDialog() {
     interactingWithProperty.value = false
-    mapViewModel.currentPlayer?.playerState?.value = PlayerState.INTERACTING
+    GlobalInstances.playerState.value = PlayerState.INTERACTING
 }

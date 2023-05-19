@@ -39,6 +39,7 @@ import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
+import com.github.polypoly.app.utils.global.GlobalInstances
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -49,7 +50,7 @@ fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
         HudLocation(location, testTag = "interactable_location_text")
-        if (playerData.playerState.value == PlayerState.MOVING)
+        if (GlobalInstances.playerState.value == PlayerState.MOVING)
             HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
         HudGameMenu()
     }

@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.GameMusic
+import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
@@ -120,7 +121,7 @@ class WelcomeActivity : ComponentActivity() {
             ) {
                 // Join button
                 BigButton(onClick = {
-                    val joinGroupIntent = Intent(mContext, JoinGameLobbyActivity::class.java)
+                    val joinGroupIntent = Intent(mContext, GameActivity::class.java)
                     startActivity(joinGroupIntent)
                 }, text = "Join Game!")
                 Spacer(modifier = Modifier.height(20.dp))

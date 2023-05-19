@@ -78,7 +78,8 @@ class GameViewModel(
         while (gameData.value?.isGameFinished() == true) {
             remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
                 tradeRequests.forEach { tradeRequest ->
-                    if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name) {
+                    if (tradeRequest.playerReceiver.user.id == playerData.value?.user?.id ||
+                            tradeRequest.playerApplicant.user.id == playerData.value?.user?.id) {
                         tradeRequestData.value = tradeRequest
                     }
                 }
@@ -87,6 +88,12 @@ class GameViewModel(
         }
     }
 
+    /**
+     * Create a trade request between the current player and the player given in parameter
+     * @param playerReceiver The player that will receive the trade request
+     * @param locationGiven The location that the current player will give to the playerReceiver
+     * @return A CompletableFuture that will be completed with true if the trade request has been created, false otherwise
+     */
     fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation): CompletableFuture<Boolean> {
         val playerDataValue = playerData.value ?: return CompletableFuture.completedFuture(false)
         val tradeRequest = TradeRequest(
@@ -133,7 +140,7 @@ class GameViewModel(
                         Game.gameInProgress?.getInGameLocation()?.get(16)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(17)!!,),
                 )
-                GameRepository.player?.playerState?.value = PlayerState.ROLLING_DICE
+                GlobalInstances.playerState.value = PlayerState.ROLLING_DICE
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
                 GameViewModel(

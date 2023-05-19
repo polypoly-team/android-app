@@ -16,7 +16,7 @@ import com.github.polypoly.app.base.game.location.LocationPropertyRepository
  * @property initialPlayerBalance The initial balance of money of the players
  */
 data class GameParameters (
-    val gameMode: GameMode = GameMode.RICHEST_PLAYER,
+    val gameMode: GameMode = GameMode.LAST_STANDING,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
     val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
