@@ -49,7 +49,6 @@ abstract class PolyPolyTest(
         val ZERO_STATS = Stats(0, 0, 0, 0, 0)
         val NO_SKIN = Skin(0,0,0)
 
-        val CURRENT_USER = User("1000","test_current_user", "I am a fake current user!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
         val TEST_USER_0 = User(
             id = "0",
             name = "John",
@@ -70,28 +69,28 @@ abstract class PolyPolyTest(
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5, TEST_USER_NOT_IN_LOBBY)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
+            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
             60, 20, getZones(), 100), "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
+            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
             360, 20, getZones(), 300), "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
+            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 2, 8,
             600, null, getZones(), 1000), "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 10, 25,
-            3600, 20, getZones(), 2000), "Joinable 2", "lobby123abc"
+            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 7,
+            4320, 20, getZones(), 2000), "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 77,
-            720, 20, getZones(), 3000), "Joinable 3", "lobby1234abc"
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
+            900, 20, getZones(), 3000), "Joinable 3", "lobbyacd1234"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            1080, 20, getZones(), 4000), "Joinable 4", "lobbyabc1234"
+            7200, 20, getZones(), 4000), "Joinable 4", "lobbyabc1234"
         )
 
         val testPlayer1 = Player(TEST_USER_1, 100, listOf())
