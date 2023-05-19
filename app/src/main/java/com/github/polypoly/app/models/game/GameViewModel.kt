@@ -11,6 +11,8 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getAllValues
@@ -135,6 +137,10 @@ class GameViewModel(
                 // TODO: Remove this when the game is created from the lobby
                 GameRepository.game = Game.launchFromPendingGame(
                     GameLobby(
+                        rules = GameParameters(
+                            gameMode = GameRepository.game?.rules?.gameMode ?: GameMode.LAST_STANDING,
+                            maxRound = GameRepository.game?.rules?.maxRound,
+                        ),
                         admin = GlobalInstances.currentUser
                     )
                 )

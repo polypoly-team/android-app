@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.data.GameRepository.Companion.player
 import com.github.polypoly.app.models.game.GameViewModel
@@ -229,10 +230,9 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     Row(
         Modifier
             .padding(Padding.medium)
-            .testTag("other_player_hud")
     ) {
         HudButton(
-            name = "otherPlayerInfoButton",
+            name = "other_player_hud",
             onClick = { openOtherPlayerInfo.value = true },
             icon = Icons.Filled.Person,
             description = "See other player information"
