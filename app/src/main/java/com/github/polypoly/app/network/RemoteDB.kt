@@ -1,9 +1,11 @@
 package com.github.polypoly.app.network
 
 
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.network.StorableObject.Companion.convertToLocal
 import com.github.polypoly.app.network.StorableObject.Companion.getDBClass
 import com.github.polypoly.app.network.StorableObject.Companion.getPath
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -202,7 +204,7 @@ class RemoteDB(
             val listener = object : ValueEventListener {
                 override fun onDataChange(data: DataSnapshot) {
                     if(data.exists()) {
-                        convertDataToObject(data, clazz).thenApply { obj -> action(obj) }
+                        convertDataToObject(data, clazz).thenAccept { action(it) }
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {}

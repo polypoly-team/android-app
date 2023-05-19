@@ -8,6 +8,9 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
+import java.util.concurrent.CompletableFuture
 
 /**
  * Represent the game and the current state of the game
@@ -20,32 +23,31 @@ import com.github.polypoly.app.base.user.User
  * (seconds since 1970-01-01T00:00:00Z)
  */
 class Game private constructor(
+    val code: String = "default-code",
     val admin: User = User(),
     var players: List<Player> = listOf(),
     val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
-) {
+) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
-    val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone ->
-        zone.locationProperties.map { location ->
-            InGameLocation(
-                locationProperty = location,
-                owner = null,
-                level = PropertyLevel.LEVEL_0,
-            )
-        }
-    }
+    val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
+
+    val inGameLocations: List<InGameLocation> = allLocations.map { location ->
+        InGameLocation(
+            locationProperty = location,
+            owner = null,
+            level = PropertyLevel.LEVEL_0,
+        ) }
+
     var currentRound: Int = 1
 
     /**
      * Go to the next turn
      */
     fun nextTurn() {
-        // TODO update the data with the DB
         ++currentRound
         if (isGameFinished()) {
             val pastGame = endGame()
-            // TODO send the pastGame to the DB
         }
     }
 
@@ -144,6 +146,29 @@ class Game private constructor(
         }
     }
 
+    override fun toDBObject(): GameDB {
+        return GameDB(
+            code,
+            admin,
+            players,
+            rules,
+            dateBegin,
+            currentRound
+        )
+    }
+
+    override fun toLocalObject(dbObject: GameDB): CompletableFuture<StorableObject<GameDB>> {
+        val game = Game(
+            dbObject.code,
+            dbObject.admin,
+            dbObject.players,
+            dbObject.rules,
+            dbObject.dateBegin
+        )
+        game.currentRound = dbObject.round
+        return CompletableFuture.completedFuture(game)
+    }
+
     companion object {
         /**
          * Launch a game from the associated game lobby
@@ -155,6 +180,7 @@ class Game private constructor(
                 Player(it, gameLobby.rules.initialPlayerBalance, listOf())
             }
             val game = Game(
+                code = gameLobby.code,
                 admin = gameLobby.admin,
                 players =
                 if (gameLobby.rules.gameMode == GameMode.LANDLORD)
@@ -199,3 +225,12 @@ class Game private constructor(
         var gameInProgress: Game? = null
     }
 }
+
+data class GameDB(
+    val code: String = "default-code",
+    val admin: User = User(),
+    var players: List<Player> = listOf(),
+    val rules: GameParameters = GameParameters(),
+    val dateBegin: Long = System.currentTimeMillis(),
+    val round: Int = 0
+)

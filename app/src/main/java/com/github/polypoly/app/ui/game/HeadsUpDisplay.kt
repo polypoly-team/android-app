@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,7 +33,6 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -40,22 +40,33 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
+ * @param playerData current player of the game
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
+ * @param otherPlayersData other players in the game
+ * @param round current round of the game
+ * @param location current location of the player
  */
 @Composable
-fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
-        if (playerData.playerState.value == PlayerState.MOVING)
-            HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
+        if (playerState == PlayerState.MOVING)
+            HudLocation(playerPosition, DpOffset(0.dp, 80.dp), "going_to_location_text")
         HudGameMenu()
     }
 }

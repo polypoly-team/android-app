@@ -5,18 +5,15 @@ package com.github.polypoly.app.utils.global
  */
 class Settings {
     companion object {
+        ////////////////////// Game-related constants
+
+        const val NUMBER_OF_LOCATIONS_ROLLED = 3
+
+        ////////////////////// DB-related constants
         const val DB_USERS_PROFILES_PATH = "users/"
 
         const val DB_GAME_LOBBIES_PATH = "lobbies/"
 
-        const val DB_ALL_USERS_ID_PATH = "all_ids"
-
-        const val DB_USER_NAME_DIRECTORY = "name"
-
-        const val DB_USER_BIO_DIRECTORY = "bio"
-
-        const val DB_USER_SKIN_DIRECTORY = "skin"
-
-        const val DB_USER_STATS_DIRECTORY = "stats"
+        const val DB_GAMES_PATH = "games/"
     }
 }

@@ -1,6 +1,8 @@
 package com.github.polypoly.app.utils.global
 
 import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.RemoteDB
@@ -38,6 +40,7 @@ class GlobalInstances {
 
         // ============================================== CURRENT USER
         var currentUser : User? = null
+
         var isSignedIn = false
 
         fun initCurrentUser(key: String, name: String) {

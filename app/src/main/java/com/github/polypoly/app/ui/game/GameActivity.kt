@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.service.TaxService
 import com.github.polypoly.app.base.menu.lobby.GameMode
@@ -70,6 +71,9 @@ class GameActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Component for the entire game activity content
+     */
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
@@ -78,7 +82,7 @@ class GameActivity : ComponentActivity() {
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
-        if (game != null && gameTurn != null && gameEnded != null) {
+        if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -97,13 +101,18 @@ class GameActivity : ComponentActivity() {
                         RollDiceDialog()
                         RollDiceButton()
                     }
+                    MapUI.MapView(mapViewModel, gameModel)
+                    PropertyInteractUIComponent(gameModel, mapViewModel)
+                    DiceRollUI(gameModel, mapViewModel)
                     NextTurnButton(gameEnded)
-                    DistanceWalkedUIComponents()
+                    DistanceWalkedUIComponents(mapViewModel)
                     Hud(
                         player,
+                        gameModel,
+                        mapViewModel,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: ""
+                        mapViewModel.interactableProperty.value?.name ?: "EPFL"
                     )
                     GameEndedLabel(gameEnded)
                 }
@@ -112,7 +121,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NextTurnButton(gameEnded: Boolean) {
+    private fun NextTurnButton(gameEnded: Boolean) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Button(
                 modifier = Modifier
@@ -133,7 +142,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GameEndedLabel(gameEnded: Boolean) {
+    private fun GameEndedLabel(gameEnded: Boolean) {
         if (gameEnded) {
             Box(
                 modifier = Modifier

@@ -7,9 +7,10 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.IRemoteStorage
+import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
@@ -25,12 +26,10 @@ class GameLobbyWaitingViewModel(
 
     private val readyForStartData: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val waitingForSyncPromise: ArrayList<CompletableFuture<Boolean>> = arrayListOf()
-
     init {
         setLoading(true)
         viewModelScope.launch {
-            pollGameLobby()
+            listenGameLobby()
         }
     }
 
@@ -50,39 +49,19 @@ class GameLobbyWaitingViewModel(
         return readyForStartData
     }
 
-    private suspend fun pollGameLobby() {
-        // Polls the storage for updates every [pollingDelay] millisecs until coroutine is terminated
-        // TODO: replace this with listening to the storage once available
-        while (true) {
-            val pollingFuture = storage.getValue<GameLobby>(lobbyCode)
-
-            pollingFuture.thenApply { gameLobby ->
-                gameLobbyData.value = gameLobby
-                readyForStartData.value = gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers
-
-                for (future in waitingForSyncPromise) {
-                    future.complete(true)
-                }
-                waitingForSyncPromise.clear()
-
-                setLoading(false)
-            }
-
-            delay(POLLING_DELAY)
-
-            if (!pollingFuture.isDone)
-                pollingFuture.cancel(true)
+    fun setGameLobby(gameLobby: GameLobby) {
+        setLoading(false)
+        // TODO: here we "force" the value change to make sure that it toggles the recomposition
+        MainScope().launch {
+            gameLobbyData.value = GameLobby()
+            gameLobbyData.value = gameLobby
         }
+        readyForStartData.postValue(gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers)
     }
 
-    /**
-     * Registers a callback that will be called next time a data is synchronized with the storage
-     * This function is primarily but not exclusively aimed for used in unit tests
-     * @return a promise that completes when the data is synced again with the storage
-     */
-    fun waitForSync(): CompletableFuture<Boolean> {
-        waitingForSyncPromise.add(CompletableFuture())
-        return waitingForSyncPromise.last()
+    private fun listenGameLobby() {
+        storage.addOnChangeListener(lobbyCode, "game_lobby_waiting_view_model", ::setGameLobby)
+        storage.getValue<GameLobby>(lobbyCode).thenAccept(::setGameLobby)
     }
 
     companion object {
