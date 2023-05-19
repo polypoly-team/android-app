@@ -2,6 +2,8 @@ package com.github.polypoly.app.ui.map
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.polypoly.app.base.game.Player
@@ -9,7 +11,6 @@ import com.github.polypoly.app.base.game.location.LocationProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.osmdroid.views.overlay.Marker
 
 /**
  * ViewModel for the Map screen that stores the distance walked by the user, as well as
@@ -25,13 +26,15 @@ class MapViewModel(
     private var _interactableProperty = mutableStateOf(null as LocationProperty?)
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    lateinit var selectedMarker: Marker
-
     var goingToLocationProperty: LocationProperty? = null
 
     var currentPlayer: Player? = null
 
-    val markerToLocationProperty = mutableMapOf<Marker, LocationProperty>()
+    private var locationSelectedData = MutableLiveData<LocationProperty>(null)
+
+    fun getLocationSelected(): LiveData<LocationProperty> {
+        return locationSelectedData
+    }
 
     /**
      * Updates the distance walked by the user by adding the given value to the current value.
@@ -62,5 +65,13 @@ class MapViewModel(
         viewModelScope.launch(dispatcher) {
             _interactableProperty.value = locationProperty
         }
+    }
+
+    /**
+     * Picks the given location as the one selected. Pass null to unselect the current location.
+     * @param location location to select
+     */
+    fun selectLocation(location: LocationProperty?) {
+        locationSelectedData.value = location
     }
 }

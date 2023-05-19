@@ -10,6 +10,7 @@ import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.addOnChangeListener
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
@@ -24,8 +25,6 @@ class GameLobbyWaitingViewModel(
     private val gameLobbyData: MutableLiveData<GameLobby> = MutableLiveData(GameLobby())
 
     private val readyForStartData: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    private val waitingForSyncPromise: ArrayList<CompletableFuture<Boolean>> = arrayListOf()
 
     init {
         setLoading(true)
@@ -51,29 +50,18 @@ class GameLobbyWaitingViewModel(
     }
 
     fun setGameLobby(gameLobby: GameLobby) {
-        // TODO: here we "force" the value change to make sure that it toggles the recomposition
-        gameLobbyData.postValue(GameLobby())
-        gameLobbyData.postValue(gameLobby)
-        readyForStartData.postValue(gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers)
         setLoading(false)
-        for (future in waitingForSyncPromise)
-            future.complete(true)
-        waitingForSyncPromise.clear()
+        // TODO: here we "force" the value change to make sure that it toggles the recomposition
+        MainScope().launch {
+            gameLobbyData.value = GameLobby()
+            gameLobbyData.value = gameLobby
+        }
+        readyForStartData.postValue(gameLobby.usersRegistered.size >= gameLobby.rules.minimumNumberOfPlayers)
     }
 
     private fun listenGameLobby() {
         storage.addOnChangeListener(lobbyCode, "game_lobby_waiting_view_model", ::setGameLobby)
         storage.getValue<GameLobby>(lobbyCode).thenAccept(::setGameLobby)
-    }
-
-    /**
-     * Registers a callback that will be called next time a data is synchronized with the storage
-     * This function is primarily but not exclusively aimed for used in unit tests
-     * @return a promise that completes when the data is synced again with the storage
-     */
-    fun waitForSync(): CompletableFuture<Boolean> {
-        waitingForSyncPromise.add(CompletableFuture())
-        return waitingForSyncPromise.last()
     }
 
     companion object {

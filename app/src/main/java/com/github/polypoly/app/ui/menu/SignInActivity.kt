@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.polypoly.app.R
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -31,6 +32,8 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemote
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -49,6 +52,8 @@ class SignInActivity : ComponentActivity() {
         initRemoteDB()
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
+
+        addFakeDataToDB()
 
         launchWelcomeIfReady()
         setContent { SignInContent() }
@@ -205,31 +210,6 @@ class SignInActivity : ComponentActivity() {
         )
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * DEBUG function
      * Add fake data (possibly duplicate from tests' fake data) if the data in DB were corrupted
@@ -240,7 +220,7 @@ class SignInActivity : ComponentActivity() {
         val NO_SKIN = Skin(0,0,0)
 
         val TEST_USER_0 = User(
-            id = "BOOM",
+            id = "0",
             name = "John",
             bio = "Hi, this is my bio :)",
             skin = Skin(0,0,0),
@@ -259,6 +239,10 @@ class SignInActivity : ComponentActivity() {
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
             60, 20, emptyList(), 100), "Full gameLobby", "1234"
+        )
+        val TEST_GAME_LOBBY_FAST = GameLobby(
+            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
+                5, 20, getZones(), 100), "Fast gameLobby", "fast"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
@@ -281,7 +265,7 @@ class SignInActivity : ComponentActivity() {
             300, 20, emptyList(), 4000), "Joinable 4", "abc1234"
         )
 
-        val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
+        val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_FAST, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
             TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
 
         TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
@@ -296,7 +280,7 @@ class SignInActivity : ComponentActivity() {
         }
 
         // Add data to DB
-        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id.toString()})
+        requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id })
         requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code))
     }
 

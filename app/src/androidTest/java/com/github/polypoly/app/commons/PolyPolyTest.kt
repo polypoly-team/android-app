@@ -3,7 +3,9 @@ package com.github.polypoly.app.commons
 import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
@@ -16,16 +18,16 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 abstract class PolyPolyTest(
@@ -68,27 +70,27 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            60, 20, emptyList(), 100), "Full gameLobby", "lobby1234"
+            60, 20, getZones(), 100), "Full gameLobby", "lobby1234"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-            360, 20, emptyList(), 300), "Private gameLobby", "lobbyabc123", true
+            360, 20, getZones(), 300), "Private gameLobby", "lobbyabc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 2, 8,
-            600, null, emptyList(), 1000), "Joinable 1", "lobbyabcd"
+            600, null, getZones(), 1000), "Joinable 1", "lobbyabcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 7,
-            4320, 20, emptyList(), 2000), "Joinable 2", "lobby123abc"
+            4320, 20, getZones(), 2000), "Joinable 2", "lobby123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
-            900, 20, emptyList(), 3000), "Joinable 3", "lobbyacd1234"
+            900, 20, getZones(), 3000), "Joinable 3", "lobbyacd1234"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            7200, 20, emptyList(), 4000), "Joinable 4", "lobbyabc1234"
+            7200, 20, getZones(), 4000), "Joinable 4", "lobbyabc1234"
         )
 
         val testPlayer1 = Player(TEST_USER_1, 100, listOf())
@@ -207,5 +209,41 @@ abstract class PolyPolyTest(
         scope.launch { liveData.removeObserver(observer) }
 
         return result
+    }
+
+    /**
+     * Picks a random location among the locations provided
+     * @param amongLocations list of locations to pick from
+     * @return a random location in the list
+     */
+    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties }): LocationProperty {
+        return amongLocations[Random.nextInt().absoluteValue % amongLocations.size]
+    }
+
+    /**
+     * Executes the given lambda in the main thread. This is intended for assignations to MutableLiveData
+     * (generally in ViewModel classes) that have this constraint.
+     * @param action Lambda to execute in the main thread
+     * @return a future that completes once the lambda is completed
+     */
+    fun execInMainThread(action: () -> Unit): CompletableFuture<Boolean> {
+        val scope = CoroutineScope(Dispatchers.Main + Job())
+        val future = CompletableFuture<Boolean>()
+        scope.launch {
+            try {
+                action()
+                future.complete(true)
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
+            }
+        }
+        return future
+    }
+
+    /**
+     * Waits for an update of the UI to start
+     */
+    fun waitForUIToUpdate() {
+        runBlocking { delay(500) }
     }
 }

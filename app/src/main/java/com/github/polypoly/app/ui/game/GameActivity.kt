@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
@@ -32,13 +33,16 @@ import org.osmdroid.views.overlay.Marker
  */
 class GameActivity : ComponentActivity() {
 
-    private val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
+    val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { GameActivityContent() }
     }
 
+    /**
+     * Component for the entire game activity content
+     */
     @Composable
     fun GameActivityContent() {
         val player = gameModel.getPlayerData().observeAsState().value
@@ -47,25 +51,24 @@ class GameActivity : ComponentActivity() {
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
 
-        if (game != null && gameTurn != null && gameEnded != null) {
+        if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MapUI.MapView(mapViewModel, interactingWithProperty)
-                    PropertyInteractUIComponent()
-                    if (player?.playerState!!.value == PlayerState.ROLLING_DICE) {
-                        RollDiceDialog()
-                        RollDiceButton()
-                    }
+                    MapUI.MapView(mapViewModel, gameModel)
+                    PropertyInteractUIComponent(gameModel, mapViewModel)
+                    DiceRollUI(gameModel, mapViewModel)
                     NextTurnButton(gameEnded)
-                    DistanceWalkedUIComponents()
+                    DistanceWalkedUIComponents(mapViewModel)
                     Hud(
                         player,
+                        gameModel,
+                        mapViewModel,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: ""
+                        mapViewModel.interactableProperty.value?.name ?: "EPFL"
                     )
                     GameEndedLabel(gameEnded)
                 }
@@ -74,7 +77,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NextTurnButton(gameEnded: Boolean) {
+    private fun NextTurnButton(gameEnded: Boolean) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Button(
                 modifier = Modifier
@@ -95,7 +98,7 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GameEndedLabel(gameEnded: Boolean) {
+    private fun GameEndedLabel(gameEnded: Boolean) {
         if (gameEnded) {
             Box(
                 modifier = Modifier
@@ -113,40 +116,5 @@ class GameActivity : ComponentActivity() {
 
     companion object {
         val mapViewModel: MapViewModel = MapViewModel()
-
-        // flag to show the building info dialog
-        val interactingWithProperty = mutableStateOf(false)
-
-        //used to determine if the player is close enough to a location to interact with it
-        private const val MAX_INTERACT_DISTANCE = 10.0 // meters
-
-        /**
-         * Updates the distance of all markers and returns the closest one.
-         *
-         * @return the closest location or null if there are no locations close enough to the player
-         */
-        fun updateAllDistancesAndFindClosest(
-            mapView: MapView,
-            myLocation: GeoPoint
-        ): LocationProperty? {
-            fun markersOf(mapView: MapView): List<Marker> {
-                return mapView.overlays.filterIsInstance<Marker>()
-            }
-
-            var closestLocationProperty = null as LocationProperty?
-            for (marker in markersOf(mapView)) {
-                val markerLocation = mapViewModel.markerToLocationProperty[marker]!!
-                if (closestLocationProperty == null ||
-                    myLocation.distanceToAsDouble(markerLocation.position())
-                    < myLocation.distanceToAsDouble(closestLocationProperty.position())
-                ) {
-                    closestLocationProperty = markerLocation
-                }
-            }
-            if (myLocation.distanceToAsDouble(closestLocationProperty!!.position()) > MAX_INTERACT_DISTANCE)
-                closestLocationProperty = null
-
-            return closestLocationProperty
-        }
     }
 }
