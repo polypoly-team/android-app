@@ -229,7 +229,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     Row(
         Modifier
             .padding(Padding.medium)
-            .testTag("other_player_hud_${playerData.user.id}")
+            .testTag("other_player_hud")
     ) {
         HudButton(
             name = "otherPlayerInfoButton",

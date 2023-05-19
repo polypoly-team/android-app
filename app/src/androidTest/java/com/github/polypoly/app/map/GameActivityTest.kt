@@ -142,7 +142,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     @Test
     fun cantOpenTradeInOtherModeThanLandlord() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertDoesNotExist()
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }

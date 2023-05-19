@@ -49,7 +49,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithTag("trade_button").assertIsDisplayed()
     }
@@ -64,7 +64,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
         composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
@@ -81,7 +81,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
         composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
@@ -94,7 +94,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         GameRepository.player?.getOwnedLocations()?.clear()
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
         composeTestRule.onNodeWithTag("locations_list_dialog").assertDoesNotExist()
     }

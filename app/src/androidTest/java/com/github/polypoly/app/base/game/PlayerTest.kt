@@ -57,21 +57,21 @@ class PlayerTest {
     fun loseMoneyDecreaseTheMoneyOfThePlayer() {
         val playerMoney = 100
         val moneyLost = 50
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         testPlayer.loseMoney(moneyLost)
         assertEquals(playerMoney - moneyLost, testPlayer.getBalance())
     }
 
     @Test
     fun loseMoneyDoesNotDecreaseTheMoneyOfThePlayerBelowZero() {
-        val testPlayer = Player(TEST_USER_0, 100, listOf())
+        val testPlayer = Player(TEST_USER_0, 100, mutableListOf())
         testPlayer.loseMoney(150)
         assertEquals(0, testPlayer.getBalance())
     }
 
     @Test
     fun loseMoneyThrowsAnExceptionIfTheAmountIsNegative() {
-        val testPlayer = Player(TEST_USER_0, 100, listOf())
+        val testPlayer = Player(TEST_USER_0, 100, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.loseMoney(-50)
         }
@@ -84,7 +84,7 @@ class PlayerTest {
 
     @Test
     fun loseMoneyThrowsAnExceptionIfTheAmountIsZero() {
-        val testPlayer = Player(TEST_USER_0, 100, listOf())
+        val testPlayer = Player(TEST_USER_0, 100, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.loseMoney(0)
         }
@@ -97,7 +97,7 @@ class PlayerTest {
 
     @Test
     fun loseMoneyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
-        val testPlayer = Player(TEST_USER_0, 0, listOf(), 3)
+        val testPlayer = Player(TEST_USER_0, 0, mutableListOf(), 3)
         val thrown = assertThrows(IllegalStateException::class.java) {
             testPlayer.loseMoney(50)
         }
@@ -109,7 +109,7 @@ class PlayerTest {
     @Test
     fun loseMoneyChangeThePlayerStatusToLostIfThePlayerHasNoMoneyLeft() {
         val playerMoney = 100
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         testPlayer.loseMoney(150)
         assertTrue(testPlayer.getBalance() == 0)
         assertTrue(testPlayer.hasLost())
@@ -119,7 +119,7 @@ class PlayerTest {
     @Test
     fun loseMoneyDoesNotChangeThePlayerStatusToLostIfThePlayerHasTheExactAmountOfMoneyLeft() {
         val playerMoney = 100
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         testPlayer.loseMoney(playerMoney)
         assertFalse(testPlayer.hasLost())
         assertTrue(testPlayer.getRoundLost() == null)
@@ -129,14 +129,14 @@ class PlayerTest {
     fun earnMoneyIncreaseTheMoneyOfThePlayer() {
         val playerMoney = 100
         val moneyEarned = 50
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         testPlayer.earnMoney(moneyEarned)
         assertEquals(playerMoney + moneyEarned, testPlayer.getBalance())
     }
 
     @Test
     fun earnMoneyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
-        val testPlayer = Player(TEST_USER_0, 0, listOf(), 4)
+        val testPlayer = Player(TEST_USER_0, 0, mutableListOf(), 4)
         val thrown = assertThrows(IllegalStateException::class.java) {
             testPlayer.earnMoney(50)
         }
@@ -147,7 +147,7 @@ class PlayerTest {
     @Test
     fun betToBuyCreatesALocationBetWithTheCorrectArguments() {
         val amountOfTheBet = 300
-        val testPlayer = Player(TEST_USER_0, 300, listOf())
+        val testPlayer = Player(TEST_USER_0, 300, mutableListOf())
         val bet = testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), amountOfTheBet)
         assertEquals(amountOfTheBet, bet.amount)
         assertEquals(TEST_USER_0.id, bet.player.user.id)
@@ -156,7 +156,7 @@ class PlayerTest {
 
     @Test
     fun betToBuyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
-        val testPlayer = Player(TEST_USER_0, 0, listOf(), 4)
+        val testPlayer = Player(TEST_USER_0, 0, mutableListOf(), 4)
         val thrown = assertThrows(IllegalStateException::class.java) {
             testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 300)
         }
@@ -166,7 +166,7 @@ class PlayerTest {
 
     @Test
     fun betToBuyThrowsAnExceptionIfTheAmountIsNegative() {
-        val testPlayer = Player(TEST_USER_0, 300, listOf())
+        val testPlayer = Player(TEST_USER_0, 300, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), -300)
         }
@@ -177,7 +177,7 @@ class PlayerTest {
 
     @Test
     fun betToBuyThrowsAnExceptionIfTheAmountIsZero() {
-        val testPlayer = Player(TEST_USER_0, 300, listOf())
+        val testPlayer = Player(TEST_USER_0, 300, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 0)
         }
@@ -187,7 +187,7 @@ class PlayerTest {
 
     @Test
     fun betToBuyThrowsAnExceptionIfTheLocationIsAlreadyOwned() {
-        val testPlayer = Player(TEST_USER_0, 300, listOf())
+        val testPlayer = Player(TEST_USER_0, 300, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             testPlayer.bidToBuy(
                 location = InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0], owner = PolyPolyTest.testPlayer2), 300)
@@ -198,7 +198,7 @@ class PlayerTest {
 
     @Test
     fun betToBuyThrowsAnExceptionIfTheAmountIsSmallerThanTheLocationPrice() {
-        val testPlayer = Player(TEST_USER_0, 100, listOf())
+        val testPlayer = Player(TEST_USER_0, 100, mutableListOf())
         val thrown = assertThrows(IllegalArgumentException::class.java) {
             val locationProperty = LocationProperty("Test", 300, 30, 60, 0.0, 0.0)
             testPlayer.bidToBuy(InGameLocation(locationProperty), 100)
@@ -210,7 +210,7 @@ class PlayerTest {
     @Test
     fun collectTuitionFeesToPayCardDecreaseThePlayerBalance() {
         val playerMoney = 500
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         val inGameBonusCard = InGameBonusCard(BonusCard.TUITION_FEES_TO_PAY, GeoPoint(0.0, 0.0))
         testPlayer.collectBonusCard(inGameBonusCard)
         assertEquals(playerMoney - 100, testPlayer.getBalance())
@@ -219,7 +219,7 @@ class PlayerTest {
     @Test
     fun collectTeachingAssistantPayDayCardIncreaseThePlayerBalance() {
         val playerMoney = 500
-        val testPlayer = Player(TEST_USER_0, playerMoney, listOf())
+        val testPlayer = Player(TEST_USER_0, playerMoney, mutableListOf())
         val inGameBonusCard = InGameBonusCard(BonusCard.TEACHING_ASSISTANT_PAYDAY, GeoPoint(0.0, 0.0))
         testPlayer.collectBonusCard(inGameBonusCard)
         assertEquals(playerMoney + 100, testPlayer.getBalance())
