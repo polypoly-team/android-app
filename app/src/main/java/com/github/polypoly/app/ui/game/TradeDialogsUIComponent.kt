@@ -12,21 +12,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
-import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Dialog to that propose a trade to the player
- * @param playerApplicant The player that propose the trade
- * @param playerReceiver The player that receive the trade
+ * @param trade The trade to propose
  * @param openDialog A mutable state to open and close the dialog.
+ * @param gameModel The game model
  */
 @Composable
-fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>) {
+fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, gameModel: GameViewModel) {
     val openDialogChooseLocation = remember {
         mutableStateOf(false)
     }
@@ -40,6 +37,7 @@ fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>) {
                 trade.playerReceiver.getOwnedLocations()
             ) {
                 trade.locationReceived = it
+                gameModel.updateTradeRequest(trade)
                 openDialogChooseLocation.value = false
             }
         }
@@ -90,7 +88,10 @@ fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: Game
                 " ${trade.locationReceived?.locationProperty?.name} with ${trade.playerApplicant.user.name}?") },
         text = {},
         buttons = {
-            Row {
+            Row (
+                modifier = Modifier.padding(Padding.medium)
+                    .fillMaxWidth()
+            ) {
                 Button(onClick = {
                     if(isApplicant) {
                         trade.currentPlayerApplicantAcceptation = true
@@ -102,6 +103,7 @@ fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: Game
                 }) {
                     Text(text = "Accept")
                 }
+                Spacer(modifier = Modifier.width(Padding.medium))
                 Button(onClick = {
                     if(isApplicant) {
                         trade.currentPlayerApplicantAcceptation = false
@@ -136,13 +138,16 @@ fun WaitingForTheOtherPlayerDecisionDialog() {
  * Dialog to inform the player that the trade is done
  * @param result The result of the trade (true if the trade is successful, false otherwise)
  * @param openDialog A mutable state to open and close the dialog.
+ * @param gameModel The game model
+ * @param trade The trade that has been done
  */
 @Composable
-fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>) {
+fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>?, gameModel: GameViewModel,
+                         trade: TradeRequest) {
     AlertDialog(
         modifier = Modifier.testTag("the_trade_is_done_dialog"),
         onDismissRequest = {
-            openDialog.value = false
+            openDialog?.value = false
         },
         title = {
             if (result)
@@ -153,7 +158,8 @@ fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>) {
         text = {},
         buttons = {
             Button(onClick = {
-                openDialog.value = false
+                openDialog?.value = false
+                gameModel.closeTradeRequest(trade)
             }) {
                 Text(text = "Ok")
             }

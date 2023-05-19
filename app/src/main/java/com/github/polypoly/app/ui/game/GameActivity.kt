@@ -81,7 +81,7 @@ class GameActivity : ComponentActivity() {
                         val tradeDialog = remember {
                             mutableStateOf(true)
                         }
-                        ProposeTradeDialog(trade, tradeDialog)
+                        ProposeTradeDialog(trade, tradeDialog, gameModel)
                     }
                     if(trade?.locationReceived != null
                         && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
@@ -101,7 +101,7 @@ class GameActivity : ComponentActivity() {
                             mutableStateOf(true)
                         }
                         if(tradeDialog.value) {
-                            TheTradeIsDoneDialog(false, tradeDialog)
+                            TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade)
                         }
                     }
                 }

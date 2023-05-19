@@ -74,6 +74,7 @@ class GameViewModel(
      * @param trade The trade request to close
      */
     fun closeTradeRequest(trade: TradeRequest) {
+        tradeRequestData.value = null
         remoteDB.removeValue<TradeRequest>(trade.code)
     }
 
@@ -82,6 +83,8 @@ class GameViewModel(
      * @param trade The trade request to update
      */
     fun updateTradeRequest(trade: TradeRequest) {
+        tradeRequestData.value = null
+        tradeRequestData.value = trade
         remoteDB.updateValue(trade)
     }
 
