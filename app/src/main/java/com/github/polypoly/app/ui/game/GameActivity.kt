@@ -62,97 +62,12 @@ class GameActivity : ComponentActivity() {
         setContent { GameActivityContent() }
     }
 
-    @Composable
-    fun BackgroundLocationPermissionHandler(callback: () -> Unit) {
-        var acknowledgePermissionDenial by remember { mutableStateOf(false) }
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Timber.tag("GameActivity").d("Background location permission granted")
-                callback()
-            }
-            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION) -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = "Background location permission is required to passively tax players if they are in a location property that is owned by another player.",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .testTag("background_location_permission_rationale")
-                    )
-                    Button(
-                        onClick = {
-                            requestBackgroundLocationPermission(grantCallback = callback, denyCallback = {
-                                acknowledgePermissionDenial = true
-                            })
-                        }
-                    ) {
-                        Text(text = "OK")
-                    }
-                }
-            }
-            else -> {
-                requestBackgroundLocationPermission(grantCallback = callback, denyCallback = {
-                    acknowledgePermissionDenial = true
-                })
-            }
-        }
-
-        // TODO: Disable taxing for everyone if one user doesn't give permission to make it fair.
-        if (acknowledgePermissionDenial) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    text = "Background location permission is required to passively tax players if they are in a location property that is owned by another player.",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .testTag("background_location_permission_denied")
-                )
-                Button(
-                    onClick = {
-                        requestBackgroundLocationPermission(grantCallback = callback, denyCallback = {
-                            acknowledgePermissionDenial = true
-                        })
-                    }
-                ) {
-                    Text(text = "OK")
-                }
-            }
-        }
-    }
-
-    private fun requestBackgroundLocationPermission(grantCallback: () -> Unit, denyCallback: () -> Unit) {
-        val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    grantCallback()
-                }
-                else {
-                    denyCallback()
-                }
-            }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         // Stop the tax service if the game mode is landlord.
         if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
             stopTaxService()
         }
-    }
-
-    private fun startTaxService() {
-        taxService = Intent(this, TaxService::class.java)
-        startForegroundService(taxService)
-    }
-
-    private fun stopTaxService() {
-        stopService(taxService)
     }
 
     @Composable
@@ -269,4 +184,88 @@ class GameActivity : ComponentActivity() {
             return closestLocationProperty
         }
     }
+
+    @Composable
+    fun BackgroundLocationPermissionHandler(callback: () -> Unit) {
+        var acknowledgePermissionDenial by remember { mutableStateOf(false) }
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                callback()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION) -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "Background location permission is required to passively tax players if they are in a location property that is owned by another player.",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .testTag("background_location_permission_rationale")
+                    )
+                    Button(
+                        onClick = {
+                            requestBackgroundLocationPermission(grantCallback = callback, denyCallback = {
+                                acknowledgePermissionDenial = true
+                            })
+                        }
+                    ) {
+                        Text(text = "OK")
+                    }
+                    // TODO: Add a button to decline permission and disable taxing for everyone.
+                }
+            }
+            else -> {
+                requestBackgroundLocationPermission(grantCallback = callback, denyCallback = {
+                    acknowledgePermissionDenial = true
+                })
+            }
+        }
+
+        // TODO: Disable taxing for everyone if one user doesn't give permission to make it fair.
+        if (acknowledgePermissionDenial) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    text = "Background location permission was denied, the game will continue with taxing disabled.",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag("background_location_permission_denied")
+                )
+                Button(
+                    onClick = {
+                        acknowledgePermissionDenial = false
+                    }
+                ) {
+                    Text(text = "OK")
+                }
+            }
+        }
+    }
+
+    private fun requestBackgroundLocationPermission(grantCallback: () -> Unit, denyCallback: () -> Unit) {
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    grantCallback()
+                }
+                else {
+                    denyCallback()
+                }
+            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    }
+
+    private fun startTaxService() {
+        taxService = Intent(this, TaxService::class.java)
+        startForegroundService(taxService)
+    }
+
+    private fun stopTaxService() {
+        stopService(taxService)
+    }
+
 }
