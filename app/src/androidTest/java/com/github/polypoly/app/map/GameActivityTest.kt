@@ -14,6 +14,7 @@ import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.game.PlayerState
 import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.utils.global.GlobalInstances
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -27,7 +28,7 @@ import org.osmdroid.views.overlay.Marker
 class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
-        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_3)
         GameRepository.player =
             GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
     }
@@ -138,6 +139,26 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
 
+    // --- Trading tests --- //
+
+    @Test
+    fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
+        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
+        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("trade_button").assertIsDisplayed()
+    }
+
+    @Test
+    fun whenClickingOnTradeYouCanChooseSeeTheListOfBuildingsYouOwn() {
+        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
+        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
+        composeTestRule.onNodeWithTag("trade_button").performClick()
+        
+    }
+
+    // --- Utility functions --- //
+
     private fun waitForUIToUpdate() {
         runBlocking { delay(500) }
     }
@@ -147,7 +168,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     }
 
     private fun setCurrentPlayerState(state: PlayerState) {
-        GameActivity.mapViewModel.currentPlayer!!.playerState.value = state
+        GlobalInstances.playerState.value = state
     }
 
     private fun getRandomMarker(): Marker {

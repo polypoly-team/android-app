@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -140,6 +139,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
             modifier = Modifier
                 .padding(Padding.medium)
                 .align(Alignment.TopStart)
+                .testTag("other_players_and_game_hud"),
         ) {
             Column(Modifier.padding(Padding.medium)) {
                 // A drop down button that expands and collapses the stats for other players and
@@ -223,11 +223,14 @@ fun HudGame(round: Int) {
  */
 @Composable
 fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
-    var openOtherPlayerInfo by remember { mutableStateOf(false) }
-    Row(Modifier.padding(Padding.medium)) {
+    val openOtherPlayerInfo = remember { mutableStateOf(false) }
+    Row(
+        Modifier.padding(Padding.medium)
+            .testTag("other_player_hud_${playerData.user.id}")
+    ) {
         HudButton(
             name = "otherPlayerInfoButton",
-            onClick = { openOtherPlayerInfo = true },
+            onClick = { openOtherPlayerInfo.value = true },
             icon = Icons.Filled.Person,
             description = "See other player information"
         )
@@ -245,34 +248,8 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
         } }
     }
 
-    if (openOtherPlayerInfo) {
-        Dialog(
-            onDismissRequest = { openOtherPlayerInfo = false },
-        ) {
-            Surface(
-                color = MaterialTheme.colors.background,
-                shape = Shapes.medium,
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .fillMaxWidth()
-            ) {
-                // TODO: Add information about other players
-                Column(
-                    modifier = Modifier
-                        .padding(Padding.large),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Do you want to trade with this player?")
-                    Spacer(modifier = Modifier.height(Padding.medium))
-                    Button(onClick = {
-                        openLocationsDialog.value = true
-                        openOtherPlayerInfo = false
-                    }) {
-                        Text(text = "Trade")
-                    }
-                }
-            }
-        }
+    if (openOtherPlayerInfo.value) {
+        AskingForATrade(openOtherPlayerInfo, openLocationsDialog)
     }
 }
 

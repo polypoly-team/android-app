@@ -1,20 +1,20 @@
 package com.github.polypoly.app.ui.game
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.theme.Padding
+import com.github.polypoly.app.ui.theme.Shapes
 
 /**
  * Dialog to that propose a trade to the player
@@ -187,4 +187,43 @@ fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>?, ga
             }
         }
     )
+}
+
+/**
+ * Dialog to ask the player if he/she wants to trade with the other player
+ * @param openOtherPlayerInfo A mutable state to open and close the dialog.
+ * @param openLocationsDialog A mutable state to open and close the dialog to choose a location
+ */
+@Composable
+fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDialog: MutableState<Boolean>) {
+    Dialog(
+        onDismissRequest = { openOtherPlayerInfo.value = false },
+    ) {
+        Surface(
+            color = MaterialTheme.colors.background,
+            shape = Shapes.medium,
+            modifier = Modifier
+                .padding(Padding.medium)
+                .fillMaxWidth()
+                .testTag("asking_for_a_trade_dialog")
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(Padding.large),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Do you want to trade with this player?")
+                Spacer(modifier = Modifier.height(Padding.medium))
+                Button(
+                    onClick = {
+                        openLocationsDialog.value = true
+                        openOtherPlayerInfo.value = false
+                    },
+                    modifier = Modifier.testTag("trade_button")
+                ) {
+                    Text(text = "Trade")
+                }
+            }
+        }
+    }
 }
