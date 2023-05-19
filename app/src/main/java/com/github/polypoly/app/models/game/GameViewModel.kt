@@ -142,7 +142,7 @@ class GameViewModel(
                     GlobalInstances.currentUser,
                     // hardcoded values for the testing
                     3000,
-                    ownedLocations = listOf(Game.gameInProgress?.getInGameLocation()?.get(0)!!,
+                    ownedLocations = mutableListOf(Game.gameInProgress?.getInGameLocation()?.get(0)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(1)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(2)!!,
                         Game.gameInProgress?.getInGameLocation()?.get(5)!!,

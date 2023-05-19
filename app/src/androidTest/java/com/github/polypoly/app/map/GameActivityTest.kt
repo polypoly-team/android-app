@@ -28,7 +28,7 @@ import org.osmdroid.views.overlay.Marker
 class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
-        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_3)
+        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
             GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
     }
@@ -139,59 +139,12 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
 
-    // --- Trading tests --- //
-
     @Test
-    fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
+    fun cantOpenTradeInOtherModeThanLandlord() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
-        composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("trade_button").assertIsDisplayed()
-    }
-
-    @Test
-    fun whenClickingOnTradeYouCanSeeAPopUpWithBuildingsToChoose() {
-        // give some location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
-        for(i in 0..2) {
-            val inGameLocation = GameRepository.game?.getInGameLocation()?.get(i)!!
-            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
-        }
-
-        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
-        composeTestRule.onNodeWithTag("trade_button").performClick()
-        composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
-    }
-
-    @Test
-    fun whenClickingOnTradeYouCanSeeTheEntirePopUpEvenWithALotOfBuildings() {
-        // give some location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
-        for(i in 0..15) {
-            val inGameLocation = GameRepository.game?.getInGameLocation()?.get(i)!!
-            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
-        }
-
-        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
-        composeTestRule.onNodeWithTag("trade_button").performClick()
-        composeTestRule.onNodeWithTag("locations_list_dialog").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Choose a location to trade").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
-    }
-
-    @Test
-    fun whenClickingOnTradeYouCantSeeThePopUpIfYouDoNotHaveBuildings() {
-        // give no location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
-
-        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
-        composeTestRule.onNodeWithTag("other_player_hud_12").performClick()
-        composeTestRule.onNodeWithTag("trade_button").performClick()
-        composeTestRule.onNodeWithTag("locations_list_dialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
     
 

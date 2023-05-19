@@ -156,7 +156,7 @@ class Game private constructor(
                 players = gameLobby.usersRegistered.map { Player(
                     user = it,
                     balance = gameLobby.rules.initialPlayerBalance,
-                    ownedLocations = listOf(),
+                    ownedLocations = mutableListOf(),
                 ) },
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,

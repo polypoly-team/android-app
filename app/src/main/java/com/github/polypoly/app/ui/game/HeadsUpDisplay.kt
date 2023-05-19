@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.data.GameRepository.Companion.player
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
@@ -225,7 +227,8 @@ fun HudGame(round: Int) {
 fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     val openOtherPlayerInfo = remember { mutableStateOf(false) }
     Row(
-        Modifier.padding(Padding.medium)
+        Modifier
+            .padding(Padding.medium)
             .testTag("other_player_hud_${playerData.user.id}")
     ) {
         HudButton(
@@ -248,8 +251,12 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
         } }
     }
 
-    if (openOtherPlayerInfo.value) {
-        AskingForATrade(openOtherPlayerInfo, openLocationsDialog)
+    // LANDLORD ONLY: Asking for a trade
+    if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
+        val player = player
+        if(player != null) {
+            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
+        }
     }
 }
 
