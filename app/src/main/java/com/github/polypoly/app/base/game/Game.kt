@@ -32,7 +32,7 @@ class Game private constructor(
 
     val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
 
-    private val inGameLocations: List<InGameLocation> = allLocations.map { location ->
+    val inGameLocations: List<InGameLocation> = allLocations.map { location ->
         InGameLocation(
             locationProperty = location,
             owner = null,
