@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -181,14 +182,14 @@ object UIElements {
      * in the welcome screen (i.e. Welcome Activity)
      */
     @Composable
-    fun GameLogo() {
+    fun GameLogo(size : Dp = 200.dp) {
             Image(
                 painter = painterResource(id = com.github.polypoly.app.R.drawable.polypoly_logo),
                 contentDescription = "game_logo",
                 alignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(size)
             )
     }
 }
