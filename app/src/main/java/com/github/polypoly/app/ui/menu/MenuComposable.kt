@@ -22,7 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat.startActivity
-import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.base.menu.RulesObject
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.rankings.RankingsActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
@@ -100,7 +100,7 @@ object MenuComposable {
                 Surface(
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
-                        .fillMaxWidth(0.95f)
+                        .fillMaxWidth(0.98f)
                         .fillMaxHeight(0.95f)
                 ) {
                     LazyColumn(modifier = Modifier.padding(20.dp)) {

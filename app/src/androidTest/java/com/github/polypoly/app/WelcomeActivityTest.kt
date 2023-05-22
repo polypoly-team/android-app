@@ -10,7 +10,7 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.settings.SettingsActivity
-import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.base.menu.RulesObject
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
