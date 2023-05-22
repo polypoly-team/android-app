@@ -1,6 +1,8 @@
 package com.github.polypoly.app.ui.theme
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -8,9 +10,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 /**
@@ -170,5 +174,21 @@ object UIElements {
         ) {
             Text(text = text)
         }
+    }
+
+    /**
+     * This composable is the main image of the game, the polypoly logo that'll be displayed
+     * in the welcome screen (i.e. Welcome Activity)
+     */
+    @Composable
+    fun GameLogo() {
+            Image(
+                painter = painterResource(id = com.github.polypoly.app.R.drawable.polypoly_logo),
+                contentDescription = "game_logo",
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
     }
 }

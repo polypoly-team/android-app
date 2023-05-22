@@ -39,7 +39,9 @@ import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.MenuActivity
+import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.ui.theme.UIElements
+import com.github.polypoly.app.ui.theme.UIElements.GameLogo
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import kotlinx.coroutines.delay
@@ -73,16 +75,13 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = Modifier.height(100.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.super_cool_logo),
-                            contentDescription = "polypoly logo",
-                            modifier = Modifier
-                                .testTag("logo"),
-                        )
+
+                        GameLogo()
+
                         Spacer(modifier = Modifier.height(50.dp))
                         GameLobbyForm()
+                        GameLobbyListButton()
                     }
-
                 }
             }
         }
@@ -105,7 +104,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                GameLobbyTextField(15, warningState) // TODO: create a constant for the max length -> create a class for the constants
+                GameLobbyTextField(GAME_LOBBY_CODE_LENGTH, warningState)
                 Spacer(modifier = Modifier.height(10.dp))
                 RectangleButton(
                     onClick = {
@@ -119,14 +118,6 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     modifier = Modifier.testTag("warningMessage")
                 )
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(30.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            GameLobbyListButton()
         }
     }
 
