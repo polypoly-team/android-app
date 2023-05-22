@@ -76,7 +76,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
                     ) {
                         Spacer(modifier = Modifier.height(100.dp))
 
-                        GameLogo()
+                        GameLogo(140.dp)
 
                         Spacer(modifier = Modifier.height(50.dp))
                         GameLobbyForm()
