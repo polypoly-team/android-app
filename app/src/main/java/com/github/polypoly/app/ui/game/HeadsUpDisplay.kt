@@ -57,16 +57,29 @@ import com.github.polypoly.app.ui.theme.Shapes
  * @param location current location of the player
  */
 @Composable
-fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(
+    playerData: Player,
+    gameViewModel: GameViewModel,
+    mapViewModel: MapViewModel,
+    otherPlayersData: List<Player>,
+    round: Int,
+    location: String
+) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val playerPosition =
+        mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerState == PlayerState.MOVING)
-            HudLocation(playerPosition, DpOffset(0.dp, 80.dp), "going_to_location_text")
+            HudLocation(
+                playerPosition,
+                DpOffset(0.dp, 80.dp),
+                "going_to_location_text",
+                "Going to: "
+            )
         HudGameMenu()
     }
 }
@@ -75,7 +88,10 @@ fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewM
  * The HUD for the current nearby location (a text at the top of the screen)
  */
 @Composable
-fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String) {
+fun HudLocation(
+    location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String,
+    headerText: String = "Current Location: "
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,11 +99,10 @@ fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), test
     ) {
         if (location.isNotEmpty())
             Text(
-                text = location,
+                text = headerText,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .testTag(testTag)
-                    .offset(offset.x, offset.y)
+                    .offset(offset.x, offset.y - 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
@@ -95,8 +110,23 @@ fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), test
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h6
             )
+        Text(
+            text = location,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .testTag(testTag)
+                .offset(offset.x, offset.y)
+                .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                .border(
+                    1.dp,
+                    MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    shape = Shapes.medium
+                )
+                .padding(Padding.medium),
+            style = MaterialTheme.typography.h4
+        )
     }
 }
 
