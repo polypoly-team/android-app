@@ -98,7 +98,6 @@ class GameActivity : ComponentActivity() {
                     MapUI.MapView(mapViewModel, gameModel)
                     PropertyInteractUIComponent(gameModel, mapViewModel)
                     DiceRollUI(gameModel, mapViewModel)
-                    NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents(mapViewModel)
                     Hud(
                         player,
@@ -110,27 +109,6 @@ class GameActivity : ComponentActivity() {
                     )
                     GameEndedLabel(gameEnded)
                 }
-            }
-        }
-    }
-
-    @Composable
-    private fun NextTurnButton(gameEnded: Boolean) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Button(
-                modifier = Modifier
-                    .size(30.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-30).dp)
-                    .testTag("next_turn_button"),
-                onClick = {
-                    if (!gameEnded) {
-                        gameModel.nextTurn()
-                    }
-                },
-                shape = CircleShape
-            ) {
-                Icon(Icons.Filled.ArrowForward, contentDescription = "Next turn")
             }
         }
     }
@@ -154,10 +132,6 @@ class GameActivity : ComponentActivity() {
 
     companion object {
         val mapViewModel: MapViewModel = MapViewModel()
-
-        // flag to show the building info dialog
-        val interactingWithProperty = mutableStateOf(false)
-
     }
 
     @Composable
