@@ -24,7 +24,7 @@ class RulesStrings {
         const val RULES_LAST_STANDING_TITLE = "Last standing mode"
         const val RULES_LAST_STANDING_TEXT =
             "In this mode, the winner is the player that is the last in the game. " +
-                    "This mode is not round base, this means it runes until someone wins! " +
+                    "This mode is not round base, this means it runs until someone wins! " +
                     "Drain down your friends balance and become the only survivor!\n\n"
 
         const val RULES_LANDLORD_TITLE = "Landlord mode"
@@ -38,7 +38,7 @@ class RulesStrings {
         const val RULES_DURING_ROUND_TEXT =
             "During rounds, you will not see other players moves neither their actions. Once the round ends, players will be able to see the moves of other players and the results of their actions!\n" +
                     "At the beginning of each rounds, players will get to roll a dice and get prompted 3 locations to visit. " +
-                    "They will have to chose only one, which they will have to physically go to by the end of the round, otherwise you will get a malus!\n\n" +
+                    "They will have to choose only one, which they will have to physically go to by the end of the round, otherwise you will get a malus!\n\n" +
                     "When visiting a location:\n" +
                     "- If the location is owned by another player, you must pay their tax. Make sure to remember who owns which buildings, to not fall into it again!\n\n" +
                     "- If the location is not owned by anyone, you can place a bid on it! " +
