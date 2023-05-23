@@ -32,12 +32,10 @@ import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_L
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_INITIAL_BALANCE
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_NAME_LENGTH
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_PLAYERS
-import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MAX_ROUNDS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MENU_PICKER_WIDTH
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_BUILDINGS_PER_LANDLORD
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_INITIAL_BALANCE
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_PLAYERS
-import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_MIN_ROUNDS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_PRIVATE_DEFAULT
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_ROUNDS_DEFAULT
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.maxBuildingPerLandlord
@@ -165,21 +163,6 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 maxValue = GAME_LOBBY_MAX_PLAYERS
             )
 
-            NumberPickerField(
-                title = getString(R.string.create_game_lobby_num_rounds),
-                value = numRounds,
-                onValueChange = { numRounds = it },
-                minValue = GAME_LOBBY_MIN_ROUNDS,
-                maxValue = GAME_LOBBY_MAX_ROUNDS
-            )
-
-            ListPickerField(
-                title = getString(R.string.create_game_lobby_round_duration),
-                value = roundDuration,
-                onValueChange = { roundDuration = it },
-                items = GameLobbyConstants.RoundDurations.values().toList()
-            )
-
             ListPickerField(
                 title = getString(R.string.create_game_lobby_game_mode),
                 value = gameMode,
@@ -195,6 +178,24 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 maxValue = GAME_LOBBY_MAX_INITIAL_BALANCE,
                 step = GAME_LOBBY_INITIAL_BALANCE_STEP
             )
+
+            if (gameMode != GameMode.LANDLORD){
+                NumberPickerField(
+                    title = getString(R.string.create_game_lobby_num_rounds),
+                    value = numRounds,
+                    onValueChange = { numRounds = it },
+                    minValue = GameLobbyConstants.GAME_LOBBY_MIN_ROUNDS,
+                    maxValue = GameLobbyConstants.GAME_LOBBY_MAX_ROUNDS,
+                )
+
+                ListPickerField(
+                    title = getString(R.string.create_game_lobby_round_duration),
+                    value = roundDuration,
+                    onValueChange = { roundDuration = it },
+                    items = GameLobbyConstants.RoundDurations.values().toList(),
+                )
+            }
+
 
             Divider(
                 modifier = Modifier
@@ -234,7 +235,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                             maximumNumberOfPlayers = maxNumPlayers,
                             roundDuration = roundDuration.toMinutes(),
                             maxRound = numRounds,
-                            initialPlayerBalance = initialPlayerBalance
+                            initialPlayerBalance = initialPlayerBalance,
                         )
                         futureGameCode.thenAccept { code ->
                             createGameLobby(mContext, rules, gameName, isPrivateGame, code)
@@ -256,6 +257,8 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
      * @param onValueChange The callback to be called when the value of the field changes
      * @param minValue The minimum value of the field
      * @param maxValue The maximum value of the field
+     * @param isEnabled Whether the field is enabled
+     * @param step The step to increment or decrement the value by
      */
     @Composable
     private fun NumberPickerField(
