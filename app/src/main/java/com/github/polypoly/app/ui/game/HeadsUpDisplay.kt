@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -69,9 +71,6 @@ fun Hud(
     val playerPosition =
         mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
-    Column(modifier = Modifier.testTag("hud")) {
-        HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerState == PlayerState.MOVING)
             HudLocation(
@@ -80,8 +79,9 @@ fun Hud(
                 "going_to_location_text",
                 "Going to: "
             )
+        HudPlayer(playerData)
+        HudOtherPlayersAndGame(otherPlayersData, round)
         HudGameMenu()
-    }
 }
 
 /**
@@ -97,12 +97,31 @@ fun HudLocation(
             .fillMaxWidth()
             .padding(Padding.medium)
     ) {
-        if (location.isNotEmpty())
+        Box(
+            modifier = Modifier.align(TopCenter),
+            contentAlignment = Center
+        ) {
+            if (location.isNotEmpty())
+                Text(
+                    text = headerText,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(offset.x, offset.y)
+                        .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                            shape = Shapes.medium
+                        )
+                        .padding(Padding.medium),
+                    style = MaterialTheme.typography.h6
+                )
             Text(
-                text = headerText,
+                text = location,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(offset.x, offset.y - 50.dp)
+                    .testTag(testTag)
+                    .offset(offset.x, offset.y + 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
@@ -110,23 +129,9 @@ fun HudLocation(
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h4
             )
-        Text(
-            text = location,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .testTag(testTag)
-                .offset(offset.x, offset.y)
-                .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                .border(
-                    1.dp,
-                    MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                    shape = Shapes.medium
-                )
-                .padding(Padding.medium),
-            style = MaterialTheme.typography.h4
-        )
+        }
     }
 }
 
