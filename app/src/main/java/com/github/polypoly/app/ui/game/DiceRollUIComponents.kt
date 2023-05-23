@@ -5,11 +5,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -72,29 +75,39 @@ fun RollDiceDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
             locationsRolled = rolled
         }
 
-        Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
-            AlertDialog(
-                onDismissRequest = { showRollDiceDialog.value = false },
-                title = { Text("Dice Roll") },
-                text = {
-                    Column {
-                        for (location in locationsRolled) {
-                            Button(onClick = {
+        Dialog(onDismissRequest = {}) {
+            Surface(shape = MaterialTheme.shapes.medium, elevation = 8.dp) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Pick a location to go to !",
+                        style = MaterialTheme.typography.h5,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(bottom = 16.dp)
+                    )
+                    locationsRolled.forEach { location ->
+                        Button(
+                            onClick = {
                                 showRollDiceDialog.value = false
                                 mapViewModel.goingToLocationProperty = location
                                 gameViewModel.diceRolled()
-                            }) {
-                                Text(location.name)
-                            }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(location.name)
                         }
                     }
-                },
-                confirmButton = {
-                    Button(onClick = { showRollDiceDialog.value = false }) {
-                        Text("Quit")
-                    }
                 }
-            )
+            }
         }
     }
 }
