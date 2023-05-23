@@ -68,20 +68,19 @@ fun Hud(
     location: String
 ) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition =
-        mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
-        HudLocation(location, testTag = "interactable_location_text")
-        if (playerState == PlayerState.MOVING)
-            HudLocation(
-                playerPosition,
-                DpOffset(0.dp, 80.dp),
-                "going_to_location_text",
-                "Going to: "
-            )
-        HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round)
-        HudGameMenu()
+    HudLocation(location, testTag = "interactable_location_text")
+    if (playerState == PlayerState.MOVING)
+        HudLocation(
+            playerPosition,
+            DpOffset(0.dp, 80.dp),
+            "going_to_location_text",
+            "Going to: "
+        )
+    HudPlayer(playerData)
+    HudOtherPlayersAndGame(otherPlayersData, round)
+    HudGameMenu()
 }
 
 /**
