@@ -2,16 +2,17 @@ package com.github.polypoly.app
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performImeAction
-import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -116,7 +117,7 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
         composeTestRule.onNodeWithTag("game_name_text_field").performImeAction()
 
         composeTestRule.onNodeWithTag("create_game_lobby_button").performClick()
-        //TODO : modify when DB is done (put the lobby code in the intent)
+
         Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
     }
 
@@ -126,13 +127,13 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
             .performClick()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "list_picker_field")
             .assertTextEquals(GameMode.LANDLORD.toString())
-        val pickerTitle = composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties)
-        composeTestRule.onNodeWithTag(pickerTitle + "number_picker_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertIsDisplayed()
-        composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertHasClickAction()
-        composeTestRule.onNodeWithTag(pickerTitle + "number_picker_field").assertIsDisplayed()
-        composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertIsDisplayed()
-        composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertHasClickAction()
+
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "left_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "left_arrow").assertHasClickAction()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_field").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertHasClickAction()
     }
 
     @Test
@@ -140,17 +141,67 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
         numPropertiesNumPickerShowsWhenGameModeIsLandlord()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "left_arrow")
             .performClick()
-        // check picker is gone
-        val pickerTitle = composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties)
-        composeTestRule.onNodeWithTag(pickerTitle + "number_picker_row").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(pickerTitle + "left_arrow").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(pickerTitle + "number_picker_field").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(pickerTitle + "right_arrow").assertDoesNotExist()
+        // check round distribution is gone
+
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_row").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "left_arrow").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_field").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertDoesNotExist()
+
+    }
+
+    @Test
+    fun roundsSelectorsAreHiddenWhenLastStandingMode(){
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "left_arrow")
+            .performClick()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_row").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_field").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
+
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_row").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_field").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
+    }
+
+    @Test
+    fun roundsSelectorsAreVisibleWhenNotLastStandingMode(){
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "number_picker_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "left_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "left_arrow").assertHasClickAction()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "number_picker_field").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "right_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "right_arrow").assertHasClickAction()
+
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_row").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertHasClickAction()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_field").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertHasClickAction()
+
     }
 
     @Test
     fun creatingGameLobbyAddsItToDB() {
-        //TODO implement when DB is done
+        val lobbiesBeforeAdding = remoteDB.getAllValues<GameLobby>()
+        val lobbyName = "coco"
+        composeTestRule.onNodeWithTag("create_game_lobby_button").assertIsNotEnabled()
+
+        composeTestRule.onNodeWithTag("game_name_text_field").performTextInput(lobbyName)
+        composeTestRule.onNodeWithTag("game_name_text_field").performImeAction()
+
+        composeTestRule.onNodeWithTag("create_game_lobby_button").performClick()
+        Intents.intended(IntentMatchers.hasComponent(GameLobbyActivity::class.java.name))
+
+        val lobbiesAfterAdding = remoteDB.getAllValues<GameLobby>()
+        lobbiesAfterAdding.thenAccept{
+            assertEquals(it.size + 1, it.size)
+        }
+       lobbiesBeforeAdding.thenAccept{ it ->
+           assertTrue(it.any { it.name == lobbyName })
+       }
     }
 
 }
