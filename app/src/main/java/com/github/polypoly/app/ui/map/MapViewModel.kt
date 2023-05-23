@@ -1,5 +1,6 @@
 package com.github.polypoly.app.ui.map
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -7,10 +8,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.PropertyLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+data class MapViewState(val locations: List<InGameLocation>)
 
 /**
  * ViewModel for the Map screen that stores the distance walked by the user, as well as
@@ -31,6 +36,12 @@ class MapViewModel(
     var currentPlayer: Player? = null
 
     private var locationSelectedData = MutableLiveData<LocationProperty>(null)
+
+    val mapViewState: MutableState<MapViewState> = mutableStateOf(MapViewState(emptyList()))
+
+    fun updateMapViewState(location: List<InGameLocation>) {
+        mapViewState.value = MapViewState(location)
+    }
 
     fun getLocationSelected(): LiveData<LocationProperty> {
         return locationSelectedData
