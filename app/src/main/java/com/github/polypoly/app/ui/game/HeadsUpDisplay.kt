@@ -102,7 +102,6 @@ fun HudLocation(
                 text = headerText,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .testTag(testTag)
                     .offset(offset.x, offset.y - 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
