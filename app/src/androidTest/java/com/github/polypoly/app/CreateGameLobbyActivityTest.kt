@@ -122,7 +122,7 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
     }
 
     @Test
-    fun selectorsAreCorrectWhenGameModeIsLandlord() {
+    fun numPropertiesNumPickerShowsWhenGameModeIsLandlord() {
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "right_arrow")
             .performClick()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "list_picker_field")
@@ -134,22 +134,11 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_field").assertIsDisplayed()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertIsDisplayed()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertHasClickAction()
-
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_row").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_field").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
-
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_row").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_field").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
-
     }
 
     @Test
-    fun selectorsAreCorrectWhenGameModeIsNotLandlord() {
-        selectorsAreCorrectWhenGameModeIsLandlord()
+    fun numPropertiesNumPickerOnlyShowsWhenGameModeIsLandlord() {
+        numPropertiesNumPickerShowsWhenGameModeIsLandlord()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "left_arrow")
             .performClick()
         // check round distribution is gone
@@ -159,8 +148,25 @@ class CreateGameLobbyActivityTest: PolyPolyTest(false, false, true) {
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "number_picker_field").assertDoesNotExist()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_landlord_num_properties) + "right_arrow").assertDoesNotExist()
 
-        // check round number and duration selectors are visible
+    }
 
+    @Test
+    fun roundsSelectorsAreHiddenWhenLastStandingMode(){
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_game_mode) + "left_arrow")
+            .performClick()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_row").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "number_picker_field").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
+
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_row").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "left_arrow").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "list_picker_field").assertDoesNotExist()
+        composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_round_duration) + "right_arrow").assertDoesNotExist()
+    }
+
+    @Test
+    fun roundsSelectorsAreVisibleWhenNotLastStandingMode(){
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "number_picker_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "left_arrow").assertIsDisplayed()
         composeTestRule.onNodeWithTag(composeTestRule.activity.getString(R.string.create_game_lobby_num_rounds) + "left_arrow").assertHasClickAction()

@@ -179,7 +179,7 @@ class CreateGameLobbyActivity :  MenuActivity("Create a game") {
                 step = GAME_LOBBY_INITIAL_BALANCE_STEP
             )
 
-            if (gameMode != GameMode.LANDLORD){
+            if (gameMode != GameMode.LAST_STANDING){
                 NumberPickerField(
                     title = getString(R.string.create_game_lobby_num_rounds),
                     value = numRounds,
