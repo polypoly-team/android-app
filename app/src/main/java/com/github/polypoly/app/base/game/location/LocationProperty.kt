@@ -17,7 +17,7 @@ data class Zone(
     An enum class representing the different levels of a [LocationProperty].
  */
 enum class PropertyLevel {
-    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_MAX
+    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_MAX
 }
 
 /**
