@@ -128,6 +128,16 @@ class Game private constructor(
     }
 
     /**
+     * Get the player associated to the admin of the game
+     * @return the player associated to the admin of the game
+     * @throws IllegalStateException if the admin is not in the game
+     */
+    fun getAdmin(): Player {
+        return players.find { it.user.id == admin.id }
+            ?: throw IllegalStateException("the admin is not in the game")
+    }
+
+    /**
      * Compute the winner of the bets, notify the players and update the balance of the players
      * and the location owner.
      */

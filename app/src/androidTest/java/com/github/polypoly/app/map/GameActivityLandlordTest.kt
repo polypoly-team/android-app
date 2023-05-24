@@ -11,8 +11,6 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -22,19 +20,17 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
+    private val currentPlayer: Player
+    private val currentGame: Game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_5)
+
     init {
-        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_5)
-        GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "0") ?: Player()
+        GameRepository.game = currentGame
+        currentPlayer = currentGame.getAdmin()
+        GameRepository.player = currentPlayer
     }
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<GameActivity>()
-
-    @Before
-    fun setUp() {
-        runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
-    }
 
     @Before
     fun startIntents() {
@@ -59,8 +55,8 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         // give some location to the player
         GameRepository.player?.getOwnedLocations()?.clear()
         for(i in 0..2) {
-            val inGameLocation = GameRepository.game?.inGameLocations?.get(i)!!
-            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
+            val inGameLocation = currentGame.inGameLocations[i]
+            currentPlayer.getOwnedLocations().add(inGameLocation)
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -74,10 +70,10 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
     @Test
     fun whenClickingOnTradeYouCanSeeTheEntirePopUpEvenWithALotOfBuildings() {
         // give some location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
+        currentPlayer.getOwnedLocations().clear()
         for(i in 0..15) {
-            val inGameLocation = GameRepository.game?.inGameLocations?.get(i)!!
-            GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
+            val inGameLocation = currentGame.inGameLocations[i]
+            currentPlayer.getOwnedLocations().add(inGameLocation)
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -91,7 +87,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
     @Test
     fun whenClickingOnTradeYouCantSeeThePopUpIfYouDoNotHaveBuildings() {
         // give no location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
+        currentPlayer.getOwnedLocations().clear()
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()

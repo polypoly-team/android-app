@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit
 class GameActivityTest : PolyPolyTest(true, false, true) {
 
     init {
-        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
-        GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
+        val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        GameRepository.game = newGame
+        GameRepository.player = newGame.getPlayer(newGame.admin.id)
     }
 
     @get:Rule
