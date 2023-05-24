@@ -144,7 +144,9 @@ fun HudPlayer(playerData: Player) {
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier.align(BottomEnd),
+            modifier = Modifier
+                .align(BottomEnd)
+                .testTag("hud_player"),
             contentAlignment = Center
         ) {
             MoneyHudText("playerBalance", "${playerData.getBalance()} $")
@@ -189,6 +191,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
             modifier = Modifier
                 .padding(Padding.medium)
                 .align(Alignment.TopStart)
+                .testTag("hud_other_players_and_game"),
         ) {
             Column(Modifier.padding(Padding.medium)) {
                 // A drop down button that expands and collapses the stats for other players and
@@ -313,6 +316,7 @@ fun HudGameMenu() {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
+                .testTag("hud_game_menu")
         ) {
             Column(modifier = Modifier.padding(10.dp, 0.dp)) {
                 // The game menu slides in and out when the game menu button is pressed
