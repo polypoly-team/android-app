@@ -11,7 +11,7 @@ import com.github.polypoly.app.base.game.Player
  * @property bids The list of the bids made on the location by the players in the previous round
  */
 data class InGameLocation (
-    var locationProperty: LocationProperty,
+    var locationProperty: LocationProperty = LocationProperty(),
     var level: PropertyLevel = PropertyLevel.LEVEL_0,
     var owner: Player? = null,
 ) {

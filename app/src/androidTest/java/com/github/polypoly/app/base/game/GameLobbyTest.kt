@@ -6,6 +6,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -169,6 +170,8 @@ class GameLobbyTest {
                 testDuration, null, emptyList(), testInitialBalance), testName, testCode
         )
         gameLobby.addUser(User("42042050", "test_user1", "", emptySkin, zeroStats, listOf(), mutableListOf()))
+
+        GlobalInstances.currentUser = testUser
 
         val game = gameLobby.start()
         val usersRegistered = gameLobby.usersRegistered

@@ -2,8 +2,10 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.network.getValues
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import java.util.concurrent.CompletableFuture
@@ -24,7 +26,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-    val started: Boolean = false
+    var started: Boolean = false
 ): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -101,8 +103,12 @@ data class GameLobby(
         if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
-
-        return Game.launchFromPendingGame(this)
+        started = true
+        val game = Game.launchFromPendingGame(this)
+        val players = game.players
+        GameRepository.player = players.first { it.user.id == (GlobalInstances.currentUser?.id ?: "") }
+        GameRepository.game = game
+        return game
     }
 
     // ====================================================================== STORABLE
@@ -114,8 +120,8 @@ data class GameLobby(
             name,
             private,
             rules,
-            currentUsersRegistered.map { user -> user.id.toString() },
-            admin.id.toString(),
+            currentUsersRegistered.map { user -> user.id },
+            admin.id,
             started
         )
     }
@@ -123,14 +129,14 @@ data class GameLobby(
     override fun toLocalObject(dbObject: GameLobbyDB): CompletableFuture<StorableObject<GameLobbyDB>> {
         return remoteDB.getValues<User>(dbObject.userIds).thenApply { users ->
             val lobby = GameLobby(
-                users.first { user -> user.id.toString() == dbObject.adminId },
+                users.first { user -> user.id == dbObject.adminId },
                 dbObject.parameters,
                 dbObject.name,
                 dbObject.code,
                 dbObject.private,
                 dbObject.started
             )
-            lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
+            lobby.addUsers(users.filter { user -> user.id != dbObject.adminId })
             lobby
         }
     }

@@ -15,5 +15,7 @@ class Settings {
         const val DB_GAME_LOBBIES_PATH = "lobbies/"
 
         const val DB_GAMES_PATH = "games/"
+
+        const val DB_TRADE_REQUESTS_PATH = "trade_requests/"
     }
 }
