@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,11 +20,13 @@ import com.github.polypoly.app.ui.theme.Shapes
 /**
  * Dialog to that propose a trade to the player
  * @param trade The trade to propose
- * @param openDialog A mutable state to open and close the dialog.
  * @param gameModel The game view model
  */
 @Composable
-fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, gameModel: GameViewModel) {
+fun ProposeTradeDialog(trade: TradeRequest, gameModel: GameViewModel) {
+    val openDialog = remember {
+        mutableStateOf(true)
+    }
     val openDialogChooseLocation = remember {
         mutableStateOf(false)
     }
@@ -38,8 +39,7 @@ fun ProposeTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, g
                 openDialogChooseLocation,
                 trade.playerReceiver.getOwnedLocations()
             ) {
-                trade.locationReceived = it
-                gameModel.updateTradeRequest(trade)
+                gameModel.updateReceiverLocationTradeRequest(it)
                 openDialogChooseLocation.value = false
             }
         }
@@ -76,8 +76,7 @@ fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean
                         if(trade.playerReceiver.getOwnedLocations().isNotEmpty()) {
                             openDialogChooseLocation.value = true
                         } else {
-                            trade.currentPlayerReceiverAcceptation = false
-                            gameModel.updateTradeRequest(trade)
+                            gameModel.acceptOrDeclineTradeRequest(false)
                         }
                         openDialog.value = false
                     }
@@ -86,8 +85,7 @@ fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean
                 }
                 Spacer(modifier = Modifier.width(Padding.medium))
                 Button(onClick = {
-                    trade.currentPlayerReceiverAcceptation = false
-                    gameModel.updateTradeRequest(trade)
+                    gameModel.acceptOrDeclineTradeRequest(false)
                     openDialog.value = false
                 }) {
                     Text(text = "No")
@@ -100,10 +98,9 @@ fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean
 /**
  * Dialog to know if the player accept the trade
  * @param trade The trade to accept
- * @param isApplicant A boolean to know if the player is the applicant or the receiver
  */
 @Composable
-fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: GameViewModel) {
+fun AcceptTradeDialog(trade: TradeRequest, gameModel: GameViewModel) {
     AlertDialog(
         modifier = Modifier.testTag("accept_trade_dialog"),
         onDismissRequest = {},
@@ -117,25 +114,13 @@ fun AcceptTradeDialog(trade: TradeRequest, isApplicant: Boolean, gameModel: Game
                     .fillMaxWidth()
             ) {
                 Button(onClick = {
-                    if(isApplicant) {
-                        trade.currentPlayerApplicantAcceptation = true
-                        gameModel.updateTradeRequest(trade)
-                    } else {
-                        trade.currentPlayerReceiverAcceptation = true
-                        gameModel.updateTradeRequest(trade)
-                    }
+                    gameModel.acceptOrDeclineTradeRequest(true)
                 }) {
                     Text(text = "Accept")
                 }
                 Spacer(modifier = Modifier.width(Padding.medium))
                 Button(onClick = {
-                    if(isApplicant) {
-                        trade.currentPlayerApplicantAcceptation = false
-                        gameModel.updateTradeRequest(trade)
-                    } else {
-                        trade.currentPlayerReceiverAcceptation = false
-                        gameModel.updateTradeRequest(trade)
-                    }
+                    gameModel.acceptOrDeclineTradeRequest(false)
                 }) {
                     Text(text = "Refuse")
                 }
@@ -166,39 +151,45 @@ fun WaitingForTheOtherPlayerDecisionDialog() {
  * @param trade The trade that has been done
  */
 @Composable
-fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>?, gameModel: GameViewModel,
+fun TheTradeIsDoneDialog(result: Boolean, gameModel: GameViewModel,
                          trade: TradeRequest, player: Player) {
-    if(result && trade.playerApplicant.user.id == player.user.id) {
-        val locationGiven = trade.locationGiven
-            ?: throw Exception("The location given by the player can't be null when the" +
-                    " trade is successful")
-        val locationReceiver = trade.locationReceived
-            ?: throw Exception("The location receive by the player can't be null when the" +
-                    " trade is successful")
-        player.tradeWith(trade.playerReceiver, locationGiven, locationReceiver)
+    val openDialog = remember {
+        mutableStateOf(true)
     }
 
-    AlertDialog(
-        modifier = Modifier.testTag("the_trade_is_done_dialog"),
-        onDismissRequest = {
-            openDialog?.value = false
-        },
-        title = {
-            if (result)
-                Text(text = "The trade is done !")
-            else
-                Text(text = "One Player has cancel the trade !")
-        },
-        text = {},
-        buttons = {
-            Button(onClick = {
+    if(openDialog.value) {
+
+        AlertDialog(
+            modifier = Modifier.testTag("the_trade_is_done_dialog"),
+            onDismissRequest = {
                 openDialog?.value = false
-                gameModel.closeTradeRequest(trade)
-            }) {
-                Text(text = "Ok")
+            },
+            title = {
+                if (result)
+                    Text(text = "The trade is done !")
+                else
+                    Text(text = "One Player has cancel the trade !")
+            },
+            text = {},
+            buttons = {
+                Button(onClick = {
+                    openDialog.value = false
+                    if(result && trade.playerApplicant.user.id == player.user.id) {
+                        val locationGiven = trade.locationGiven
+                            ?: throw Exception("The location given by the player can't be null when the" +
+                                    " trade is successful")
+                        val locationReceiver = trade.locationReceived
+                            ?: throw Exception("The location receive by the player can't be null when the" +
+                                    " trade is successful")
+                        player.tradeWith(trade.playerReceiver, locationGiven, locationReceiver)
+                    }
+                    gameModel.closeTradeRequest()
+                }) {
+                    Text(text = "Ok")
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 /**

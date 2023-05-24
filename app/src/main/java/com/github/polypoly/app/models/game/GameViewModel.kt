@@ -12,13 +12,11 @@ import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.removeValue
-import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.*
@@ -65,7 +63,6 @@ class GameViewModel(
 
     /**
      * Close a trade request
-     * @param trade The trade request to close
      */
     fun closeTradeRequest() {
         remoteDB.removeValue<TradeRequest>(tradeRequestData.value?.code ?: return).thenAccept {
@@ -77,11 +74,36 @@ class GameViewModel(
      * Update a trade request
      * @param trade The trade request to update
      */
-    fun updateTradeRequest(trade: TradeRequest) {
+    private fun updateTradeRequest(trade: TradeRequest) {
         remoteDB.updateValue(trade).thenAccept {
             tradeRequestData.value = null
             tradeRequestData.value = trade
         }
+    }
+
+    /**
+     * Accept or decline the trade request
+     * @param accept True if the player accept the trade request, false otherwise
+     */
+    fun acceptOrDeclineTradeRequest(accept: Boolean) {
+        val tradeRequest = tradeRequestData.value ?: return
+        val currentPlayer = playerData.value ?: return
+        if(tradeRequest.isReceiver(currentPlayer) ) {
+            tradeRequest.currentPlayerReceiverAcceptance = accept
+        }
+        if(tradeRequest.isApplicant(currentPlayer)) {
+            tradeRequest.currentPlayerApplicantAcceptance = accept
+        }
+        updateTradeRequest(tradeRequest)
+    }
+
+    /**
+     * Update the location received in the trade request
+     */
+    fun updateReceiverLocationTradeRequest(location: InGameLocation) {
+        val tradeRequest = tradeRequestData.value ?: return
+        tradeRequest.locationReceived = location
+        updateTradeRequest(tradeRequest)
     }
 
     /**
@@ -91,7 +113,8 @@ class GameViewModel(
         while (gameData.value?.isGameFinished() == false) {
             remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
                 tradeRequests.forEach { tradeRequest ->
-                    if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name) {
+                    if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name
+                        && tradeRequestData.value == null) {
                         tradeRequestData.value = tradeRequest
                     }
                 }
@@ -100,18 +123,20 @@ class GameViewModel(
         }
     }
 
-    fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation): CompletableFuture<Boolean> {
-        val playerDataValue = playerData.value ?: return CompletableFuture.completedFuture(false)
+    fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation) {
+        val playerDataValue = playerData.value ?: return
         val tradeRequest = TradeRequest(
             playerApplicant = playerDataValue,
             playerReceiver = playerReceiver,
             locationGiven = locationGiven,
             locationReceived = null,
-            currentPlayerApplicantAcceptation = null,
-            currentPlayerReceiverAcceptation = null,
+            currentPlayerApplicantAcceptance = null,
+            currentPlayerReceiverAcceptance = null,
             code = "${playerReceiver.user.name}${playerDataValue.user.name}",
         )
-        return remoteDB.setValue(tradeRequest)
+        remoteDB.setValue(tradeRequest).thenAccept {
+            tradeRequestData.value = tradeRequest
+        }
     }
 
     fun getGameData(): LiveData<Game> {

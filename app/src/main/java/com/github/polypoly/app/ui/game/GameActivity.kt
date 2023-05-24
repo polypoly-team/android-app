@@ -114,51 +114,37 @@ class GameActivity : ComponentActivity() {
      */
     @Composable
     fun DialogsForTrade(trade: TradeRequest?, player: Player) {
+        if(trade == null) return
+
         // Pop up when a player ask for a trade
-        if (trade != null && trade.playerReceiver.user.id == player.user.id
-            && trade.locationReceived == null) {
-            val tradeDialog = remember {
-                mutableStateOf(true)
-            }
-            ProposeTradeDialog(trade, tradeDialog, gameModel)
+        if (trade.isReceiver(player) && trade.locationReceived == null) {
+            ProposeTradeDialog(trade, gameModel)
         }
 
         // Pop up when the player has to accept or refuse a trade
-        if(trade?.locationReceived != null
-            && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation == null) ||
-                    (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation == null))) {
-            AcceptTradeDialog(trade, trade.playerApplicant.user.id == player.user.id, gameModel)
+        if(trade.locationReceived != null
+            && ((trade.isApplicant(player) && trade.currentPlayerReceiverAcceptance == null) ||
+                    (trade.isReceiver(player) && trade.currentPlayerApplicantAcceptance == null))) {
+            AcceptTradeDialog(trade, gameModel)
         }
 
         //Pop up when the player has to wait for the other player decision
-        if(trade?.locationReceived != null
-            && ((trade.playerReceiver.user.id == player.user.id && trade.currentPlayerReceiverAcceptation != null
-                    && trade.currentPlayerApplicantAcceptation == null) ||
-                    (trade.playerApplicant.user.id == player.user.id && trade.currentPlayerApplicantAcceptation != null
-                            && trade.currentPlayerReceiverAcceptation == null))) {
+        if(trade.locationReceived != null
+            && ((trade.isReceiver(player) && trade.currentPlayerReceiverAcceptance != null
+                    && trade.currentPlayerApplicantAcceptance == null) ||
+                    (trade.isApplicant(player) && trade.currentPlayerApplicantAcceptance != null
+                            && trade.currentPlayerReceiverAcceptance == null))) {
             WaitingForTheOtherPlayerDecisionDialog()
         }
 
         //Pop up when the trade is cancelled
-        if(trade != null
-            && (trade.currentPlayerApplicantAcceptation == false || trade.currentPlayerReceiverAcceptation == false)) {
-            val tradeDialog = remember {
-                mutableStateOf(true)
-            }
-            if(tradeDialog.value) {
-                TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade, player)
-            }
+        if(trade.isAccepted() == false) {
+            TheTradeIsDoneDialog(false, gameModel, trade, player)
         }
 
         //Pop up when the trade is accepted
-        if(trade != null
-            && (trade.currentPlayerApplicantAcceptation == true && trade.currentPlayerReceiverAcceptation == true)) {
-            val tradeDialog = remember {
-                mutableStateOf(true)
-            }
-            if(tradeDialog.value) {
-                TheTradeIsDoneDialog(true, tradeDialog, gameModel, trade, player)
-            }
+        if(trade.isAccepted() == true) {
+            TheTradeIsDoneDialog(true, gameModel, trade, player)
         }
     }
 
