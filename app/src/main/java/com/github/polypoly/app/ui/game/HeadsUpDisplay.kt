@@ -429,7 +429,7 @@ fun TurnFinishedNotification() {
         Text(
             text = "You finished your turn, waiting for the next one...",
             modifier = Modifier
-                .testTag("turnFinishedNotification")
+                .testTag("turn_finished_notification")
                 .background(MaterialTheme.colors.background, shape = Shapes.medium)
                 .padding(Padding.medium)
                 .align(BottomCenter),

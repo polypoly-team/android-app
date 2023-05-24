@@ -149,6 +149,22 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
+    @Test
+    fun successfulBidNotificationIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("successful_bid_alert").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsDisplayedAtEndOfTurn() {
+        forceChangePlayerState(PlayerState.TURN_FINISHED).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertIsDisplayed()
+    }
+
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
@@ -167,10 +183,11 @@ class GameActivityTest : PolyPolyTest(true, false) {
         gameViewModel.locationReached()
         if (playerState == PlayerState.INTERACTING) return
 
-        if (playerState == PlayerState.BIDDING) {
-            gameViewModel.startBidding()
-            return
-        }
+        gameViewModel.startBidding()
+        if (playerState == PlayerState.BIDDING) return
+
+        gameViewModel.endBidding()
+        if (playerState == PlayerState.TURN_FINISHED) return
 
         // TODO add other states support when needed
     }

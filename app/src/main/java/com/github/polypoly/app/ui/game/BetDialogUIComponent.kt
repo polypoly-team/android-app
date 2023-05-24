@@ -174,7 +174,7 @@ fun SuccessfulBidNotification(gameViewModel: GameViewModel, duration: Duration) 
 @Composable
 private fun SuccessfulBidAlert(bid: LocationBid, onClose: () -> Unit) {
     AlertDialog(
-        modifier = Modifier.testTag("successfulBigAlert"),
+        modifier = Modifier.testTag("successful_bid_alert"),
         onDismissRequest = onClose,
         title = {
             Text("Congratulations, your bid was successful !!")
