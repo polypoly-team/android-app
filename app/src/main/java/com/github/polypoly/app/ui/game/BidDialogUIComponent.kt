@@ -81,7 +81,7 @@ private fun BidDialogBody(
             textStyle = typography.body1,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("bid_button")
+                .testTag("bid_input")
         )
         if (showError.value) {
             Text(

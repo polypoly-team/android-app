@@ -76,7 +76,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
 
         composeTestRule.onNodeWithTag("bid_button").performClick()
 
-        composeTestRule.onNodeWithTag("bid_button").performTextInput("10")
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("10")
         composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
 
         composeTestRule.onNodeWithTag("bid_error_message", true).assertIsDisplayed()
@@ -91,7 +91,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
 
         composeTestRule.onNodeWithTag("bid_button").performClick()
         // TODO: Replace by future MAX_BET or similar
-        composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("3000")
         composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
         composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
