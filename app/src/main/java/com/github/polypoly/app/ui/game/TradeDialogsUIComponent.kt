@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -166,7 +167,17 @@ fun WaitingForTheOtherPlayerDecisionDialog() {
  */
 @Composable
 fun TheTradeIsDoneDialog(result: Boolean, openDialog: MutableState<Boolean>?, gameModel: GameViewModel,
-                         trade: TradeRequest) {
+                         trade: TradeRequest, player: Player) {
+    if(result && trade.playerApplicant.user.id == player.user.id) {
+        val locationGiven = trade.locationGiven
+            ?: throw Exception("The location given by the player can't be null when the" +
+                    " trade is successful")
+        val locationReceiver = trade.locationReceived
+            ?: throw Exception("The location receive by the player can't be null when the" +
+                    " trade is successful")
+        player.tradeWith(trade.playerReceiver, locationGiven, locationReceiver)
+    }
+
     AlertDialog(
         modifier = Modifier.testTag("the_trade_is_done_dialog"),
         onDismissRequest = {

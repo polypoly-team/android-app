@@ -112,10 +112,14 @@ data class Player (
      * @param player the player to trade with
      * @param locationGiven the location the player wants to give
      * @param locationReceived the location the player wants to receive
+     * @throws IllegalArgumentException if the player receiver does not own the location he/she wants to give
+     * @throws IllegalArgumentException if the player does not own the location he/she wants to give
      */
     fun tradeWith(player: Player, locationGiven: InGameLocation, locationReceived: InGameLocation) {
-        if(!player.ownedLocations.contains(locationReceived) || !ownedLocations.contains(locationGiven))
-            throw IllegalArgumentException("A player does not own the location he/she wants to give")
+        if(!player.ownedLocations.contains(locationReceived))
+            throw IllegalArgumentException("The player receiver does not own the location he/she wants to give")
+        if(!ownedLocations.contains(locationGiven))
+            throw IllegalArgumentException("The player does not own the location he/she wants to give")
         player.ownedLocations += locationGiven
         ownedLocations -= locationGiven
         player.ownedLocations -= locationReceived

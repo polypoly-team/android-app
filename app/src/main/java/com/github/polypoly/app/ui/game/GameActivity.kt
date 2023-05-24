@@ -146,7 +146,7 @@ class GameActivity : ComponentActivity() {
                 mutableStateOf(true)
             }
             if(tradeDialog.value) {
-                TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade)
+                TheTradeIsDoneDialog(false, tradeDialog, gameModel, trade, player)
             }
         }
 
@@ -157,7 +157,7 @@ class GameActivity : ComponentActivity() {
                 mutableStateOf(true)
             }
             if(tradeDialog.value) {
-                TheTradeIsDoneDialog(true, tradeDialog, gameModel, trade)
+                TheTradeIsDoneDialog(true, tradeDialog, gameModel, trade, player)
             }
         }
     }
