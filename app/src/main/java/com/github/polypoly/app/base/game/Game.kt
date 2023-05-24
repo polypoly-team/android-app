@@ -8,9 +8,7 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
 import java.util.concurrent.CompletableFuture
 
@@ -164,11 +162,20 @@ class Game private constructor(
         }
     }
 
+    /**
+     * Retrieve the InGameLocation of this location
+     */
     fun getInGameLocation(location: LocationProperty): InGameLocation? {
         return findInGameLocation(location)?.copy()
     }
 
-    fun addBid(bid: LocationBid) {
+    /**
+     * Registers a bid for the current player
+     * @param bid: bid to register
+     * @throws IllegalArgumentException if the player is not part of the game
+     * @throws IllegalStateException if the player has already made a bid this turn or cannot buy the corresponding location
+     */
+    fun registerBid(bid: LocationBid) {
         if (!playInThisGame(bid.player.user))
             throw java.lang.IllegalArgumentException("${bid.player.user} is not part of this game")
         if (!allLocations.contains(bid.location))

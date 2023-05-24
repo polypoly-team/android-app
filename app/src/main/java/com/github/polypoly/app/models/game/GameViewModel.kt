@@ -12,25 +12,13 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.removeValue
-import com.github.polypoly.app.utils.global.GlobalInstances
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -351,6 +339,12 @@ class GameViewModel(
         return result
     }
 
+    /**
+     * Registers a bid on the location and amount provided
+     * @param location location to bid on
+     * @param bidAmount amount for the bid
+     * @return a future that completes once the registering ended, holding true iff it succeeded
+     */
     fun bidForLocation(location: LocationProperty, bidAmount: Int): CompletableFuture<Boolean> {
         val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
         val player = playerData.value ?: return CompletableFuture.completedFuture(false)
@@ -365,7 +359,7 @@ class GameViewModel(
                 future.complete(false)
             } else {
                 val bid = LocationBid(location, player, bidAmount)
-                gameUpdated.addBid(bid)
+                gameUpdated.registerBid(bid)
 
                 remoteDB.setValue(gameUpdated).thenApply {
                     gameData.value = gameUpdated

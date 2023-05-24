@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false, false) {
+class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
         val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)

@@ -138,6 +138,11 @@ private fun BetDialogButtons(
     }
 }
 
+/**
+ * Creates a popup that indicates a bid was successful
+ * @param gameViewModel view model of the associated game
+ * @param duration duration of the popup before automatic dismiss
+ */
 @Composable
 fun SuccessfulBidNotification(gameViewModel: GameViewModel, duration: Duration) {
     val successfulBid = gameViewModel.successfulBidData.observeAsState().value
