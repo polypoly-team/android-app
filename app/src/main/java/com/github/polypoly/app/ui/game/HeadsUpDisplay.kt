@@ -36,7 +36,7 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding

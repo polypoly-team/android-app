@@ -11,7 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.commons.LoggedInTest
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Assert.assertEquals

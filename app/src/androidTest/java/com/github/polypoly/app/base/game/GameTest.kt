@@ -33,7 +33,7 @@ class GameTest {
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
     @Before
-    fun initLoby() {
+    fun initLobby() {
         gameLobby.addUser(testUser2)
         gameLobby.addUser(testUser3)
         gameLobby.addUser(testUser4)

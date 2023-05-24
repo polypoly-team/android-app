@@ -1,7 +1,7 @@
 package com.github.polypoly.app.ui.menu.lobby
 
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.network.keyExists
+import com.github.polypoly.app.database.keyExists
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CHARACTERS
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB

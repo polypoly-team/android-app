@@ -20,7 +20,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.GameLogo
