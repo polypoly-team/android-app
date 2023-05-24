@@ -152,7 +152,7 @@ class Game private constructor(
             val maxBid = bids.maxWithOrNull(LocationBid.comparator)
             if (maxBid != null) {
                 val inGame = findInGameLocation(location) ?: throw IllegalStateException("Bid won for location $location that is not part of the game")
-                inGame.owner = maxBid.player
+                maxBid.player.earnNewLocation(inGame)
                 maxBid.player.loseMoney(maxBid.amount)
             }
         }
