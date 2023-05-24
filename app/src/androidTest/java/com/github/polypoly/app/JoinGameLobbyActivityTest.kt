@@ -30,12 +30,12 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true, true) {
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("noGameLobbyCodeText").assertIsDisplayed()
         composeTestRule.onNodeWithTag("showGameLobbiesButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("logo").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("game_logo").assertIsDisplayed()
     }
 
     @Test
     fun inputInvalidGameLobbyCodeDisplaysWarningMessage() {
-        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("emixam67")
+        composeTestRule.onNodeWithTag("gameLobbyCodeField").performTextInput("95812")
         composeTestRule.onNodeWithTag("JoinGameLobbyButton").performClick()
 
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.game_lobby_does_not_exist)).assertIsDisplayed()

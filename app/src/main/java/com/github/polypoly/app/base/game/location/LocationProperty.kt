@@ -1,5 +1,6 @@
 package com.github.polypoly.app.base.game.location
 
+import android.location.Location
 import org.osmdroid.util.GeoPoint
 
 /**
@@ -44,4 +45,18 @@ data class LocationProperty(
      *   @return the [GeoPoint] representing the position of the [LocationProperty] on the map.
      */
     fun position(): GeoPoint = GeoPoint(latitude, longitude)
+
+    /**
+     *  The distance between the [LocationProperty] and a [Location].
+     *
+     *  @param location the [Location] to compare with.
+     *
+     *  @return the distance between the [LocationProperty] and the [Location].
+     */
+    fun distanceTo(location: Location): Float {
+        val locationPropertyLocation = Location("")
+        locationPropertyLocation.latitude = latitude
+        locationPropertyLocation.longitude = longitude
+        return location.distanceTo(locationPropertyLocation)
+    }
 }

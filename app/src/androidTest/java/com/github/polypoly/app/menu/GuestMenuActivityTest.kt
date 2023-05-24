@@ -11,7 +11,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.polypoly.app.base.RulesObject
+import com.github.polypoly.app.base.menu.RulesObject
 import com.github.polypoly.app.ui.map.VisitMapActivity
 import com.github.polypoly.app.ui.menu.GuestMenuActivity
 import com.github.polypoly.app.ui.menu.SignInActivity

@@ -23,7 +23,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.absoluteValue
@@ -70,27 +69,27 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            60, 20, getZones(), 100), "Full gameLobby", "lobby1234"
+            60, 20, getZones(), 100), "Full gameLobby", "11111"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-            360, 20, getZones(), 300), "Private gameLobby", "lobbyabc123", true
+            360, 20, getZones(), 300), "Private gameLobby", "22222", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 2, 8,
-            600, null, getZones(), 1000), "Joinable 1", "lobbyabcd"
+            600, null, getZones(), 1000), "Joinable 1", "33333"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 7,
-            4320, 20, getZones(), 2000), "Joinable 2", "lobby123abc"
+            4320, 20, getZones(), 2000), "Joinable 2", "44444"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
-            900, 20, getZones(), 3000), "Joinable 3", "lobbyacd1234"
+            900, 20, getZones(), 3000), "Joinable 3", "55555"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            7200, 20, getZones(), 4000), "Joinable 4", "lobbyabc1234"
+            7200, 20, getZones(), 4000), "Joinable 4", "66666"
         )
         val TEST_GAME_LOBBY_AVAILABLE_5 = GameLobby(
             TEST_USER_5, GameParameters(GameMode.LANDLORD, 2, 4,
