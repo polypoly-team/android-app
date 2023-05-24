@@ -2,8 +2,6 @@ package com.github.polypoly.app.utils.global
 
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.user.Skin
-import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.database.IRemoteStorage
 import com.github.polypoly.app.database.RemoteDB
