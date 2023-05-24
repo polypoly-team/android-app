@@ -4,20 +4,15 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import kotlinx.coroutines.delay
 import org.junit.After
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
+class JoinGameLobbyActivityTest: PolyPolyTest(true, true, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<JoinGameLobbyActivity>()
@@ -104,7 +99,7 @@ class JoinGameLobbyActivityTest: PolyPolyTest(true, true) {
                 composeTestRule.onNodeWithContentDescription("${lobby.name}/${player.name} icon").assertIsDisplayed()
             }
             composeTestRule.onNodeWithText("Round duration: ", useUnmergedTree = true).assertIsDisplayed()
-            composeTestRule.onNodeWithText(lobby.rules.roundDuration.toString(), useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithText(lobby.rules.getRoundDurationValue().toString(), useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText("Game mode: ", useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithText(lobby.rules.gameMode.toString(), useUnmergedTree = true).assertIsDisplayed()
             composeTestRule.onNodeWithTag("${lobby.name}/joinGameLobbyButton", useUnmergedTree = true).assertIsDisplayed().assertHasClickAction()

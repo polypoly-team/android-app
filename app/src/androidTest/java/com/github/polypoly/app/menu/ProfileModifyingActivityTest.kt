@@ -12,14 +12,13 @@ import com.github.polypoly.app.commons.LoggedInTest
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileModifyingActivity
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
-
-//TODO: FIX TESTS FOR CI
 
 @RunWith(AndroidJUnit4::class)
 class ProfileModifyingActivityTest: LoggedInTest(true, true) {
@@ -39,12 +38,11 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
             Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
-        testIntent.putExtra("userId", userLoggedIn.id)
         ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
 
         // Clicking on button
         button.performClick()
-//        Intents.intended(IntentMatchers.hasComponent(ProfileActivity::class.java.name)) // TODO: fixme - cirrus emulator is too slow
+        //Intents.intended(IntentMatchers.hasComponent(ProfileActivity::class.java.name)) // TODO: fixme - cirrus emulator is too slow
 
         Intents.release()
 
@@ -59,7 +57,6 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
             Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
-        testIntent.putExtra("userId", userLoggedIn.id)
         ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
 
         // Fills a non-empty name
@@ -68,8 +65,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // Clicking on button
         button.performClick()
 
-        val userKey = userLoggedIn.id.toString()
-        Thread.sleep(TIMEOUT_DURATION * 2000) // TODO: fixme ugly but easiest workaround until we can listen to the DB
+        val userKey = userLoggedIn.id
         val nameFound = remoteDB.getValue<User>(userKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS).name
 
         assertEquals(newName, nameFound)
@@ -86,7 +82,6 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
             Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
-        testIntent.putExtra("userId", userLoggedIn.id)
         ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
 
         // Fills a non-empty name
@@ -95,8 +90,7 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // Clicking on button
         button.performClick()
 
-        val userKey = userLoggedIn.id.toString()
-        Thread.sleep(TIMEOUT_DURATION * 2000) // TODO: fixme ugly but easiest workaround until we can listen to the DB
+        val userKey = userLoggedIn.id
         val bioFound = remoteDB.getValue<User>(userKey).get(TIMEOUT_DURATION, TimeUnit.SECONDS).bio
 
         assertEquals(newBio, bioFound)
@@ -112,7 +106,6 @@ class ProfileModifyingActivityTest: LoggedInTest(true, true) {
         // An intent with the logged-in user's id is sent to the activity
         val testIntent =
             Intent(ApplicationProvider.getApplicationContext(), ProfileModifyingActivity::class.java)
-        testIntent.putExtra("n kqnd", userLoggedIn.id)
         ActivityScenario.launch<ProfileModifyingActivity>(testIntent)
 
         nicknameText.performTextReplacement("")

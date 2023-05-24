@@ -32,12 +32,11 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements
 import com.github.polypoly.app.ui.theme.UIElements.SecondaryButton
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 
 class ProfileActivity : MenuActivity("Profile") {
-
-    //ONLY TO TEST WITHOUT THE DATABASE
-    private var userId: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +65,7 @@ class ProfileActivity : MenuActivity("Profile") {
     @Composable
     fun ProfileAndStats() {
 
-        var user by remember { mutableStateOf(User()) }
-        remoteDB.getValue<User>(userId.toString()).thenAccept{userFound ->
-            user = userFound
-        }
-
+        val user = currentUser!!
 
         var profileHeight by remember { mutableStateOf(340.dp) }
         val localDensity = LocalDensity.current
@@ -136,7 +131,6 @@ class ProfileActivity : MenuActivity("Profile") {
         SecondaryButton(
             onClick = {
                 val profileModifyingIntent = Intent(mContext, ProfileModifyingActivity::class.java)
-                profileModifyingIntent.putExtra("userId", userId)
                 finish()
                 startActivity(profileModifyingIntent)
             },
@@ -182,7 +176,7 @@ class ProfileActivity : MenuActivity("Profile") {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.background,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .padding(20.dp)
         ) {
@@ -271,7 +265,7 @@ class ProfileActivity : MenuActivity("Profile") {
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colors.secondaryVariant,
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(UIElements.smallIconSize)
                 )
                 .fillMaxWidth()
                 .padding(15.dp)

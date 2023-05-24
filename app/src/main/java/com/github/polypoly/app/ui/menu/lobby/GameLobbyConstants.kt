@@ -1,6 +1,7 @@
 package com.github.polypoly.app.ui.menu.lobby
 
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 
 /**
  * Constants used in the app
@@ -17,7 +18,7 @@ class GameLobbyConstants {
         /**
          * Constants for game lobby settings
          */
-        const val GAME_LOBBY_MAX_NAME_LENGTH = 15
+        const val GAME_LOBBY_MAX_NAME_LENGTH = 9
         const val GAME_LOBBY_PRIVATE_DEFAULT = false
         const val GAME_LOBBY_MAX_PLAYERS = 8
         const val GAME_LOBBY_MIN_PLAYERS = 2
@@ -28,6 +29,9 @@ class GameLobbyConstants {
         const val GAME_LOBBY_MAX_INITIAL_BALANCE = 15000
         const val GAME_LOBBY_INITIAL_BALANCE_STEP = 500
         const val GAME_LOBBY_INITIAL_BALANCE_DEFAULT = 2500
+        val maxBuildingPerLandlord =
+            getZones().fold(0) { acc, zone -> acc + zone.locationProperties.size } / GAME_LOBBY_MAX_PLAYERS
+        const val GAME_LOBBY_MIN_BUILDINGS_PER_LANDLORD = 1
 
         /**
          * Constants for game lobby menu UI
@@ -37,7 +41,7 @@ class GameLobbyConstants {
 
     }
 
-    enum class DurationType(){
+    enum class DurationType() {
         HOUR, DAY, MINUTE;
     }
 
@@ -92,16 +96,16 @@ class GameLobbyConstants {
             }
         }
 
-        companion object{
+        companion object {
 
             /**
              * default value for the round duration
              */
-            fun getDefaultValue(): RoundDurations{
+            fun getDefaultValue(): RoundDurations {
                 return ONE_DAY
             }
 
-            fun getMaxRoundDuration(): RoundDurations{
+            fun getMaxRoundDuration(): RoundDurations {
                 return RoundDurations.values().sortedArrayDescending().first()
             }
         }

@@ -8,25 +8,26 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.TradeRequest
-import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.getAllValues
-import com.github.polypoly.app.network.removeValue
-import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
+import kotlinx.coroutines.*
+import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class GameViewModel(
     game: Game,
-    player: Player
+    player: Player,
+    private val coroutineScope: CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 ): LoadingModel() {
 
     private val gameData: MutableLiveData<Game> = MutableLiveData(game)
@@ -37,16 +38,16 @@ class GameViewModel(
 
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
+    private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
+    //used to determine if the player is close enough to a location to interact with it
+    private val MAX_INTERACT_DISTANCE = 10.0 // meters
 
     init {
-        viewModelScope.launch {
-            listenToTradeRequest()
+        setLoading(true)
+        coroutineScope.launch {
+            gameLoop()
         }
-    }
-
-    fun getTradeRequestData(): LiveData<TradeRequest> {
-        return tradeRequestData
     }
 
     fun getGameData(): LiveData<Game> {
@@ -65,66 +66,167 @@ class GameViewModel(
         return gameEndedData
     }
 
-    fun nextTurn() {
-        gameData.value?.nextTurn()
-        roundTurnData.value = gameData.value?.currentRound ?: -1
-        gameEndedData.value = gameData.value?.isGameFinished() ?: false
+    fun getPlayerStateData(): LiveData<PlayerState> {
+        return playerStateData
     }
 
-    /**
-     * Close a trade request
-     * @param trade The trade request to close
-     */
-    fun closeTradeRequest(trade: TradeRequest) {
-        tradeRequestData.value = null
-        remoteDB.removeValue<TradeRequest>(trade.code)
-    }
+    private suspend fun gameLoop() {
+        var currentGame = gameData.value
 
-    /**
-     * Update a trade request
-     * @param trade The trade request to update
-     */
-    fun updateTradeRequest(trade: TradeRequest) {
-        tradeRequestData.value = null
-        tradeRequestData.value = trade
-        remoteDB.updateValue(trade)
-    }
+        while (currentGame != null && !currentGame.isGameFinished()) {
+            playerStateData.postValue(PlayerState.ROLLING_DICE)
+            setLoading(false)
 
-    /**
-     * Listen to the trade request that are sent to the current player
-     */
-    private suspend fun listenToTradeRequest() {
-        while (gameData.value?.isGameFinished() == true) {
-            remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
-                tradeRequests.forEach { tradeRequest ->
-                    if (tradeRequest.playerReceiver.user.id == playerData.value?.user?.id ||
-                            tradeRequest.playerApplicant.user.id == playerData.value?.user?.id) {
-                        tradeRequestData.value = tradeRequest
-                    }
-                }
-            }
-            delay(2500)
+            delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
+
+            playerStateData.postValue(PlayerState.TURN_FINISHED)
+
+            nextTurn()
+
+            currentGame = gameData.value
         }
     }
 
     /**
-     * Create a trade request between the current player and the player given in parameter
-     * @param playerReceiver The player that will receive the trade request
-     * @param locationGiven The location that the current player will give to the playerReceiver
-     * @return A CompletableFuture that will be completed with true if the trade request has been created, false otherwise
+     * Computes the next turn state and synchronizes with the other players
+     * @return a future that completes when the turn is synced with the other players
      */
-    fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation): CompletableFuture<Boolean> {
-        val playerDataValue = playerData.value ?: return CompletableFuture.completedFuture(false)
-        val tradeRequest = TradeRequest(
-            playerApplicant = playerDataValue,
-            playerReceiver = playerReceiver,
-            locationGiven = locationGiven,
-            locationReceived = null,
-            currentPlayerApplicantAcceptation = null,
-            currentPlayerReceiverAcceptation = null,
-            code = "${playerReceiver.user.name}${playerDataValue.user.name}",
-        )
-        return remoteDB.setValue(tradeRequest)
+    fun nextTurn(): CompletableFuture<Boolean> {
+        setLoading(true)
+        val completionFuture = CompletableFuture<Boolean>()
+
+        coroutineScope.launch {
+            gameData.value?.nextTurn()
+
+            synchronizeGame().thenAccept { syncSucceeded ->
+                if (syncSucceeded) {
+                    roundTurnData.value = gameData.value?.currentRound ?: -1
+                    gameEndedData.value = gameData.value?.isGameFinished() ?: false
+                }
+                setLoading(false)
+                completionFuture.complete(syncSucceeded)
+            }
+        }
+
+        return completionFuture
+    }
+
+    private fun synchronizeGame(): CompletableFuture<Boolean> {
+        val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
+        return remoteDB.getValue<Game>(gameUpdated.key).thenCompose { gameFound ->
+            if (gameFound.currentRound < gameUpdated.currentRound) {
+                gameData.value = gameUpdated
+                remoteDB.setValue(gameUpdated)
+            } else { // up to date version already on live db
+                gameData.value = gameFound
+                CompletableFuture.completedFuture(true)
+            }
+        }
+    }
+
+    private fun playerStateFSMTransition(expectedFrom: PlayerState, to: PlayerState) {
+        if (playerStateData.value != expectedFrom) {
+            throw IllegalStateException("Illegal state transition from ${playerStateData.value} instead of $expectedFrom to $to")
+        }
+        playerStateData.value = to
+    }
+
+    /**
+     * Ends ROLLING_DICE state and moves to MOVING
+     */
+    fun diceRolled() {
+        playerStateFSMTransition(PlayerState.ROLLING_DICE, PlayerState.MOVING)
+    }
+
+    /**
+     * Ends MOVING state and moves to INTERACTING
+     */
+    fun locationReached() {
+        playerStateFSMTransition(PlayerState.MOVING, PlayerState.INTERACTING)
+    }
+
+    /**
+     * Ends INTERACTING state and moves to BIDDING
+     */
+    fun startBidding() {
+        playerStateFSMTransition(PlayerState.INTERACTING, PlayerState.BIDDING)
+    }
+
+    /**
+     * Ends BIDDING state and moves back to INTERACTING
+     */
+    fun cancelBidding() {
+        playerStateFSMTransition(PlayerState.BIDDING, PlayerState.INTERACTING)
+    }
+
+    /**
+     * Resets player state back to the beginning of a turn (ie ROLLING_DICE)
+     */
+    fun resetTurnState() {
+        playerStateData.value = PlayerState.ROLLING_DICE
+    }
+
+    /**
+     * Computes the closest location to the given position among the existing locations in the game.
+     * @param position Reference position
+     * @return A future holding the closest location found or null if the closest location is farther than MAX_INTERACT_DISTANCE
+     */
+    fun computeClosestLocation(position: GeoPoint): CompletableFuture<LocationProperty?> {
+        val result = CompletableFuture<LocationProperty?>()
+
+        coroutineScope.launch {
+            var closestLocation: LocationProperty? = null
+            var closestDistance = Double.MAX_VALUE
+
+            val allLocations = gameData.value?.allLocations ?: listOf()
+            for (location in allLocations) {
+                val distance = position.distanceToAsDouble(location.position())
+                if (distance < closestDistance) {
+                    closestLocation = location
+                    closestDistance = distance
+                }
+            }
+
+            if (closestDistance > MAX_INTERACT_DISTANCE) {
+                closestLocation = null
+            }
+
+            result.complete(closestLocation)
+        }
+
+        return result
+    }
+
+    /**
+     * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
+     * ensuring that the player does not visit the same location twice.
+     * @param currentLocation current location that the player can interact with. May be null if no such location exist
+     */
+    fun rollDiceLocations(currentLocation: LocationProperty?): CompletableFuture<List<LocationProperty>> {
+        val result = CompletableFuture<List<LocationProperty>>()
+
+        coroutineScope.launch {
+            val locationsNotToVisitName = mutableListOf<String>()
+            if (currentLocation != null)
+                locationsNotToVisitName.add(currentLocation.name)
+
+            val allLocations = gameData.value?.allLocations ?: listOf()
+
+            val locationsToVisit = mutableListOf<LocationProperty>()
+            for (i in 1..NUMBER_OF_LOCATIONS_ROLLED) {
+                val closestLocations = allLocations
+                    .filter { !locationsNotToVisitName.contains(it.name) }
+                    .sortedBy { it.position().distanceToAsDouble(currentLocation?.position() ?: it.position()) }
+                val diceRoll = Random.Default.nextInt(allLocations.indices)
+
+                locationsToVisit.add(closestLocations[diceRoll])
+                locationsNotToVisitName.add(closestLocations[diceRoll].name)
+            }
+
+            result.complete(locationsToVisit)
+        }
+
+        return result
     }
 
     companion object {
@@ -134,38 +236,15 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                // TODO: Remove this when the game is created from the lobby
-                GameRepository.game = Game.launchFromPendingGame(
-                    GameLobby(
-                        rules = GameParameters(
-                            gameMode = GameRepository.game?.rules?.gameMode ?: GameMode.LAST_STANDING,
-                            maxRound = GameRepository.game?.rules?.maxRound,
-                        ),
-                        admin = GlobalInstances.currentUser
-                    )
-                )
                 GameRepository.player = Player(
-                    GlobalInstances.currentUser,
-                    // hardcoded values for the testing
-                    3000,
-                    ownedLocations = mutableListOf(Game.gameInProgress?.getInGameLocation()?.get(0)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(1)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(2)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(5)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(8)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(9)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(10)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(11)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(12)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(13)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(14)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(15)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(16)!!,
-                        Game.gameInProgress?.getInGameLocation()?.get(17)!!,),
-                )
-                GlobalInstances.playerState.value = PlayerState.ROLLING_DICE
+                    GlobalInstances.currentUser ?: User(),
+                    GameRepository.game?.rules?.initialPlayerBalance ?: -1)
+
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
+
+                remoteDB.setValue(GameRepository.game!!)
+
                 GameViewModel(
                     GameRepository.game!!,
                     GameRepository.player!!

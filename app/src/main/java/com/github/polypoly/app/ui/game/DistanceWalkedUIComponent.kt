@@ -17,14 +17,15 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
 /**
  * Displays the distance walked and a button to reset it.
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
-fun DistanceWalkedUIComponents() {
+fun DistanceWalkedUIComponents(mapViewModel: MapViewModel) {
     fun formattedDistance(distance: Float): String {
         return if (distance < 1000) "${"%.1f".format(distance)} m"
         else "${"%.1f".format(distance / 1000)} km"

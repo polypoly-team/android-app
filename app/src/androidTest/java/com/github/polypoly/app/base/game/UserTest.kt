@@ -8,7 +8,7 @@ import org.junit.Test
 class UserTest {
 
     // Values that are often used in tests
-    val USER_TEST = User(15)
+    val USER_TEST = User("15")
 
     @Test
     fun convertingToDBObjectWorks() {

@@ -4,20 +4,21 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
-import com.github.polypoly.app.ui.map.MapUI
+import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.ui.map.VisitMapActivity
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.osmdroid.views.overlay.Marker
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class VisitMapActivityTest {
+class VisitMapActivityTest : PolyPolyTest(true, true) {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<VisitMapActivity>()
@@ -35,10 +36,9 @@ class VisitMapActivityTest {
 
     @Test
     fun openDialogWhenInteractingWithPropertyTrue() {
-        val marker = MapUI.mapView.overlays.first { it is Marker} as Marker
-        composeTestRule.activity.mapViewModel.selectedMarker = marker
-        composeTestRule.activity.interactingWithProperty.value = true
-        runBlocking { delay(500) }
+        setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        waitForUIToUpdate()
+
         composeTestRule.onNodeWithTag("building_description_dialog").assertIsDisplayed()
     }
 
@@ -48,10 +48,10 @@ class VisitMapActivityTest {
             .first { zone -> zone.locationProperties.any { location -> location.description != "" } }
             .locationProperties.first {location -> location.description != ""}
         val locationName = locationWithDescription.name
-        val marker = MapUI.mapView.overlays.first { it is Marker && it.title == locationName } as Marker
-        composeTestRule.activity.mapViewModel.selectedMarker = marker
-        composeTestRule.activity.interactingWithProperty.value = true
-        runBlocking { delay(500) }
+
+        setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        waitForUIToUpdate()
+
         composeTestRule.onNodeWithText(locationName)
         composeTestRule.onNodeWithText(locationWithDescription.description)
         composeTestRule.onNodeWithText(locationWithDescription.positivePoint)
@@ -66,11 +66,10 @@ class VisitMapActivityTest {
                 .first { zone -> zone.locationProperties.any { location -> location.description == "" } }
                 .locationProperties.first { location -> location.description == "" }
             val locationName = locationWithoutDescription.name
-            val marker =
-                MapUI.mapView.overlays.first { it is Marker && it.title == locationName } as Marker
-            composeTestRule.activity.mapViewModel.selectedMarker = marker
-            composeTestRule.activity.interactingWithProperty.value = true
-            runBlocking { delay(500) }
+
+            setLocationInMapViewModel(locationWithoutDescription).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
+            waitForUIToUpdate()
             composeTestRule.onNodeWithText(locationName)
             composeTestRule.onNodeWithText("No Info about this building")
         } catch (_: NoSuchElementException) {}
@@ -78,13 +77,15 @@ class VisitMapActivityTest {
 
     @Test
     fun clickOnCloseButtonCloseTheDialog() {
-        val marker = MapUI.mapView.overlays.first { it is Marker} as Marker
-        composeTestRule.activity.mapViewModel.selectedMarker = marker
-        composeTestRule.activity.interactingWithProperty.value = true
-        runBlocking { delay(500) }
+        setLocationInMapViewModel(getRandomLocation()).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        waitForUIToUpdate()
         composeTestRule.onNodeWithTag("building_description_dialog").assertIsDisplayed()
         composeTestRule.onNodeWithTag("close_building_description_dialog").performClick()
-        runBlocking { delay(500) }
+        waitForUIToUpdate()
         composeTestRule.onNodeWithTag("building_description_dialog").assertDoesNotExist()
+    }
+
+    private fun setLocationInMapViewModel(location: LocationProperty): CompletableFuture<Boolean> {
+        return execInMainThread { composeTestRule.activity.mapViewModel.selectLocation(location) }
     }
 }

@@ -1,12 +1,16 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.PropertyLevel
+import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
+import java.util.concurrent.CompletableFuture
 
 /**
  * Represent the game and the current state of the game
@@ -19,36 +23,31 @@ import com.github.polypoly.app.base.user.User
  * (seconds since 1970-01-01T00:00:00Z)
  */
 class Game private constructor(
+    val code: String = "default-code",
     val admin: User = User(),
     var players: List<Player> = listOf(),
     val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
-) {
+) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
-    private val inGameLocations: List<InGameLocation> = rules.gameMap.flatMap { zone -> zone.locationProperties.map { location ->
+    val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
+
+    private val inGameLocations: List<InGameLocation> = allLocations.map { location ->
         InGameLocation(
             locationProperty = location,
             owner = null,
             level = PropertyLevel.LEVEL_0,
-        ) } }
-    var currentRound: Int = 1
+        ) }
 
-    /**
-     * Return the [InGameLocation] of the current [Game]
-     */
-    fun getInGameLocation(): List<InGameLocation> {
-        return inGameLocations;
-    }
+    var currentRound: Int = 1
 
     /**
      * Go to the next turn
      */
     fun nextTurn() {
-        // TODO update the data with the DB
         ++currentRound
-        if(isGameFinished()) {
+        if (isGameFinished()) {
             val pastGame = endGame()
-            // TODO send the pastGame to the DB
         }
     }
 
@@ -58,17 +57,19 @@ class Game private constructor(
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
      */
     fun isGameFinished(): Boolean {
-        return when(rules.gameMode) {
+        return when (rules.gameMode) {
             GameMode.LAST_STANDING -> {
                 players.filter { !it.hasLost() }.size <= 1
             }
+
             GameMode.RICHEST_PLAYER -> {
-                if(rules.maxRound == null)
+                if (rules.maxRound == null)
                     throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
                 currentRound > rules.maxRound
             }
+
             GameMode.LANDLORD -> {
-                if(rules.maxRound == null)
+                if (rules.maxRound == null)
                     throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
                 currentRound > rules.maxRound
             }
@@ -79,14 +80,15 @@ class Game private constructor(
      * Return the ranking of the players
      * @return a [Map] of the [Player]s' [User] id and their rank
      */
-    fun ranking(): Map<Long, Int> {
+    fun ranking(): Map<String, Int> {
         val playersSorted = players.sortedDescending()
-        val map = playersSorted.mapIndexed { index, player -> player.user.id to index+1 }.toMap().toMutableMap()
-        for(i in 1 until (players.size)) {
+        val map = playersSorted.mapIndexed { index, player -> player.user.id to index + 1 }.toMap()
+            .toMutableMap()
+        for (i in 1 until (players.size)) {
             val currentPlayer = playersSorted[i]
-            val previousPlayer = playersSorted[i-1]
-            if(currentPlayer.compareTo(previousPlayer) == 0) {
-                map[previousPlayer.user.id]?.let{ map[currentPlayer.user.id] = it }
+            val previousPlayer = playersSorted[i - 1]
+            if (currentPlayer.compareTo(previousPlayer) == 0) {
+                map[previousPlayer.user.id]?.let { map[currentPlayer.user.id] = it }
             }
         }
         return map
@@ -98,7 +100,7 @@ class Game private constructor(
      * @throws IllegalStateException if the game is not finished
      */
     fun endGame(): PastGame {
-        if(!isGameFinished()) throw IllegalStateException("can't end the game now")
+        if (!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
             users = players.map(Player::user),
             usersRank = ranking().map { it.key to it.value }.toMap(),
@@ -121,7 +123,7 @@ class Game private constructor(
      * @param userId the id of the user
      * @return the player associated to the user id
      */
-    fun getPlayer(userId: Long): Player? {
+    fun getPlayer(userId: String): Player? {
         return players.find { it.user.id == userId }
     }
 
@@ -132,9 +134,9 @@ class Game private constructor(
     fun computeAllWinnersOfBets() {
         inGameLocations.forEach {
             val winningBet = it.computeWinningBid()
-            if(winningBet != null) {
+            if (winningBet != null) {
                 val winner = winningBet.player
-                if(winner.user.currentUser) {
+                if (winner.user.currentUser) {
                     winner.loseMoney(winningBet.amount)
                     // TODO : notify the player that he has won and the other players in the bets
                     //  that they have lost
@@ -144,6 +146,29 @@ class Game private constructor(
         }
     }
 
+    override fun toDBObject(): GameDB {
+        return GameDB(
+            code,
+            admin,
+            players,
+            rules,
+            dateBegin,
+            currentRound
+        )
+    }
+
+    override fun toLocalObject(dbObject: GameDB): CompletableFuture<StorableObject<GameDB>> {
+        val game = Game(
+            dbObject.code,
+            dbObject.admin,
+            dbObject.players,
+            dbObject.rules,
+            dbObject.dateBegin
+        )
+        game.currentRound = dbObject.round
+        return CompletableFuture.completedFuture(game)
+    }
+
     companion object {
         /**
          * Launch a game from the associated game lobby
@@ -151,18 +176,47 @@ class Game private constructor(
          * @return the new game created from the lobby
          */
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
+            val players = gameLobby.usersRegistered.map {
+                Player(it, gameLobby.rules.initialPlayerBalance, listOf())
+            }
             val game = Game(
+                code = gameLobby.code,
                 admin = gameLobby.admin,
-                players = gameLobby.usersRegistered.map { Player(
-                    user = it,
-                    balance = gameLobby.rules.initialPlayerBalance,
-                    ownedLocations = mutableListOf(),
-                ) },
+                players =
+                if (gameLobby.rules.gameMode == GameMode.LANDLORD)
+                    landLordPlayers(
+                        gameLobby,
+                        players
+                    )
+                else players,
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
             )
             gameInProgress = game
             return game
+        }
+
+        private fun landLordPlayers(gameLobby: GameLobby, players: List<Player>): List<Player> {
+            fun generateRandomLocations(
+                gameMapLocations: List<LocationProperty>,
+                n: Int
+            ): List<LocationProperty> =
+                gameMapLocations.shuffled().take(n)
+
+            val allProperties = gameLobby.rules.gameMap.flatMap { zone -> zone.locationProperties }
+            val assignedProperties = mutableSetOf<LocationProperty>()
+
+            return players.map { player ->
+                val randomLocationsToGive = generateRandomLocations(
+                    allProperties - assignedProperties,
+                    gameLobby.rules.maxBuildingPerLandlord
+                )
+                assignedProperties += randomLocationsToGive
+                player.copy(
+                    ownedLocations = randomLocationsToGive
+                        .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
+                )
+            }
         }
 
         /**
@@ -171,3 +225,12 @@ class Game private constructor(
         var gameInProgress: Game? = null
     }
 }
+
+data class GameDB(
+    val code: String = "default-code",
+    val admin: User = User(),
+    var players: List<Player> = listOf(),
+    val rules: GameParameters = GameParameters(),
+    val dateBegin: Long = System.currentTimeMillis(),
+    val round: Int = 0
+)

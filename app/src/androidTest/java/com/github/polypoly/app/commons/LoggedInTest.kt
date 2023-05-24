@@ -1,11 +1,13 @@
 package com.github.polypoly.app.commons
 
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+
 abstract class LoggedInTest(
     clearRemoteStorage: Boolean,
     fillWithFakeData: Boolean)
-    :PolyPolyTest(clearRemoteStorage, fillWithFakeData) {
+    : PolyPolyTest(clearRemoteStorage, fillWithFakeData, true) {
 
-    protected val userLoggedIn = TEST_USER_0
+    protected val userLoggedIn = currentUser!!
 
     // TODO: effectively log in the user before any test
 }

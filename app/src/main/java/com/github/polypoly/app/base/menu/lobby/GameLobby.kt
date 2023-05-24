@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @property name The name of the [GameLobby]
  * @property code The (secret) code of the [GameLobby]
  * @property private If the [GameLobby] is private or not
+ * @property started If the [Game] has started or not
  */
 data class GameLobby(
     val admin: User = User(),
@@ -23,6 +24,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
+    val started: Boolean = false
 ): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -51,7 +53,7 @@ data class GameLobby(
     fun addUser(user: User) {
         if (currentUsersRegistered.size >= rules.maximumNumberOfPlayers)
             throw IllegalStateException("The game is already full")
-        if (currentUsersRegistered.any{u -> u.id == user.id})
+        if (currentUsersRegistered.any{ u -> u.id == user.id})
             throw java.lang.IllegalArgumentException("User $user is already registered")
         currentUsersRegistered.add(user)
     }
@@ -80,7 +82,7 @@ data class GameLobby(
      * @param withId the id of the user to remove
      * @throws IllegalArgumentException if no user with the given id is not in the lobby
      */
-    fun removeUser(withId: Long) {
+    fun removeUser(withId: String) {
         for (i in 0 until currentUsersRegistered.size) {
             if (currentUsersRegistered[i].id == withId) {
                 currentUsersRegistered.removeAt(i)
@@ -99,6 +101,7 @@ data class GameLobby(
         if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
+
         return Game.launchFromPendingGame(this)
     }
 
@@ -112,7 +115,8 @@ data class GameLobby(
             private,
             rules,
             currentUsersRegistered.map { user -> user.id.toString() },
-            admin.id.toString()
+            admin.id.toString(),
+            started
         )
     }
 
@@ -123,7 +127,8 @@ data class GameLobby(
                 dbObject.parameters,
                 dbObject.name,
                 dbObject.code,
-                dbObject.private
+                dbObject.private,
+                dbObject.started
             )
             lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
             lobby
@@ -138,7 +143,8 @@ data class GameLobbyDB(
     val private: Boolean = false,
     val parameters: GameParameters = GameParameters(),
     val userIds: List<String> = listOf(""),
-    val adminId: String = ""
+    val adminId: String = "",
+    val started: Boolean = false
 ) {
     init {
         if(!userIds.contains(adminId)) {

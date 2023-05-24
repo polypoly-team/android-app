@@ -1,16 +1,14 @@
 package com.github.polypoly.app.utils.global
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import com.github.polypoly.app.base.game.TradeRequest
+
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.IRemoteStorage
 import com.github.polypoly.app.network.RemoteDB
-import com.github.polypoly.app.ui.game.PlayerState
+import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.network.keyExists
 import com.github.polypoly.app.ui.menu.lobby.UniqueGameLobbyCodeGenerator
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -21,11 +19,13 @@ import com.google.firebase.ktx.Firebase
  */
 class GlobalInstances {
     companion object {
+
         // ============================================== STORAGE
         /**
          * For the storable classes to be correctly initialized, we create dummy instances
          */
-        val dummyInstances = listOf(GameLobby(), User(), TradeRequest())
+        @Suppress("UNUSED")
+        val dummyInstances = listOf(GameLobby(), User())
 
         lateinit var remoteDB: IRemoteStorage
         var remoteDBInitialized = false
@@ -38,14 +38,23 @@ class GlobalInstances {
             }
         }
 
-        var currentUser : User = User(15, "fake_user", "I am fake until google db is fully setup", Skin.default(),
-            Stats(0, 0, 0, 0, 0), listOf(), mutableListOf()
-        )
-        var currentFBUser : FirebaseUser? = null
+        // ============================================== CURRENT USER
+        var currentUser : User? = null
+
         var isSignedIn = false
 
-        val uniqueCodeGenerator = UniqueGameLobbyCodeGenerator()
+        fun initCurrentUser(key: String, name: String) {
+            remoteDB.keyExists<User>(key).thenAccept { exists ->
+                if(exists) {
+                    remoteDB.getValue<User>(key).thenAccept { currentUser = it }
+                } else {
+                    currentUser = User(id = key, name = name)
+                    remoteDB.registerValue(currentUser!!)
+                }
+            }
+        }
 
-        var playerState: MutableState<PlayerState> = mutableStateOf(PlayerState.INIT)
+        // ============================================== GAME CODE
+        val uniqueCodeGenerator = UniqueGameLobbyCodeGenerator()
     }
 }

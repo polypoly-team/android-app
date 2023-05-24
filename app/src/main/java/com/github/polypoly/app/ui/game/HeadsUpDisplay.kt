@@ -3,7 +3,14 @@ package com.github.polypoly.app.ui.game
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -17,6 +24,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,28 +40,33 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.data.GameRepository.Companion.player
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.models.game.GameViewModel
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
-import com.github.polypoly.app.utils.global.GlobalInstances
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
+ * @param playerData current player of the game
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
+ * @param otherPlayersData other players in the game
+ * @param round current round of the game
+ * @param location current location of the player
  */
 @Composable
-fun Hud(playerData: Player, otherPlayersData: List<Player>, round: Int, location: String, gameModel: GameViewModel) {
+fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
+        HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")
-        if (GlobalInstances.playerState.value == PlayerState.MOVING)
-            HudLocation(mapViewModel.goingToLocationProperty!!.name, DpOffset(0.dp, 80.dp), "going_to_location_text")
+        if (playerState == PlayerState.MOVING)
+            HudLocation(playerPosition, DpOffset(0.dp, 80.dp), "going_to_location_text")
         HudGameMenu()
     }
 }
@@ -134,7 +147,7 @@ fun HudPlayer(playerData: Player) {
  * players
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
+fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -142,7 +155,6 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
             modifier = Modifier
                 .padding(Padding.medium)
                 .align(Alignment.TopStart)
-                .testTag("other_players_and_game_hud"),
         ) {
             Column(Modifier.padding(Padding.medium)) {
                 // A drop down button that expands and collapses the stats for other players and
@@ -170,7 +182,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
                         Column(Modifier.padding(Padding.medium)) {
                             HudGame(round)
                             otherPlayersData.forEach {
-                                HudOtherPlayer(it, gameModel)
+                                HudOtherPlayer(it)
                             }
                         }
                     }
@@ -221,19 +233,14 @@ fun HudGame(round: Int) {
 /**
  * The HUD for the stats of other players, it displays basic information such as their balance,
  * and a button shows complete information on click
- * @param playerData The data of the player to display
- * @param gameModel The game view model
  */
 @Composable
-fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
-    val openOtherPlayerInfo = remember { mutableStateOf(false) }
-    Row(
-        Modifier
-            .padding(Padding.medium)
-    ) {
+fun HudOtherPlayer(playerData: Player) {
+    var openOtherPlayerInfo by remember { mutableStateOf(false) }
+    Row(Modifier.padding(Padding.medium)) {
         HudButton(
-            name = "other_player_hud",
-            onClick = { openOtherPlayerInfo.value = true },
+            name = "otherPlayerInfoButton",
+            onClick = { openOtherPlayerInfo = true },
             icon = Icons.Filled.Person,
             description = "See other player information"
         )
@@ -242,20 +249,20 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
         }
     }
 
-    val openLocationsDialog =  remember{ mutableStateOf(false) }
-    if (openLocationsDialog.value) {
-        player?.let { it ->
-            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
-            openLocationsDialog.value = false
-            gameModel.createATradeRequest(playerData, location)
-        } }
-    }
-
-    // LANDLORD ONLY: Asking for a trade
-    if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
-        val player = player
-        if(player != null) {
-            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
+    if (openOtherPlayerInfo) {
+        Dialog(
+            onDismissRequest = { openOtherPlayerInfo = false },
+        ) {
+            Surface(
+                color = MaterialTheme.colors.background,
+                shape = Shapes.medium,
+                modifier = Modifier
+                    .padding(Padding.medium)
+                    .fillMaxWidth()
+            ) {
+                // TODO: Add information about other players
+                Text(text = "Other player info")
+            }
         }
     }
 }

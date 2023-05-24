@@ -1,10 +1,6 @@
 package com.github.polypoly.app.ui.game
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -12,19 +8,35 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.ui.game.GameActivity.Companion.mapViewModel
-import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.ui.map.MapViewModel
 
 // flag to show the roll dice dialog
 val showRollDiceDialog = mutableStateOf(false)
+
+/**
+ * UI for dice button and dialog
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
+ */
+@Composable
+fun DiceRollUI(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
+    val playerState = gameViewModel.getPlayerStateData().observeAsState().value
+
+    if (playerState == PlayerState.ROLLING_DICE) {
+        RollDiceButton()
+        RollDiceDialog(gameViewModel, mapViewModel)
+    }
+}
 
 /**
  * Button for rolling the dice.
@@ -38,10 +50,7 @@ fun RollDiceButton() {
                 .align(BottomCenter)
                 .offset(y = (-80).dp)
                 .testTag("roll_dice_button"),
-            onClick = {
-                if (mapViewModel.interactableProperty.value != null)
-                    showRollDiceDialog.value = true
-            },
+            onClick = { showRollDiceDialog.value = true },
             shape = CircleShape
         ) {
             Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
@@ -51,25 +60,33 @@ fun RollDiceButton() {
 
 /**
  * Dice roll dialog, shows the result of 3 dice rolls in a column.
+ * @param gameViewModel GameViewModel to use for game business logic
+ * @param mapViewModel GameViewModel to use for map business logic
  */
 @Composable
-fun RollDiceDialog() {
+fun RollDiceDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
     if (showRollDiceDialog.value) {
+        var locationsRolled by remember { mutableStateOf(listOf<LocationProperty>()) }
+
+        gameViewModel.rollDiceLocations(mapViewModel.getLocationSelected().value).thenAccept { rolled ->
+            locationsRolled = rolled
+        }
+
         Dialog(onDismissRequest = { showRollDiceDialog.value = false }) {
             AlertDialog(
                 onDismissRequest = { showRollDiceDialog.value = false },
                 title = { Text("Dice Roll") },
                 text = {
                     Column {
-                        val rollDice = rollDiceLocations()
-                        for (i in 0..2)
+                        for (location in locationsRolled) {
                             Button(onClick = {
                                 showRollDiceDialog.value = false
-                                GlobalInstances.playerState.value = PlayerState.MOVING
-                                mapViewModel.goingToLocationProperty = rollDice[i]
+                                mapViewModel.goingToLocationProperty = location
+                                gameViewModel.diceRolled()
                             }) {
-                                Text(rollDice[i].name)
+                                Text(location.name)
                             }
+                        }
                     }
                 },
                 confirmButton = {
@@ -80,25 +97,4 @@ fun RollDiceDialog() {
             )
         }
     }
-}
-
-/**
- * Rolls the dice and returns the location that corresponds to the sum of 2 dice rolls, 3 times
- * ensuring that the player does not visit the same location twice.
- */
-private fun rollDiceLocations(): List<LocationProperty> {
-    val locationsNotToVisitName = mutableListOf(mapViewModel.interactableProperty.value?.name)
-
-    val locationsToVisit = mutableListOf<LocationProperty>()
-    for (i in 1..3) {
-        val diceRollsSum = IntArray(2) { (1..6).random() }.sum() - 2
-        val closestLocations = mapViewModel.markerToLocationProperty.entries
-            .filter { !locationsNotToVisitName.contains(it.value.name) }
-            .sortedBy { it.key.position.distanceToAsDouble(mapViewModel.interactableProperty.value!!.position()) }
-            .take(11)
-
-        locationsToVisit.add(closestLocations[diceRollsSum].value)
-        locationsNotToVisitName.add(closestLocations[diceRollsSum].value.name)
-    }
-    return locationsToVisit
 }
