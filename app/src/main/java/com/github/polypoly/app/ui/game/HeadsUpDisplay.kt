@@ -35,11 +35,13 @@ import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
+import com.github.polypoly.app.base.menu.lobby.GameMode
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -140,7 +142,7 @@ fun HudPlayer(playerData: Player) {
         ) {
             MoneyHudText("playerBalance", "${playerData.getBalance()} $")
             HudButton(
-                name = "playerInfoButton",
+                testTag = "player_info_button",
                 onClick = { openPlayerInfo = true },
                 icon = Icons.Filled.Person,
                 description = "See player information"
@@ -185,7 +187,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
                 // A drop down button that expands and collapses the stats for other players and
                 // the game
                 ToggleIconButton(
-                    "otherPlayersAndGameDropDownButton",
+                    "other_players_and_game_hud",
                     "Expand or collapse the stats for other players and the game",
                     { isExpanded = !isExpanded },
                     isExpanded,
@@ -227,7 +229,7 @@ fun HudGame(round: Int) {
 
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
-            name = "gameInfoButton",
+            testTag = "game_info_button",
             onClick = { openGameInfo = true },
             icon = Icons.Filled.Info,
             description = "See game information"
@@ -263,11 +265,12 @@ fun HudGame(round: Int) {
  */
 @Composable
 fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
-    var openOtherPlayerInfo by remember { mutableStateOf(false) }
+    val openOtherPlayerInfo = remember { mutableStateOf(false) }
+
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
-            name = "otherPlayerInfoButton",
-            onClick = { openOtherPlayerInfo = true },
+            testTag = "other_player_hud",
+            onClick = { openOtherPlayerInfo.value = true },
             icon = Icons.Filled.Person,
             description = "See other player information"
         )
@@ -285,34 +288,11 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
             } }
     }
 
-    if (openOtherPlayerInfo) {
-        Dialog(
-            onDismissRequest = { openOtherPlayerInfo = false },
-        ) {
-            Surface(
-                color = MaterialTheme.colors.background,
-                shape = Shapes.medium,
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .fillMaxWidth()
-            ) {
-                // TODO: Add information about other players
-                Text(text = "Other player info")
-                Column(
-                    modifier = Modifier
-                        .padding(Padding.large),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Do you want to trade with this player?")
-                    Spacer(modifier = Modifier.height(Padding.medium))
-                    Button(onClick = {
-                        openLocationsDialog.value = true
-                        openOtherPlayerInfo = false
-                    }) {
-                        Text(text = "Trade")
-                    }
-                }
-            }
+    // LANDLORD ONLY: Asking for a trade
+    if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
+        val player = GameRepository.player
+        if(player != null) {
+            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
         }
     }
 }
@@ -346,7 +326,7 @@ fun HudGameMenu() {
 
                 // The drop down button that expands and collapses the game menu
                 HudButton(
-                    name = "gameMenuDropDownButton",
+                    testTag = "gameMenuDropDownButton",
                     onClick = { openGameMenu = !openGameMenu },
                     icon = Icons.Filled.Menu,
                     description = "Expand or collapse the game menu"
@@ -360,12 +340,12 @@ fun HudGameMenu() {
  * A button that is used in the HUD
  */
 @Composable
-fun HudButton(name: String, onClick: () -> Unit, icon: ImageVector, description: String) {
+fun HudButton(testTag: String, onClick: () -> Unit, icon: ImageVector, description: String) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .semantics { contentDescription = description }
-            .testTag(name)
+            .testTag(testTag)
             .padding(bottom = Padding.large),
         shape = CircleShape,
     ) {
@@ -413,7 +393,7 @@ fun MoneyHudText(name: String, text: String) {
  */
 @Composable
 fun ToggleIconButton(
-    name: String,
+    testTag: String,
     description: String,
     onClick: () -> Unit,
     toggle: Boolean,
@@ -424,7 +404,7 @@ fun ToggleIconButton(
         onClick = onClick,
         modifier = Modifier
             .semantics { contentDescription = description }
-            .testTag(name),
+            .testTag(testTag),
         shape = CircleShape,
     )
     {

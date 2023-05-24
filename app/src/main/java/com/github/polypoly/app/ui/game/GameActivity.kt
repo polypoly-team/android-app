@@ -54,7 +54,8 @@ class GameActivity : ComponentActivity() {
         super.onDestroy()
         // Stop the tax service if the game mode is landlord.
         if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
-            stopTaxService()
+            // TODO : Uncomment this when the bug of BackgroundLocationPermissionHandler is fixed
+            //stopTaxService()
         }
     }
 
@@ -81,7 +82,8 @@ class GameActivity : ComponentActivity() {
                      * if they are in a location property that is owned by another player.
                      */
                     if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
-                        BackgroundLocationPermissionHandler { startTaxService() }
+                        // TODO : this code causes an error in the landlord mode that has existed for several PRs
+                        //BackgroundLocationPermissionHandler { startTaxService() }
                     }
                     MapUI.MapView(mapViewModel, gameModel)
                     PropertyInteractUIComponent(gameModel, mapViewModel)
