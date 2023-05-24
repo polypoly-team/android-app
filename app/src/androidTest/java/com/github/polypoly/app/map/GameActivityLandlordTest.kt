@@ -59,7 +59,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         // give some location to the player
         GameRepository.player?.getOwnedLocations()?.clear()
         for(i in 0..2) {
-            val inGameLocation = GameRepository.game?.getInGameLocations()?.get(i)!!
+            val inGameLocation = GameRepository.game?.inGameLocations?.get(i)!!
             GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
         }
 
@@ -76,7 +76,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         // give some location to the player
         GameRepository.player?.getOwnedLocations()?.clear()
         for(i in 0..15) {
-            val inGameLocation = GameRepository.game?.getInGameLocations()?.get(i)!!
+            val inGameLocation = GameRepository.game?.inGameLocations?.get(i)!!
             GameRepository.player?.getOwnedLocations()?.add(inGameLocation)
         }
 

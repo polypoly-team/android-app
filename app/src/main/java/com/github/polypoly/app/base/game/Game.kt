@@ -127,10 +127,6 @@ class Game private constructor(
         return players.find { it.user.id == userId }
     }
 
-    fun getInGameLocations(): List<InGameLocation> {
-        return inGameLocations
-    }
-
     /**
      * Compute the winner of the bets, notify the players and update the balance of the players
      * and the location owner.
