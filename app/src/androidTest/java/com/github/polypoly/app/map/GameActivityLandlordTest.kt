@@ -42,6 +42,11 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         Intents.release()
     }
 
+    /*@Test
+    fun testLandlord() {
+
+    }*/
+
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()

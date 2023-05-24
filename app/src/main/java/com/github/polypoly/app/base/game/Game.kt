@@ -201,8 +201,6 @@ class Game private constructor(
                 inGameLocations = inGameLocations
             )
 
-            GameRepository.player = players.first { it.user.id == (currentUser?.id ?: "") }
-
             gameInProgress = game
             return game
         }

@@ -5,6 +5,7 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.network.getValues
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH
 import java.util.concurrent.CompletableFuture
@@ -104,6 +105,8 @@ data class GameLobby(
         }
         started = true
         val game = Game.launchFromPendingGame(this)
+        val players = game.players
+        GameRepository.player = players.first { it.user.id == (GlobalInstances.currentUser?.id ?: "") }
         GameRepository.game = game
         return game
     }
