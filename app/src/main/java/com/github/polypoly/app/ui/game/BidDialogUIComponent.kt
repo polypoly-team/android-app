@@ -24,22 +24,22 @@ import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationProperty
 
 /**
- * Bet popup dialog
- * @param onBuy lambda to execute when a valid bet is set
- * @param onClose lambda to execute when the bet is canceled
- * @param locationOnBet location to bid for
+ * Bid popup dialog
+ * @param onBuy lambda to execute when a valid bid is set
+ * @param onClose lambda to execute when the bid is canceled
+ * @param locationOnBid location to bid for
  */
 @Composable
-fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: LocationProperty) {
+fun BidDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBid: LocationProperty) {
     val inputPrice = remember { mutableStateOf("") }
     val showError = remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onClose,
         title = {
-            Text(text = "Enter your bet")
+            Text(text = "Enter your bid")
         },
-        modifier = Modifier.testTag("betDialog"),
+        modifier = Modifier.testTag("bid_dialog"),
         text = {
             BidDialogBody(
                 inputPrice = inputPrice,
@@ -48,7 +48,7 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: Locati
         },
         buttons = {
             BidDialogButtons(
-                locationBid = locationOnBet,
+                locationBid = locationOnBid,
                 onBuy = onBuy,
                 onClose = onClose,
                 inputPrice = inputPrice,
@@ -59,7 +59,7 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: Locati
 }
 
 /**
- * Body for the bet dialog.
+ * Body for the bid dialog.
  * @param inputPrice the price input by the user
  * @param showError whether to show the error message
  */
@@ -85,7 +85,7 @@ private fun BidDialogBody(
         )
         if (showError.value) {
             Text(
-                text = "You cannot bet less than the base price!",
+                text = "You cannot bid less than the base price!",
                 color = colors.error,
                 style = typography.caption,
                 modifier = Modifier
@@ -97,7 +97,7 @@ private fun BidDialogBody(
 }
 
 /**
- * The buttons that are shown in the bet dialog.
+ * The buttons that are shown in the bid dialog.
  * @param locationBid location to bid for
  * @param onBuy lambda to execute when a valid bid is set
  */
@@ -127,7 +127,7 @@ private fun BidDialogButtons(
         ) {
             Text(
                 text = "Confirm",
-                modifier = Modifier.testTag("confirmBetButton")
+                modifier = Modifier.testTag("confirm_bid_button")
             )
         }
 
@@ -136,7 +136,7 @@ private fun BidDialogButtons(
         ) {
             Text(
                 text = "Close",
-                modifier = Modifier.testTag("closeBetButton")
+                modifier = Modifier.testTag("close_bid_button")
             )
         }
     }

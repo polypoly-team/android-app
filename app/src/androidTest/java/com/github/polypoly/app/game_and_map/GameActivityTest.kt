@@ -57,31 +57,31 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
     }
 
     @Test
     fun mapActivity_Hides_Marker_Info_View_On_Close_Button_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeButton").performClick()
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("close_button").performClick()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertDoesNotExist()
     }
 
     @Test
-    fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
+    fun mapActivityDisplaysErrorOnInvalidBidAmount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
         composeTestRule.onNodeWithTag("bid_button").performClick()
 
-        composeTestRule.onNodeWithTag("betInput").performTextInput("10")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
+        composeTestRule.onNodeWithTag("bid_button").performTextInput("10")
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
 
         composeTestRule.onNodeWithTag("bid_error_message", true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("close_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     @Test // could be looped for extensive testing
@@ -89,11 +89,11 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
         // TODO: Replace by future MAX_BET or similar
         composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     // While it may be better for grades to have a test for each component,

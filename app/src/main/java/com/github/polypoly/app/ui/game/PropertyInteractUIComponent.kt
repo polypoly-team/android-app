@@ -19,7 +19,7 @@ import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.Padding
 
 /**
- * Manage the building info dialog and the bet dialog.
+ * Manage the building info dialog and the bid dialog.
  * @param gameViewModel GameViewModel to use for game business logic
  * @param mapViewModel GameViewModel to use for map business logic
  */
@@ -31,13 +31,13 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
     PropertyInteractDialog(locationSelected, gameViewModel, mapViewModel)
 
     if (playerState == PlayerState.BIDDING) {
-        BetDialog(
-            onBuy = { valueBet ->
-                onBid(valueBet, gameViewModel)
+        BidDialog(
+            onBuy = { valueBid ->
+                onBid(valueBid, gameViewModel)
                 leaveInteractionDialog(gameViewModel, mapViewModel)
             },
             onClose = { leaveInteractionDialog(gameViewModel, mapViewModel) },
-            locationOnBet = locationSelected
+            locationOnBid = locationSelected
         )
     }
 }
@@ -52,7 +52,7 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
 private fun PropertyInteractDialog(locationSelected: LocationProperty, gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
     AlertDialog(
         onDismissRequest = { leaveInteractionDialog(gameViewModel, mapViewModel) },
-        modifier = Modifier.testTag("buildingInfoDialog"),
+        modifier = Modifier.testTag("building_info_dialog"),
         title = {
             Row {
                 Text(text = locationSelected.name)
@@ -84,13 +84,13 @@ private fun PropertyInteractButtons(gameViewModel: GameViewModel, mapViewModel: 
     ) {
         Button(
             onClick = { gameViewModel.startBidding() },
-            modifier = Modifier.testTag("betButton")
+            modifier = Modifier.testTag("bid_button")
         ) {
-            Text(text = "Bet")
+            Text(text = "Bid")
         }
         Button(
             onClick = { leaveInteractionDialog(gameViewModel, mapViewModel) },
-            modifier = Modifier.testTag("closeButton")
+            modifier = Modifier.testTag("close_button")
         ) {
             Text(text = "Close")
         }
