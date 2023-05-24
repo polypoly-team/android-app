@@ -51,8 +51,6 @@ class GameViewModel(
         setLoading(true)
         coroutineScope.launch {
             gameLoop()
-        }
-        viewModelScope.launch {
             listenToTradeRequest()
         }
     }
