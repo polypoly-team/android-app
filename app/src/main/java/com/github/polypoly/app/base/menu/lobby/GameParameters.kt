@@ -23,6 +23,7 @@ data class GameParameters (
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationPropertyRepository.getZones(),
     val initialPlayerBalance: Int = 500,
+    val maxBuildingPerLandlord: Int = GameLobbyConstants.maxBuildingPerLandlord,
 ) {
 
     init {
@@ -32,5 +33,10 @@ data class GameParameters (
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
         if (roundDuration <= 0 || roundDuration >= GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
+    }
+
+    fun getRoundDurationValue(): GameLobbyConstants.RoundDurations {
+        return GameLobbyConstants.RoundDurations.values().find { it.toMinutes() == roundDuration }
+            ?: throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 }

@@ -177,7 +177,7 @@ class Game private constructor(
          */
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
             val players = gameLobby.usersRegistered.map {
-                Player(it, gameLobby.rules.initialPlayerBalance, listOf())
+                Player(it, gameLobby.rules.initialPlayerBalance, mutableListOf())
             }
             val game = Game(
                 code = gameLobby.code,
@@ -215,6 +215,7 @@ class Game private constructor(
                 player.copy(
                     ownedLocations = randomLocationsToGive
                         .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
+                        .toMutableList()
                 )
             }
         }

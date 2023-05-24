@@ -8,29 +8,26 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.ui.game.PlayerState
-import com.github.polypoly.app.ui.map.MapUI
-import com.github.polypoly.app.utils.global.GlobalInstances
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.osmdroid.views.overlay.Marker
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, false, true) {
 
     init {
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: 0) ?: Player()
+            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
     }
 
     @get:Rule
@@ -38,7 +35,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Before
     fun setUp() {
-        runBlocking { delay(5000) } // TODO: Find a better way to wait for the UI to update
+        forceChangePlayerState(PlayerState.ROLLING_DICE).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     @Before
@@ -59,13 +56,15 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
-        forceOpenMarkerDialog()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
         composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
     }
 
     @Test
     fun mapActivity_Hides_Marker_Info_View_On_Close_Button_Click() {
-        forceOpenMarkerDialog()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
         composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
         composeTestRule.onNodeWithTag("closeButton").performClick()
         composeTestRule.onNodeWithTag("buildingInfoDialog").assertDoesNotExist()
@@ -73,7 +72,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
-        forceOpenMarkerDialog()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
         composeTestRule.onNodeWithTag("betButton").performClick()
 
         composeTestRule.onNodeWithTag("betInput").performTextInput("10")
@@ -81,17 +82,19 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
         composeTestRule.onNodeWithTag("betErrorMessage", true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
-        // composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
 
     @Test // could be looped for extensive testing
     fun mapActivity_Displays_Success_On_Valid_Bet_Amount() {
-        forceOpenMarkerDialog()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
         composeTestRule.onNodeWithTag("betButton").performClick()
         // TODO: Replace by future MAX_BET or similar
         composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
         composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
-        // composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }
 
     // While it may be better for grades to have a test for each component,
@@ -100,7 +103,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_INIT() {
-        setCurrentPlayerState(PlayerState.INIT)
+        forceChangePlayerState(PlayerState.INIT).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -108,7 +111,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_ROLLING_DICE() {
-        setCurrentPlayerState(PlayerState.ROLLING_DICE)
+        forceChangePlayerState(PlayerState.ROLLING_DICE).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -117,10 +120,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_MOVING() {
-        GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
-        GameActivity.mapViewModel.goingToLocationProperty = getRandomLocationProperty()
-        setCurrentPlayerState(PlayerState.MOVING)
-        waitForUIToUpdate()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.MOVING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -130,9 +132,8 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
     @Test
     fun mapActivity_Displays_Only_Necessary_UI_Components_INTERACTING() {
-        setCurrentPlayerState(PlayerState.INTERACTING)
-        GameActivity.mapViewModel.setInteractableLocation(getRandomLocationProperty())
-        waitForUIToUpdate()
+        forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
@@ -146,32 +147,37 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertDoesNotExist()
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
-    
 
-    // --- Utility functions --- //
-
-    private fun waitForUIToUpdate() {
-        runBlocking { delay(500) }
+    private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
+        return execInMainThread {
+            GameActivity.mapViewModel.selectLocation(getRandomLocation())
+            GameActivity.mapViewModel.goingToLocationProperty = getRandomLocation()
+            waitForUIToUpdate()
+        }
     }
 
-    private fun getRandomLocationProperty(): LocationProperty {
-        return GameActivity.mapViewModel.markerToLocationProperty[getRandomMarker()]!!
+    private fun applyPlayerStateChange(gameViewModel: GameViewModel, playerState: PlayerState) {
+        gameViewModel.resetTurnState()
+        if (playerState == PlayerState.ROLLING_DICE) return
+
+        gameViewModel.diceRolled()
+        if (playerState == PlayerState.MOVING) return
+
+        gameViewModel.locationReached()
+        if (playerState == PlayerState.INTERACTING) return
+
+        if (playerState == PlayerState.BIDDING) {
+            gameViewModel.startBidding()
+            return
+        }
+
+        // TODO add other states support when needed
     }
 
-    private fun setCurrentPlayerState(state: PlayerState) {
-        GlobalInstances.playerState.value = state
-    }
-
-    private fun getRandomMarker(): Marker {
-        val mapView = MapUI.mapView
-        val n = mapView.overlays.filterIsInstance<Marker>().size
-        val random = (0 until n).random()
-        return mapView.overlays.filterIsInstance<Marker>()[random]
-    }
-
-    private fun forceOpenMarkerDialog() {
-        GameActivity.mapViewModel.selectedMarker = getRandomMarker()
-        GameActivity.interactingWithProperty.value = true
-        waitForUIToUpdate()
+    private fun forceChangePlayerState(playerState: PlayerState): CompletableFuture<Boolean> {
+        return execInMainThread {
+            applyPlayerStateChange(composeTestRule.activity.gameModel, playerState)
+            waitForUIToUpdate()
+        }
     }
 }
