@@ -316,6 +316,16 @@ class GameViewModel(
         return result
     }
 
+    /**
+     * Resets all game related code
+     * // TODO: update user's score?
+     */
+    fun finishGame() {
+        GameRepository.game = null
+        GameRepository.player = null
+        GameRepository.gameCode = null
+    }
+
     companion object {
         /**
          * Factory object for the GameLobbyWaitingViewModel
