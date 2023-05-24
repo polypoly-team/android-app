@@ -1,8 +1,8 @@
 package com.github.polypoly.app.base.menu.lobby
 
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 
 /**
  * A class that represent the parameters of a [Game]
@@ -15,23 +15,23 @@ import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
  * @property gameMap The map of the game whit the different zones available
  * @property initialPlayerBalance The initial balance of money of the players
  */
-data class GameParameters(
-    val gameMode: GameMode = GameMode.RICHEST_PLAYER,
+data class GameParameters (
+    val gameMode: GameMode = GameMode.LAST_STANDING,
     val minimumNumberOfPlayers: Int = 3,
     val maximumNumberOfPlayers: Int = 7,
     val roundDuration: Int = GameLobbyConstants.RoundDurations.getDefaultValue().toMinutes(),
     val maxRound: Int? = null,
     val gameMap: List<Zone> = LocationPropertyRepository.getZones(),
     val initialPlayerBalance: Int = 500,
-    val maxBuildingPerLandlord: Int = GameLobbyConstants.maxBuildingPerLandlord
+    val maxBuildingPerLandlord: Int = GameLobbyConstants.maxBuildingPerLandlord,
 ) {
 
     init {
-        if (minimumNumberOfPlayers <= 1)
+        if (minimumNumberOfPlayers < GameLobbyConstants.GAME_LOBBY_MIN_PLAYERS)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
-        if (roundDuration <= 0 || roundDuration > GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
+        if (roundDuration <= 0 || roundDuration >= GameLobbyConstants.RoundDurations.getMaxRoundDuration().toMinutes())
             throw java.lang.IllegalArgumentException("Invalid game duration$roundDuration")
     }
 

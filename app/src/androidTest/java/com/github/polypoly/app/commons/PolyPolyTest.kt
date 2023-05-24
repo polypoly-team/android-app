@@ -91,18 +91,23 @@ abstract class PolyPolyTest(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
             7200, 20, getZones(), 4000), "Joinable 4", "66666"
         )
+        val TEST_GAME_LOBBY_AVAILABLE_5 = GameLobby(
+            TEST_USER_5, GameParameters(GameMode.LANDLORD, 2, 4,
+                600, 20, getZones(), 4000), "Joinable 5", "lobbyabc12345",
+            private = true
+        )
 
-        val testPlayer1 = Player(TEST_USER_1, 100, listOf())
-        val testPlayer2 = Player(TEST_USER_2, 200, listOf())
-        val testPlayer3 = Player(TEST_USER_3, 100, listOf())
-        val testPlayer4 = Player(TEST_USER_4, 0, listOf(), 4)
-        val testPlayer5 = Player(TEST_USER_5, 0, listOf(), 5)
-        val testPlayer6 = Player(TEST_USER_0, 0, listOf(), 5)
+        val testPlayer1 = Player(TEST_USER_1, 100)
+        val testPlayer2 = Player(TEST_USER_2, 200)
+        val testPlayer3 = Player(TEST_USER_3, 100)
+        val testPlayer4 = Player(TEST_USER_4, 0, 4)
+        val testPlayer5 = Player(TEST_USER_5, 0, 5)
+        val testPlayer6 = Player(TEST_USER_0, 0, 5)
         val gameRulesDefault = GameParameters(GameMode.RICHEST_PLAYER, 3, 7,
             2, 10, LocationPropertyRepository.getZones(), 200)
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
-        TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+        TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4, TEST_GAME_LOBBY_AVAILABLE_5)
 
         private val mockDB = MockDB()
 
@@ -122,6 +127,7 @@ abstract class PolyPolyTest(
             TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
             TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
             TEST_GAME_LOBBY_AVAILABLE_3.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_4))
+            TEST_GAME_LOBBY_AVAILABLE_5.addUsers(listOf(TEST_USER_1, TEST_USER_2))
         }
     }
 

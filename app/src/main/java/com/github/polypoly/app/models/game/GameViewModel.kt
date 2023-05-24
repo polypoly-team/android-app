@@ -9,12 +9,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.TradeRequest
+import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
+import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.network.removeValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.*
@@ -40,6 +42,8 @@ class GameViewModel(
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
 
+    private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
+
     //used to determine if the player is close enough to a location to interact with it
     private val MAX_INTERACT_DISTANCE = 10.0 // meters
 
@@ -47,6 +51,89 @@ class GameViewModel(
         setLoading(true)
         coroutineScope.launch {
             gameLoop()
+            listenToTradeRequest()
+        }
+    }
+
+    fun getTradeRequestData(): LiveData<TradeRequest> {
+        return tradeRequestData
+    }
+
+    /**
+     * Close a trade request
+     */
+    fun closeTradeRequest() {
+        remoteDB.removeValue<TradeRequest>(tradeRequestData.value?.code ?: return).thenAccept {
+            tradeRequestData.value = null
+        }
+    }
+
+    /**
+     * Update a trade request
+     * @param trade The trade request to update
+     */
+    private fun updateTradeRequest(trade: TradeRequest) {
+        remoteDB.updateValue(trade).thenAccept {
+            tradeRequestData.value = null
+            tradeRequestData.value = trade
+        }
+    }
+
+    /**
+     * Accept or decline the trade request
+     * @param accept True if the player accept the trade request, false otherwise
+     */
+    fun acceptOrDeclineTradeRequest(accept: Boolean) {
+        val tradeRequest = tradeRequestData.value ?: return
+        val currentPlayer = playerData.value ?: return
+        if(tradeRequest.isReceiver(currentPlayer) ) {
+            tradeRequest.currentPlayerReceiverAcceptance = accept
+        }
+        if(tradeRequest.isApplicant(currentPlayer)) {
+            tradeRequest.currentPlayerApplicantAcceptance = accept
+        }
+        updateTradeRequest(tradeRequest)
+    }
+
+    /**
+     * Update the location received in the trade request
+     */
+    fun updateReceiverLocationTradeRequest(location: InGameLocation) {
+        val tradeRequest = tradeRequestData.value ?: return
+        tradeRequest.locationReceived = location
+        updateTradeRequest(tradeRequest)
+    }
+
+    /**
+     * Listen to the trade request that are sent to the current player
+     */
+    private suspend fun listenToTradeRequest() {
+        while (gameData.value?.isGameFinished() == false) {
+            remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
+                tradeRequests.forEach { tradeRequest ->
+                    if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name
+                        && tradeRequestData.value == null) {
+                        tradeRequestData.value = tradeRequest
+                    }
+                }
+            }
+            delay(2500)
+        }
+    }
+
+    fun createATradeRequest(playerReceiver: Player, locationGiven: InGameLocation) {
+        val playerDataValue = playerData.value ?: return
+        val tradeRequest = TradeRequest(
+            playerApplicant = playerDataValue,
+            playerReceiver = playerReceiver,
+            locationGiven = locationGiven,
+            locationReceived = null,
+            currentPlayerApplicantAcceptance = null,
+            currentPlayerReceiverAcceptance = null,
+            code = "${playerReceiver.user.name}${playerDataValue.user.name}",
+        )
+        remoteDB.setValue(tradeRequest).thenAccept {
+            tradeRequestData.value = tradeRequest
         }
     }
 
@@ -236,9 +323,6 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                GameRepository.player = Player(
-                    GlobalInstances.currentUser ?: User(),
-                    GameRepository.game?.rules?.initialPlayerBalance ?: -1)
 
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
