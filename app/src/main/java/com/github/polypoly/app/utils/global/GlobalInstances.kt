@@ -5,10 +5,10 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.IRemoteStorage
-import com.github.polypoly.app.network.RemoteDB
-import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.network.keyExists
+import com.github.polypoly.app.database.IRemoteStorage
+import com.github.polypoly.app.database.RemoteDB
+import com.github.polypoly.app.database.getValue
+import com.github.polypoly.app.database.keyExists
 import com.github.polypoly.app.ui.menu.lobby.UniqueGameLobbyCodeGenerator
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase

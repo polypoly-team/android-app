@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,11 +7,10 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
-import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
 import org.junit.After
 import org.junit.Before

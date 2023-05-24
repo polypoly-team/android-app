@@ -3,8 +3,8 @@ package com.github.polypoly.app.base.menu.lobby
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.network.getValues
+import com.github.polypoly.app.database.StorableObject
+import com.github.polypoly.app.database.getValues
 import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAME_LOBBIES_PATH

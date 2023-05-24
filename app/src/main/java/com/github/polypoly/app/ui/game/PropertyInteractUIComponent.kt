@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.Padding
 

@@ -1,4 +1,4 @@
-package com.github.polypoly.app.network
+package com.github.polypoly.app.database
 
 import com.github.polypoly.app.commons.PolyPolyTest
 import org.junit.Assert.assertThrows

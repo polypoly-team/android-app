@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
