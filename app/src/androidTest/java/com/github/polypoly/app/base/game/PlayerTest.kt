@@ -8,6 +8,8 @@ import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.commons.PolyPolyTest.Companion.TEST_USER_0
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +25,7 @@ class PlayerTest {
 
     @Before
     fun startGame() {
+        GlobalInstances.currentUser = PolyPolyTest.TEST_USER_1
         gameLobby.addUser(PolyPolyTest.TEST_USER_2)
         gameLobby.addUser(PolyPolyTest.TEST_USER_3)
         gameLobby.addUser(PolyPolyTest.TEST_USER_4)

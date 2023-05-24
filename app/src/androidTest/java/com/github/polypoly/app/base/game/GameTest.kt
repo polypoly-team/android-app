@@ -9,6 +9,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -32,12 +33,13 @@ class GameTest {
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
     @Before
-    fun startIntents() {
+    fun initLoby() {
         gameLobby.addUser(testUser2)
         gameLobby.addUser(testUser3)
         gameLobby.addUser(testUser4)
         gameLobby.addUser(testUser5)
         gameLobby.addUser(testUser6)
+        GlobalInstances.currentUser = testUser1
     }
 
 
