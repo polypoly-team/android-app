@@ -13,6 +13,7 @@ import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -22,9 +23,10 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false, true) {
+class GameActivityTest : PolyPolyTest(true, false, false) {
 
     init {
+        currentUser = TEST_USER_4
         GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
         GameRepository.player =
             GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()

@@ -113,16 +113,10 @@ data class Player (
      * The player bid to buy a location
      * @param location the location the player wants to buy
      * @param amount the amount of money the player wants to bid
-     * @return the [LocationBid] created
-     * @throws IllegalStateException if there is no game in progress
-     * @throws IllegalStateException if the player is not in the game currently in progress
-     * @throws IllegalArgumentException if the location is already owned by someone
-     * @throws IllegalArgumentException if the amount of money bet is negative or zero
-     * @throws IllegalStateException if the player has already lost the game
-     * @throws IllegalArgumentException if the player has not enough money to buy the location
+     * @return true iff the player can buy this location with this amount
      */
     fun canBuy(location: LocationProperty, amount: Int) : Boolean {
-        return amount <= balance && roundLost == null && amount >= location.basePrice
+        return amount > 0 || amount <= balance && roundLost == null && amount >= location.basePrice
     }
 
     /**
