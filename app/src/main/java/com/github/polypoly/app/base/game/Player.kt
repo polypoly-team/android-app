@@ -158,7 +158,7 @@ data class Player (
      */
     fun earnNewLocation(location: InGameLocation) {
         if(location.owner != null)
-            throw IllegalArgumentException("The location is already owned by someone")
+            throw IllegalArgumentException("The location is already owned by ${location.owner}")
         location.owner = this
         ownedLocations += location
     }

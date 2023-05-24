@@ -42,17 +42,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         Intents.release()
     }
 
-    /**
-     * Clear the location of the player if any to make sure the next test will not be impacted
-     * by the previous one
-     */
-    @After
-    fun clearLocationOfThePlayerIfAny() {
-        for (location in currentPlayer.getOwnedLocations()) {
-            currentPlayer.looseLocation(location)
-        }
-    }
-
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -63,10 +52,8 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCanSeeAPopUpWithBuildingsToChoose() {
-        for(i in 0..2) {
-            val inGameLocation = currentGame.inGameLocations[i]
-            currentPlayer.earnNewLocation(inGameLocation)
-        }
+        clearLocationOfThePlayerIfAny()
+        giveLocationsToPlayer(2)
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
@@ -78,10 +65,8 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCanSeeTheEntirePopUpEvenWithALotOfBuildings() {
-        for(i in 0..15) {
-            val inGameLocation = currentGame.inGameLocations[i]
-            currentPlayer.earnNewLocation(inGameLocation)
-        }
+        clearLocationOfThePlayerIfAny()
+        giveLocationsToPlayer(16)
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
@@ -93,9 +78,35 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCantSeeThePopUpIfYouDoNotHaveBuildings() {
+        clearLocationOfThePlayerIfAny()
+
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
         composeTestRule.onNodeWithTag("locations_list_dialog").assertDoesNotExist()
+    }
+
+    /**
+     * Clear the location of the player if any
+     */
+    private fun clearLocationOfThePlayerIfAny() {
+        for (location in currentPlayer.getOwnedLocations()) {
+            currentPlayer.looseLocation(location)
+        }
+    }
+
+    /**
+     * Give locations to the player, could give less if there is not enough locations
+     * @param numberOfLocations the number of locations to give
+     */
+    private fun giveLocationsToPlayer(numberOfLocations: Int) {
+        repeat(numberOfLocations) {
+            val unownedLocation = currentGame.inGameLocations.filter { it.owner == null }
+            if (unownedLocation.isEmpty()) {
+                return
+            }
+            val inGameLocation = unownedLocation[0]
+            currentPlayer.earnNewLocation(inGameLocation)
+        }
     }
 }

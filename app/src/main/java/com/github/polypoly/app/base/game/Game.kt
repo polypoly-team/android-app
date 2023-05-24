@@ -2,7 +2,6 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.PropertyLevel
 import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
@@ -21,6 +20,7 @@ import java.util.concurrent.CompletableFuture
  * @property currentRound the current round of the [Game]
  * @property dateBegin the date and time when the [Game] has started in Unix time
  * (seconds since 1970-01-01T00:00:00Z)
+ * @property inGameLocations the [InGameLocation]s of the [Game]
  */
 class Game private constructor(
     val code: String = "default-code",
@@ -28,16 +28,11 @@ class Game private constructor(
     var players: List<Player> = listOf(),
     val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
+    val inGameLocations: List<InGameLocation> = rules.gameMap
+        .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
     val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
-
-    val inGameLocations: List<InGameLocation> = allLocations.map { location ->
-        InGameLocation(
-            locationProperty = location,
-            owner = null,
-            level = PropertyLevel.LEVEL_0,
-        ) }
 
     var currentRound: Int = 1
 
@@ -189,46 +184,52 @@ class Game private constructor(
             val players = gameLobby.usersRegistered.map {
                 Player(it, gameLobby.rules.initialPlayerBalance)
             }
+            val inGameLocations = gameLobby.rules.gameMap.flatMap { zone ->
+                zone.locationProperties.map { InGameLocation(it) }
+            }
+            if(gameLobby.rules.gameMode == GameMode.LANDLORD)
+                assignRandomLocations(inGameLocations, gameLobby, players)
+
             val game = Game(
                 code = gameLobby.code,
                 admin = gameLobby.admin,
-                players =
-                if (gameLobby.rules.gameMode == GameMode.LANDLORD)
-                    landLordPlayers(
-                        gameLobby,
-                        players
-                    )
-                else players,
+                players = players,
                 rules = gameLobby.rules,
                 dateBegin = System.currentTimeMillis() / 1000,
+                inGameLocations = inGameLocations
             )
+
             gameInProgress = game
             return game
         }
 
-        private fun landLordPlayers(gameLobby: GameLobby, players: List<Player>): List<Player> {
+        /**
+         * Assign random locations to the players and update the list of [InGameLocation]s
+         * @param inGameLocations the list of [InGameLocation]s to update
+         * @param gameLobby the game lobby from which the game is launch
+         * @param players the list of players
+         */
+        private fun assignRandomLocations(inGameLocations: List<InGameLocation>,
+                                          gameLobby: GameLobby,
+                                          players: List<Player>) {
             fun generateRandomLocations(
-                gameMapLocations: List<LocationProperty>,
+                gameMapLocations: List<InGameLocation>,
                 n: Int
-            ): List<LocationProperty> =
+            ): List<InGameLocation> =
                 gameMapLocations.shuffled().take(n)
 
-            val allProperties = gameLobby.rules.gameMap.flatMap { zone -> zone.locationProperties }
-            val assignedProperties = mutableSetOf<LocationProperty>()
 
             players.forEach { player ->
+
+                // Get X random [InGameLocation]s
                 val randomLocationsToGive = generateRandomLocations(
-                    allProperties - assignedProperties,
+                    inGameLocations.filter { it.owner == null },
                     gameLobby.rules.maxBuildingPerLandlord
                 )
-                assignedProperties += randomLocationsToGive
-                val randomInGameLocation = randomLocationsToGive
-                    .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
-                    .toMutableList()
-                player.earnNewLocations(randomInGameLocation)
-            }
 
-            return players
+                // Assign the locations to the player and update the [InGameLocation]'s owner
+                player.earnNewLocations(randomLocationsToGive)
+            }
         }
 
         /**

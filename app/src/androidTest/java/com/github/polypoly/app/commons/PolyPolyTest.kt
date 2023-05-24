@@ -97,12 +97,12 @@ abstract class PolyPolyTest(
             private = true
         )
 
-        val testPlayer1 = Player(TEST_USER_1, 100, mutableListOf())
-        val testPlayer2 = Player(TEST_USER_2, 200, mutableListOf())
-        val testPlayer3 = Player(TEST_USER_3, 100, mutableListOf())
-        val testPlayer4 = Player(TEST_USER_4, 0, mutableListOf(), 4)
-        val testPlayer5 = Player(TEST_USER_5, 0, mutableListOf(), 5)
-        val testPlayer6 = Player(TEST_USER_0, 0, mutableListOf(), 5)
+        val testPlayer1 = Player(TEST_USER_1, 100)
+        val testPlayer2 = Player(TEST_USER_2, 200)
+        val testPlayer3 = Player(TEST_USER_3, 100)
+        val testPlayer4 = Player(TEST_USER_4, 0, 4)
+        val testPlayer5 = Player(TEST_USER_5, 0, 5)
+        val testPlayer6 = Player(TEST_USER_0, 0, 5)
         val gameRulesDefault = GameParameters(GameMode.RICHEST_PLAYER, 3, 7,
             2, 10, LocationPropertyRepository.getZones(), 200)
 

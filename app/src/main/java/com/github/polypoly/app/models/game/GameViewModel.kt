@@ -295,9 +295,6 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                GameRepository.player = Player(
-                    GlobalInstances.currentUser ?: User(),
-                    GameRepository.game?.rules?.initialPlayerBalance ?: -1)
 
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
