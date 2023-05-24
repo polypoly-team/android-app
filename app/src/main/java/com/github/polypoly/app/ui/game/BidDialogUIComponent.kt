@@ -49,7 +49,7 @@ fun BidDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBid: Locati
         buttons = {
             BidDialogButtons(
                 locationBid = locationOnBid,
-                onBuy = onBuy,
+                onBid = onBuy,
                 onClose = onClose,
                 inputPrice = inputPrice,
                 showError = showError
@@ -99,12 +99,15 @@ private fun BidDialogBody(
 /**
  * The buttons that are shown in the bid dialog.
  * @param locationBid location to bid for
- * @param onBuy lambda to execute when a valid bid is set
+ * @param onBid lambda to execute when a valid bid is set
+ * @param onClose lambda to execute when the bid is canceled
+ * @param inputPrice the price input by the user
+ * @param showError whether to show the error message
  */
 @Composable
 private fun BidDialogButtons(
     locationBid: LocationProperty,
-    onBuy: (Float) -> Unit,
+    onBid: (Float) -> Unit,
     onClose: () -> Unit,
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
@@ -119,7 +122,7 @@ private fun BidDialogButtons(
             onClick = {
                 val amount = inputPrice.value.toFloatOrNull()
                 if (amount != null && amount >= locationBid.basePrice) {
-                    onBuy(amount)
+                    onBid(amount)
                 } else {
                     showError.value = true
                 }
