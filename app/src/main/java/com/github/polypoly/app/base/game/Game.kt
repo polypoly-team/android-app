@@ -187,7 +187,7 @@ class Game private constructor(
          */
         fun launchFromPendingGame(gameLobby: GameLobby): Game {
             val players = gameLobby.usersRegistered.map {
-                Player(it, gameLobby.rules.initialPlayerBalance, mutableListOf())
+                Player(it, gameLobby.rules.initialPlayerBalance)
             }
             val game = Game(
                 code = gameLobby.code,
@@ -216,18 +216,19 @@ class Game private constructor(
             val allProperties = gameLobby.rules.gameMap.flatMap { zone -> zone.locationProperties }
             val assignedProperties = mutableSetOf<LocationProperty>()
 
-            return players.map { player ->
+            players.forEach { player ->
                 val randomLocationsToGive = generateRandomLocations(
                     allProperties - assignedProperties,
                     gameLobby.rules.maxBuildingPerLandlord
                 )
                 assignedProperties += randomLocationsToGive
-                player.copy(
-                    ownedLocations = randomLocationsToGive
-                        .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
-                        .toMutableList()
-                )
+                val randomInGameLocation = randomLocationsToGive
+                    .map { location -> InGameLocation(location, PropertyLevel.LEVEL_0, player) }
+                    .toMutableList()
+                player.earnNewLocations(randomInGameLocation)
             }
+
+            return players
         }
 
         /**

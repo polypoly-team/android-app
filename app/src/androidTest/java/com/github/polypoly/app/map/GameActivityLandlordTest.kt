@@ -53,7 +53,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
     @Test
     fun whenClickingOnTradeYouCanSeeAPopUpWithBuildingsToChoose() {
         // give some location to the player
-        GameRepository.player?.getOwnedLocations()?.clear()
+        currentPlayer.getOwnedLocations().clear()
         for(i in 0..2) {
             val inGameLocation = currentGame.inGameLocations[i]
             currentPlayer.getOwnedLocations().add(inGameLocation)

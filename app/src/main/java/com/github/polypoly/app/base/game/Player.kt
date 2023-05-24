@@ -17,9 +17,10 @@ import kotlin.random.Random
 data class Player (
     val user: User = User(),
     private var balance: Int = 0,
-    private var ownedLocations: MutableList<InGameLocation> = mutableListOf(),
     private var roundLost: Int? = null,
 ) : Comparable<Player> {
+
+    private var ownedLocations: MutableList<InGameLocation> = mutableListOf()
 
     /**
      * If the player has lost the game (i.e. if the player has no more money)
@@ -151,11 +152,24 @@ data class Player (
     }
 
     /**
-     * Get the list of the owned locations of the player
-     * @return the list of the owned locations of the player
+     * Earn a new location
+     * @param location the location the player has earned
+     * @throws IllegalArgumentException if the location is already owned by someone
      */
-    fun getOwnedLocations(): MutableList<InGameLocation> {
-        return ownedLocations
+    fun earnNewLocation(location: InGameLocation) {
+        if(location.owner != null)
+            throw IllegalArgumentException("The location is already owned by someone")
+        ownedLocations += location
+    }
+
+    /**
+     * Earn a new locations
+     * @param location the list of locations the player has earned
+     */
+    fun earnNewLocations(location: List<InGameLocation>) {
+        for (loc in location) {
+            earnNewLocation(loc)
+        }
     }
 
     /**
