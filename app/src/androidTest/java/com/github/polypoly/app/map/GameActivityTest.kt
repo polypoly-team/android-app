@@ -26,10 +26,9 @@ import java.util.concurrent.TimeUnit
 class GameActivityTest : PolyPolyTest(true, false, false) {
 
     init {
-        currentUser = TEST_USER_4
-        GameRepository.game = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
-        GameRepository.player =
-            GameRepository.game?.getPlayer(GameRepository.game?.admin?.id ?: "") ?: Player()
+        val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        GameRepository.game = newGame
+        GameRepository.player = newGame.getPlayer(newGame.admin.id)
     }
 
     @get:Rule
@@ -140,6 +139,14 @@ class GameActivityTest : PolyPolyTest(true, false, false) {
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
         composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
+    }
+
+    @Test
+    fun cantOpenTradeInOtherModeThanLandlord() {
+        composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
+        composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
+        composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {

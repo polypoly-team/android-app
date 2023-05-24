@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,16 +13,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,10 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.github.polypoly.app.base.game.PlayerState
-import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.service.TaxService
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
@@ -45,11 +37,6 @@ import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.PolypolyTheme
-import com.github.polypoly.app.utils.Constants
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import timber.log.Timber
 
 /**
  * Activity for displaying the map used in the game.
@@ -67,7 +54,8 @@ class GameActivity : ComponentActivity() {
         super.onDestroy()
         // Stop the tax service if the game mode is landlord.
         if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
-            stopTaxService()
+            // TODO : Uncomment this when the bug of BackgroundLocationPermissionHandler is fixed
+            //stopTaxService()
         }
     }
 
@@ -81,6 +69,7 @@ class GameActivity : ComponentActivity() {
         val game = gameModel.getGameData().observeAsState().value
         val gameTurn = gameModel.getRoundTurnData().observeAsState().value
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
+        val trade = gameModel.getTradeRequestData().observeAsState().value
 
         if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
@@ -93,12 +82,12 @@ class GameActivity : ComponentActivity() {
                      * if they are in a location property that is owned by another player.
                      */
                     if (GameRepository.game?.rules?.gameMode == GameMode.LANDLORD) {
-                        BackgroundLocationPermissionHandler { startTaxService() }
+                        // TODO : this code causes an error in the landlord mode that has existed for several PRs
+                        //BackgroundLocationPermissionHandler { startTaxService() }
                     }
                     MapUI.MapView(mapViewModel, gameModel)
                     PropertyInteractUIComponent(gameModel, mapViewModel)
                     DiceRollUI(gameModel, mapViewModel)
-                    NextTurnButton(gameEnded)
                     DistanceWalkedUIComponents(mapViewModel)
                     Hud(
                         player,
@@ -106,32 +95,56 @@ class GameActivity : ComponentActivity() {
                         mapViewModel,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: "EPFL"
+                        mapViewModel.interactableProperty.value?.name ?: "EPFL",
+                        gameModel
                     )
                     GameEndedLabel(gameEnded)
+
+                    // pop-ups for trades:
+                    DialogsForTrade(trade, player)
                 }
             }
         }
     }
 
+    /**
+     * This function is used to display the pop-ups for the trades
+     * @param trade the trade request
+     * @param player the current player
+     */
     @Composable
-    private fun NextTurnButton(gameEnded: Boolean) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Button(
-                modifier = Modifier
-                    .size(30.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-30).dp)
-                    .testTag("next_turn_button"),
-                onClick = {
-                    if (!gameEnded) {
-                        gameModel.nextTurn()
-                    }
-                },
-                shape = CircleShape
-            ) {
-                Icon(Icons.Filled.ArrowForward, contentDescription = "Next turn")
-            }
+    fun DialogsForTrade(trade: TradeRequest?, player: Player) {
+        if(trade == null) return
+
+        // Pop up when a player ask for a trade
+        if (trade.isReceiver(player) && trade.locationReceived == null) {
+            ProposeTradeDialog(trade, gameModel)
+        }
+
+        // Pop up when the player has to accept or refuse a trade
+        if(trade.locationReceived != null
+            && ((trade.isApplicant(player) && trade.currentPlayerReceiverAcceptance == null) ||
+                    (trade.isReceiver(player) && trade.currentPlayerApplicantAcceptance == null))) {
+            AcceptTradeDialog(trade, gameModel)
+        }
+
+        //Pop up when the player has to wait for the other player decision
+        if(trade.locationReceived != null
+            && ((trade.isReceiver(player) && trade.currentPlayerReceiverAcceptance != null
+                    && trade.currentPlayerApplicantAcceptance == null) ||
+                    (trade.isApplicant(player) && trade.currentPlayerApplicantAcceptance != null
+                            && trade.currentPlayerReceiverAcceptance == null))) {
+            WaitingForTheOtherPlayerDecisionDialog()
+        }
+
+        //Pop up when the trade is cancelled
+        if(trade.isAccepted() == false) {
+            TheTradeIsDoneDialog(false, gameModel, trade, player)
+        }
+
+        //Pop up when the trade is accepted
+        if(trade.isAccepted() == true) {
+            TheTradeIsDoneDialog(true, gameModel, trade, player)
         }
     }
 
@@ -154,10 +167,6 @@ class GameActivity : ComponentActivity() {
 
     companion object {
         val mapViewModel: MapViewModel = MapViewModel()
-
-        // flag to show the building info dialog
-        val interactingWithProperty = mutableStateOf(false)
-
     }
 
     @Composable

@@ -4,16 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
@@ -22,6 +19,7 @@ import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.JoinGameLobbyActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.BigButton
+import com.github.polypoly.app.ui.theme.UIElements.GameLogo
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 
 /**
@@ -68,7 +66,14 @@ class WelcomeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     // The first element is the logo of the game
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
                     GameLogo()
+                    }
                     Spacer(modifier = Modifier.weight(1f))
                     // Then the game buttons are in the center of the screen
                     GameButtons()
@@ -80,28 +85,6 @@ class WelcomeActivity : ComponentActivity() {
     }
 
     // ===================================================== WELCOME COMPONENTS
-    /**
-     * This composable is the main image of the game, the polypoly logo that'll be displayed
-     * in the welcome screen (i.e. Welcome Activity)
-     */
-    @Composable
-    fun GameLogo() {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.super_cool_logo),
-                contentDescription = "game_logo",
-                alignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        }
-    }
 
     /**
      * So far, the player has two main options, join an existing game or create a new one,

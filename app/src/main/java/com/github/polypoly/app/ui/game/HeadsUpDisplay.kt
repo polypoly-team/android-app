@@ -3,14 +3,7 @@ package com.github.polypoly.app.ui.game
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -41,12 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
+import com.github.polypoly.app.base.menu.lobby.GameMode
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -58,17 +54,31 @@ import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
  * @param location current location of the player
  */
 @Composable
-fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewModel, otherPlayersData: List<Player>, round: Int, location: String) {
+fun Hud(
+    playerData: Player,
+    gameViewModel: GameViewModel,
+    mapViewModel: MapViewModel,
+    otherPlayersData: List<Player>,
+    round: Int,
+    location: String,
+    gameModel: GameViewModel
+) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val playerPosition =
+        mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
     Column(modifier = Modifier.testTag("hud")) {
         SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
         HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round)
+        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerState == PlayerState.MOVING)
-            HudLocation(playerPosition, DpOffset(0.dp, 80.dp), "going_to_location_text")
+            HudLocation(
+                playerPosition,
+                DpOffset(0.dp, 80.dp),
+                "going_to_location_text",
+                "Going to: "
+            )
         HudGameMenu()
     }
 }
@@ -77,7 +87,10 @@ fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewM
  * The HUD for the current nearby location (a text at the top of the screen)
  */
 @Composable
-fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String) {
+fun HudLocation(
+    location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String,
+    headerText: String = "Current Location: "
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,11 +98,10 @@ fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), test
     ) {
         if (location.isNotEmpty())
             Text(
-                text = location,
+                text = headerText,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .testTag(testTag)
-                    .offset(offset.x, offset.y)
+                    .offset(offset.x, offset.y - 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
@@ -97,8 +109,23 @@ fun HudLocation(location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), test
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h6
             )
+        Text(
+            text = location,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .testTag(testTag)
+                .offset(offset.x, offset.y)
+                .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                .border(
+                    1.dp,
+                    MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    shape = Shapes.medium
+                )
+                .padding(Padding.medium),
+            style = MaterialTheme.typography.h4
+        )
     }
 }
 
@@ -117,7 +144,7 @@ fun HudPlayer(playerData: Player) {
         ) {
             MoneyHudText("playerBalance", "${playerData.getBalance()} $")
             HudButton(
-                name = "playerInfoButton",
+                testTag = "player_info_button",
                 onClick = { openPlayerInfo = true },
                 icon = Icons.Filled.Person,
                 description = "See player information"
@@ -149,7 +176,7 @@ fun HudPlayer(playerData: Player) {
  * players
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
+fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -162,7 +189,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                 // A drop down button that expands and collapses the stats for other players and
                 // the game
                 ToggleIconButton(
-                    "otherPlayersAndGameDropDownButton",
+                    "other_players_and_game_hud",
                     "Expand or collapse the stats for other players and the game",
                     { isExpanded = !isExpanded },
                     isExpanded,
@@ -184,7 +211,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                         Column(Modifier.padding(Padding.medium)) {
                             HudGame(round)
                             otherPlayersData.forEach {
-                                HudOtherPlayer(it)
+                                HudOtherPlayer(it, gameModel)
                             }
                         }
                     }
@@ -204,7 +231,7 @@ fun HudGame(round: Int) {
 
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
-            name = "gameInfoButton",
+            testTag = "game_info_button",
             onClick = { openGameInfo = true },
             icon = Icons.Filled.Info,
             description = "See game information"
@@ -235,14 +262,17 @@ fun HudGame(round: Int) {
 /**
  * The HUD for the stats of other players, it displays basic information such as their balance,
  * and a button shows complete information on click
+ * @param playerData The data of the player to display
+ * @param gameModel The game view model
  */
 @Composable
-fun HudOtherPlayer(playerData: Player) {
-    var openOtherPlayerInfo by remember { mutableStateOf(false) }
+fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
+    val openOtherPlayerInfo = remember { mutableStateOf(false) }
+
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
-            name = "otherPlayerInfoButton",
-            onClick = { openOtherPlayerInfo = true },
+            testTag = "other_player_hud",
+            onClick = { openOtherPlayerInfo.value = true },
             icon = Icons.Filled.Person,
             description = "See other player information"
         )
@@ -251,20 +281,20 @@ fun HudOtherPlayer(playerData: Player) {
         }
     }
 
-    if (openOtherPlayerInfo) {
-        Dialog(
-            onDismissRequest = { openOtherPlayerInfo = false },
-        ) {
-            Surface(
-                color = MaterialTheme.colors.background,
-                shape = Shapes.medium,
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .fillMaxWidth()
-            ) {
-                // TODO: Add information about other players
-                Text(text = "Other player info")
-            }
+    val openLocationsDialog =  remember{ mutableStateOf(false) }
+    if (openLocationsDialog.value) {
+        GameRepository.player?.let { it ->
+            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
+                openLocationsDialog.value = false
+                gameModel.createATradeRequest(playerData, location)
+            } }
+    }
+
+    // LANDLORD ONLY: Asking for a trade
+    if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
+        val player = GameRepository.player
+        if(player != null) {
+            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
         }
     }
 }
@@ -298,7 +328,7 @@ fun HudGameMenu() {
 
                 // The drop down button that expands and collapses the game menu
                 HudButton(
-                    name = "gameMenuDropDownButton",
+                    testTag = "gameMenuDropDownButton",
                     onClick = { openGameMenu = !openGameMenu },
                     icon = Icons.Filled.Menu,
                     description = "Expand or collapse the game menu"
@@ -312,12 +342,12 @@ fun HudGameMenu() {
  * A button that is used in the HUD
  */
 @Composable
-fun HudButton(name: String, onClick: () -> Unit, icon: ImageVector, description: String) {
+fun HudButton(testTag: String, onClick: () -> Unit, icon: ImageVector, description: String) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .semantics { contentDescription = description }
-            .testTag(name)
+            .testTag(testTag)
             .padding(bottom = Padding.large),
         shape = CircleShape,
     ) {
@@ -365,7 +395,7 @@ fun MoneyHudText(name: String, text: String) {
  */
 @Composable
 fun ToggleIconButton(
-    name: String,
+    testTag: String,
     description: String,
     onClick: () -> Unit,
     toggle: Boolean,
@@ -376,7 +406,7 @@ fun ToggleIconButton(
         onClick = onClick,
         modifier = Modifier
             .semantics { contentDescription = description }
-            .testTag(name),
+            .testTag(testTag),
         shape = CircleShape,
     )
     {

@@ -126,9 +126,10 @@ fun initLocationOverlay(mapView: MapView, mapViewModel: MapViewModel, gameViewMo
     var lastLocation = Location("")
 
     val onClosestLocationFound = { closestLocation: LocationProperty? ->
-        if (closestLocation != null) {
+        if (closestLocation != null)
             mapViewModel.setInteractableLocation(closestLocation)
-        }
+        else
+            mapViewModel.setInteractableLocation(null)
     }
 
     val locationOverlay = object : MyLocationNewOverlay(locationProvider, mapView) {

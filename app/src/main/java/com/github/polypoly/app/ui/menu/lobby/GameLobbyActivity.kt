@@ -569,7 +569,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param mContext the context of the activity
      */
     private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
-        return  { if (isAdmin) launchGameActivity(mContext) }
+        return  { if (true) launchGameActivity(mContext) }
     }
 
     /**
@@ -650,10 +650,10 @@ class GameLobbyActivity : ComponentActivity() {
         val completedLobby = gameLobbyWaitingModel.getGameLobby().value
         if (completedLobby != null) {
             //TODO adapt start() in GameLobby as adviser in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198335312
-            val newGameLobby = completedLobby.copy(started = true)
-            remoteDB.updateValue(newGameLobby)
+            completedLobby.start()
+            remoteDB.updateValue(completedLobby)
 
-            navigateToGame(packageContext, newGameLobby)
+            navigateToGame(packageContext, completedLobby)
         }
     }
 
@@ -683,7 +683,6 @@ class GameLobbyActivity : ComponentActivity() {
      * Navigate to the game activity and finish this activity.
      */
     private fun navigateToGame(packageContext: Context, gameLobby: GameLobby){
-        GameRepository.game = Game.launchFromPendingGame(gameLobby)
         val gameIntent = Intent(packageContext, GameActivity::class.java)
         startActivity(gameIntent)
         leaveLobby(gameLobby)

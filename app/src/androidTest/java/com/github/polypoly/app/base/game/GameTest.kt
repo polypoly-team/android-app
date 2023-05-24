@@ -9,6 +9,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
+import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -32,12 +33,13 @@ class GameTest {
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
     @Before
-    fun startIntents() {
+    fun initLoby() {
         gameLobby.addUser(testUser2)
         gameLobby.addUser(testUser3)
         gameLobby.addUser(testUser4)
         gameLobby.addUser(testUser5)
         gameLobby.addUser(testUser6)
+        GlobalInstances.currentUser = testUser1
     }
 
 
@@ -96,7 +98,7 @@ class GameTest {
     fun whenGameStartEveryPlayerHasTheCorrectLocation() {
         gameLobby.start()
         for (player in Game.gameInProgress?.players!!) {
-            assertEquals(0, player.ownedLocations.size)
+            assertEquals(0, player.getOwnedLocations().size)
         }
     }
 
@@ -115,7 +117,7 @@ class GameTest {
             gameLobby.addUser(testUser6)
             gameLobby.start()
             for (player in Game.gameInProgress?.players!!) {
-                assertEquals(i, player.ownedLocations.size)
+                assertEquals(i, player.getOwnedLocations().size)
             }
         }
     }
@@ -137,7 +139,7 @@ class GameTest {
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
             for (player in Game.gameInProgress?.players!!)
-                for (location in player.ownedLocations) {
+                for (location in player.getOwnedLocations()) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")
                     ownedLocationsSet.add(location)

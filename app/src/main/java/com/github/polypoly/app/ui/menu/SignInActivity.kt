@@ -4,18 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.github.polypoly.app.R
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository.getZones
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
@@ -26,14 +23,13 @@ import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
+import com.github.polypoly.app.ui.theme.UIElements.GameLogo
 import com.github.polypoly.app.ui.theme.UIElements.MainActionButton
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initCurrentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.initRemoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -126,29 +122,18 @@ class SignInActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     // The first element is the logo of the game
-                    GameLogo()
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
+                        GameLogo()
+                    }
                     Spacer(modifier = Modifier.weight(1f))
                     SignInOrGuestButtons()
                 }
             }
-        }
-    }
-
-    /**
-     * The logo of polypoly
-     */
-    @Composable
-    fun GameLogo() {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.tmp_happysmile),
-                contentDescription = "game_logo",
-            )
         }
     }
 
@@ -238,31 +223,31 @@ class SignInActivity : ComponentActivity() {
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
-            60, 20, emptyList(), 100), "Full gameLobby", "1234"
+                60, 20, emptyList(), 100), "Full gameLobby", "1234"
         )
         val TEST_GAME_LOBBY_FAST = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-                5, 20, getZones(), 100), "Fast gameLobby", "fast"
+                5, 20, getZones(), 100), "Fast!", "fast"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            900, 20, emptyList(), 120), "Private gameLobby", "abc123", true
+                900, 20, emptyList(), 120), "Private gameLobby", "abc123", true
         )
         val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
             TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
-            600, null, emptyList(), 1500), "Joinable 1", "abcd"
+                600, null, emptyList(), 1500), "cool lobby", "abcd"
         )
         val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
             TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 5,
-            30, 20, emptyList(), 5000), "Joinable 2", "123abc"
+                30, 20, emptyList(), 5000), "harry's game", "123abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
             TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
-            10080, 20, emptyList(), 3000), "Joinable 3", "1234abc"
+                10080, 20, emptyList(), 3000), "7days rounds!", "1234abc"
         )
         val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
             TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-            300, 20, emptyList(), 4000), "Joinable 4", "abc1234"
+                300, 20, emptyList(), 4000), "needpeople", "abc1234"
         )
 
         val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_FAST, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
