@@ -7,7 +7,9 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
 import java.util.concurrent.CompletableFuture
 
@@ -198,6 +200,8 @@ class Game private constructor(
                 dateBegin = System.currentTimeMillis() / 1000,
                 inGameLocations = inGameLocations
             )
+
+            GameRepository.player = players.first { it.user.id == (currentUser?.id ?: "") }
 
             gameInProgress = game
             return game

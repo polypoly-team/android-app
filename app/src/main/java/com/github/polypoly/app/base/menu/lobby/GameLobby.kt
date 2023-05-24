@@ -2,6 +2,7 @@ package com.github.polypoly.app.base.menu.lobby
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
 import com.github.polypoly.app.network.getValues
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
@@ -24,7 +25,7 @@ data class GameLobby(
     val name: String = "defaultName",
     val code: String = "defaultCode",
     val private: Boolean = false,
-    val started: Boolean = false
+    var started: Boolean = false
 ): StorableObject<GameLobbyDB>(GameLobbyDB::class, DB_GAME_LOBBIES_PATH, code) {
 
     private val currentUsersRegistered: ArrayList<User> = ArrayList()
@@ -101,8 +102,10 @@ data class GameLobby(
         if (!canStart()) {
             throw java.lang.IllegalStateException("Try to start a game not ready to start yet")
         }
-
-        return Game.launchFromPendingGame(this)
+        started = true
+        val game = Game.launchFromPendingGame(this)
+        GameRepository.game = game
+        return game
     }
 
     // ====================================================================== STORABLE

@@ -27,7 +27,7 @@ data class GameParameters (
 ) {
 
     init {
-        if (minimumNumberOfPlayers <= 1)
+        if (minimumNumberOfPlayers < GameLobbyConstants.GAME_LOBBY_MIN_PLAYERS)
             throw java.lang.IllegalArgumentException("At least 2 players are needed for a game (provided $minimumNumberOfPlayers)")
         if (maximumNumberOfPlayers < minimumNumberOfPlayers)
             throw java.lang.IllegalArgumentException("Maximum number of players $maximumNumberOfPlayers must be greater than the minimum number $minimumNumberOfPlayers")
