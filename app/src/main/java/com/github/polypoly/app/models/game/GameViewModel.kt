@@ -67,8 +67,10 @@ class GameViewModel(
      * Close a trade request
      * @param trade The trade request to close
      */
-    fun closeTradeRequest(trade: TradeRequest) {
-        remoteDB.removeValue<TradeRequest>(trade.code)
+    fun closeTradeRequest() {
+        remoteDB.removeValue<TradeRequest>(tradeRequestData.value?.code ?: return).thenAccept {
+            tradeRequestData.value = null
+        }
     }
 
     /**
@@ -76,14 +78,17 @@ class GameViewModel(
      * @param trade The trade request to update
      */
     fun updateTradeRequest(trade: TradeRequest) {
-        remoteDB.updateValue(trade)
+        remoteDB.updateValue(trade).thenAccept {
+            tradeRequestData.value = null
+            tradeRequestData.value = trade
+        }
     }
 
     /**
      * Listen to the trade request that are sent to the current player
      */
     private suspend fun listenToTradeRequest() {
-        while (gameData.value?.isGameFinished() == true) {
+        while (gameData.value?.isGameFinished() == false) {
             remoteDB.getAllValues<TradeRequest>().thenAccept { tradeRequests ->
                 tradeRequests.forEach { tradeRequest ->
                     if (tradeRequest.playerReceiver.user.name == playerData.value?.user?.name) {

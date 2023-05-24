@@ -65,7 +65,7 @@ class Game private constructor(
 
             GameMode.LANDLORD -> {
                 if (rules.maxRound == null)
-                    throw IllegalStateException("maxRound can't be null in RICHEST_PLAYER game mode")
+                    throw IllegalStateException("maxRound can't be null in LANDLORD game mode")
                 currentRound > rules.maxRound
             }
         }
