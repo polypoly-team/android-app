@@ -159,6 +159,7 @@ data class Player (
     fun earnNewLocation(location: InGameLocation) {
         if(location.owner != null)
             throw IllegalArgumentException("The location is already owned by someone")
+        location.owner = this
         ownedLocations += location
     }
 
@@ -170,6 +171,24 @@ data class Player (
         for (loc in location) {
             earnNewLocation(loc)
         }
+    }
+
+    /**
+     * Loose a location
+     * @param location the location the player has lost
+     */
+    fun looseLocation(location: InGameLocation) {
+        if (!ownedLocations.contains(location)) return
+        location.owner = null
+        ownedLocations -= location
+    }
+
+    /**
+     * get the list of the owned locations of the player
+     * @return the list of the owned locations of the player (copy of the mutable list)
+     */
+    fun getOwnedLocations(): List<InGameLocation> {
+        return ownedLocations.toList()
     }
 
     /**

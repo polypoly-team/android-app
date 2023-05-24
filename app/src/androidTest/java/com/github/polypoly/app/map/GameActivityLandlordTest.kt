@@ -42,6 +42,17 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         Intents.release()
     }
 
+    /**
+     * Clear the location of the player if any to make sure the next test will not be impacted
+     * by the previous one
+     */
+    @After
+    fun clearLocationOfThePlayerIfAny() {
+        for (location in currentPlayer.getOwnedLocations()) {
+            currentPlayer.looseLocation(location)
+        }
+    }
+
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -52,11 +63,9 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCanSeeAPopUpWithBuildingsToChoose() {
-        // give some location to the player
-        currentPlayer.getOwnedLocations().clear()
         for(i in 0..2) {
             val inGameLocation = currentGame.inGameLocations[i]
-            currentPlayer.getOwnedLocations().add(inGameLocation)
+            currentPlayer.earnNewLocation(inGameLocation)
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -69,11 +78,9 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCanSeeTheEntirePopUpEvenWithALotOfBuildings() {
-        // give some location to the player
-        currentPlayer.getOwnedLocations().clear()
         for(i in 0..15) {
             val inGameLocation = currentGame.inGameLocations[i]
-            currentPlayer.getOwnedLocations().add(inGameLocation)
+            currentPlayer.earnNewLocation(inGameLocation)
         }
 
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -86,9 +93,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
 
     @Test
     fun whenClickingOnTradeYouCantSeeThePopUpIfYouDoNotHaveBuildings() {
-        // give no location to the player
-        currentPlayer.getOwnedLocations().clear()
-
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("trade_button").performClick()
