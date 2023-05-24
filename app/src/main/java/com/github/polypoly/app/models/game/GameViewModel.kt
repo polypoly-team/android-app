@@ -356,6 +356,7 @@ class GameViewModel(
                 remoteDB.setValue(gameUpdated).thenApply {
                     gameData.value = gameUpdated
                     currentTurnBid = bid
+                    future.complete(true)
                 }
             }
         }
@@ -370,7 +371,6 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
 
