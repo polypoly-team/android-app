@@ -171,8 +171,6 @@ class GameViewModel(
 
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
-            playerStateData.postValue(PlayerState.TURN_FINISHED)
-
             nextTurn()
 
             currentGame = gameData.value
@@ -267,6 +265,10 @@ class GameViewModel(
         playerStateFSMTransition(PlayerState.BIDDING, PlayerState.INTERACTING)
     }
 
+    fun endBidding() {
+        playerStateFSMTransition(PlayerState.BIDDING, PlayerState.TURN_FINISHED)
+    }
+
     /**
      * Resets player state back to the beginning of a turn (ie ROLLING_DICE)
      */
@@ -356,6 +358,7 @@ class GameViewModel(
                 remoteDB.setValue(gameUpdated).thenApply {
                     gameData.value = gameUpdated
                     currentTurnBid = bid
+                    endBidding()
                     future.complete(true)
                 }
             }

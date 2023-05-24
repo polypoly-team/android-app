@@ -43,6 +43,7 @@ import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
 import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.data.GameRepository.Companion.player
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -72,13 +73,16 @@ fun Hud(
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
         HudLocation(location, testTag = "interactable_location_text")
-        if (playerState == PlayerState.MOVING)
+        if (playerState == PlayerState.MOVING) {
             HudLocation(
                 playerPosition,
                 DpOffset(0.dp, 80.dp),
                 "going_to_location_text",
                 "Going to: "
             )
+        } else if (playerState == PlayerState.TURN_FINISHED) {
+            TurnFinishedNotification()
+        }
         HudGameMenu()
     }
 }
@@ -417,3 +421,17 @@ fun ToggleIconButton(
     }
 }
 
+@Composable
+fun TurnFinishedNotification() {
+    Box(modifier = Modifier.offset(x = (-50).dp, y = -(7).dp)) {
+        Text(
+            text = "You finished your turn, waiting for the next one...",
+            modifier = Modifier
+                .testTag("turnFinishedNotification")
+                .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                .width(100.dp)
+                .padding(Padding.medium),
+            style = MaterialTheme.typography.h6,
+        )
+    }
+}
