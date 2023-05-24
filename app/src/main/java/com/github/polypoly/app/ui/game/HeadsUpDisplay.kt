@@ -22,8 +22,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -423,15 +425,15 @@ fun ToggleIconButton(
 
 @Composable
 fun TurnFinishedNotification() {
-    Box(modifier = Modifier.offset(x = (-50).dp, y = -(7).dp)) {
+    Box (modifier = Modifier.fillMaxWidth().fillMaxHeight()){
         Text(
             text = "You finished your turn, waiting for the next one...",
             modifier = Modifier
                 .testTag("turnFinishedNotification")
                 .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                .width(100.dp)
-                .padding(Padding.medium),
-            style = MaterialTheme.typography.h6,
+                .padding(Padding.medium)
+                .align(BottomCenter),
+            style = MaterialTheme.typography.body1,
         )
     }
 }
