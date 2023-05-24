@@ -46,6 +46,7 @@ import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
+import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -62,6 +63,7 @@ fun Hud(playerData: Player, gameViewModel: GameViewModel, mapViewModel: MapViewM
     val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
     Column(modifier = Modifier.testTag("hud")) {
+        SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
         HudPlayer(playerData)
         HudOtherPlayersAndGame(otherPlayersData, round)
         HudLocation(location, testTag = "interactable_location_text")

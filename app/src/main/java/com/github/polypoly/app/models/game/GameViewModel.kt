@@ -3,20 +3,30 @@ package com.github.polypoly.app.models.game
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -39,6 +49,11 @@ class GameViewModel(
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
+    private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
+    val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
+
+    private var currentTurnBid: LocationBid? = null
 
     //used to determine if the player is close enough to a location to interact with it
     private val MAX_INTERACT_DISTANCE = 10.0 // meters
@@ -103,6 +118,9 @@ class GameViewModel(
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
                 }
+
+                onNextTurnEnd()
+
                 setLoading(false)
                 completionFuture.complete(syncSucceeded)
             }
@@ -111,12 +129,25 @@ class GameViewModel(
         return completionFuture
     }
 
+    private fun onNextTurnEnd() {
+        val game = gameData.value ?: return
+
+        val previousBid = currentTurnBid
+        if (previousBid != null &&
+            game.getInGameLocation(previousBid.location)?.isTheOwner(playerData.value) == true) {
+            _successfulBidData.value = previousBid
+        }
+        currentTurnBid = null
+    }
+
     private fun synchronizeGame(): CompletableFuture<Boolean> {
         val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
         return remoteDB.getValue<Game>(gameUpdated.key).thenCompose { gameFound ->
             if (gameFound.currentRound < gameUpdated.currentRound) {
-                gameData.value = gameUpdated
-                remoteDB.setValue(gameUpdated)
+                remoteDB.setValue(gameUpdated).thenCompose{
+                    gameData.value = gameUpdated
+                    CompletableFuture.completedFuture(true)
+                }
             } else { // up to date version already on live db
                 gameData.value = gameFound
                 CompletableFuture.completedFuture(true)
@@ -227,6 +258,32 @@ class GameViewModel(
         }
 
         return result
+    }
+
+    fun bidForLocation(location: LocationProperty, bidAmount: Int): CompletableFuture<Boolean> {
+        val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
+        val player = playerData.value ?: return CompletableFuture.completedFuture(false)
+
+        if (currentTurnBid != null || !player.canBuy(location, bidAmount))
+            return CompletableFuture.completedFuture(false)
+
+        val future = CompletableFuture<Boolean>()
+
+        coroutineScope.launch {
+            if (gameUpdated.getInGameLocation(location)?.owner != null || bidAmount > player.getBalance()) {
+                future.complete(false)
+            } else {
+                val bid = LocationBid(location, player, bidAmount)
+                gameUpdated.addBid(bid)
+
+                remoteDB.setValue(gameUpdated).thenApply {
+                    gameData.value = gameUpdated
+                    currentTurnBid = bid
+                }
+            }
+        }
+
+        return future
     }
 
     companion object {

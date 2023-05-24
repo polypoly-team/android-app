@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.user.User
 import kotlin.random.Random
 
@@ -120,21 +121,8 @@ data class Player (
      * @throws IllegalStateException if the player has already lost the game
      * @throws IllegalArgumentException if the player has not enough money to buy the location
      */
-    fun bidToBuy(location: InGameLocation, amount: Int) : LocationBid {
-        if(Game.gameInProgress == null)
-            throw IllegalStateException("There are no game in progress")
-        if(Game.gameInProgress?.playInThisGame(user) == false)
-            throw IllegalStateException("The player is not in the game currently in progress")
-        if(location.owner != null)
-            throw IllegalArgumentException("The location is already owned by someone")
-        if(amount <= 0)
-            throw IllegalArgumentException("The amount of money bet cannot be negative or zero")
-        if(roundLost != null)
-            throw IllegalStateException("The player has already lost the game")
-        if(location.currentPrice() > balance)
-            throw IllegalArgumentException("The player has not bet enough money to buy the location")
-        return LocationBid(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
-        // TODO : add in the DB the bet
+    fun canBuy(location: LocationProperty, amount: Int) : Boolean {
+        return amount <= balance && roundLost == null && amount >= location.basePrice
     }
 
     /**

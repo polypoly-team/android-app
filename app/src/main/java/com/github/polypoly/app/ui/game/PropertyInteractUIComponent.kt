@@ -17,6 +17,7 @@ import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.Padding
+import kotlin.math.floor
 
 /**
  * Manage the building info dialog and the bet dialog.
@@ -33,8 +34,9 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
     if (playerState == PlayerState.BIDDING) {
         BetDialog(
             onBuy = { valueBet ->
-                onBuy(valueBet, gameViewModel)
-                leaveInteractionDialog(gameViewModel, mapViewModel)
+                gameViewModel.bidForLocation(locationSelected, floor(valueBet).toInt()).thenApply {
+                    leaveInteractionDialog(gameViewModel, mapViewModel)
+                }
             },
             onClose = { leaveInteractionDialog(gameViewModel, mapViewModel) },
             locationOnBet = locationSelected
@@ -102,8 +104,4 @@ private fun leaveInteractionDialog(gameViewModel: GameViewModel, mapViewModel: M
         gameViewModel.cancelBidding()
     }
     mapViewModel.selectLocation(null)
-}
-
-private fun onBuy(valueBet: Float, gameViewModel: GameViewModel) {
-    // TODO: call gameViewModel's buy logic
 }
