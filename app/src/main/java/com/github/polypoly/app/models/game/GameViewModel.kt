@@ -44,10 +44,10 @@ class GameViewModel(
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
 
+    private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
+
     //used to determine if the player is close enough to a location to interact with it
     private val MAX_INTERACT_DISTANCE = 10.0 // meters
-
-    private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
 
     init {
         setLoading(true)

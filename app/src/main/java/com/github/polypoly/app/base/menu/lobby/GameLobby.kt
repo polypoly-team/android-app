@@ -114,8 +114,8 @@ data class GameLobby(
             name,
             private,
             rules,
-            currentUsersRegistered.map { user -> user.id.toString() },
-            admin.id.toString(),
+            currentUsersRegistered.map { user -> user.id },
+            admin.id,
             started
         )
     }
@@ -123,14 +123,14 @@ data class GameLobby(
     override fun toLocalObject(dbObject: GameLobbyDB): CompletableFuture<StorableObject<GameLobbyDB>> {
         return remoteDB.getValues<User>(dbObject.userIds).thenApply { users ->
             val lobby = GameLobby(
-                users.first { user -> user.id.toString() == dbObject.adminId },
+                users.first { user -> user.id == dbObject.adminId },
                 dbObject.parameters,
                 dbObject.name,
                 dbObject.code,
                 dbObject.private,
                 dbObject.started
             )
-            lobby.addUsers(users.filter { user -> user.id.toString() != dbObject.adminId })
+            lobby.addUsers(users.filter { user -> user.id != dbObject.adminId })
             lobby
         }
     }
