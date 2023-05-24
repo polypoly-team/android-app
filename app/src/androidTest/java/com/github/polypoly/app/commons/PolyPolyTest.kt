@@ -93,7 +93,7 @@ abstract class PolyPolyTest(
         )
         val TEST_GAME_LOBBY_AVAILABLE_5 = GameLobby(
             TEST_USER_5, GameParameters(GameMode.LANDLORD, 2, 4,
-                1080, 20, getZones(), 4000), "Joinable 5", "lobbyabc12345"
+                600, 20, getZones(), 4000), "Joinable 5", "lobbyabc12345"
         )
 
         val testPlayer1 = Player(TEST_USER_1, 100, mutableListOf())
