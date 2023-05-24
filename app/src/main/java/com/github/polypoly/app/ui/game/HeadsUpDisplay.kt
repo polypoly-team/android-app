@@ -3,14 +3,7 @@ package com.github.polypoly.app.ui.game
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -41,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
@@ -63,7 +57,8 @@ fun Hud(
     mapViewModel: MapViewModel,
     otherPlayersData: List<Player>,
     round: Int,
-    location: String
+    location: String,
+    gameModel: GameViewModel
 ) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
     val playerPosition =
@@ -71,7 +66,7 @@ fun Hud(
 
     Column(modifier = Modifier.testTag("hud")) {
         HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round)
+        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
         HudLocation(location, testTag = "interactable_location_text")
         if (playerState == PlayerState.MOVING)
             HudLocation(
@@ -177,7 +172,7 @@ fun HudPlayer(playerData: Player) {
  * players
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
+fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -212,7 +207,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int) {
                         Column(Modifier.padding(Padding.medium)) {
                             HudGame(round)
                             otherPlayersData.forEach {
-                                HudOtherPlayer(it)
+                                HudOtherPlayer(it, gameModel)
                             }
                         }
                     }
@@ -263,9 +258,11 @@ fun HudGame(round: Int) {
 /**
  * The HUD for the stats of other players, it displays basic information such as their balance,
  * and a button shows complete information on click
+ * @param playerData The data of the player to display
+ * @param gameModel The game view model
  */
 @Composable
-fun HudOtherPlayer(playerData: Player) {
+fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     var openOtherPlayerInfo by remember { mutableStateOf(false) }
     Row(Modifier.padding(Padding.medium)) {
         HudButton(
@@ -277,6 +274,15 @@ fun HudOtherPlayer(playerData: Player) {
         Column(Modifier.padding(Padding.medium)) {
             HudText("playerBalance", "${playerData.getBalance()} $")
         }
+    }
+
+    val openLocationsDialog =  remember{ mutableStateOf(false) }
+    if (openLocationsDialog.value) {
+        GameRepository.player?.let { it ->
+            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
+                openLocationsDialog.value = false
+                gameModel.createATradeRequest(playerData, location)
+            } }
     }
 
     if (openOtherPlayerInfo) {
@@ -292,6 +298,20 @@ fun HudOtherPlayer(playerData: Player) {
             ) {
                 // TODO: Add information about other players
                 Text(text = "Other player info")
+                Column(
+                    modifier = Modifier
+                        .padding(Padding.large),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "Do you want to trade with this player?")
+                    Spacer(modifier = Modifier.height(Padding.medium))
+                    Button(onClick = {
+                        openLocationsDialog.value = true
+                        openOtherPlayerInfo = false
+                    }) {
+                        Text(text = "Trade")
+                    }
+                }
             }
         }
     }

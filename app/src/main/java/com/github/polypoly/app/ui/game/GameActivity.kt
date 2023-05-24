@@ -93,7 +93,8 @@ class GameActivity : ComponentActivity() {
                         mapViewModel,
                         game.players,
                         gameTurn,
-                        mapViewModel.interactableProperty.value?.name ?: "EPFL"
+                        mapViewModel.interactableProperty.value?.name ?: "EPFL",
+                        gameModel
                     )
                     GameEndedLabel(gameEnded)
 
