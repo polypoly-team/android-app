@@ -48,9 +48,7 @@ data class LocationProperty(
 
     /**
      *  The distance between the [LocationProperty] and a [Location].
-     *
      *  @param location the [Location] to compare with.
-     *
      *  @return the distance between the [LocationProperty] and the [Location].
      */
     fun distanceTo(location: Location): Float {

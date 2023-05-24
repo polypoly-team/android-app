@@ -264,7 +264,7 @@ class GameViewModel(
             var closestLocation: LocationProperty? = null
             var closestDistance = Double.MAX_VALUE
 
-            val allLocations = gameData.value?.allLocations ?: listOf()
+            val allLocations = gameData.value?.getLocations() ?: listOf()
             for (location in allLocations) {
                 val distance = position.distanceToAsDouble(location.position())
                 if (distance < closestDistance) {
@@ -296,7 +296,7 @@ class GameViewModel(
             if (currentLocation != null)
                 locationsNotToVisitName.add(currentLocation.name)
 
-            val allLocations = gameData.value?.allLocations ?: listOf()
+            val allLocations = gameData.value?.getLocations() ?: listOf()
 
             val locationsToVisit = mutableListOf<LocationProperty>()
             for (i in 1..NUMBER_OF_LOCATIONS_ROLLED) {

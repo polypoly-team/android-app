@@ -41,14 +41,14 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: Locati
         },
         modifier = Modifier.testTag("betDialog"),
         text = {
-            BetDialogBody(
+            BidDialogBody(
                 inputPrice = inputPrice,
                 showError = showError
             )
         },
         buttons = {
-            BetDialogButtons(
-                locationOnBet = locationOnBet,
+            BidDialogButtons(
+                locationBid = locationOnBet,
                 onBuy = onBuy,
                 onClose = onClose,
                 inputPrice = inputPrice,
@@ -60,9 +60,11 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: Locati
 
 /**
  * Body for the bet dialog.
+ * @param inputPrice the price input by the user
+ * @param showError whether to show the error message
  */
 @Composable
-private fun BetDialogBody(
+private fun BidDialogBody(
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
 ) {
@@ -79,7 +81,7 @@ private fun BetDialogBody(
             textStyle = typography.body1,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("betInput")
+                .testTag("bid_button")
         )
         if (showError.value) {
             Text(
@@ -88,7 +90,7 @@ private fun BetDialogBody(
                 style = typography.caption,
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .testTag("betErrorMessage")
+                    .testTag("bid_error_message")
             )
         }
     }
@@ -96,10 +98,12 @@ private fun BetDialogBody(
 
 /**
  * The buttons that are shown in the bet dialog.
+ * @param locationBid location to bid for
+ * @param onBuy lambda to execute when a valid bid is set
  */
 @Composable
-private fun BetDialogButtons(
-    locationOnBet: LocationProperty,
+private fun BidDialogButtons(
+    locationBid: LocationProperty,
     onBuy: (Float) -> Unit,
     onClose: () -> Unit,
     inputPrice: MutableState<String>,
@@ -114,7 +118,7 @@ private fun BetDialogButtons(
         Button(
             onClick = {
                 val amount = inputPrice.value.toFloatOrNull()
-                if (amount != null && amount >= locationOnBet.basePrice) {
+                if (amount != null && amount >= locationBid.basePrice) {
                     onBuy(amount)
                 } else {
                     showError.value = true

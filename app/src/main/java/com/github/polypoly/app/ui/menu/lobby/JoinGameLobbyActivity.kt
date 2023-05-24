@@ -473,7 +473,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * @param testTag (String): The test tag to be used for testing
      */
     @Composable
-    fun RectangleButton(onClick: () -> Unit, description: String = "", testTag: String = "Undefined",) {
+    fun RectangleButton(onClick: () -> Unit, description: String = "", testTag: String = "Undefined") {
         Button(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
@@ -519,6 +519,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
+     * @param mContext The context of the activity
      */
     private fun joinGameLobbyRoom(mContext: Context) {
         remoteDB.getValue<GameLobby>(gameLobbyCode).thenAccept { gameLobby ->

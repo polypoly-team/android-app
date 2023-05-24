@@ -17,4 +17,4 @@ data class LocationBid (
     val amount: Int = 100,
     val randomNumber: Float = Random.nextFloat(),
     val timeOfTheBid: Long = System.currentTimeMillis(),
-) {}
+)

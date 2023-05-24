@@ -8,6 +8,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
@@ -46,23 +47,23 @@ class GameTest {
     @Test
     fun whenGameStartGameInProgressIsNotNull() {
         gameLobby.start()
-        assertNotNull(Game.gameInProgress)
+        assertNotNull(GameRepository.game)
     }
 
     @Test
     fun whenGameStartGameInProgressHasTheCorrectRules() {
         gameLobby.start()
-        assertEquals(gameRules.gameMode, Game.gameInProgress?.rules?.gameMode)
-        assertEquals(gameRules.maximumNumberOfPlayers, Game.gameInProgress?.rules?.maximumNumberOfPlayers)
-        assertEquals(gameRules.minimumNumberOfPlayers, Game.gameInProgress?.rules?.minimumNumberOfPlayers)
-        assertEquals(gameRules.initialPlayerBalance, Game.gameInProgress?.rules?.initialPlayerBalance)
-        assertEquals(gameRules.roundDuration, Game.gameInProgress?.rules?.roundDuration)
+        assertEquals(gameRules.gameMode, GameRepository.game?.rules?.gameMode)
+        assertEquals(gameRules.maximumNumberOfPlayers, GameRepository.game?.rules?.maximumNumberOfPlayers)
+        assertEquals(gameRules.minimumNumberOfPlayers, GameRepository.game?.rules?.minimumNumberOfPlayers)
+        assertEquals(gameRules.initialPlayerBalance, GameRepository.game?.rules?.initialPlayerBalance)
+        assertEquals(gameRules.roundDuration, GameRepository.game?.rules?.roundDuration)
     }
 
     @Test
     fun whenGameStartEveryPlayerHasTheCorrectBalance() {
         gameLobby.start()
-        for(player in Game.gameInProgress?.players!!) {
+        for(player in GameRepository.game?.players!!) {
             assertEquals(gameRules.initialPlayerBalance, player.getBalance())
         }
     }
@@ -70,7 +71,7 @@ class GameTest {
     @Test
     fun whenGameStartEveryPlayerHasRank1() {
         gameLobby.start()
-        val ranking = Game.gameInProgress?.ranking()
+        val ranking = GameRepository.game?.ranking()
         for (rank in ranking!!) {
             assertEquals(1, rank.value)
         }
@@ -79,12 +80,12 @@ class GameTest {
     @Test
     fun rankingRankPlayersCorrectly() {
         gameLobby.start()
-        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(100)
-        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(200)
-        Game.gameInProgress?.getPlayer(testUser3.id)?.loseMoney(300)
-        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(200)
-        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(300)
-        val ranking = Game.gameInProgress?.ranking()
+        GameRepository.game?.getPlayer(testUser1.id)?.earnMoney(100)
+        GameRepository.game?.getPlayer(testUser2.id)?.earnMoney(200)
+        GameRepository.game?.getPlayer(testUser3.id)?.loseMoney(300)
+        GameRepository.game?.getPlayer(testUser4.id)?.loseMoney(200)
+        GameRepository.game?.getPlayer(testUser5.id)?.loseMoney(300)
+        val ranking = GameRepository.game?.ranking()
         assertEquals(2, ranking?.get(testUser1.id))
         assertEquals(1, ranking?.get(testUser2.id))
         assertEquals(5, ranking?.get(testUser3.id))
@@ -97,7 +98,7 @@ class GameTest {
     @Test
     fun whenGameStartEveryPlayerHasTheCorrectLocation() {
         gameLobby.start()
-        for (player in Game.gameInProgress?.players!!) {
+        for (player in GameRepository.game?.players!!) {
             assertEquals(0, player.getOwnedLocations().size)
         }
     }
@@ -116,7 +117,7 @@ class GameTest {
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
             gameLobby.start()
-            for (player in Game.gameInProgress?.players!!) {
+            for (player in GameRepository.game?.players!!) {
                 assertEquals(i, player.getOwnedLocations().size)
             }
         }
@@ -138,7 +139,7 @@ class GameTest {
             gameLobby.start()
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
-            for (player in Game.gameInProgress?.players!!)
+            for (player in GameRepository.game?.players!!)
                 for (location in player.getOwnedLocations()) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")

@@ -33,7 +33,7 @@ fun PropertyInteractUIComponent(gameViewModel: GameViewModel, mapViewModel: MapV
     if (playerState == PlayerState.BIDDING) {
         BetDialog(
             onBuy = { valueBet ->
-                onBuy(valueBet, gameViewModel)
+                onBid(valueBet, gameViewModel)
                 leaveInteractionDialog(gameViewModel, mapViewModel)
             },
             onClose = { leaveInteractionDialog(gameViewModel, mapViewModel) },
@@ -104,6 +104,6 @@ private fun leaveInteractionDialog(gameViewModel: GameViewModel, mapViewModel: M
     mapViewModel.selectLocation(null)
 }
 
-private fun onBuy(valueBet: Float, gameViewModel: GameViewModel) {
+private fun onBid(valueBid: Float, gameViewModel: GameViewModel) {
     // TODO: call gameViewModel's buy logic
 }

@@ -74,12 +74,12 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
 
         composeTestRule.onNodeWithTag("betInput").performTextInput("10")
         composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
 
-        composeTestRule.onNodeWithTag("betErrorMessage", true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("bid_error_message", true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
         composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
     }

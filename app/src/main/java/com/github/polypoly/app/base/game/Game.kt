@@ -13,14 +13,14 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Represent the game and the current state of the game
+ * @property code the code of the game
  * @property admin the [User] who is the admin of the game
  * @property players the [Player]s of the game
  * @property rules the rules of the [Game]
- * @property inGameLocations the [InGameLocation]s of the [Game]
- * @property currentRound the current round of the [Game]
  * @property dateBegin the date and time when the [Game] has started in Unix time
  * (seconds since 1970-01-01T00:00:00Z)
  * @property inGameLocations the [InGameLocation]s of the [Game]
+ * @property currentRound the current round of the [Game]
  */
 class Game private constructor(
     val code: String = "default-code",
@@ -32,17 +32,23 @@ class Game private constructor(
         .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
-    val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
-
     var currentRound: Int = 1
 
     /**
-     * Go to the next turn
+     * @return the [List] of [LocationProperty] of the [Game]
+     */
+    fun getLocations(): List<LocationProperty> {
+        return rules.gameMap.flatMap { zone -> zone.locationProperties }
+    }
+
+    /**
+     * Go to the next turn and change the player order in function of the [Player]s' rank
      */
     fun nextTurn() {
         ++currentRound
+        players = players.sortedDescending()
         if (isGameFinished()) {
-            val pastGame = endGame()
+            endGame()
         }
     }
 
@@ -50,6 +56,7 @@ class Game private constructor(
      * Test if the game is finished
      * @return true if the game is finished, false otherwise
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
+     * @throws IllegalStateException if the game mode is LANDLORD and maxRound is null
      */
     fun isGameFinished(): Boolean {
         return when (rules.gameMode) {
@@ -94,11 +101,11 @@ class Game private constructor(
      * @return the PastGame object
      * @throws IllegalStateException if the game is not finished
      */
-    fun endGame(): PastGame {
+    private fun endGame(): PastGame {
         if (!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
             users = players.map(Player::user),
-            usersRank = ranking().map { it.key to it.value }.toMap(),
+            usersRank = ranking(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
@@ -187,10 +194,10 @@ class Game private constructor(
             val inGameLocations = gameLobby.rules.gameMap.flatMap { zone ->
                 zone.locationProperties.map { InGameLocation(it) }
             }
-            if(gameLobby.rules.gameMode == GameMode.LANDLORD)
+            if (gameLobby.rules.gameMode == GameMode.LANDLORD)
                 assignRandomLocations(inGameLocations, gameLobby, players)
 
-            val game = Game(
+            return Game(
                 code = gameLobby.code,
                 admin = gameLobby.admin,
                 players = players,
@@ -198,9 +205,6 @@ class Game private constructor(
                 dateBegin = System.currentTimeMillis() / 1000,
                 inGameLocations = inGameLocations
             )
-
-            gameInProgress = game
-            return game
         }
 
         /**
@@ -231,14 +235,12 @@ class Game private constructor(
                 player.earnNewLocations(randomLocationsToGive)
             }
         }
-
-        /**
-         * The game currently in progress
-         */
-        var gameInProgress: Game? = null
     }
 }
 
+/**
+ * The database representation of a game
+ */
 data class GameDB(
     val code: String = "default-code",
     val admin: User = User(),

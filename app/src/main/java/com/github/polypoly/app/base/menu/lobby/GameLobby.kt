@@ -113,7 +113,7 @@ data class GameLobby(
 
     // ====================================================================== STORABLE
 
-    // TODO: add tests for converters
+    // TODO : add tests for converters
     override fun toDBObject(): GameLobbyDB {
         return GameLobbyDB(
             code,
