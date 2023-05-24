@@ -96,7 +96,7 @@ class GameTest {
     fun whenGameStartEveryPlayerHasTheCorrectLocation() {
         gameLobby.start()
         for (player in Game.gameInProgress?.players!!) {
-            assertEquals(0, player.ownedLocations.size)
+            assertEquals(0, player.getOwnedLocations().size)
         }
     }
 
@@ -115,7 +115,7 @@ class GameTest {
             gameLobby.addUser(testUser6)
             gameLobby.start()
             for (player in Game.gameInProgress?.players!!) {
-                assertEquals(i, player.ownedLocations.size)
+                assertEquals(i, player.getOwnedLocations().size)
             }
         }
     }
@@ -137,7 +137,7 @@ class GameTest {
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
             for (player in Game.gameInProgress?.players!!)
-                for (location in player.ownedLocations) {
+                for (location in player.getOwnedLocations()) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")
                     ownedLocationsSet.add(location)
