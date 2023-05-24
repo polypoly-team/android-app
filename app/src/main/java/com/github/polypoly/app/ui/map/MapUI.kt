@@ -32,8 +32,10 @@ object MapUI {
     }
 
     private fun createMapView(
-        context: Context, mapViewModel: MapViewModel,
-        gameViewModel: GameViewModel?, mapViewState: MapViewState? = null
+        context: Context,
+        mapViewModel: MapViewModel,
+        gameViewModel: GameViewModel?,
+        mapViewState: MapViewState? = null
     ): MapView {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         val mapView = initMapView(context)

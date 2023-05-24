@@ -82,8 +82,12 @@ fun initMapView(context: Context): MapView {
  * @return the marker that was added
  */
 fun addMarkerTo(
-    mapView: MapView, location: LocationProperty, zoneColor: Int,
-    mapViewModel: MapViewModel, gameViewModel: GameViewModel?, propertyLevel: PropertyLevel,
+    mapView: MapView,
+    location: LocationProperty,
+    zoneColor: Int,
+    mapViewModel: MapViewModel,
+    gameViewModel: GameViewModel?,
+    propertyLevel: PropertyLevel,
     owned: Boolean = true
 ): Marker {
     fun buildMarkerIcon(
