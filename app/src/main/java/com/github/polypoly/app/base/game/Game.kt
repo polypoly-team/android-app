@@ -48,11 +48,15 @@ class Game private constructor(
         ++currentRound
 
         if (!isGameFinished()) {
-            computeAllWinnersOfBids()
-            currentRoundBids.clear()
+            computeBids()
         } else {
             val pastGame = endGame()
         }
+    }
+
+    private fun computeBids() {
+        computeAllWinnersOfBids()
+        currentRoundBids.clear()
     }
 
     /**
@@ -146,12 +150,17 @@ class Game private constructor(
      * and the location owner.
      */
     private fun computeAllWinnersOfBids() {
-        currentRoundBids.groupBy(LocationBid::location).forEach { (location, bids) ->
-            val maxBid = bids.maxWithOrNull(LocationBid.comparator)
+        for ((location, bids) in currentRoundBids.groupBy(LocationBid::location)) {
+            var maxBid: LocationBid? = null
+            for (bid in bids) {
+                bid.player.loseMoney(bid.amount)
+                if (maxBid == null || LocationBid.comparator.compare(bid, maxBid) >= 0) {
+                    maxBid = bid
+                }
+            }
             if (maxBid != null) {
                 val inGame = findInGameLocation(location) ?: throw IllegalStateException("Bid won for location $location that is not part of the game")
                 maxBid.player.earnNewLocation(inGame)
-                maxBid.player.loseMoney(maxBid.amount)
             }
         }
     }

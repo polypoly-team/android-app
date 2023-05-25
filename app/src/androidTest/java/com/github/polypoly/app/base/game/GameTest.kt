@@ -186,6 +186,40 @@ class GameTest: PolyPolyTest(false, false) {
     }
 
     @Test
+    fun nextTurnMakesAllUsersLoseMoneyForBids() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+        val player1 = game.getPlayer(TEST_USER_1.id)!!
+        val player2 = game.getPlayer(TEST_USER_2.id)!!
+        val player3 = game.getPlayer(TEST_USER_3.id)!!
+        val player4 = game.getPlayer(TEST_USER_4.id)!!
+        val player5 = game.getPlayer(TEST_USER_5.id)!!
+
+        val location1 = getRandomLocation()
+        val location2 = getRandomLocation(excluding = listOf(location1))
+        val location3 = getRandomLocation(excluding = listOf(location1, location2))
+
+        game.registerBid(LocationBid(location1, player0, 300))
+        game.registerBid(LocationBid(location1, player1, 350))
+
+        game.registerBid(LocationBid(location2, player2, 500))
+        game.registerBid(LocationBid(location2, player3, 400))
+        game.registerBid(LocationBid(location2, player4, 450))
+
+        game.registerBid(LocationBid(location3, player5, 400))
+
+        game.nextTurn()
+
+        assertEquals(700, player0.getBalance())
+        assertEquals(650, player1.getBalance())
+        assertEquals(500, player2.getBalance())
+        assertEquals(600, player3.getBalance())
+        assertEquals(550, player4.getBalance())
+        assertEquals(600, player5.getBalance())
+    }
+
+    @Test
     fun registerBidThrowsIfLocationIsNotPartOfGame() {
         val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
 
