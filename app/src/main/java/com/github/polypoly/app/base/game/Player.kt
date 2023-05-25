@@ -20,9 +20,7 @@ data class Player (
     private var balance: Int = 0,
     private var roundLost: Int? = null,
 ) : Comparable<Player> {
-
-    private var ownedLocations: MutableList<InGameLocation> = mutableListOf()
-
+    
     /**
      * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise
@@ -81,12 +79,7 @@ data class Player (
             throw IllegalStateException("The player has already lost the game")
         if(amount > balance) {
             balance = 0
-            if(ownedLocations.isEmpty()) {
-                roundLost = Game.gameInProgress?.currentRound
-                // TODO : tell the player that he lose the game
-            } else {
-                // TODO : ask the player if he wants to sell one of his/her properties
-            }
+            roundLost = Game.gameInProgress?.currentRound
         } else {
             balance -= amount
         }
@@ -109,25 +102,6 @@ data class Player (
     }
 
     /**
-     * Trade a location with another player
-     * @param player the player to trade with
-     * @param locationGiven the location the player wants to give
-     * @param locationReceived the location the player wants to receive
-     * @throws IllegalArgumentException if the player receiver does not own the location he/she wants to give
-     * @throws IllegalArgumentException if the player does not own the location he/she wants to give
-     */
-    fun tradeWith(player: Player, locationGiven: InGameLocation, locationReceived: InGameLocation) {
-        if(!player.ownedLocations.contains(locationReceived))
-            throw IllegalArgumentException("The player receiver does not own the location he/she wants to give")
-        if(!ownedLocations.contains(locationGiven))
-            throw IllegalArgumentException("The player does not own the location he/she wants to give")
-        player.ownedLocations += locationGiven
-        ownedLocations -= locationGiven
-        player.ownedLocations -= locationReceived
-        ownedLocations += locationReceived
-    }
-
-    /**
      * The player bid to buy a location
      * @param location the location the player wants to buy
      * @param amount the amount of money the player wants to bid
@@ -146,7 +120,6 @@ data class Player (
         if(location.owner != null)
             throw IllegalArgumentException("The location is already owned by ${location.owner}")
         location.owner = this
-        ownedLocations += location
     }
 
     /**
@@ -164,35 +137,9 @@ data class Player (
      * @param location the location the player has lost
      */
     fun looseLocation(location: InGameLocation) {
-        if (!ownedLocations.contains(location)) return
+        if (location.owner != this)
+            throw IllegalArgumentException("The location is not owned by $this but by ${location.owner ?: "null"}")
         location.owner = null
-        ownedLocations -= location
-    }
-
-    /**
-     * get the list of the owned locations of the player
-     * @return the list of the owned locations of the player (copy of the mutable list)
-     */
-    fun getOwnedLocations(): List<InGameLocation> {
-        return ownedLocations.toList()
-    }
-
-    /**
-     * Update the state of the player with all the new data
-     * @param newBalance the new balance of the player
-     * @param newOwnedLocations the new list of the owned locations of the player
-     * @param newRoundLost the new round when the player had lost the game if the player has lost the game,
-     * @throws IllegalArgumentException if the player has lost the game and the balance is not equal to 0
-     * @throws IllegalArgumentException if the player has lost the game and the player owns locations
-     */
-    fun updateState(newBalance: Int, newOwnedLocations: List<InGameLocation>, newRoundLost: Int?) {
-        if(balance > 0 && roundLost != null)
-            throw IllegalArgumentException("If the player has lost the game, the balance of the player must be equal to 0")
-        if(ownedLocations.isNotEmpty() && roundLost != null)
-            throw IllegalArgumentException("If the player has lost the game, the player can't owned locations")
-        balance = newBalance
-        ownedLocations = newOwnedLocations.toMutableList()
-        roundLost = newRoundLost
     }
 
     override fun compareTo(other: Player): Int {

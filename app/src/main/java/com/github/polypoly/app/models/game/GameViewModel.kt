@@ -12,13 +12,24 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
+import com.github.polypoly.app.network.RemoteDB
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.removeValue
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -82,6 +93,25 @@ class GameViewModel(
             tradeRequestData.value = null
             tradeRequestData.value = trade
         }
+    }
+
+    /**
+     * Trade a location with another player
+     * @param player the player to trade with
+     * @param locationGiven the location the player wants to give
+     * @param locationReceived the location the player wants to receive
+     * @throws IllegalArgumentException if the player receiver does not own the location he/she wants to give
+     * @throws IllegalArgumentException if the player does not own the location he/she wants to give
+     */
+    fun tradeWith(player: Player, locationGiven: InGameLocation, locationReceived: InGameLocation) {
+        val currentPlayer = playerData.value ?: return
+        if (locationGiven.owner != currentPlayer)
+            throw IllegalArgumentException("The player does not own the location he/she wants to give")
+        if (locationReceived.owner != player)
+            throw IllegalArgumentException("The player receiver does not own the location he/she wants to give")
+        locationGiven.owner = player
+        locationReceived.owner = currentPlayer
+        gameData.value = gameData.value // force update of game observers as the locations owned change
     }
 
     /**
@@ -274,6 +304,15 @@ class GameViewModel(
      */
     fun resetTurnState() {
         playerStateData.value = PlayerState.ROLLING_DICE
+    }
+
+    /**
+     * Feature intended for tests only !!
+     * Forces a refresh of the game LiveData to let observers witness the change
+     */
+    fun refreshGameData() {
+        // TODO: find a way to enforce usage only in tests
+        gameData.value = gameData.value
     }
 
     /**

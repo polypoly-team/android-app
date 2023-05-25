@@ -82,26 +82,25 @@ class GameTest: PolyPolyTest(false, false) {
     @Test
     fun rankingRankPlayersCorrectly() {
         gameLobby.start()
-        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(100)
-        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(200)
-        Game.gameInProgress?.getPlayer(testUser3.id)?.loseMoney(300)
-        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(200)
-        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(300)
+        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(200)
+        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(100)
+        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(100)
+        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(250)
+        Game.gameInProgress?.getPlayer(testUser6.id)?.loseMoney(250)
         val ranking = Game.gameInProgress?.ranking()
-        assertEquals(2, ranking?.get(testUser1.id))
-        assertEquals(1, ranking?.get(testUser2.id))
-        assertEquals(5, ranking?.get(testUser3.id))
+        assertEquals(1, ranking?.get(testUser1.id))
+        assertEquals(2, ranking?.get(testUser2.id))
+        assertEquals(3, ranking?.get(testUser3.id))
         assertEquals(4, ranking?.get(testUser4.id))
         assertEquals(5, ranking?.get(testUser5.id))
-        assertEquals(3, ranking?.get(testUser6.id))
-
+        assertEquals(5, ranking?.get(testUser6.id))
     }
 
     @Test
-    fun whenGameStartEveryPlayerHasTheCorrectLocation() {
-        gameLobby.start()
-        for (player in Game.gameInProgress?.players!!) {
-            assertEquals(0, player.getOwnedLocations().size)
+    fun whenGameStartNoPlayerOnwnAnyLocation() {
+        val game = gameLobby.start()
+        for (location in game.inGameLocations) {
+            assertTrue(location.owner == null)
         }
     }
 
@@ -118,9 +117,9 @@ class GameTest: PolyPolyTest(false, false) {
             gameLobby.addUser(testUser4)
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
-            gameLobby.start()
+            val game = gameLobby.start()
             for (player in Game.gameInProgress?.players!!) {
-                assertEquals(i, player.getOwnedLocations().size)
+                assertEquals(i, game.getOwnedLocations(player).size)
             }
         }
     }
@@ -138,11 +137,11 @@ class GameTest: PolyPolyTest(false, false) {
             gameLobby.addUser(testUser4)
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
-            gameLobby.start()
+            val game = gameLobby.start()
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
             for (player in Game.gameInProgress?.players!!)
-                for (location in player.getOwnedLocations()) {
+                for (location in game.getOwnedLocations(player)) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")
                     ownedLocationsSet.add(location)
@@ -176,13 +175,13 @@ class GameTest: PolyPolyTest(false, false) {
 
         game.nextTurn()
 
-        assertEquals(player1.getOwnedLocations().map(InGameLocation::locationProperty), listOf(location1))
-        assertEquals(player2.getOwnedLocations().map(InGameLocation::locationProperty), listOf(location2))
-        assertEquals(player5.getOwnedLocations().map(InGameLocation::locationProperty), listOf(location3))
+        assertEquals(game.getOwnedLocations(player1).map(InGameLocation::locationProperty), listOf(location1))
+        assertEquals(game.getOwnedLocations(player2).map(InGameLocation::locationProperty), listOf(location2))
+        assertEquals(game.getOwnedLocations(player5).map(InGameLocation::locationProperty), listOf(location3))
 
-        assertTrue(player0.getOwnedLocations().isEmpty())
-        assertTrue(player3.getOwnedLocations().isEmpty())
-        assertTrue(player4.getOwnedLocations().isEmpty())
+        assertTrue(game.getOwnedLocations(player0).isEmpty())
+        assertTrue(game.getOwnedLocations(player3).isEmpty())
+        assertTrue(game.getOwnedLocations(player4).isEmpty())
     }
 
     @Test

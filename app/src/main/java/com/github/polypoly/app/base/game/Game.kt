@@ -196,6 +196,10 @@ class Game private constructor(
         currentRoundBids.add(bid)
     }
 
+    fun getOwnedLocations(player: Player): List<InGameLocation> {
+        return inGameLocations.filter { location -> location.owner == player }
+    }
+
     override fun toDBObject(): GameDB {
         return GameDB(
             code,

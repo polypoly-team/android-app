@@ -8,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
+import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
@@ -16,6 +17,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class GameActivityLandlordTest : PolyPolyTest(true, false) {
@@ -95,9 +97,13 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
      * Clear the location of the player if any
      */
     private fun clearLocationOfThePlayerIfAny() {
-        for (location in currentPlayer.getOwnedLocations()) {
+        val gameViewModel = composeTestRule.activity.gameModel
+        for (location in gameViewModel.getGameData().value!!.getOwnedLocations(currentPlayer)) {
             currentPlayer.looseLocation(location)
         }
+        val remains = gameViewModel.getGameData().value!!.inGameLocations.filter { it.owner == currentPlayer }
+        // refresh game data to reflect change
+        execInMainThread { gameViewModel.refreshGameData() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     /**
@@ -113,5 +119,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
             val inGameLocation = unownedLocation[0]
             currentPlayer.earnNewLocation(inGameLocation)
         }
+        // refresh game data to reflect change
+        execInMainThread { composeTestRule.activity.gameModel.refreshGameData() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 }
