@@ -23,10 +23,14 @@ object MapUI {
         val mapViewState = mapViewModel.mapViewState.value
         AndroidView(
             factory = { context ->
-                if (gameViewModel != null)
-                    mapViewModel.updateMapViewState(gameViewModel.getGameData().value!!.inGameLocations)
-                val mapView = createMapView(context, mapViewModel, gameViewModel, mapViewState)
-                mapView
+                // workaround as updating the mapViewState isn't otherwise reflected in createMapView
+                var updatedMapViewState = mapViewState
+                val locations = gameViewModel?.getGameData()?.value?.inGameLocations
+                if (locations != null) {
+                    mapViewModel.updateMapViewState(locations)
+                    updatedMapViewState = mapViewModel.mapViewState.value
+                }
+                createMapView(context, mapViewModel, gameViewModel, updatedMapViewState)
             }, modifier = Modifier.testTag("map")
         )
     }
