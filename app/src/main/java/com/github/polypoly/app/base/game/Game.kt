@@ -30,7 +30,7 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
     val inGameLocations: List<InGameLocation> = rules.gameMap
         .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
-    val transactions : List<GameTransaction> = listOf(),
+    val transactions : ArrayList<GameTransaction> = arrayListOf(),
     val pastTransactions: ArrayList<List<GameTransaction>> = arrayListOf(),
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
@@ -139,7 +139,8 @@ class Game private constructor(
         for (transaction in transactions.filter { !it.isExecuted() }) {
             transaction.execute()
         }
-        pastTransactions.add(transactions)
+        pastTransactions.add(transactions.toList())
+        transactions.clear()
     }
 
     /**
