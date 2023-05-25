@@ -1,7 +1,7 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.StorableObject
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

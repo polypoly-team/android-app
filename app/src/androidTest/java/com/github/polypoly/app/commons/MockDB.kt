@@ -1,7 +1,7 @@
 package com.github.polypoly.app.commons
 
-import com.github.polypoly.app.network.IRemoteStorage
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.IRemoteStorage
+import com.github.polypoly.app.database.StorableObject
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 

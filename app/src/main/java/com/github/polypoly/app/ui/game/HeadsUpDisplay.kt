@@ -37,7 +37,7 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
@@ -81,10 +81,16 @@ fun Hud(
 
 /**
  * The HUD for the current nearby location (a text at the top of the screen)
+ * @param location current location of the player
+ * @param offset offset of the text
+ * @param testTag test tag for the text in the Hud
+ * @param headerText text to display before the location
  */
 @Composable
 fun HudLocation(
-    location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String,
+    location: String,
+    offset: DpOffset = DpOffset(0.dp, 10.dp),
+    testTag: String,
     headerText: String = "Current Location: "
 ) {
     Box(
@@ -133,6 +139,7 @@ fun HudLocation(
 /**
  * The HUD for the player stats, it displays basic information such as their balance,
  * and a button shows complete information on click
+ * @param playerData current player of the game
  */
 @Composable
 fun HudPlayer(playerData: Player) {
@@ -177,6 +184,9 @@ fun HudPlayer(playerData: Player) {
  * The HUD that shows the stats for other players and the game, it's a button on the top left
  * that expands and collapses a tab that contains information about the game and the other
  * players
+ * @param otherPlayersData other players in the game
+ * @param round current round of the game
+ * @param gameModel GameViewModel associated with the game
  */
 @Composable
 fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {

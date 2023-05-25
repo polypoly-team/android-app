@@ -15,9 +15,12 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 /**
  * A service that runs in the background, receives location updates and processes them
+ * @property fusedLocationProviderClient The fused location provider client
+ * @property locationCallback The location callback
  */
 abstract class LocationService: Service() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -46,12 +49,18 @@ abstract class LocationService: Service() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    /**
+     * Start receiving location updates
+     */
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest.create().apply {
-            interval = Constants.LANDLORD_TAX_POLL_RATE * 1000 // Update interval in milliseconds
-            fastestInterval = Constants.LANDLORD_TAX_POLL_RATE * 1000 // Fastest update interval in milliseconds
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
+        val locationRequest = LocationRequest.Builder(Constants.LANDLORD_TAX_POLL_RATE * 1000)
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setMinUpdateIntervalMillis(Constants.LANDLORD_TAX_POLL_RATE * 1000)
+            .build()
 
         // Check that location permissions are granted
         if (ActivityCompat.checkSelfPermission(
@@ -83,12 +92,7 @@ abstract class LocationService: Service() {
 
     /**
      * Process a location update
-     *
      * @param location The new location
      */
     abstract fun processLocationUpdate(location: Location)
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
 }

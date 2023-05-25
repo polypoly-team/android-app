@@ -1,9 +1,8 @@
-package com.github.polypoly.app.models.game
+package com.github.polypoly.app.viewmodels.game
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
@@ -13,10 +12,10 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.getAllValues
-import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.network.removeValue
+import com.github.polypoly.app.viewmodels.commons.LoadingModel
+import com.github.polypoly.app.database.getAllValues
+import com.github.polypoly.app.database.getValue
+import com.github.polypoly.app.database.removeValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.*
@@ -265,7 +264,7 @@ class GameViewModel(
             var closestLocation: LocationProperty? = null
             var closestDistance = Double.MAX_VALUE
 
-            val allLocations = gameData.value?.allLocations ?: listOf()
+            val allLocations = gameData.value?.getLocations() ?: listOf()
             for (location in allLocations) {
                 val distance = position.distanceToAsDouble(location.position())
                 if (distance < closestDistance) {
@@ -297,7 +296,7 @@ class GameViewModel(
             if (currentLocation != null)
                 locationsNotToVisitName.add(currentLocation.name)
 
-            val allLocations = gameData.value?.allLocations ?: listOf()
+            val allLocations = gameData.value?.getLocations() ?: listOf()
 
             val locationsToVisit = mutableListOf<LocationProperty>()
             for (i in 1..NUMBER_OF_LOCATIONS_ROLLED) {

@@ -7,7 +7,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.network.getAllValues
+import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.ui.menu.lobby.CreateGameLobbyActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
