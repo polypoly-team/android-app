@@ -56,6 +56,9 @@ class GameViewModel(
     private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
     val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
 
+    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(null)
+    val locationsOwnedData: LiveData<List<InGameLocation>> get() = _locationsOwnedData
+
     private var currentTurnBid: LocationBid? = null
 
     private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
@@ -66,6 +69,7 @@ class GameViewModel(
     init {
         setLoading(true)
         coroutineScope.launch {
+            refreshInGameLocationsOwned()
             gameLoop()
             listenToTradeRequest()
         }
@@ -111,7 +115,10 @@ class GameViewModel(
             throw IllegalArgumentException("The player receiver does not own the location he/she wants to give")
         locationGiven.owner = player
         locationReceived.owner = currentPlayer
-        gameData.value = gameData.value // force update of game observers as the locations owned change
+
+        // TODO: push to DB here
+
+        refreshInGameLocationsOwned()
     }
 
     /**
@@ -235,6 +242,8 @@ class GameViewModel(
     }
 
     private fun onNextTurnEnd() {
+        refreshInGameLocationsOwned()
+
         val game = gameData.value ?: return
 
         val previousBid = currentTurnBid
@@ -304,15 +313,6 @@ class GameViewModel(
      */
     fun resetTurnState() {
         playerStateData.value = PlayerState.ROLLING_DICE
-    }
-
-    /**
-     * Feature intended for tests only !!
-     * Forces a refresh of the game LiveData to let observers witness the change
-     */
-    fun refreshGameData() {
-        // TODO: find a way to enforce usage only in tests
-        gameData.value = gameData.value
     }
 
     /**
@@ -410,6 +410,11 @@ class GameViewModel(
         }
 
         return future
+    }
+
+    fun refreshInGameLocationsOwned() {
+        val player = playerData.value ?: return
+        _locationsOwnedData.value = gameData.value?.inGameLocations?.filter { it.owner == player }
     }
 
     companion object {

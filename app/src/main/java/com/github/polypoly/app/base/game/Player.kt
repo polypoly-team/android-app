@@ -20,7 +20,7 @@ data class Player (
     private var balance: Int = 0,
     private var roundLost: Int? = null,
 ) : Comparable<Player> {
-    
+
     /**
      * If the player has lost the game (i.e. if the player has no more money)
      * @return true if the player has lost the game, false otherwise

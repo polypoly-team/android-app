@@ -44,11 +44,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         Intents.release()
     }
 
-    /*@Test
-    fun testLandlord() {
-
-    }*/
-
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
         composeTestRule.onNodeWithTag("other_players_and_game_hud").performClick()
@@ -101,9 +96,8 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
         for (location in gameViewModel.getGameData().value!!.getOwnedLocations(currentPlayer)) {
             currentPlayer.looseLocation(location)
         }
-        val remains = gameViewModel.getGameData().value!!.inGameLocations.filter { it.owner == currentPlayer }
         // refresh game data to reflect change
-        execInMainThread { gameViewModel.refreshGameData() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        execInMainThread { gameViewModel.refreshInGameLocationsOwned() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     /**
@@ -120,6 +114,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
             currentPlayer.earnNewLocation(inGameLocation)
         }
         // refresh game data to reflect change
-        execInMainThread { composeTestRule.activity.gameModel.refreshGameData() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        execInMainThread { composeTestRule.activity.gameModel.refreshInGameLocationsOwned() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 }
