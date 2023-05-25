@@ -5,27 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterEnd
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -36,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.models.game.GameViewModel
@@ -44,8 +37,6 @@ import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.data.GameRepository.Companion.player
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -67,26 +58,23 @@ fun Hud(
     gameModel: GameViewModel
 ) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition =
-        mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
-    Column(modifier = Modifier.testTag("hud")) {
-        SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
-        HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
-        HudLocation(location, testTag = "interactable_location_text")
-        if (playerState == PlayerState.MOVING) {
-            HudLocation(
-                playerPosition,
-                DpOffset(0.dp, 80.dp),
-                "going_to_location_text",
-                "Going to: "
-            )
-        } else if (playerState == PlayerState.TURN_FINISHED) {
-            TurnFinishedNotification()
-        }
-        HudGameMenu()
+    SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
+    HudLocation(location, testTag = "interactable_location_text")
+    if (playerState == PlayerState.MOVING) {
+        HudLocation(
+            playerPosition,
+            DpOffset(0.dp, 80.dp),
+            "going_to_location_text",
+            "Going to: "
+        )
+    } else if (playerState == PlayerState.TURN_FINISHED) {
+        TurnFinishedNotification()
     }
+    HudPlayer(playerData)
+    HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
+    HudGameMenu()
 }
 
 /**
@@ -102,12 +90,31 @@ fun HudLocation(
             .fillMaxWidth()
             .padding(Padding.medium)
     ) {
-        if (location.isNotEmpty())
+        Box(
+            modifier = Modifier.align(TopCenter),
+            contentAlignment = Center
+        ) {
+            if (location.isNotEmpty())
+                Text(
+                    text = headerText,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(offset.x, offset.y)
+                        .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                            shape = Shapes.medium
+                        )
+                        .padding(Padding.medium),
+                    style = MaterialTheme.typography.h6
+                )
             Text(
-                text = headerText,
+                text = location,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(offset.x, offset.y - 50.dp)
+                    .testTag(testTag)
+                    .offset(offset.x, offset.y + 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
@@ -115,23 +122,9 @@ fun HudLocation(
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h4
             )
-        Text(
-            text = location,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .testTag(testTag)
-                .offset(offset.x, offset.y)
-                .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                .border(
-                    1.dp,
-                    MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                    shape = Shapes.medium
-                )
-                .padding(Padding.medium),
-            style = MaterialTheme.typography.h4
-        )
+        }
     }
 }
 
@@ -145,7 +138,9 @@ fun HudPlayer(playerData: Player) {
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier.align(BottomEnd),
+            modifier = Modifier
+                .align(BottomEnd)
+                .testTag("hud_player"),
             contentAlignment = Center
         ) {
             MoneyHudText("playerBalance", "${playerData.getBalance()} $")
@@ -190,6 +185,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
             modifier = Modifier
                 .padding(Padding.medium)
                 .align(Alignment.TopStart)
+                .testTag("hud_other_players_and_game"),
         ) {
             Column(Modifier.padding(Padding.medium)) {
                 // A drop down button that expands and collapses the stats for other players and
@@ -317,6 +313,7 @@ fun HudGameMenu() {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
+                .testTag("hud_game_menu")
         ) {
             Column(modifier = Modifier.padding(10.dp, 0.dp)) {
                 // The game menu slides in and out when the game menu button is pressed

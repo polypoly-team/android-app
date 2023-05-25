@@ -107,7 +107,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
         forceChangePlayerState(PlayerState.INIT).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
     }
 
     @Test
@@ -115,7 +117,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
         forceChangePlayerState(PlayerState.ROLLING_DICE).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("roll_dice_button").assertIsDisplayed()
     }
 
@@ -126,7 +130,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
 
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
         composeTestRule.onNodeWithTag("going_to_location_text").assertIsDisplayed()
     }
@@ -137,7 +143,9 @@ class GameActivityTest : PolyPolyTest(true, false) {
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
 
