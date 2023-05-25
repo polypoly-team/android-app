@@ -211,11 +211,11 @@ class SignInActivity : ComponentActivity() {
             trophiesDisplay = mutableListOf(0, 4)
         )
 
-        val TEST_USER_1 = User("12","Carter", "Not me!", Skin.default(), Stats())
-        val TEST_USER_2 = User("123","Harry", "Ha!", Skin.default(), Stats())
-        val TEST_USER_3 = User("1234","James", "Hey!", Skin.default(), Stats())
-        val TEST_USER_4 = User("12345","Henri", "Ohh!", Skin.default(), Stats())
-        val TEST_USER_5 = User("123456", "test_user_5", "", Skin.default(), Stats())
+        val TEST_USER_1 = User("12","Carter", "Not me!", Skin.DEFAULT, Stats())
+        val TEST_USER_2 = User("123","Harry", "Ha!", Skin.DEFAULT, Stats())
+        val TEST_USER_3 = User("1234","James", "Hey!", Skin.DEFAULT, Stats())
+        val TEST_USER_4 = User("12345","Henri", "Ohh!", Skin.DEFAULT, Stats())
+        val TEST_USER_5 = User("123456", "test_user_5", "", Skin.DEFAULT, Stats())
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
