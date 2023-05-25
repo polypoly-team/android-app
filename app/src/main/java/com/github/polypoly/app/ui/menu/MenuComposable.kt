@@ -35,6 +35,11 @@ object MenuComposable {
     private val spaceBetweenButtons = 10.dp
 
     // ===================================================== MENU DISPOSITIONS
+
+    /**
+     * A row of all the buttons in the menu to go to the different activities
+     * (rules, profile, rankings, settings)
+     */
     @Composable
     fun RowButtons() {
         Row(
@@ -47,6 +52,10 @@ object MenuComposable {
         }
     }
 
+    /**
+     * A column of all the buttons in the menu to go to the different activities
+     * (rules, profile, rankings, settings) with a button to retract the column
+     */
     @Composable
     fun ColumnButtons() {
         Column(
@@ -68,6 +77,9 @@ object MenuComposable {
 
     }
 
+    /**
+     * All the buttons in the menu to go to the different activities
+     */
     @Composable
     private fun AllButtons() {
         RulesButton()
@@ -128,6 +140,9 @@ object MenuComposable {
         }
     }
 
+    /**
+     * Creates a button to go to the profile of the user
+     */
     @Composable
     private fun ProfileButton() {
         ActivityOptionButton(
@@ -138,6 +153,9 @@ object MenuComposable {
         )
     }
 
+    /**
+     * Creates a button to go to the rankings of the users
+     */
     @Composable
     private fun RankingsButton() {
         ActivityOptionButton(
@@ -148,6 +166,9 @@ object MenuComposable {
         )
     }
 
+    /**
+     * Creates a button to go to the settings of the app
+     */
     @Composable
     fun SettingsButton() {
         ActivityOptionButton(

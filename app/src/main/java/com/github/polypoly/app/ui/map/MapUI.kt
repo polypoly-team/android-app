@@ -2,14 +2,13 @@ package com.github.polypoly.app.ui.map
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.PropertyLevel
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 

@@ -5,6 +5,7 @@ import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.data.GameRepository
 import kotlin.random.Random
 
 /**
@@ -45,17 +46,11 @@ data class Player (
      * Update the balance of the player with the money earned.
      * @param amount the amount of money earned*
      * @throws IllegalArgumentException if the amount of money earned is negative
-     * @throws IllegalStateException if there is no game in progress
-     * @throws IllegalStateException if the player is not in the game currently in progress
      * @throws IllegalStateException if the player has already lost the game
      */
     fun earnMoney(amount: Int) {
         if(amount <= 0)
             throw IllegalArgumentException("The amount of money earned cannot be negative or zero")
-        if(Game.gameInProgress == null)
-            throw IllegalStateException("There are no game in progress")
-        if(Game.gameInProgress?.playInThisGame(user) == false)
-            throw IllegalStateException("The player is not in the game currently in progress")
         if(roundLost != null)
             throw IllegalStateException("The player has already lost the game")
         balance += amount
@@ -66,23 +61,17 @@ data class Player (
      * If the player has not enough money, he/she has to sell his properties or to lose.
      * @param amount the amount of money lost
      * @throws IllegalArgumentException if the amount of money lost is negative
-     * @throws IllegalStateException if there is no game in progress
-     * @throws IllegalStateException if the player is not in the game currently in progress
      * @throws IllegalStateException if the player has already lost the game
      */
     fun loseMoney(amount: Int) {
         if(amount <= 0)
             throw IllegalArgumentException("The amount of money lost cannot be negative or zero")
-        if(Game.gameInProgress == null)
-            throw IllegalStateException("There are no game in progress")
-        if(Game.gameInProgress?.playInThisGame(user) == false)
-            throw IllegalStateException("The player is not in the game currently in progress")
         if(roundLost != null)
             throw IllegalStateException("The player has already lost the game")
         if(amount > balance) {
             balance = 0
             if(ownedLocations.isEmpty()) {
-                roundLost = Game.gameInProgress?.currentRound
+                roundLost = GameRepository.game?.currentRound
                 // TODO : tell the player that he lose the game
             } else {
                 // TODO : ask the player if he wants to sell one of his/her properties
@@ -178,23 +167,12 @@ data class Player (
     }
 
     /**
-     * Update the state of the player with all the new data
-     * @param newBalance the new balance of the player
-     * @param newOwnedLocations the new list of the owned locations of the player
-     * @param newRoundLost the new round when the player had lost the game if the player has lost the game,
-     * @throws IllegalArgumentException if the player has lost the game and the balance is not equal to 0
-     * @throws IllegalArgumentException if the player has lost the game and the player owns locations
+     * Compare the player with another player.
+     * Comparing two players that have not lost the game is based on the balance of the player.
+     * Comparing two players that have lost the game is based on the round when the player had
+     * lost the game.
+     * A player that has lost the game is always inferior to a player that has not lost the game.
      */
-    fun updateState(newBalance: Int, newOwnedLocations: List<InGameLocation>, newRoundLost: Int?) {
-        if(balance > 0 && roundLost != null)
-            throw IllegalArgumentException("If the player has lost the game, the balance of the player must be equal to 0")
-        if(ownedLocations.isNotEmpty() && roundLost != null)
-            throw IllegalArgumentException("If the player has lost the game, the player can't owned locations")
-        balance = newBalance
-        ownedLocations = newOwnedLocations.toMutableList()
-        roundLost = newRoundLost
-    }
-
     override fun compareTo(other: Player): Int {
         return if (roundLost != null && other.roundLost != null) {
             roundLost!!.compareTo(other.roundLost!!)

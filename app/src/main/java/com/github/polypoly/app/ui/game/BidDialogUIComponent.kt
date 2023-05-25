@@ -18,38 +18,38 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 /**
- * Bet popup dialog
- * @param onBuy lambda to execute when a valid bet is set
- * @param onClose lambda to execute when the bet is canceled
- * @param locationOnBet location to bid for
+ * Bid popup dialog
+ * @param onBuy lambda to execute when a valid bid is set
+ * @param onClose lambda to execute when the bid is canceled
+ * @param locationOnBid location to bid for
  */
 @Composable
-fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: LocationProperty) {
+fun BidDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBid: LocationProperty) {
     val inputPrice = remember { mutableStateOf("") }
     val showError = remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onClose,
         title = {
-            Text(text = "Enter your bet")
+            Text(text = "Enter your bid")
         },
-        modifier = Modifier.testTag("betDialog"),
+        modifier = Modifier.testTag("bid_dialog"),
         text = {
-            BetDialogBody(
+            BidDialogBody(
                 inputPrice = inputPrice,
                 showError = showError
             )
         },
         buttons = {
-            BetDialogButtons(
-                locationOnBet = locationOnBet,
-                onBuy = onBuy,
+            BidDialogButtons(
+                locationBid = locationOnBid,
+                onBid = onBuy,
                 onClose = onClose,
                 inputPrice = inputPrice,
                 showError = showError
@@ -59,10 +59,12 @@ fun BetDialog(onBuy: (Float) -> Unit, onClose: () -> Unit, locationOnBet: Locati
 }
 
 /**
- * Body for the bet dialog.
+ * Body for the bid dialog.
+ * @param inputPrice the price input by the user
+ * @param showError whether to show the error message
  */
 @Composable
-private fun BetDialogBody(
+private fun BidDialogBody(
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
 ) {
@@ -79,28 +81,33 @@ private fun BetDialogBody(
             textStyle = typography.body1,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("betInput")
+                .testTag("bid_input")
         )
         if (showError.value) {
             Text(
-                text = "You cannot bet less than the base price!",
+                text = "You cannot bid less than the base price!",
                 color = colors.error,
                 style = typography.caption,
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .testTag("betErrorMessage")
+                    .testTag("bid_error_message")
             )
         }
     }
 }
 
 /**
- * The buttons that are shown in the bet dialog.
+ * The buttons that are shown in the bid dialog.
+ * @param locationBid location to bid for
+ * @param onBid lambda to execute when a valid bid is set
+ * @param onClose lambda to execute when the bid is canceled
+ * @param inputPrice the price input by the user
+ * @param showError whether to show the error message
  */
 @Composable
-private fun BetDialogButtons(
-    locationOnBet: LocationProperty,
-    onBuy: (Float) -> Unit,
+private fun BidDialogButtons(
+    locationBid: LocationProperty,
+    onBid: (Float) -> Unit,
     onClose: () -> Unit,
     inputPrice: MutableState<String>,
     showError: MutableState<Boolean>
@@ -114,8 +121,8 @@ private fun BetDialogButtons(
         Button(
             onClick = {
                 val amount = inputPrice.value.toFloatOrNull()
-                if (amount != null && amount >= locationOnBet.basePrice) {
-                    onBuy(amount)
+                if (amount != null && amount >= locationBid.basePrice) {
+                    onBid(amount)
                 } else {
                     showError.value = true
                 }
@@ -123,7 +130,7 @@ private fun BetDialogButtons(
         ) {
             Text(
                 text = "Confirm",
-                modifier = Modifier.testTag("confirmBetButton")
+                modifier = Modifier.testTag("confirm_bid_button")
             )
         }
 
@@ -132,7 +139,7 @@ private fun BetDialogButtons(
         ) {
             Text(
                 text = "Close",
-                modifier = Modifier.testTag("closeBetButton")
+                modifier = Modifier.testTag("close_bid_button")
             )
         }
     }

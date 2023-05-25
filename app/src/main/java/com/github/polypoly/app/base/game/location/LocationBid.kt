@@ -36,3 +36,4 @@ data class LocationBid (
         val comparator = Comparator<LocationBid> { a, b -> compare(a, b) }
     }
 }
+
