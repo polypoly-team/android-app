@@ -11,6 +11,7 @@ import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
@@ -36,7 +37,7 @@ class GameTest: PolyPolyTest(false, false) {
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
     @Before
-    fun initLoby() {
+    fun initLobby() {
         gameLobby.addUser(testUser2)
         gameLobby.addUser(testUser3)
         gameLobby.addUser(testUser4)
@@ -49,23 +50,23 @@ class GameTest: PolyPolyTest(false, false) {
     @Test
     fun whenGameStartGameInProgressIsNotNull() {
         gameLobby.start()
-        assertNotNull(Game.gameInProgress)
+        assertNotNull(GameRepository.game)
     }
 
     @Test
     fun whenGameStartGameInProgressHasTheCorrectRules() {
         gameLobby.start()
-        assertEquals(gameRules.gameMode, Game.gameInProgress?.rules?.gameMode)
-        assertEquals(gameRules.maximumNumberOfPlayers, Game.gameInProgress?.rules?.maximumNumberOfPlayers)
-        assertEquals(gameRules.minimumNumberOfPlayers, Game.gameInProgress?.rules?.minimumNumberOfPlayers)
-        assertEquals(gameRules.initialPlayerBalance, Game.gameInProgress?.rules?.initialPlayerBalance)
-        assertEquals(gameRules.roundDuration, Game.gameInProgress?.rules?.roundDuration)
+        assertEquals(gameRules.gameMode, GameRepository.game?.rules?.gameMode)
+        assertEquals(gameRules.maximumNumberOfPlayers, GameRepository.game?.rules?.maximumNumberOfPlayers)
+        assertEquals(gameRules.minimumNumberOfPlayers, GameRepository.game?.rules?.minimumNumberOfPlayers)
+        assertEquals(gameRules.initialPlayerBalance, GameRepository.game?.rules?.initialPlayerBalance)
+        assertEquals(gameRules.roundDuration, GameRepository.game?.rules?.roundDuration)
     }
 
     @Test
     fun whenGameStartEveryPlayerHasTheCorrectBalance() {
         gameLobby.start()
-        for(player in Game.gameInProgress?.players!!) {
+        for(player in GameRepository.game?.players!!) {
             assertEquals(gameRules.initialPlayerBalance, player.getBalance())
         }
     }
@@ -73,7 +74,7 @@ class GameTest: PolyPolyTest(false, false) {
     @Test
     fun whenGameStartEveryPlayerHasRank1() {
         gameLobby.start()
-        val ranking = Game.gameInProgress?.ranking()
+        val ranking = GameRepository.game?.ranking()
         for (rank in ranking!!) {
             assertEquals(1, rank.value)
         }
@@ -82,12 +83,12 @@ class GameTest: PolyPolyTest(false, false) {
     @Test
     fun rankingRankPlayersCorrectly() {
         gameLobby.start()
-        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(200)
-        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(100)
-        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(100)
-        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(250)
-        Game.gameInProgress?.getPlayer(testUser6.id)?.loseMoney(250)
-        val ranking = Game.gameInProgress?.ranking()
+        GameRepository.game?.getPlayer(testUser1.id)?.earnMoney(200)
+        GameRepository.game?.getPlayer(testUser2.id)?.earnMoney(100)
+        GameRepository.game?.getPlayer(testUser4.id)?.loseMoney(100)
+        GameRepository.game?.getPlayer(testUser5.id)?.loseMoney(250)
+        GameRepository.game?.getPlayer(testUser6.id)?.loseMoney(250)
+        val ranking = GameRepository.game?.ranking()
         assertEquals(1, ranking?.get(testUser1.id))
         assertEquals(2, ranking?.get(testUser2.id))
         assertEquals(3, ranking?.get(testUser3.id))
@@ -118,7 +119,7 @@ class GameTest: PolyPolyTest(false, false) {
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
             val game = gameLobby.start()
-            for (player in Game.gameInProgress?.players!!) {
+            for (player in GameRepository.game?.players!!) {
                 assertEquals(i, game.getOwnedLocations(player).size)
             }
         }
@@ -140,12 +141,13 @@ class GameTest: PolyPolyTest(false, false) {
             val game = gameLobby.start()
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
-            for (player in Game.gameInProgress?.players!!)
+            for (player in GameRepository.game?.players!!) {
                 for (location in game.getOwnedLocations(player)) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")
                     ownedLocationsSet.add(location)
                 }
+            }
         }
     }
 

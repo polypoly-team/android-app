@@ -21,7 +21,7 @@ class GameLobbyConstants {
         const val GAME_LOBBY_MAX_NAME_LENGTH = 9
         const val GAME_LOBBY_PRIVATE_DEFAULT = false
         const val GAME_LOBBY_MAX_PLAYERS = 8
-        const val GAME_LOBBY_MIN_PLAYERS = 1
+        const val GAME_LOBBY_MIN_PLAYERS = 2
         const val GAME_LOBBY_MAX_ROUNDS = 30
         const val GAME_LOBBY_MIN_ROUNDS = 2
         const val GAME_LOBBY_ROUNDS_DEFAULT = 5
@@ -41,7 +41,7 @@ class GameLobbyConstants {
 
     }
 
-    enum class DurationType() {
+    enum class DurationType {
         HOUR, DAY, MINUTE;
     }
 

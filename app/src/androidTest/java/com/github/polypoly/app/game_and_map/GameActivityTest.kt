@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,11 +7,10 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
-import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
@@ -59,31 +58,31 @@ class GameActivityTest : PolyPolyTest(true, false) {
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
     }
 
     @Test
     fun mapActivity_Hides_Marker_Info_View_On_Close_Button_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeButton").performClick()
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("close_button").performClick()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertDoesNotExist()
     }
 
     @Test
-    fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
+    fun mapActivityDisplaysErrorOnInvalidBidAmount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
 
-        composeTestRule.onNodeWithTag("betInput").performTextInput("10")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("10")
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
 
-        composeTestRule.onNodeWithTag("betErrorMessage", true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("bid_error_message", true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("close_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     @Test // could be looped for extensive testing
@@ -91,11 +90,11 @@ class GameActivityTest : PolyPolyTest(true, false) {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
         // TODO: Replace by future MAX_BET or similar
-        composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("3000")
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     // While it may be better for grades to have a test for each component,

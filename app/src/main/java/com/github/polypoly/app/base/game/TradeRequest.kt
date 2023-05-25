@@ -1,7 +1,7 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.utils.global.Settings
 import java.util.concurrent.CompletableFuture
 

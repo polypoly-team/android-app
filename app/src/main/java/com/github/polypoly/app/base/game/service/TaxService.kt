@@ -1,6 +1,8 @@
 package com.github.polypoly.app.base.game.service
 
 import android.location.Location
+import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.utils.Constants
 

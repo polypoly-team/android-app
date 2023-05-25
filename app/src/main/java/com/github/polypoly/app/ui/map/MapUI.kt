@@ -10,7 +10,7 @@ import com.github.polypoly.app.BuildConfig
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.PropertyLevel
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
@@ -39,7 +39,7 @@ object MapUI {
         val mapView = initMapView(context)
         if (gameViewModel != null) {
             val player = gameViewModel.getPlayerData().value
-            for (location in gameViewModel.getGameData().value?.allLocations ?: listOf()){
+            for (location in gameViewModel.getGameData().value?.getLocations() ?: listOf()){
                 val zone = LocationPropertyRepository.getZones().find { it.locationProperties.contains(location) }
                 val owned = locationsOwned.find { inGame -> inGame.locationProperty == location }
                 addMarkerTo(

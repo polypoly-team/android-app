@@ -1,9 +1,6 @@
-package com.github.polypoly.app.models.menu.lobby
+package com.github.polypoly.app.viewmodels.menu.lobby
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-import com.github.polypoly.app.utils.global.Settings
-import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
