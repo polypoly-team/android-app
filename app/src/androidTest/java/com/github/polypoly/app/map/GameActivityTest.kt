@@ -4,6 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
@@ -13,6 +14,8 @@ import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.ui.menu.WelcomeActivity
+import com.github.polypoly.app.ui.menu.profile.ProfileActivity
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -24,8 +27,10 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 class GameActivityTest : PolyPolyTest(true, false, true) {
 
+    val lobby = TEST_GAME_LOBBY_AVAILABLE_4
+
     init {
-        val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        val newGame = Game.launchFromPendingGame(lobby)
         GameRepository.game = newGame
         GameRepository.player = newGame.getPlayer(newGame.admin.id)
     }
@@ -148,6 +153,27 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
+    // ======================================================================== END SCREEN
+    @Test
+    fun endScreenIsDisplayedWhenGameEnds() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("end_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun playerRowAreDisplayedWhenGameEnds() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("end_screen_row_1").assertIsDisplayed()
+    }
+
+    @Test
+    fun returnButtonWorksAtGameEnd() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithText("Return to menu").performClick()
+        Intents.intended(IntentMatchers.hasComponent(WelcomeActivity::class.java.name))
+    }
+
+
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
@@ -172,6 +198,16 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         }
 
         // TODO add other states support when needed
+    }
+
+    // TODO: why does this timeout?
+    private fun forceGameEnd(): CompletableFuture<Boolean> {
+        return execInMainThread {
+            for(i in 0..(lobby.rules.maxRound ?: 100)) {
+                composeTestRule.activity.gameModel.nextTurn().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            }
+            waitForUIToUpdate()
+        }
     }
 
     private fun forceChangePlayerState(playerState: PlayerState): CompletableFuture<Boolean> {

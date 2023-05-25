@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Game
@@ -37,7 +38,9 @@ import com.github.polypoly.app.ui.theme.UIElements
 fun GameEndUI(lastGame: Game, quitAction: () -> Unit) {
     Dialog(onDismissRequest = {}) {
         Surface(
-            modifier = Modifier.padding(Padding.medium),
+            modifier = Modifier
+                .padding(Padding.medium)
+                .testTag("end_screen"),
             color = Color.Transparent
         ) {
             Column(
@@ -86,7 +89,7 @@ private fun LeaderBoard(orderedPlayers: List<Player>) {
     ) {
         Column {
             for (i in orderedPlayers.indices) {
-                LeaderBoardRow(player = orderedPlayers[i], rank = i)
+                LeaderBoardRow(player = orderedPlayers[i], rank = i+1)
             }
         }
     }
@@ -108,6 +111,7 @@ private fun LeaderBoardRow(player: Player, rank: Int) {
             .background(color)
             .fillMaxWidth()
             .padding(Padding.small)
+            .testTag("end_screen_row_$rank")
     ) {
         Text(text = "$rank. ${player.user.name}", color = textColor)
         Spacer(modifier = Modifier.weight(1f))

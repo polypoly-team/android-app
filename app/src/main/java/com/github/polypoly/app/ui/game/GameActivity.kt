@@ -102,7 +102,6 @@ class GameActivity : ComponentActivity() {
                         mapViewModel.interactableProperty.value?.name ?: "EPFL",
                         gameModel
                     )
-                    GameEndedLabel(gameEnded)
 
                     // pop-ups for trades:
                     DialogsForTrade(trade, player)

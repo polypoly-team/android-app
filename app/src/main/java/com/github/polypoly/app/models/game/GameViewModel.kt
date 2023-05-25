@@ -185,7 +185,7 @@ class GameViewModel(
         coroutineScope.launch {
             gameData.value?.nextTurn()
 
-            synchronizeGame().thenAccept { syncSucceeded ->
+            synchronizeGame().thenApply { syncSucceeded ->
                 if (syncSucceeded) {
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
