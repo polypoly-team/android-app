@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -63,22 +64,19 @@ fun Hud(
     gameModel: GameViewModel
 ) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition =
-        mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
-    Column(modifier = Modifier.testTag("hud")) {
-        HudPlayer(playerData)
-        HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
-        HudLocation(location, testTag = "interactable_location_text")
-        if (playerState == PlayerState.MOVING)
-            HudLocation(
-                playerPosition,
-                DpOffset(0.dp, 80.dp),
-                "going_to_location_text",
-                "Going to: "
-            )
-        HudGameMenu()
-    }
+    HudLocation(location, testTag = "interactable_location_text")
+    if (playerState == PlayerState.MOVING)
+        HudLocation(
+            playerPosition,
+            DpOffset(0.dp, 80.dp),
+            "going_to_location_text",
+            "Going to: "
+        )
+    HudPlayer(playerData)
+    HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
+    HudGameMenu()
 }
 
 /**
@@ -94,12 +92,31 @@ fun HudLocation(
             .fillMaxWidth()
             .padding(Padding.medium)
     ) {
-        if (location.isNotEmpty())
+        Box(
+            modifier = Modifier.align(TopCenter),
+            contentAlignment = Center
+        ) {
+            if (location.isNotEmpty())
+                Text(
+                    text = headerText,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(offset.x, offset.y)
+                        .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                            shape = Shapes.medium
+                        )
+                        .padding(Padding.medium),
+                    style = MaterialTheme.typography.h6
+                )
             Text(
-                text = headerText,
+                text = location,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(offset.x, offset.y - 50.dp)
+                    .testTag(testTag)
+                    .offset(offset.x, offset.y + 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
                     .border(
                         1.dp,
@@ -107,23 +124,9 @@ fun HudLocation(
                         shape = Shapes.medium
                     )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h4
             )
-        Text(
-            text = location,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .testTag(testTag)
-                .offset(offset.x, offset.y)
-                .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                .border(
-                    1.dp,
-                    MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                    shape = Shapes.medium
-                )
-                .padding(Padding.medium),
-            style = MaterialTheme.typography.h4
-        )
+        }
     }
 }
 
@@ -137,7 +140,9 @@ fun HudPlayer(playerData: Player) {
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier.align(BottomEnd),
+            modifier = Modifier
+                .align(BottomEnd)
+                .testTag("hud_player"),
             contentAlignment = Center
         ) {
             MoneyHudText("playerBalance", "${playerData.getBalance()} $")
@@ -182,6 +187,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
             modifier = Modifier
                 .padding(Padding.medium)
                 .align(Alignment.TopStart)
+                .testTag("hud_other_players_and_game"),
         ) {
             Column(Modifier.padding(Padding.medium)) {
                 // A drop down button that expands and collapses the stats for other players and
@@ -309,6 +315,7 @@ fun HudGameMenu() {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
+                .testTag("hud_game_menu")
         ) {
             Column(modifier = Modifier.padding(10.dp, 0.dp)) {
                 // The game menu slides in and out when the game menu button is pressed
