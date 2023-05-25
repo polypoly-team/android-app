@@ -65,6 +65,6 @@ object MapUI {
 
         val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel, gameViewModel)
         mapView.overlays.add(currentLocationOverlay)
-        return mapView 
+        return mapView
     }
 }
