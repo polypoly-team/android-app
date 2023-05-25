@@ -403,7 +403,7 @@ class GameViewModel(
 
     fun refreshInGameLocationsOwned() {
         val player = playerData.value ?: return
-        _locationsOwnedData.value = gameData.value?.inGameLocations?.filter { it.owner == player }
+        _locationsOwnedData.postValue(gameData.value?.inGameLocations?.filter { it.owner == player })
     }
 
     companion object {
