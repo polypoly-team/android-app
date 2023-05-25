@@ -18,7 +18,6 @@ data class Player (
     val user: User = User(),
     private var balance: Int = 0,
     private var roundLost: Int? = null,
-    private val bill : Set<Transaction> = Transaction.values().toSet(),
 ) : Comparable<Player> {
 
     private var ownedLocations: MutableList<InGameLocation> = mutableListOf()

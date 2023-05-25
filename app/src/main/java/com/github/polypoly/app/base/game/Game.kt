@@ -7,9 +7,7 @@ import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
 import java.util.concurrent.CompletableFuture
 
@@ -32,6 +30,8 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
     val inGameLocations: List<InGameLocation> = rules.gameMap
         .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
+    val transactions : List<GameTransaction> = listOf(),
+    val pastTransactions: ArrayList<List<GameTransaction>> = arrayListOf(),
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
     val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
@@ -46,6 +46,7 @@ class Game private constructor(
         if (isGameFinished()) {
             val pastGame = endGame()
         }
+        computeTransactions()
     }
 
     /**
@@ -132,6 +133,13 @@ class Game private constructor(
     fun getAdmin(): Player {
         return players.find { it.user.id == admin.id }
             ?: throw IllegalStateException("the admin is not in the game")
+    }
+
+    private fun computeTransactions(){
+        for (transaction in transactions.filter { !it.isExecuted() }) {
+            transaction.execute()
+        }
+        pastTransactions.add(transactions)
     }
 
     /**
