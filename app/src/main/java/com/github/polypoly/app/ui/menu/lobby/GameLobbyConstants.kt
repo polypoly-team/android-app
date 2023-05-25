@@ -49,6 +49,7 @@ class GameLobbyConstants {
      * Enum for the round durations
      */
     enum class RoundDurations(private val value: Int, private val durationType: DurationType) {
+        TWO_MINUTES(2, DurationType.MINUTE),
         FIVE_MINUTES(5, DurationType.MINUTE),
         TEN_MINUTES(10, DurationType.MINUTE),
         FIFTEEN_MINUTES(15, DurationType.MINUTE),

@@ -69,7 +69,7 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            60, 20, getZones(), 100), "Full gameLobby", "11111"
+            60, 20, getZones(), 1000), "Full gameLobby", "11111"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
@@ -221,8 +221,10 @@ abstract class PolyPolyTest(
      * @param amongLocations list of locations to pick from
      * @return a random location in the list
      */
-    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties }): LocationProperty {
-        return amongLocations[Random.nextInt().absoluteValue % amongLocations.size]
+    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties },
+                          excluding: List<LocationProperty> = listOf()): LocationProperty {
+        val availableLocations = amongLocations.minus(excluding.toSet())
+        return availableLocations[Random.nextInt().absoluteValue % availableLocations.size]
     }
 
     /**

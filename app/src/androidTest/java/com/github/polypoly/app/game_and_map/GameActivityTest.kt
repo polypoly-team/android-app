@@ -12,6 +12,7 @@ import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -21,7 +22,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false, true) {
+class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
         val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
@@ -155,6 +156,22 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
+    @Test
+    fun successfulBidNotificationIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("successful_bid_alert").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsDisplayedAtEndOfTurn() {
+        forceChangePlayerState(PlayerState.TURN_FINISHED).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertIsDisplayed()
+    }
+
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
@@ -173,10 +190,11 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         gameViewModel.locationReached()
         if (playerState == PlayerState.INTERACTING) return
 
-        if (playerState == PlayerState.BIDDING) {
-            gameViewModel.startBidding()
-            return
-        }
+        gameViewModel.startBidding()
+        if (playerState == PlayerState.BIDDING) return
+
+        gameViewModel.endBidding()
+        if (playerState == PlayerState.TURN_FINISHED) return
 
         // TODO add other states support when needed
     }

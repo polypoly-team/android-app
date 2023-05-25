@@ -10,5 +10,5 @@ enum class PlayerState {
     INTERACTING,
     BIDDING,
     TRADING,
-    TURN_FINISHED // mainly used by game to force the players to be ready for the next turn
+    TURN_FINISHED // when the main action is done
 }

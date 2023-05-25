@@ -1,6 +1,7 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
@@ -34,6 +35,8 @@ class Game private constructor(
 
     var currentRound: Int = 1
 
+    private val currentRoundBids: MutableList<LocationBid> = mutableListOf()
+
     /**
      * @return the [List] of [LocationProperty] of the [Game]
      */
@@ -45,11 +48,21 @@ class Game private constructor(
      * Go to the next turn and change the player order in function of the [Player]s' rank
      */
     fun nextTurn() {
+        if (isGameFinished()) return
+
         ++currentRound
         players = players.sortedDescending()
-        if (isGameFinished()) {
-            endGame()
+
+        if (!isGameFinished()) {
+            computeBids()
+        } else {
+            val pastGame = endGame()
         }
+    }
+
+    private fun computeBids() {
+        computeAllWinnersOfBids()
+        currentRoundBids.clear()
     }
 
     /**
@@ -143,19 +156,51 @@ class Game private constructor(
      * Compute the winner of the bets, notify the players and update the balance of the players
      * and the location owner.
      */
-    fun computeAllWinnersOfBets() {
-        inGameLocations.forEach {
-            val winningBet = it.computeWinningBid()
-            if (winningBet != null) {
-                val winner = winningBet.player
-                if (winner.user.currentUser) {
-                    winner.loseMoney(winningBet.amount)
-                    // TODO : notify the player that he has won and the other players in the bets
-                    //  that they have lost
+    private fun computeAllWinnersOfBids() {
+        for ((location, bids) in currentRoundBids.groupBy(LocationBid::location)) {
+            var maxBid: LocationBid? = null
+            for (bid in bids) {
+                bid.player.loseMoney(bid.amount)
+                if (maxBid == null || LocationBid.comparator.compare(bid, maxBid) >= 0) {
+                    maxBid = bid
                 }
-                // TODO : what if a player wins but doesn't open their phone?
+            }
+            if (maxBid != null) {
+                val inGame = findInGameLocation(location) ?: throw IllegalStateException("Bid won for location $location that is not part of the game")
+                maxBid.player.earnNewLocation(inGame)
             }
         }
+    }
+
+    private fun findInGameLocation(location: LocationProperty): InGameLocation? {
+        return inGameLocations.find {loc ->
+            loc.locationProperty.name == location.name
+        }
+    }
+
+    /**
+     * Retrieve the InGameLocation of this location
+     */
+    fun getInGameLocation(location: LocationProperty): InGameLocation? {
+        return findInGameLocation(location)?.copy()
+    }
+
+    /**
+     * Registers a bid for the current player
+     * @param bid: bid to register
+     * @throws IllegalArgumentException if the player is not part of the game
+     * @throws IllegalStateException if the player has already made a bid this turn or cannot buy the corresponding location
+     */
+    fun registerBid(bid: LocationBid) {
+        if (!playInThisGame(bid.player.user))
+            throw java.lang.IllegalArgumentException("${bid.player.user} is not part of this game")
+        if (!inGameLocations.any { inGame -> inGame.locationProperty == bid.location })
+            throw java.lang.IllegalArgumentException("${bid.location} is not part of the locations in this game")
+        if (currentRoundBids.any {existingBid -> existingBid.player.user.id == bid.player.user.id } )
+            throw IllegalStateException("A single player can only bid on one location per turn")
+        if (!bid.player.canBuy(bid.location, bid.amount))
+            throw IllegalStateException("The player ${bid.player} cannot bid on ${bid.location} for ${bid.amount}")
+        currentRoundBids.add(bid)
     }
 
     override fun toDBObject(): GameDB {
@@ -165,7 +210,9 @@ class Game private constructor(
             players,
             rules,
             dateBegin,
-            currentRound
+            currentRound,
+            inGameLocations,
+            currentRoundBids
         )
     }
 
@@ -175,9 +222,11 @@ class Game private constructor(
             dbObject.admin,
             dbObject.players,
             dbObject.rules,
-            dbObject.dateBegin
+            dbObject.dateBegin,
+            dbObject.inGameLocations
         )
         game.currentRound = dbObject.round
+        game.currentRoundBids.addAll(dbObject.currentRoundBids)
         return CompletableFuture.completedFuture(game)
     }
 
@@ -247,5 +296,7 @@ data class GameDB(
     var players: List<Player> = listOf(),
     val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
-    val round: Int = 0
+    val round: Int = 0,
+    val inGameLocations: List<InGameLocation> = listOf(),
+    val currentRoundBids: List<LocationBid> = listOf()
 )

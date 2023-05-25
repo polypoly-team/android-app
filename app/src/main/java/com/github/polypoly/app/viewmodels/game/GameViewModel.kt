@@ -10,6 +10,7 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.viewmodels.commons.LoadingModel
@@ -40,6 +41,11 @@ class GameViewModel(
     private val gameEndedData: MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val playerStateData: MutableLiveData<PlayerState> = MutableLiveData(PlayerState.INIT)
+
+    private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
+    val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
+
+    private var currentTurnBid: LocationBid? = null
 
     private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
 
@@ -165,8 +171,6 @@ class GameViewModel(
 
             delay(currentGame.rules.roundDuration.toLong() * 1000 * 60)
 
-            playerStateData.postValue(PlayerState.TURN_FINISHED)
-
             nextTurn()
 
             currentGame = gameData.value
@@ -189,6 +193,9 @@ class GameViewModel(
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
                 }
+
+                onNextTurnEnd()
+
                 setLoading(false)
                 completionFuture.complete(syncSucceeded)
             }
@@ -197,12 +204,25 @@ class GameViewModel(
         return completionFuture
     }
 
+    private fun onNextTurnEnd() {
+        val game = gameData.value ?: return
+
+        val previousBid = currentTurnBid
+        if (previousBid != null &&
+            game.getInGameLocation(previousBid.location)?.isTheOwner(playerData.value) == true) {
+            _successfulBidData.value = previousBid
+        }
+        currentTurnBid = null
+    }
+
     private fun synchronizeGame(): CompletableFuture<Boolean> {
         val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
         return remoteDB.getValue<Game>(gameUpdated.key).thenCompose { gameFound ->
             if (gameFound.currentRound < gameUpdated.currentRound) {
-                gameData.value = gameUpdated
-                remoteDB.setValue(gameUpdated)
+                remoteDB.setValue(gameUpdated).thenCompose{
+                    gameData.value = gameUpdated
+                    CompletableFuture.completedFuture(true)
+                }
             } else { // up to date version already on live db
                 gameData.value = gameFound
                 CompletableFuture.completedFuture(true)
@@ -243,6 +263,10 @@ class GameViewModel(
      */
     fun cancelBidding() {
         playerStateFSMTransition(PlayerState.BIDDING, PlayerState.INTERACTING)
+    }
+
+    fun endBidding() {
+        playerStateFSMTransition(PlayerState.BIDDING, PlayerState.TURN_FINISHED)
     }
 
     /**
@@ -315,6 +339,40 @@ class GameViewModel(
         return result
     }
 
+    /**
+     * Registers a bid on the location and amount provided
+     * @param location location to bid on
+     * @param bidAmount amount for the bid
+     * @return a future that completes once the registering ended, holding true iff it succeeded
+     */
+    fun bidForLocation(location: LocationProperty, bidAmount: Int): CompletableFuture<Boolean> {
+        val gameUpdated = gameData.value ?: return CompletableFuture.completedFuture(false)
+        val player = playerData.value ?: return CompletableFuture.completedFuture(false)
+
+        if (currentTurnBid != null || !player.canBuy(location, bidAmount))
+            return CompletableFuture.completedFuture(false)
+
+        val future = CompletableFuture<Boolean>()
+
+        coroutineScope.launch {
+            if (gameUpdated.getInGameLocation(location)?.owner != null || bidAmount > player.getBalance()) {
+                future.complete(false)
+            } else {
+                val bid = LocationBid(location, player, bidAmount)
+                gameUpdated.registerBid(bid)
+
+                remoteDB.setValue(gameUpdated).thenApply {
+                    gameData.value = gameUpdated
+                    currentTurnBid = bid
+                    endBidding()
+                    future.complete(true)
+                }
+            }
+        }
+
+        return future
+    }
+
     companion object {
         /**
          * Factory object for the GameLobbyWaitingViewModel
@@ -322,7 +380,6 @@ class GameViewModel(
          */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-
                 requireNotNull(GameRepository.game)
                 requireNotNull(GameRepository.player)
 

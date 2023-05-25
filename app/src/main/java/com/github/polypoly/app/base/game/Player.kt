@@ -3,6 +3,7 @@ package com.github.polypoly.app.base.game
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
 import kotlin.random.Random
@@ -119,23 +120,10 @@ data class Player (
      * The player bid to buy a location
      * @param location the location the player wants to buy
      * @param amount the amount of money the player wants to bid
-     * @return the [LocationBid] created
-     * @throws IllegalArgumentException if the location is already owned by someone
-     * @throws IllegalArgumentException if the amount of money bet is negative or zero
-     * @throws IllegalStateException if the player has already lost the game
-     * @throws IllegalArgumentException if the player has not enough money to buy the location
+     * @return true iff the player can buy this location with this amount
      */
-    fun bidToBuy(location: InGameLocation, amount: Int) : LocationBid {
-        if(location.owner != null)
-            throw IllegalArgumentException("The location is already owned by someone")
-        if(amount <= 0)
-            throw IllegalArgumentException("The amount of money bet cannot be negative or zero")
-        if(roundLost != null)
-            throw IllegalStateException("The player has already lost the game")
-        if(location.currentPrice() > balance)
-            throw IllegalArgumentException("The player has not bet enough money to buy the location")
-        return LocationBid(this, amount, Random.nextFloat(), System.currentTimeMillis() / 1000)
-        // TODO : add in the DB the bet
+    fun canBuy(location: LocationProperty, amount: Int) : Boolean {
+        return amount in 1..balance && roundLost == null && amount >= location.basePrice
     }
 
     /**

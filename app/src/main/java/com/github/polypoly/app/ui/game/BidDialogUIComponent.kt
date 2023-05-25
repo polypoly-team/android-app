@@ -6,22 +6,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
+import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.viewmodels.game.GameViewModel
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
  * Bid popup dialog
@@ -143,4 +143,66 @@ private fun BidDialogButtons(
             )
         }
     }
+}
+
+/**
+ * Creates a popup that indicates a bid was successful
+ * @param gameViewModel view model of the associated game
+ * @param duration duration of the popup before automatic dismiss
+ */
+@Composable
+fun SuccessfulBidNotification(gameViewModel: GameViewModel, duration: Duration) {
+    val successfulBid = gameViewModel.successfulBidData.observeAsState().value
+    val currentRoundTurn = gameViewModel.getRoundTurnData().observeAsState().value
+
+    val notificationTurn = remember { mutableStateOf(-1) }
+    val showCurrentTurn = remember { mutableStateOf(false) }
+
+    if (successfulBid != null && currentRoundTurn != null) {
+        if (!showCurrentTurn.value && notificationTurn.value < currentRoundTurn) {
+            notificationTurn.value = currentRoundTurn
+            showCurrentTurn.value = true
+
+            LaunchedEffect(currentRoundTurn) {
+                delay(duration.toLong(DurationUnit.MILLISECONDS))
+                showCurrentTurn.value = false
+            }
+        }
+
+        if (showCurrentTurn.value) {
+            SuccessfulBidAlert(
+                bid =  successfulBid,
+                onClose = { showCurrentTurn.value = false }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SuccessfulBidAlert(bid: LocationBid, onClose: () -> Unit) {
+    AlertDialog(
+        modifier = Modifier.testTag("successful_bid_alert"),
+        onDismissRequest = onClose,
+        title = {
+            Text("Congratulations, your bid was successful !!")
+        },
+        text = {
+            Text("You bought ${bid.location.name} for ${bid.amount} !!")
+        },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = SpaceEvenly
+            ) {
+                Button(
+                    onClick = { onClose() },
+                )
+                {
+                    Text("close")
+                }
+            }
+        }
+    )
 }

@@ -18,9 +18,10 @@ import org.junit.runners.JUnit4
 import org.osmdroid.util.GeoPoint
 
 @RunWith(JUnit4::class)
-class PlayerTest {
+class PlayerTest: PolyPolyTest(false, false) {
 
-    private val gameLobby = GameLobby(PolyPolyTest.TEST_USER_1, PolyPolyTest.gameRulesDefault,
+    private val gameLobby = GameLobby(
+        TEST_USER_1, gameRulesDefault,
         "test_game", "123456", false)
 
     @Before
@@ -148,66 +149,23 @@ class PlayerTest {
     }
 
     @Test
-    fun betToBuyCreatesALocationBetWithTheCorrectArguments() {
-        val amountOfTheBet = 300
-        val testPlayer = Player(TEST_USER_0, 300)
-        val bet = testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), amountOfTheBet)
-        assertEquals(amountOfTheBet, bet.amount)
-        assertEquals(TEST_USER_0.id, bet.player.user.id)
-        assertTrue(bet.randomNumber < 1 && bet.randomNumber >= 0)
-    }
-
-    @Test
-    fun betToBuyThrowsAnExceptionIfThePlayerHasAlreadyLost() {
+    fun canBuyFailsIfThePlayerHasLost() {
         val testPlayer = Player(TEST_USER_0, 0, 4)
-        val thrown = assertThrows(IllegalStateException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 300)
-        }
-        assertNotNull(thrown.message)
-         assertEquals("The player has already lost the game", thrown.message)
+        assertFalse(testPlayer.canBuy(getRandomLocation(), 300))
     }
 
     @Test
-    fun betToBuyThrowsAnExceptionIfTheAmountIsNegative() {
+    fun canBuyFailsWithNegativeOrNullAmount() {
         val testPlayer = Player(TEST_USER_0, 300)
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), -300)
-        }
-        assertNotNull(thrown.message)
-        val message = thrown.message
-        assertEquals("The amount of money bet cannot be negative or zero", message)
+        assertFalse(testPlayer.canBuy(getRandomLocation(), -300))
+        assertFalse(testPlayer.canBuy(getRandomLocation(), 0))
     }
 
     @Test
-    fun betToBuyThrowsAnExceptionIfTheAmountIsZero() {
-        val testPlayer = Player(TEST_USER_0, 300)
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.bidToBuy(InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0]), 0)
-        }
-        assertNotNull(thrown.message)
-        assertEquals("The amount of money bet cannot be negative or zero", thrown.message)
-    }
-
-    @Test
-    fun betToBuyThrowsAnExceptionIfTheLocationIsAlreadyOwned() {
-        val testPlayer = Player(TEST_USER_0, 300)
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
-            testPlayer.bidToBuy(
-                location = InGameLocation(LocationPropertyRepository.getZones()[0].locationProperties[0], owner = PolyPolyTest.testPlayer2), 300)
-        }
-        assertNotNull(thrown.message)
-        assertEquals("The location is already owned by someone", thrown.message)
-    }
-
-    @Test
-    fun betToBuyThrowsAnExceptionIfTheAmountIsSmallerThanTheLocationPrice() {
+    fun canBuyFailsIfTheAmountIsSmallerThanTheLocationPrice() {
         val testPlayer = Player(TEST_USER_0, 100)
-        val thrown = assertThrows(IllegalArgumentException::class.java) {
-            val locationProperty = LocationProperty("Test", 300, 30, 60, 0.0, 0.0)
-            testPlayer.bidToBuy(InGameLocation(locationProperty), 100)
-        }
-        assertNotNull(thrown.message)
-        assertEquals("The player has not bet enough money to buy the location", thrown.message)
+        val locationProperty = LocationProperty("Test", 300, 30, 60, 0.0, 0.0)
+        assertFalse(testPlayer.canBuy(locationProperty, locationProperty.basePrice - 1))
     }
 
     @Test
