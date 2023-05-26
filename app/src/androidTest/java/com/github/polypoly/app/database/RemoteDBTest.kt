@@ -1,7 +1,6 @@
-package com.github.polypoly.app.network
+package com.github.polypoly.app.database
 
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDBInitialized
@@ -17,7 +16,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import kotlin.NoSuchElementException
-import kotlin.reflect.KClass
 
 @RunWith(JUnit4::class)
 class RemoteDBTest: PolyPolyTest(false, false) {

@@ -5,23 +5,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
@@ -35,14 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
-import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -66,14 +60,18 @@ fun Hud(
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
     val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
+    SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
     HudLocation(location, testTag = "interactable_location_text")
-    if (playerState == PlayerState.MOVING)
+    if (playerState == PlayerState.MOVING) {
         HudLocation(
             playerPosition,
             DpOffset(0.dp, 80.dp),
             "going_to_location_text",
             "Going to: "
         )
+    } else if (playerState == PlayerState.TURN_FINISHED) {
+        TurnFinishedNotification()
+    }
     HudPlayer(playerData)
     HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
     HudGameMenu()
@@ -81,10 +79,16 @@ fun Hud(
 
 /**
  * The HUD for the current nearby location (a text at the top of the screen)
+ * @param location current location of the player
+ * @param offset offset of the text
+ * @param testTag test tag for the text in the Hud
+ * @param headerText text to display before the location
  */
 @Composable
 fun HudLocation(
-    location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String,
+    location: String,
+    offset: DpOffset = DpOffset(0.dp, 10.dp),
+    testTag: String,
     headerText: String = "Current Location: "
 ) {
     Box(
@@ -133,6 +137,7 @@ fun HudLocation(
 /**
  * The HUD for the player stats, it displays basic information such as their balance,
  * and a button shows complete information on click
+ * @param playerData current player of the game
  */
 @Composable
 fun HudPlayer(playerData: Player) {
@@ -177,6 +182,9 @@ fun HudPlayer(playerData: Player) {
  * The HUD that shows the stats for other players and the game, it's a button on the top left
  * that expands and collapses a tab that contains information about the game and the other
  * players
+ * @param otherPlayersData other players in the game
+ * @param round current round of the game
+ * @param gameModel GameViewModel associated with the game
  */
 @Composable
 fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
@@ -271,6 +279,8 @@ fun HudGame(round: Int) {
  */
 @Composable
 fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
+    val game = gameModel.getGameData().observeAsState().value ?: return
+
     val openOtherPlayerInfo = remember { mutableStateOf(false) }
 
     Row(Modifier.padding(Padding.medium)) {
@@ -287,8 +297,8 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
 
     val openLocationsDialog =  remember{ mutableStateOf(false) }
     if (openLocationsDialog.value) {
-        GameRepository.player?.let { it ->
-            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
+        GameRepository.player?.let { player ->
+            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, game.getOwnedLocations(player) ) { location ->
                 openLocationsDialog.value = false
                 gameModel.createATradeRequest(playerData, location)
             } }
@@ -298,7 +308,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
         val player = GameRepository.player
         if(player != null) {
-            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
+            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player, game)
         }
     }
 }
@@ -422,3 +432,19 @@ fun ToggleIconButton(
     }
 }
 
+@Composable
+fun TurnFinishedNotification() {
+    Box (modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()){
+        Text(
+            text = "You finished your turn, waiting for the next one...",
+            modifier = Modifier
+                .testTag("turn_finished_notification")
+                .background(MaterialTheme.colors.background, shape = Shapes.medium)
+                .padding(Padding.medium)
+                .align(BottomCenter),
+            style = MaterialTheme.typography.body1,
+        )
+    }
+}

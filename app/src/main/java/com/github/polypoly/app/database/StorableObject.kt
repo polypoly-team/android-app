@@ -1,4 +1,4 @@
-package com.github.polypoly.app.network
+package com.github.polypoly.app.database
 
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass

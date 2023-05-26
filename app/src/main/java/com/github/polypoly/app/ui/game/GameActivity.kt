@@ -29,13 +29,14 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.service.TaxService
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 /**
  * Activity for displaying the map used in the game.
+ * @property gameModel The view model for the game
  */
 class GameActivity : ComponentActivity() {
     val gameModel: GameViewModel by viewModels { GameViewModel.Factory }
@@ -144,6 +145,10 @@ class GameActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * A Pop-up that notify the player that the game has ended.
+     * @param gameEnded true if the game has ended, false otherwise
+     */
     @Composable
     private fun GameEndedLabel(gameEnded: Boolean) {
         if (gameEnded) {
@@ -161,10 +166,9 @@ class GameActivity : ComponentActivity() {
         }
     }
 
-    companion object {
-        val mapViewModel: MapViewModel = MapViewModel()
-    }
-
+    /**
+     * Handler for the background location permission.
+     */
     @Composable
     fun BackgroundLocationPermissionHandler(callback: () -> Unit) {
         var acknowledgePermissionDenial by remember { mutableStateOf(false) }
@@ -224,6 +228,11 @@ class GameActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * This function is used to request the background location permission
+     * @param grantCallback the callback if the permission is granted
+     * @param denyCallback the callback if the permission is denied
+     */
     private fun requestBackgroundLocationPermission(grantCallback: () -> Unit, denyCallback: () -> Unit) {
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -239,13 +248,23 @@ class GameActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * This function is used to start the tax service
+     */
     private fun startTaxService() {
         taxService = Intent(this, TaxService::class.java)
         startForegroundService(taxService)
     }
 
+    /**
+     * This function is used to stop the tax service
+     */
     private fun stopTaxService() {
         stopService(taxService)
+    }
+
+    companion object {
+        val mapViewModel: MapViewModel = MapViewModel()
     }
 
 }

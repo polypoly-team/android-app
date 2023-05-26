@@ -7,9 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.polypoly.app.BuildConfig
+import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.location.PropertyLevel
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.MapView
 
@@ -20,13 +21,10 @@ object MapUI {
      */
     @Composable
     fun MapView(mapViewModel: MapViewModel, gameViewModel: GameViewModel?) {
-        val mapViewState = mapViewModel.mapViewState.value
+        val locationsOwned = gameViewModel?.locationsOwnedData?.observeAsState()?.value ?: listOf()
         AndroidView(
             factory = { context ->
-                if (gameViewModel != null)
-                    mapViewModel.updateMapViewState(gameViewModel.getGameData().value!!.inGameLocations)
-                val mapView = createMapView(context, mapViewModel, gameViewModel, mapViewState)
-                mapView
+                createMapView(context, mapViewModel, gameViewModel, locationsOwned)
             }, modifier = Modifier.testTag("map")
         )
     }
@@ -35,25 +33,27 @@ object MapUI {
         context: Context,
         mapViewModel: MapViewModel,
         gameViewModel: GameViewModel?,
-        mapViewState: MapViewState? = null
+        locationsOwned: List<InGameLocation>
     ): MapView {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         val mapView = initMapView(context)
-        if (mapViewState != null) {
-            for (location in mapViewState.locations){
-                val zone = LocationPropertyRepository.getZones().find { it.locationProperties.contains(location.locationProperty) }
+        if (gameViewModel != null) {
+            val player = gameViewModel.getPlayerData().value
+            for (location in gameViewModel.getGameData().value?.getLocations() ?: listOf()){
+                val zone = LocationPropertyRepository.getZones().find { it.locationProperties.contains(location) }
+                val owned = locationsOwned.find { inGame -> inGame.locationProperty == location }
                 addMarkerTo(
                     mapView,
-                    location.locationProperty,
+                    location,
                     zone!!.color,
                     mapViewModel,
                     gameViewModel,
-                    location.level,
-                    location.owner != null
+                    owned?.level ?: PropertyLevel.LEVEL_0,
+                    owned?.owner == player
                 )
             }
-        } else
-            for (zone in LocationPropertyRepository.getZones())
+        } else {
+            for (zone in LocationPropertyRepository.getZones()) {
                 for (location in zone.locationProperties)
                     addMarkerTo(
                         mapView,
@@ -63,6 +63,8 @@ object MapUI {
                         gameViewModel,
                         PropertyLevel.LEVEL_0
                     )
+            }
+        }
 
         val currentLocationOverlay = initLocationOverlay(mapView, mapViewModel, gameViewModel)
         mapView.overlays.add(currentLocationOverlay)

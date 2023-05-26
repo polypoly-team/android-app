@@ -52,7 +52,9 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
-    // ===================================================== MAIN CONTENT
+    /**
+     * main content of the welcome activity
+     */
     @Composable
     fun WelcomeContent() {
         GameMusic.setSong(LocalContext.current, R.raw.mocksong)
