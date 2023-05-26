@@ -44,4 +44,8 @@
     <string name="game_lobby_settings_title">"Game Settings"</string>
     // =========================================================================
 
+    // GAME ==================================================================
+    <string name="game_end_screen_return">"Return to menu"</string>
+    <string name="game_end_screen_text">"End of the game!"</string>
+
 </resources>

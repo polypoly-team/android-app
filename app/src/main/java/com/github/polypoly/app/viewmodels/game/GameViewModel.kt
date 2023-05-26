@@ -12,16 +12,10 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.game.transactions.TaxTransaction
-import com.github.polypoly.app.base.menu.lobby.GameLobby
-import com.github.polypoly.app.base.menu.lobby.GameMode
-import com.github.polypoly.app.base.menu.lobby.GameParameters
-import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.database.RemoteDB
 import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.database.removeValue
@@ -29,8 +23,6 @@ import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUse
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import com.github.polypoly.app.viewmodels.commons.LoadingModel
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -229,7 +221,7 @@ class GameViewModel(
         coroutineScope.launch {
             gameData.value?.nextTurn()
 
-            synchronizeGame().thenAccept { syncSucceeded ->
+            synchronizeGame().thenApply { syncSucceeded ->
                 if (syncSucceeded) {
                     roundTurnData.value = gameData.value?.currentRound ?: -1
                     gameEndedData.value = gameData.value?.isGameFinished() ?: false
@@ -394,6 +386,36 @@ class GameViewModel(
     }
 
     /**
+     * Resets all game related code
+     * @return a future that contains true if the user was successfully updated
+     */
+    fun finishGame(): CompletableFuture<Boolean> {
+        val isWinner = gameData.value?.ranking()?.get(playerData.value?.user?.key) == 1
+        val user = currentUser!!
+        val updatedStats = Stats(
+            accountCreation = user.stats.accountCreation,
+            lastConnection = user.stats.lastConnection,
+            numberOfGames = user.stats.numberOfGames + 1,
+            numberOfWins = user.stats.numberOfWins + if(isWinner) 1 else 0
+        )
+        val updatedUser = User(
+            id = user.id,
+            name = user.id,
+            bio = user.bio,
+            skin = user.skin,
+            stats = updatedStats,
+            trophiesWon = user.trophiesWon,
+            trophiesDisplay = user.trophiesDisplay,
+            currentUser = user.currentUser
+        )
+        val future = remoteDB.updateValue(updatedUser)
+        GameRepository.game = null
+        GameRepository.player = null
+        GameRepository.gameCode = null
+        return future
+    }
+
+    /*
      * Registers a bid on the location and amount provided
      * @param location location to bid on
      * @param bidAmount amount for the bid
