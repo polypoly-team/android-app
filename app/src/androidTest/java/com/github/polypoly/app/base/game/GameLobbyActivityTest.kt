@@ -183,7 +183,7 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
     //    assert(gameLobbyAfterClick.usersRegistered.count{it.id == gameLobbyAfterClick.admin.id} == 1)
 
     //    resetGameLobby()
-    //}
+    //} 
 
     @Test
     fun buttonDisabledWhenNotEnoughPlayers() {
