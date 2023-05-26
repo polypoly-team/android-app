@@ -57,7 +57,7 @@ class GameViewModel(
     private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
     val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
 
-    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(null)
+    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(game.getOwnedLocations(player))
     val locationsOwnedData: LiveData<List<InGameLocation>> get() = _locationsOwnedData
 
     private var currentTurnBid: LocationBid? = null
@@ -430,7 +430,7 @@ class GameViewModel(
 
     fun refreshInGameLocationsOwned() {
         val player = playerData.value ?: return
-        _locationsOwnedData.postValue(gameData.value?.inGameLocations?.filter { it.owner == player })
+        _locationsOwnedData.postValue(gameData.value?.getOwnedLocations(player))
     }
 
     fun bidOnLocationSelected(location: LocationProperty) {

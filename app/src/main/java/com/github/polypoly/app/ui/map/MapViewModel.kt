@@ -26,7 +26,8 @@ class MapViewModel(
     private var _interactableProperty = mutableStateOf(null as LocationProperty?)
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    var goingToLocationProperty: LocationProperty? = null
+    private val _goingToLocationPropertyData: MutableLiveData<LocationProperty> = MutableLiveData(null)
+    val goingToLocationPropertyData: LiveData<LocationProperty> = _goingToLocationPropertyData
 
     var currentPlayer: Player? = null
 
@@ -73,5 +74,9 @@ class MapViewModel(
      */
     fun selectLocation(location: LocationProperty?) {
         locationSelectedData.value = location
+    }
+
+    fun goToLocation(location: LocationProperty?) {
+        _goingToLocationPropertyData.value = location
     }
 }
