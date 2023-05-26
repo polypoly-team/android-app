@@ -85,7 +85,7 @@ fun Hud(
     } else if (playerState == PlayerState.TURN_FINISHED) {
         TurnFinishedNotification()
     }
-    HudPlayer(playerData)
+    HudPlayer(playerData, gameModel)
     HudOtherPlayersAndGame(otherPlayersData, gameModel)
     HudGameMenu()
 }
@@ -143,7 +143,7 @@ fun HudLocation(
  * @param playerData current player of the game
  */
 @Composable
-fun HudPlayer(playerData: Player) {
+fun HudPlayer(playerData: Player, gameModel: GameViewModel) {
     var openPlayerInfo by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -167,8 +167,7 @@ fun HudPlayer(playerData: Player) {
         Dialog(
             onDismissRequest = { openPlayerInfo = false },
         ) {
-            // FIXME: Use actual data once DB is fixed
-            val playerOwnedLocations = game?.inGameLocations?.shuffled()?.take(3)!!
+            val playerOwnedLocations = gameModel.locationsOwnedData.observeAsState().value ?: listOf()
             Column(Modifier.padding(Padding.medium)) {
                 StatsHeader(textContent = "${playerData.user.name}'s stats")
                 StatsCategory(textContent = "Balance")
