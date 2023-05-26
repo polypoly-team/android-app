@@ -50,11 +50,8 @@ class MapViewModel(
      */
     fun addDistanceWalked(distance: Float) {
         viewModelScope.launch(dispatcher) {
-            if(distance < 10000){
-                computeMilestones(distance, _distanceWalked.value)
-                _distanceWalked.value += distance
-            }
-
+            computeMilestones(distance, _distanceWalked.value)
+            _distanceWalked.value += distance
         }
     }
 

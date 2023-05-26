@@ -27,6 +27,6 @@ class GameMilestoneRewardTransaction(private val milestoneNumber : Int) :
 
     override fun getTransactionDescription(): String {
         return "You have reached the ${milestoneNumber * milestoneRewardDistance} meters milestone " +
-                "and will earn $milestoneRewardValue by the end of the round!"
+                "and will earn $milestoneRewardValue$ by the end of the round!"
     }
 }
