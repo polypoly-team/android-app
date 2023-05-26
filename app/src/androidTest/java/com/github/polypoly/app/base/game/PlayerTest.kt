@@ -114,10 +114,10 @@ class PlayerTest: PolyPolyTest(false, false) {
     fun loseMoneyChangeThePlayerStatusToLostIfThePlayerHasNoMoneyLeft() {
         val playerMoney = 100
         val testPlayer = Player(TEST_USER_0, playerMoney)
-        testPlayer.loseMoney(150)
-        assertTrue(testPlayer.getBalance() == 0)
+        testPlayer.loseMoney(200)
+        assertEquals(testPlayer.getBalance(), 0)
         assertTrue(testPlayer.hasLost())
-        assertTrue(testPlayer.getRoundLost() == 1)
+        assertEquals(testPlayer.getRoundLost(), 1)
     }
 
     @Test

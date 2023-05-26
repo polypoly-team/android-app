@@ -279,6 +279,8 @@ fun HudGame(round: Int) {
  */
 @Composable
 fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
+    val game = gameModel.getGameData().observeAsState().value ?: return
+
     val openOtherPlayerInfo = remember { mutableStateOf(false) }
 
     Row(Modifier.padding(Padding.medium)) {
@@ -295,8 +297,8 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
 
     val openLocationsDialog =  remember{ mutableStateOf(false) }
     if (openLocationsDialog.value) {
-        GameRepository.player?.let { it ->
-            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, it.getOwnedLocations()) { location ->
+        GameRepository.player?.let { player ->
+            LocationsDialog(title = "Choose a location to trade", openLocationsDialog, game.getOwnedLocations(player) ) { location ->
                 openLocationsDialog.value = false
                 gameModel.createATradeRequest(playerData, location)
             } }
@@ -306,7 +308,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
         val player = GameRepository.player
         if(player != null) {
-            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player)
+            AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player, game)
         }
     }
 }
@@ -432,7 +434,9 @@ fun ToggleIconButton(
 
 @Composable
 fun TurnFinishedNotification() {
-    Box (modifier = Modifier.fillMaxWidth().fillMaxHeight()){
+    Box (modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()){
         Text(
             text = "You finished your turn, waiting for the next one...",
             modifier = Modifier

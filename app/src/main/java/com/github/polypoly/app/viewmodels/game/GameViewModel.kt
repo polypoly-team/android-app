@@ -13,12 +13,12 @@ import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.viewmodels.commons.LoadingModel
 import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.database.removeValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
+import com.github.polypoly.app.viewmodels.commons.LoadingModel
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -45,6 +45,9 @@ class GameViewModel(
     private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
     val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
 
+    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(null)
+    val locationsOwnedData: LiveData<List<InGameLocation>> get() = _locationsOwnedData
+
     private var currentTurnBid: LocationBid? = null
 
     private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
@@ -55,6 +58,7 @@ class GameViewModel(
     init {
         setLoading(true)
         coroutineScope.launch {
+            refreshInGameLocationsOwned()
             gameLoop()
             listenToTradeRequest()
         }
@@ -82,6 +86,28 @@ class GameViewModel(
             tradeRequestData.value = null
             tradeRequestData.value = trade
         }
+    }
+
+    /**
+     * Trade a location with another player
+     * @param player the player to trade with
+     * @param locationGiven the location the player wants to give
+     * @param locationReceived the location the player wants to receive
+     * @throws IllegalArgumentException if the player receiver does not own the location he/she wants to give
+     * @throws IllegalArgumentException if the player does not own the location he/she wants to give
+     */
+    fun tradeWith(player: Player, locationGiven: InGameLocation, locationReceived: InGameLocation) {
+        val currentPlayer = playerData.value ?: return
+        if (locationGiven.owner != currentPlayer)
+            throw IllegalArgumentException("The player does not own the location he/she wants to give")
+        if (locationReceived.owner != player)
+            throw IllegalArgumentException("The player receiver does not own the location he/she wants to give")
+        locationGiven.owner = player
+        locationReceived.owner = currentPlayer
+
+        // TODO: push to DB here
+
+        refreshInGameLocationsOwned()
     }
 
     /**
@@ -205,6 +231,8 @@ class GameViewModel(
     }
 
     private fun onNextTurnEnd() {
+        refreshInGameLocationsOwned()
+
         val game = gameData.value ?: return
 
         val previousBid = currentTurnBid
@@ -371,6 +399,11 @@ class GameViewModel(
         }
 
         return future
+    }
+
+    fun refreshInGameLocationsOwned() {
+        val player = playerData.value ?: return
+        _locationsOwnedData.postValue(gameData.value?.inGameLocations?.filter { it.owner == player })
     }
 
     companion object {
