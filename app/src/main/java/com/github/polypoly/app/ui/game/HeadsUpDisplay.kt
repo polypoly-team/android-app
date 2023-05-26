@@ -270,6 +270,7 @@ fun HudGame(gameModel: GameViewModel) {
                 StatsData(textContent = "${game?.rules?.gameMode}")
                 StatsCategory(textContent = "Current round")
                 StatsData(textContent = "${gameModel.getRoundTurnData().observeAsState().value}")
+
             }
         }
     }
@@ -295,6 +296,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
             description = "See other player information"
         )
         Column(Modifier.padding(Padding.medium)) {
+            HudText("playerName-${playerData.user.name}", playerData.user.name)
             HudText("playerBalance", "${playerData.getBalance()} $")
         }
     }
@@ -522,15 +524,17 @@ private fun CustomCard(cardColor: Color, content: @Composable () -> Unit) {
 fun TurnFinishedNotification() {
     Box (modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight()){
+        .fillMaxHeight()
+        .offset(y = 140.dp)){
         Text(
             text = "You finished your turn, waiting for the next one...",
             modifier = Modifier
                 .testTag("turn_finished_notification")
                 .background(MaterialTheme.colors.background, shape = Shapes.medium)
                 .padding(Padding.medium)
-                .align(BottomCenter),
+                .align(TopCenter),
             style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onBackground
         )
     }
 }

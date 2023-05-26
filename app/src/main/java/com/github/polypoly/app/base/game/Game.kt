@@ -31,6 +31,8 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
     val inGameLocations: List<InGameLocation> = rules.gameMap
         .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
+    val transactions : ArrayList<GameTransaction> = arrayListOf(),
+    val pastTransactions: MutableMap<Int, List<GameTransaction>> = mutableMapOf(),
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
 
     var currentRound: Int = 1
@@ -58,6 +60,7 @@ class Game private constructor(
         } else {
             val pastGame = endGame()
         }
+        computeTransactions()
     }
 
     private fun computeBids() {
@@ -150,6 +153,14 @@ class Game private constructor(
     fun getAdmin(): Player {
         return players.find { it.user.id == admin.id }
             ?: throw IllegalStateException("the admin is not in the game")
+    }
+
+    private fun computeTransactions(){
+        for (transaction in transactions.filter { !it.isExecuted() }) {
+            transaction.execute()
+        }
+        pastTransactions[currentRound] = transactions.toList()
+        transactions.clear()
     }
 
     /**
