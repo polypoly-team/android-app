@@ -4,16 +4,22 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.viewmodels.game.GameViewModel
+import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,12 +28,15 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false) {
+class GameActivityTest : PolyPolyTest(true, true, true) {
+
+    val lobby = TEST_GAME_LOBBY_AVAILABLE_4
 
     init {
-        val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
+        val newGame = Game.launchFromPendingGame(lobby)
         GameRepository.game = newGame
         GameRepository.player = newGame.getPlayer(newGame.admin.id)
+        currentUser = GameRepository.player?.user
     }
 
     @get:Rule
@@ -156,6 +165,58 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
+    // ======================================================================== END SCREEN
+
+    @Test
+    fun endScreenIsNotDisplayedWhenGameNotFinished() {
+        composeTestRule.onNodeWithTag("end_screen").assertDoesNotExist()
+    }
+
+
+    /*@Test //FIXME: due to nextTurn() that times out, these tests don't pass
+    fun endScreenIsDisplayedWhenGameEnds() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("end_screen").assertIsDisplayed()
+    }
+
+    @Test
+    fun playerRowAreDisplayedWhenGameEnds() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("end_screen_row_1").assertIsDisplayed()
+    }
+
+    @Test
+    fun returnButtonReturnsToWelcomeActivityAtGameEnd() {
+        forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithText("Return to menu").performClick()
+        Intents.intended(IntentMatchers.hasComponent(WelcomeActivity::class.java.name))
+    }*/
+
+    // ======================================================================== FINISH GAME
+
+    @Test
+    fun finishGameSetsNullGame() {
+        composeTestRule.activity.gameModel.finishGame()
+        assertTrue(GameRepository.game == null)
+        assertTrue(GameRepository.player == null)
+    }
+
+    @Test
+    fun finishGameUpdatesUserGameCount() {
+        val gameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
+        composeTestRule.activity.gameModel.finishGame().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        val newGameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
+        assertTrue(newGameCount == gameCount + 1)
+    }
+
+    @Test
+    fun finishGameUpdatesUserWinCount() {
+        val winCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
+        composeTestRule.activity.gameModel.finishGame()
+        val newWinCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
+        assertTrue(newWinCount == winCount + 1)
+    }
+
     @Test
     fun successfulBidNotificationIsNotDisplayedByDefault() {
         composeTestRule.onNodeWithTag("successful_bid_alert").assertDoesNotExist()
@@ -175,7 +236,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
-            GameActivity.mapViewModel.goingToLocationProperty = getRandomLocation()
+            GameActivity.mapViewModel._goingToLocationPropertyData.value = getRandomLocation()
             waitForUIToUpdate()
         }
     }
@@ -197,6 +258,16 @@ class GameActivityTest : PolyPolyTest(true, false) {
         if (playerState == PlayerState.TURN_FINISHED) return
 
         // TODO add other states support when needed
+    }
+
+    // TODO: why does this timeout?
+    private fun forceGameEnd(): CompletableFuture<Boolean> {
+        return execInMainThread {
+            for(i in 0..(lobby.rules.maxRound ?: 50)) {
+                composeTestRule.activity.gameModel.nextTurn().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+            }
+            waitForUIToUpdate()
+        }
     }
 
     private fun forceChangePlayerState(playerState: PlayerState): CompletableFuture<Boolean> {

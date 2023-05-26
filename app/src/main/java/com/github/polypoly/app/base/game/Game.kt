@@ -9,8 +9,10 @@ import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.database.StorableObject
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
 import java.util.concurrent.CompletableFuture
+import kotlin.random.Random
 
 /**
  * Represent the game and the current state of the game
@@ -61,11 +63,22 @@ class Game private constructor(
             val pastGame = endGame()
         }
         computeTransactions()
+        randomlyUpgradeBuildings()
     }
 
     private fun computeBids() {
         computeAllWinnersOfBids()
         currentRoundBids.clear()
+    }
+
+    private fun randomlyUpgradeBuildings() {
+        for (player in players) {
+            val locationsOwned = getOwnedLocations(player)
+            if (locationsOwned.isNotEmpty()) {
+                val rdmId = Random.nextInt(locationsOwned.size)
+                locationsOwned[rdmId].upgrade()
+            }
+        }
     }
 
     /**
