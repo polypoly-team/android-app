@@ -151,8 +151,7 @@ class GameTest {
     @Test
     fun whenNextTurnComputesTransactions() {
 
-        gameLobby.start()
-        val game = Game.gameInProgress!!
+        val game = gameLobby.start()
         val player1 = game.players[0]
         val player2 = game.players[1]
         val player1MoneyBefore = player1.getBalance()
@@ -188,7 +187,7 @@ class GameTest {
         game.nextTurn()
 
         assert(game.transactions.isEmpty())
-        for (transactions in game.pastTransactions){
+        for (transactions in game.pastTransactions.values){
             for (transaction in transactions) {
                 assertTrue(transaction.isExecuted())
             }
