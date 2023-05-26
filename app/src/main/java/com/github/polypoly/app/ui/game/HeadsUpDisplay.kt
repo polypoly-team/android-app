@@ -30,13 +30,12 @@ import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -75,6 +74,7 @@ fun Hud(
     HudPlayer(playerData)
     HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
     HudGameMenu()
+    MilestoneEventConsumer(milestonesToDisplay = mapViewModel.newMilestonesToDisplay)
 }
 
 /**
@@ -305,7 +305,7 @@ fun HudOtherPlayer(playerData: Player, gameModel: GameViewModel) {
     }
 
     // LANDLORD ONLY: Asking for a trade
-    if(openOtherPlayerInfo.value && game?.rules?.gameMode == GameMode.LANDLORD) {
+    if(openOtherPlayerInfo.value && game.rules.gameMode == GameMode.LANDLORD) {
         val player = GameRepository.player
         if(player != null) {
             AskingForATrade(openOtherPlayerInfo, openLocationsDialog, player, game)

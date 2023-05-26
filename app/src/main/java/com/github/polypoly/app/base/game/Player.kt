@@ -2,11 +2,9 @@ package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.bonus_card.InGameBonusCard
 import com.github.polypoly.app.base.game.location.InGameLocation
-import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
-import kotlin.random.Random
 
 /**
  * A class that represent a [Player] in a [Game] with his/her info which are specific to the [Game]
@@ -20,6 +18,7 @@ data class Player (
     val user: User = User(),
     private var balance: Int = 0,
     private var roundLost: Int? = null,
+    private var lastMilestone : Int = 0
 ) : Comparable<Player> {
 
     /**
@@ -129,6 +128,20 @@ data class Player (
         if (location.owner != this)
             throw IllegalArgumentException("The location is not owned by $this but by ${location.owner ?: "null"}")
         location.owner = null
+    }
+
+    /**
+     * give the last milestone reached by the player
+     */
+    fun getLastMilestone() : Int {
+        return lastMilestone
+    }
+
+    /**
+     * increment the last milestone reached by the player
+     */
+    fun incrementLastMilestone() {
+        lastMilestone++
     }
 
     /**
