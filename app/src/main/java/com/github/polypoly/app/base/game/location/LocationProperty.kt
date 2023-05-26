@@ -17,7 +17,16 @@ data class Zone(
     An enum class representing the different levels of a [LocationProperty].
  */
 enum class PropertyLevel {
-    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_MAX
+    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_MAX;
+
+    override fun toString(): String {
+        return when (this) {
+            LEVEL_0 -> "Level 0"
+            LEVEL_1 -> "Level 1"
+            LEVEL_2 -> "Level 2"
+            LEVEL_MAX -> "Level Max"
+        }
+    }
 }
 
 /**
