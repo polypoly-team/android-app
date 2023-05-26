@@ -107,7 +107,6 @@ class GuestMenuActivity : ComponentActivity()  {
         MainActionButton(
             onClick = {
                 val visitedMapIntent = Intent(mContext, VisitMapActivity::class.java)
-                finish()
                 startActivity(visitedMapIntent)
             },
             testTag = "discover_map_button",

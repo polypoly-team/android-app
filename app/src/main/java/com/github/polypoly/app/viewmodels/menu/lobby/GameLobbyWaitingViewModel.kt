@@ -1,18 +1,17 @@
-package com.github.polypoly.app.models.menu.lobby
+package com.github.polypoly.app.viewmodels.menu.lobby
 
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.IRemoteStorage
-import com.github.polypoly.app.network.addOnChangeListener
-import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.viewmodels.commons.LoadingModel
+import com.github.polypoly.app.database.IRemoteStorage
+import com.github.polypoly.app.database.addOnChangeListener
+import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CompletableFuture
 
 /**
  * View model for waiting in a game lobby until enough players are connected

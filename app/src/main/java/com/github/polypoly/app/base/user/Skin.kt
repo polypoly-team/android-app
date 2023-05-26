@@ -44,16 +44,6 @@ data class Skin(
             )
         }
 
-        /**
-         * Generate the default skin (skin with id 0 for each part)
-         * @return the default skin
-         */
-        fun default(): Skin {
-            return Skin(
-                idHead = 0,
-                idBody = 0,
-                idLegs = 0
-            )
-        }
+        val DEFAULT = Skin(0,0,0)
     }
 }

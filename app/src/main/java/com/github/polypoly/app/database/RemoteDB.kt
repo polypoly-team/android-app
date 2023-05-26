@@ -1,9 +1,9 @@
-package com.github.polypoly.app.network
+package com.github.polypoly.app.database
 
 
-import com.github.polypoly.app.network.StorableObject.Companion.convertToLocal
-import com.github.polypoly.app.network.StorableObject.Companion.getDBClass
-import com.github.polypoly.app.network.StorableObject.Companion.getPath
+import com.github.polypoly.app.database.StorableObject.Companion.convertToLocal
+import com.github.polypoly.app.database.StorableObject.Companion.getDBClass
+import com.github.polypoly.app.database.StorableObject.Companion.getPath
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

@@ -1,6 +1,6 @@
 package com.github.polypoly.app.base.user
 
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_USERS_PROFILES_PATH
 import java.util.concurrent.CompletableFuture
 

@@ -1,28 +1,27 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.menu.PastGame
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.utils.global.Settings.Companion.DB_GAMES_PATH
 import java.util.concurrent.CompletableFuture
 
 /**
  * Represent the game and the current state of the game
+ * @property code the code of the game
  * @property admin the [User] who is the admin of the game
  * @property players the [Player]s of the game
  * @property rules the rules of the [Game]
- * @property inGameLocations the [InGameLocation]s of the [Game]
- * @property currentRound the current round of the [Game]
  * @property dateBegin the date and time when the [Game] has started in Unix time
  * (seconds since 1970-01-01T00:00:00Z)
  * @property inGameLocations the [InGameLocation]s of the [Game]
+ * @property currentRound the current round of the [Game]
  */
 class Game private constructor(
     val code: String = "default-code",
@@ -32,26 +31,48 @@ class Game private constructor(
     val dateBegin: Long = System.currentTimeMillis(),
     val inGameLocations: List<InGameLocation> = rules.gameMap
         .flatMap { zone -> zone.locationProperties.map { InGameLocation(it) } },
+    val transactions : ArrayList<GameTransaction> = arrayListOf(),
+    val pastTransactions: MutableMap<Int, List<GameTransaction>> = mutableMapOf(),
 ) : StorableObject<GameDB>(GameDB::class, DB_GAMES_PATH, code) {
-
-    val allLocations: List<LocationProperty> get() = rules.gameMap.flatMap { zone -> zone.locationProperties }
 
     var currentRound: Int = 1
 
+    private val currentRoundBids: MutableList<LocationBid> = mutableListOf()
+
     /**
-     * Go to the next turn
+     * @return the [List] of [LocationProperty] of the [Game]
+     */
+    fun getLocations(): List<LocationProperty> {
+        return rules.gameMap.flatMap { zone -> zone.locationProperties }
+    }
+
+    /**
+     * Go to the next turn and change the player order in function of the [Player]s' rank
      */
     fun nextTurn() {
+        if (isGameFinished()) return
+
         ++currentRound
-        if (isGameFinished()) {
+        players = players.sortedDescending()
+
+        if (!isGameFinished()) {
+            computeBids()
+        } else {
             val pastGame = endGame()
         }
+        computeTransactions()
+    }
+
+    private fun computeBids() {
+        computeAllWinnersOfBids()
+        currentRoundBids.clear()
     }
 
     /**
      * Test if the game is finished
      * @return true if the game is finished, false otherwise
      * @throws IllegalStateException if the game mode is RICHEST_PLAYER and maxRound is null
+     * @throws IllegalStateException if the game mode is LANDLORD and maxRound is null
      */
     fun isGameFinished(): Boolean {
         return when (rules.gameMode) {
@@ -96,11 +117,11 @@ class Game private constructor(
      * @return the PastGame object
      * @throws IllegalStateException if the game is not finished
      */
-    fun endGame(): PastGame {
+    private fun endGame(): PastGame {
         if (!isGameFinished()) throw IllegalStateException("can't end the game now")
         return PastGame(
             users = players.map(Player::user),
-            usersRank = ranking().map { it.key to it.value }.toMap(),
+            usersRank = ranking(),
             date = dateBegin,
             duration = System.currentTimeMillis() / 1000 - dateBegin,
         )
@@ -134,23 +155,67 @@ class Game private constructor(
             ?: throw IllegalStateException("the admin is not in the game")
     }
 
+    private fun computeTransactions(){
+        for (transaction in transactions.filter { !it.isExecuted() }) {
+            transaction.execute()
+        }
+        pastTransactions[currentRound] = transactions.toList()
+        transactions.clear()
+    }
+
     /**
      * Compute the winner of the bets, notify the players and update the balance of the players
      * and the location owner.
      */
-    fun computeAllWinnersOfBets() {
-        inGameLocations.forEach {
-            val winningBet = it.computeWinningBid()
-            if (winningBet != null) {
-                val winner = winningBet.player
-                if (winner.user.currentUser) {
-                    winner.loseMoney(winningBet.amount)
-                    // TODO : notify the player that he has won and the other players in the bets
-                    //  that they have lost
+    private fun computeAllWinnersOfBids() {
+        for ((location, bids) in currentRoundBids.groupBy(LocationBid::location)) {
+            var maxBid: LocationBid? = null
+            for (bid in bids) {
+                bid.player.loseMoney(bid.amount)
+                if (maxBid == null || LocationBid.comparator.compare(bid, maxBid) >= 0) {
+                    maxBid = bid
                 }
-                // TODO : what if a player wins but doesn't open their phone?
+            }
+            if (maxBid != null) {
+                val inGame = findInGameLocation(location) ?: throw IllegalStateException("Bid won for location $location that is not part of the game")
+                maxBid.player.earnNewLocation(inGame)
             }
         }
+    }
+
+    private fun findInGameLocation(location: LocationProperty): InGameLocation? {
+        return inGameLocations.find {loc ->
+            loc.locationProperty.name == location.name
+        }
+    }
+
+    /**
+     * Retrieve the InGameLocation of this location
+     */
+    fun getInGameLocation(location: LocationProperty): InGameLocation? {
+        return findInGameLocation(location)?.copy()
+    }
+
+    /**
+     * Registers a bid for the current player
+     * @param bid: bid to register
+     * @throws IllegalArgumentException if the player is not part of the game
+     * @throws IllegalStateException if the player has already made a bid this turn or cannot buy the corresponding location
+     */
+    fun registerBid(bid: LocationBid) {
+        if (!playInThisGame(bid.player.user))
+            throw java.lang.IllegalArgumentException("${bid.player.user} is not part of this game")
+        if (!inGameLocations.any { inGame -> inGame.locationProperty == bid.location })
+            throw java.lang.IllegalArgumentException("${bid.location} is not part of the locations in this game")
+        if (currentRoundBids.any {existingBid -> existingBid.player.user.id == bid.player.user.id } )
+            throw IllegalStateException("A single player can only bid on one location per turn")
+        if (!bid.player.canBuy(bid.location, bid.amount))
+            throw IllegalStateException("The player ${bid.player} cannot bid on ${bid.location} for ${bid.amount}")
+        currentRoundBids.add(bid)
+    }
+
+    fun getOwnedLocations(player: Player): List<InGameLocation> {
+        return inGameLocations.filter { location -> location.owner == player }
     }
 
     override fun toDBObject(): GameDB {
@@ -160,7 +225,9 @@ class Game private constructor(
             players,
             rules,
             dateBegin,
-            currentRound
+            currentRound,
+            inGameLocations,
+            currentRoundBids
         )
     }
 
@@ -170,9 +237,11 @@ class Game private constructor(
             dbObject.admin,
             dbObject.players,
             dbObject.rules,
-            dbObject.dateBegin
+            dbObject.dateBegin,
+            dbObject.inGameLocations
         )
         game.currentRound = dbObject.round
+        game.currentRoundBids.addAll(dbObject.currentRoundBids)
         return CompletableFuture.completedFuture(game)
     }
 
@@ -189,10 +258,10 @@ class Game private constructor(
             val inGameLocations = gameLobby.rules.gameMap.flatMap { zone ->
                 zone.locationProperties.map { InGameLocation(it) }
             }
-            if(gameLobby.rules.gameMode == GameMode.LANDLORD)
+            if (gameLobby.rules.gameMode == GameMode.LANDLORD)
                 assignRandomLocations(inGameLocations, gameLobby, players)
 
-            val game = Game(
+            return Game(
                 code = gameLobby.code,
                 admin = gameLobby.admin,
                 players = players,
@@ -200,9 +269,6 @@ class Game private constructor(
                 dateBegin = System.currentTimeMillis() / 1000,
                 inGameLocations = inGameLocations
             )
-
-            gameInProgress = game
-            return game
         }
 
         /**
@@ -233,19 +299,19 @@ class Game private constructor(
                 player.earnNewLocations(randomLocationsToGive)
             }
         }
-
-        /**
-         * The game currently in progress
-         */
-        var gameInProgress: Game? = null
     }
 }
 
+/**
+ * The database representation of a game
+ */
 data class GameDB(
     val code: String = "default-code",
     val admin: User = User(),
     var players: List<Player> = listOf(),
     val rules: GameParameters = GameParameters(),
     val dateBegin: Long = System.currentTimeMillis(),
-    val round: Int = 0
+    val round: Int = 0,
+    val inGameLocations: List<InGameLocation> = listOf(),
+    val currentRoundBids: List<LocationBid> = listOf()
 )

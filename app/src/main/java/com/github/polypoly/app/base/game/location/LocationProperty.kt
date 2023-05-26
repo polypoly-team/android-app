@@ -17,7 +17,16 @@ data class Zone(
     An enum class representing the different levels of a [LocationProperty].
  */
 enum class PropertyLevel {
-    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_MAX
+    LEVEL_0, LEVEL_1, LEVEL_2, LEVEL_MAX;
+
+    override fun toString(): String {
+        return when (this) {
+            LEVEL_0 -> "Level 0"
+            LEVEL_1 -> "Level 1"
+            LEVEL_2 -> "Level 2"
+            LEVEL_MAX -> "Level Max"
+        }
+    }
 }
 
 /**
@@ -48,9 +57,7 @@ data class LocationProperty(
 
     /**
      *  The distance between the [LocationProperty] and a [Location].
-     *
      *  @param location the [Location] to compare with.
-     *
      *  @return the distance between the [LocationProperty] and the [Location].
      */
     fun distanceTo(location: Location): Float {

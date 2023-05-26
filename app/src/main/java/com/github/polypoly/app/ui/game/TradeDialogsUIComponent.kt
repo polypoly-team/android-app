@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -11,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.Dialog
+import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 
@@ -24,12 +26,15 @@ import com.github.polypoly.app.ui.theme.Shapes
  */
 @Composable
 fun ProposeTradeDialog(trade: TradeRequest, gameModel: GameViewModel) {
+    val game = gameModel.getGameData().observeAsState().value ?: return
+
     val openDialog = remember {
         mutableStateOf(true)
     }
     val openDialogChooseLocation = remember {
         mutableStateOf(false)
     }
+
     Surface(
         color = Color.Transparent,
     ) {
@@ -37,14 +42,14 @@ fun ProposeTradeDialog(trade: TradeRequest, gameModel: GameViewModel) {
             LocationsDialog(
                 "Choose a location to trade2",
                 openDialogChooseLocation,
-                trade.playerReceiver.getOwnedLocations()
+                game.getOwnedLocations(trade.playerReceiver)
             ) {
                 gameModel.updateReceiverLocationTradeRequest(it)
                 openDialogChooseLocation.value = false
             }
         }
         if(openDialog.value) {
-            PropositionTradeDialog(trade, openDialog, gameModel, openDialogChooseLocation)
+            PropositionTradeDialog(trade, game, openDialog, gameModel, openDialogChooseLocation)
         }
     }
 }
@@ -57,7 +62,7 @@ fun ProposeTradeDialog(trade: TradeRequest, gameModel: GameViewModel) {
  * @param openDialogChooseLocation A mutable state to open and close the dialog to choose a location
  */
 @Composable
-fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean>, gameModel: GameViewModel,
+fun PropositionTradeDialog(trade: TradeRequest, game: Game, openDialog: MutableState<Boolean>, gameModel: GameViewModel,
                            openDialogChooseLocation: MutableState<Boolean>){
     AlertDialog(
         modifier = Modifier.testTag("propose_trade_dialog"),
@@ -73,7 +78,7 @@ fun PropositionTradeDialog(trade: TradeRequest, openDialog: MutableState<Boolean
                 Button(
                     onClick = {
                         // test if you can accept the trade, i.e. if you have a location to trade
-                        if(trade.playerReceiver.getOwnedLocations().isNotEmpty()) {
+                        if(game.getOwnedLocations(trade.playerReceiver).isNotEmpty()) {
                             openDialogChooseLocation.value = true
                         } else {
                             gameModel.acceptOrDeclineTradeRequest(false)
@@ -181,7 +186,7 @@ fun TheTradeIsDoneDialog(result: Boolean, gameModel: GameViewModel,
                         val locationReceiver = trade.locationReceived
                             ?: throw Exception("The location receive by the player can't be null when the" +
                                     " trade is successful")
-                        player.tradeWith(trade.playerReceiver, locationGiven, locationReceiver)
+                        gameModel.tradeWith(trade.playerReceiver, locationGiven, locationReceiver)
                     }
                     gameModel.closeTradeRequest()
                 }) {
@@ -199,7 +204,7 @@ fun TheTradeIsDoneDialog(result: Boolean, gameModel: GameViewModel,
  */
 @Composable
 fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDialog: MutableState<Boolean>,
-                player: Player
+                player: Player, game: Game
 ) {
     Dialog(
         onDismissRequest = { openOtherPlayerInfo.value = false },
@@ -221,7 +226,7 @@ fun AskingForATrade(openOtherPlayerInfo: MutableState<Boolean>, openLocationsDia
                 Spacer(modifier = Modifier.height(Padding.medium))
                 Button(
                     onClick = {
-                        if(player.getOwnedLocations().isNotEmpty()) {
+                        if(game.getOwnedLocations(player).isNotEmpty()) {
                             openLocationsDialog.value = true
                         }
                         openOtherPlayerInfo.value = false

@@ -30,4 +30,7 @@ object RulesObject {
     )
 }
 
+/**
+ * A chapter of the rules
+ */
 data class RulesChapter(val title: String, val content: String)

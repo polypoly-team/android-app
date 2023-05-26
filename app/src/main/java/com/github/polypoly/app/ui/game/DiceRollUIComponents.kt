@@ -2,8 +2,8 @@ package com.github.polypoly.app.ui.game
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.location.LocationProperty
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 
 // flag to show the roll dice dialog
@@ -54,7 +54,8 @@ fun RollDiceButton() {
                 .offset(y = (-80).dp)
                 .testTag("roll_dice_button"),
             onClick = { showRollDiceDialog.value = true },
-            shape = CircleShape
+            shape = CircleShape,
+            elevation = ButtonDefaults.elevation(0.dp),
         ) {
             Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
         }

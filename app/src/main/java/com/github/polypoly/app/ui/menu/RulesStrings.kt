@@ -1,5 +1,8 @@
 package com.github.polypoly.app.ui.menu
 
+/**
+ * This class contains all the strings used in the rules
+ */
 class RulesStrings {
     companion object {
 
