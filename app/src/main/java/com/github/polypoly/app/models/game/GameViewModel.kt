@@ -320,8 +320,9 @@ class GameViewModel(
 
     /**
      * Resets all game related code
+     * @return a future that contains true if the user was successfully updated
      */
-    fun finishGame() {
+    fun finishGame(): CompletableFuture<Boolean> {
         val currentPlayer = playerData.value!!
         val isWinner = gameData.value?.ranking()?.get(currentPlayer.user.key) == 1
         val updatedStats = Stats(
@@ -340,10 +341,11 @@ class GameViewModel(
             trophiesDisplay = currentPlayer.user.trophiesDisplay,
             currentUser = currentPlayer.user.currentUser
         )
-        remoteDB.updateValue(updatedUser)
+        val future = remoteDB.updateValue(updatedUser)
         GameRepository.game = null
         GameRepository.player = null
         GameRepository.gameCode = null
+        return future
     }
 
     companion object {

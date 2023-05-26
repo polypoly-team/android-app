@@ -18,9 +18,11 @@ import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +31,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false, true) {
+class GameActivityTest : PolyPolyTest(true, true, true) {
 
     val lobby = TEST_GAME_LOBBY_AVAILABLE_4
 
@@ -37,6 +39,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         val newGame = Game.launchFromPendingGame(lobby)
         GameRepository.game = newGame
         GameRepository.player = newGame.getPlayer(newGame.admin.id)
+        currentUser = GameRepository.player?.user
     }
 
     @get:Rule
@@ -182,16 +185,16 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     @Test
     fun finishGameSetsNullGame() {
         composeTestRule.activity.gameModel.finishGame()
-        assert(GameRepository.game == null)
-        assert(GameRepository.player == null)
+        assertTrue(GameRepository.game == null)
+        assertTrue(GameRepository.player == null)
     }
 
     @Test
     fun finishGameUpdatesUserGameCount() {
         val gameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
-        composeTestRule.activity.gameModel.finishGame()
+        composeTestRule.activity.gameModel.finishGame().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         val newGameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
-        assert(newGameCount == gameCount + 1)
+        assertTrue(newGameCount == gameCount + 1)
     }
 
     @Test
@@ -199,7 +202,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         val winCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
         composeTestRule.activity.gameModel.finishGame()
         val newWinCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
-        assert(newWinCount == winCount + 1)
+        assertTrue(newWinCount == winCount + 1)
     }
 
 
