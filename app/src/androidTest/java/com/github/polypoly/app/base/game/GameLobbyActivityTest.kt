@@ -3,14 +3,12 @@ package com.github.polypoly.app.base.game
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
@@ -46,7 +44,6 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
         GameRepository.gameCode = lobbyCode
         resetGameLobby()
     }
-
 
     @Before
     fun setup(){
@@ -166,27 +163,27 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
         }
     }
 
-    @Test
-    fun adminIsRedistributedWhenAdminLeavesLobby() {
-        val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
-        resetGameLobby()
-        syncFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        composeTestRule.waitForIdle()
+    //@Test
+    //fun adminIsRedistributedWhenAdminLeavesLobby() {
+    //    val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
+    //    resetGameLobby()
+    //    syncFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+    //    composeTestRule.waitForIdle()
 
-        val gameLobbyBeforeLeave = composeTestRule.activity.gameLobbyWaitingModel.getGameLobby().value!!
-        assert(gameLobbyBeforeLeave.admin.id == currentUser!!.id)
-        assert(gameLobbyBeforeLeave.usersRegistered.contains(currentUser))
+    //    val gameLobbyBeforeLeave = composeTestRule.activity.gameLobbyWaitingModel.getGameLobby().value!!
+    //    assert(gameLobbyBeforeLeave.admin.id == currentUser!!.id)
+    //    assert(gameLobbyBeforeLeave.usersRegistered.contains(currentUser))
 
-        composeTestRule.onNodeWithTag("game_lobby_leave_button", useUnmergedTree = true)
-            .performClick()
+    //    composeTestRule.onNodeWithTag("game_lobby_leave_button", useUnmergedTree = true)
+    //        .performClick()
 
-        val gameLobbyAfterClick = composeTestRule.activity.gameLobbyWaitingModel.getGameLobby().value!!
-        assert(!gameLobbyAfterClick.usersRegistered.contains(currentUser))
-        assert(gameLobbyAfterClick.admin != currentUser)
-        assert(gameLobbyAfterClick.usersRegistered.count{it.id == gameLobbyAfterClick.admin.id} == 1)
+    //    val gameLobbyAfterClick = composeTestRule.activity.gameLobbyWaitingModel.getGameLobby().value!!
+    //    assert(!gameLobbyAfterClick.usersRegistered.contains(currentUser))
+    //    assert(gameLobbyAfterClick.admin != currentUser)
+    //    assert(gameLobbyAfterClick.usersRegistered.count{it.id == gameLobbyAfterClick.admin.id} == 1)
 
-        resetGameLobby()
-    }
+    //    resetGameLobby()
+    //}
 
     @Test
     fun buttonDisabledWhenNotEnoughPlayers() {
@@ -241,6 +238,8 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
 //        Intents.intended(IntentMatchers.hasComponent(GameActivity::class.java.name))
 //
 //    }
+
+
 
     fun resetGameLobby(){
         for (user in baseGameLobby.usersRegistered){

@@ -1,4 +1,4 @@
-package com.github.polypoly.app.models.commons
+package com.github.polypoly.app.viewmodels.commons
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

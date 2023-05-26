@@ -35,14 +35,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.polypoly.app.R
-import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.menu.lobby.GameLobbyWaitingViewModel
-import com.github.polypoly.app.network.addOnChangeListener
-import com.github.polypoly.app.network.removeValue
+import com.github.polypoly.app.viewmodels.menu.lobby.GameLobbyWaitingViewModel
+import com.github.polypoly.app.database.addOnChangeListener
+import com.github.polypoly.app.database.removeValue
 import com.github.polypoly.app.ui.commons.CircularLoader
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.theme.Padding
@@ -91,6 +90,7 @@ class GameLobbyActivity : ComponentActivity() {
             //TODO: implement as advised in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198327499
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
                 if (it.started && it.admin.id != user.id) {
+                    gameLobby.start()
                     navigateToGame(context, gameLobby)
                 }
             }
@@ -569,7 +569,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param mContext the context of the activity
      */
     private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
-        return  { if (true) launchGameActivity(mContext) }
+        return  { if (isAdmin) launchGameActivity(mContext) }
     }
 
     /**

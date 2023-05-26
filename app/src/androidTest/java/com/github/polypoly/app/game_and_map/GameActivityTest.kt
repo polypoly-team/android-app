@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,12 +7,12 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
-import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.game.GameActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-class GameActivityTest : PolyPolyTest(true, false, true) {
+class GameActivityTest : PolyPolyTest(true, false) {
 
     init {
         val newGame = Game.launchFromPendingGame(TEST_GAME_LOBBY_AVAILABLE_4)
@@ -58,31 +58,31 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     fun mapActivity_InfoView_Displayed_On_Marker_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
     }
 
     @Test
     fun mapActivity_Hides_Marker_Info_View_On_Close_Button_Click() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeButton").performClick()
-        composeTestRule.onNodeWithTag("buildingInfoDialog").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("close_button").performClick()
+        composeTestRule.onNodeWithTag("building_info_dialog").assertDoesNotExist()
     }
 
     @Test
-    fun mapActivity_Displays_Error_On_Invalid_Bet_Amount() {
+    fun mapActivityDisplaysErrorOnInvalidBidAmount() {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
 
-        composeTestRule.onNodeWithTag("betInput").performTextInput("10")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("10")
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
 
-        composeTestRule.onNodeWithTag("betErrorMessage", true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("closeBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("bid_error_message", true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("close_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     @Test // could be looped for extensive testing
@@ -90,11 +90,11 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceOpenMarkerDialog().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
 
-        composeTestRule.onNodeWithTag("betButton").performClick()
+        composeTestRule.onNodeWithTag("bid_button").performClick()
         // TODO: Replace by future MAX_BET or similar
-        composeTestRule.onNodeWithTag("betInput").performTextInput("3000")
-        composeTestRule.onNodeWithTag("confirmBetButton", true).performClick()
-        composeTestRule.onNodeWithTag("betDialog", true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("bid_input").performTextInput("3000")
+        composeTestRule.onNodeWithTag("confirm_bid_button", true).performClick()
+        composeTestRule.onNodeWithTag("bid_dialog", true).assertDoesNotExist()
     }
 
     // While it may be better for grades to have a test for each component,
@@ -106,7 +106,9 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceChangePlayerState(PlayerState.INIT).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
     }
 
     @Test
@@ -114,7 +116,9 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceChangePlayerState(PlayerState.ROLLING_DICE).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("roll_dice_button").assertIsDisplayed()
     }
 
@@ -125,7 +129,9 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
 
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
         composeTestRule.onNodeWithTag("going_to_location_text").assertIsDisplayed()
     }
@@ -136,7 +142,9 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceChangePlayerState(PlayerState.INTERACTING).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("map").assertIsDisplayed()
         composeTestRule.onNodeWithTag("distance_walked_row").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("hud").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_player").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_other_players_and_game").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("hud_game_menu").assertIsDisplayed()
         composeTestRule.onNodeWithTag("interactable_location_text").assertIsDisplayed()
     }
 
@@ -146,6 +154,22 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         composeTestRule.onAllNodesWithTag("other_player_hud")[0].performClick()
         composeTestRule.onNodeWithTag("asking_for_a_trade_dialog").assertDoesNotExist()
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
+    }
+
+    @Test
+    fun successfulBidNotificationIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("successful_bid_alert").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsNotDisplayedByDefault() {
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertDoesNotExist()
+    }
+
+    @Test
+    fun turnFinishedIsDisplayedAtEndOfTurn() {
+        forceChangePlayerState(PlayerState.TURN_FINISHED).get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        composeTestRule.onNodeWithTag("turn_finished_notification").assertIsDisplayed()
     }
 
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
@@ -166,10 +190,11 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         gameViewModel.locationReached()
         if (playerState == PlayerState.INTERACTING) return
 
-        if (playerState == PlayerState.BIDDING) {
-            gameViewModel.startBidding()
-            return
-        }
+        gameViewModel.startBidding()
+        if (playerState == PlayerState.BIDDING) return
+
+        gameViewModel.endBidding()
+        if (playerState == PlayerState.TURN_FINISHED) return
 
         // TODO add other states support when needed
     }

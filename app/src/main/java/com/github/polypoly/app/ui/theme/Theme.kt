@@ -7,6 +7,9 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+/**
+ * The light theme colors
+ */
 private val LightColorPalette = darkColors(
     primary = redPrincipal,
     secondary = purpleLight,
@@ -17,6 +20,9 @@ private val LightColorPalette = darkColors(
     onSecondary = purpleVeryDark
 )
 
+/**
+ * The dark theme colors
+ */
 private val DarkColorPalette = lightColors(
     primary = redPrincipal,
     secondary = purpleMid,
@@ -27,6 +33,9 @@ private val DarkColorPalette = lightColors(
     onSecondary = Color.White,
 )
 
+/**
+ * init the theme in function of the system theme
+ */
 @Composable
 fun PolypolyTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {

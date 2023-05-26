@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class GameActivityLandlordTest : PolyPolyTest(true, false) {
@@ -41,11 +42,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
     fun releaseIntents() {
         Intents.release()
     }
-
-    /*@Test
-    fun testLandlord() {
-
-    }*/
 
     @Test
     fun whenClickingOnOtherPlayerYouCanChooseToTrade() {
@@ -95,9 +91,12 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
      * Clear the location of the player if any
      */
     private fun clearLocationOfThePlayerIfAny() {
-        for (location in currentPlayer.getOwnedLocations()) {
+        val gameViewModel = composeTestRule.activity.gameModel
+        for (location in gameViewModel.getGameData().value!!.getOwnedLocations(currentPlayer)) {
             currentPlayer.looseLocation(location)
         }
+        // refresh game data to reflect change
+        execInMainThread { gameViewModel.refreshInGameLocationsOwned() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     /**
@@ -113,5 +112,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
             val inGameLocation = unownedLocation[0]
             currentPlayer.earnNewLocation(inGameLocation)
         }
+        // refresh game data to reflect change
+        execInMainThread { composeTestRule.activity.gameModel.refreshInGameLocationsOwned() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 }

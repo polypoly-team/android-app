@@ -20,8 +20,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.StorableObject
-import com.github.polypoly.app.ui.game.GameEndUI
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.ui.menu.profile.CreateProfileActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 import com.github.polypoly.app.ui.theme.UIElements.GameLogo
@@ -200,11 +199,8 @@ class SignInActivity : ComponentActivity() {
      * DEBUG function
      * Add fake data (possibly duplicate from tests' fake data) if the data in DB were corrupted
      */
-    fun addFakeDataToDB() {
+    private fun addFakeDataToDB() {
         // Miscellaneous test data
-        val ZERO_STATS = Stats(0, 0, 0, 0, 0)
-        val NO_SKIN = Skin(0,0,0)
-
         val TEST_USER_0 = User(
             id = "0",
             name = "John",
@@ -215,11 +211,11 @@ class SignInActivity : ComponentActivity() {
             trophiesDisplay = mutableListOf(0, 4)
         )
 
-        val TEST_USER_1 = User("12","Carter", "Not me!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_2 = User("123","Harry", "Ha!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_3 = User("1234","James", "Hey!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_4 = User("12345","Henri", "Ohh!", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
-        val TEST_USER_5 = User("123456", "test_user_5", "", NO_SKIN, ZERO_STATS, listOf(), mutableListOf())
+        val TEST_USER_1 = User("12","Carter", "Not me!", Skin.DEFAULT, Stats())
+        val TEST_USER_2 = User("123","Harry", "Ha!", Skin.DEFAULT, Stats())
+        val TEST_USER_3 = User("1234","James", "Hey!", Skin.DEFAULT, Stats())
+        val TEST_USER_4 = User("12345","Henri", "Ohh!", Skin.DEFAULT, Stats())
+        val TEST_USER_5 = User("123456", "test_user_5", "", Skin.DEFAULT, Stats())
         val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
 
         val TEST_GAME_LOBBY_FULL = GameLobby(

@@ -1,11 +1,11 @@
-package com.github.polypoly.app.models.game
+package com.github.polypoly.app.viewmodels.game
 
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.commons.PolyPolyTest
-import com.github.polypoly.app.models.commons.LoadingModel
-import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.viewmodels.commons.LoadingModel
+import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,4 +1,4 @@
-package com.github.polypoly.app.models.commons
+package com.github.polypoly.app.viewmodels.commons
 
 import com.github.polypoly.app.commons.PolyPolyTest
 import org.junit.Assert.assertFalse

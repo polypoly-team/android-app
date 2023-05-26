@@ -1,6 +1,8 @@
 package com.github.polypoly.app.base.game
 
 import com.github.polypoly.app.base.game.location.InGameLocation
+import com.github.polypoly.app.base.game.location.LocationBid
+import com.github.polypoly.app.base.game.location.LocationProperty
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
@@ -8,6 +10,8 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.commons.PolyPolyTest
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants
 import com.github.polypoly.app.utils.global.GlobalInstances
 import org.junit.Assert.*
@@ -17,7 +21,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class GameTest {
+class GameTest: PolyPolyTest(false, false) {
 
     private val emptySkin = Skin(0,0,0)
     private val zeroStats = Stats(0,0,0,0,0)
@@ -32,8 +36,9 @@ class GameTest {
         testDuration, 10, LocationPropertyRepository.getZones(), 200)
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
+
     @Before
-    fun initLoby() {
+    fun initLobby() {
         gameLobby.addUser(testUser2)
         gameLobby.addUser(testUser3)
         gameLobby.addUser(testUser4)
@@ -46,23 +51,23 @@ class GameTest {
     @Test
     fun whenGameStartGameInProgressIsNotNull() {
         gameLobby.start()
-        assertNotNull(Game.gameInProgress)
+        assertNotNull(GameRepository.game)
     }
 
     @Test
     fun whenGameStartGameInProgressHasTheCorrectRules() {
         gameLobby.start()
-        assertEquals(gameRules.gameMode, Game.gameInProgress?.rules?.gameMode)
-        assertEquals(gameRules.maximumNumberOfPlayers, Game.gameInProgress?.rules?.maximumNumberOfPlayers)
-        assertEquals(gameRules.minimumNumberOfPlayers, Game.gameInProgress?.rules?.minimumNumberOfPlayers)
-        assertEquals(gameRules.initialPlayerBalance, Game.gameInProgress?.rules?.initialPlayerBalance)
-        assertEquals(gameRules.roundDuration, Game.gameInProgress?.rules?.roundDuration)
+        assertEquals(gameRules.gameMode, GameRepository.game?.rules?.gameMode)
+        assertEquals(gameRules.maximumNumberOfPlayers, GameRepository.game?.rules?.maximumNumberOfPlayers)
+        assertEquals(gameRules.minimumNumberOfPlayers, GameRepository.game?.rules?.minimumNumberOfPlayers)
+        assertEquals(gameRules.initialPlayerBalance, GameRepository.game?.rules?.initialPlayerBalance)
+        assertEquals(gameRules.roundDuration, GameRepository.game?.rules?.roundDuration)
     }
 
     @Test
     fun whenGameStartEveryPlayerHasTheCorrectBalance() {
         gameLobby.start()
-        for(player in Game.gameInProgress?.players!!) {
+        for(player in GameRepository.game?.players!!) {
             assertEquals(gameRules.initialPlayerBalance, player.getBalance())
         }
     }
@@ -70,7 +75,7 @@ class GameTest {
     @Test
     fun whenGameStartEveryPlayerHasRank1() {
         gameLobby.start()
-        val ranking = Game.gameInProgress?.ranking()
+        val ranking = GameRepository.game?.ranking()
         for (rank in ranking!!) {
             assertEquals(1, rank.value)
         }
@@ -79,26 +84,25 @@ class GameTest {
     @Test
     fun rankingRankPlayersCorrectly() {
         gameLobby.start()
-        Game.gameInProgress?.getPlayer(testUser1.id)?.earnMoney(100)
-        Game.gameInProgress?.getPlayer(testUser2.id)?.earnMoney(200)
-        Game.gameInProgress?.getPlayer(testUser3.id)?.loseMoney(300)
-        Game.gameInProgress?.getPlayer(testUser4.id)?.loseMoney(200)
-        Game.gameInProgress?.getPlayer(testUser5.id)?.loseMoney(300)
-        val ranking = Game.gameInProgress?.ranking()
-        assertEquals(2, ranking?.get(testUser1.id))
-        assertEquals(1, ranking?.get(testUser2.id))
-        assertEquals(5, ranking?.get(testUser3.id))
+        GameRepository.game?.getPlayer(testUser1.id)?.earnMoney(200)
+        GameRepository.game?.getPlayer(testUser2.id)?.earnMoney(100)
+        GameRepository.game?.getPlayer(testUser4.id)?.loseMoney(100)
+        GameRepository.game?.getPlayer(testUser5.id)?.loseMoney(250)
+        GameRepository.game?.getPlayer(testUser6.id)?.loseMoney(250)
+        val ranking = GameRepository.game?.ranking()
+        assertEquals(1, ranking?.get(testUser1.id))
+        assertEquals(2, ranking?.get(testUser2.id))
+        assertEquals(3, ranking?.get(testUser3.id))
         assertEquals(4, ranking?.get(testUser4.id))
         assertEquals(5, ranking?.get(testUser5.id))
-        assertEquals(3, ranking?.get(testUser6.id))
-
+        assertEquals(5, ranking?.get(testUser6.id))
     }
 
     @Test
-    fun whenGameStartEveryPlayerHasTheCorrectLocation() {
-        gameLobby.start()
-        for (player in Game.gameInProgress?.players!!) {
-            assertEquals(0, player.getOwnedLocations().size)
+    fun whenGameStartNoPlayerOnwnAnyLocation() {
+        val game = gameLobby.start()
+        for (location in game.inGameLocations) {
+            assertTrue(location.owner == null)
         }
     }
 
@@ -115,9 +119,9 @@ class GameTest {
             gameLobby.addUser(testUser4)
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
-            gameLobby.start()
-            for (player in Game.gameInProgress?.players!!) {
-                assertEquals(i, player.getOwnedLocations().size)
+            val game = gameLobby.start()
+            for (player in GameRepository.game?.players!!) {
+                assertEquals(i, game.getOwnedLocations(player).size)
             }
         }
     }
@@ -135,15 +139,185 @@ class GameTest {
             gameLobby.addUser(testUser4)
             gameLobby.addUser(testUser5)
             gameLobby.addUser(testUser6)
-            gameLobby.start()
+            val game = gameLobby.start()
             val ownedLocationsSet = mutableSetOf<InGameLocation>()
 
-            for (player in Game.gameInProgress?.players!!)
-                for (location in player.getOwnedLocations()) {
+            for (player in GameRepository.game?.players!!) {
+                for (location in game.getOwnedLocations(player)) {
                     if (ownedLocationsSet.contains(location))
                         fail("Location $location is duplicated.")
                     ownedLocationsSet.add(location)
                 }
+            }
         }
+    }
+
+    @Test
+    fun nextTurnAssignsLocationsCorrectly() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+        val player1 = game.getPlayer(TEST_USER_1.id)!!
+        val player2 = game.getPlayer(TEST_USER_2.id)!!
+        val player3 = game.getPlayer(TEST_USER_3.id)!!
+        val player4 = game.getPlayer(TEST_USER_4.id)!!
+        val player5 = game.getPlayer(TEST_USER_5.id)!!
+
+        val location1 = getRandomLocation()
+        val location2 = getRandomLocation(excluding = listOf(location1))
+        val location3 = getRandomLocation(excluding = listOf(location1, location2))
+
+        game.registerBid(LocationBid(location1, player0, 300))
+        game.registerBid(LocationBid(location1, player1, 350))
+
+        game.registerBid(LocationBid(location2, player2, 500))
+        game.registerBid(LocationBid(location2, player3, 400))
+        game.registerBid(LocationBid(location2, player4, 450))
+
+        game.registerBid(LocationBid(location3, player5, 400))
+
+        game.nextTurn()
+
+        assertEquals(game.getOwnedLocations(player1).map(InGameLocation::locationProperty), listOf(location1))
+        assertEquals(game.getOwnedLocations(player2).map(InGameLocation::locationProperty), listOf(location2))
+        assertEquals(game.getOwnedLocations(player5).map(InGameLocation::locationProperty), listOf(location3))
+
+        assertTrue(game.getOwnedLocations(player0).isEmpty())
+        assertTrue(game.getOwnedLocations(player3).isEmpty())
+        assertTrue(game.getOwnedLocations(player4).isEmpty())
+    }
+
+    @Test
+    fun nextTurnMakesAllUsersLoseMoneyForBids() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+        val player1 = game.getPlayer(TEST_USER_1.id)!!
+        val player2 = game.getPlayer(TEST_USER_2.id)!!
+        val player3 = game.getPlayer(TEST_USER_3.id)!!
+        val player4 = game.getPlayer(TEST_USER_4.id)!!
+        val player5 = game.getPlayer(TEST_USER_5.id)!!
+
+        val location1 = getRandomLocation()
+        val location2 = getRandomLocation(excluding = listOf(location1))
+        val location3 = getRandomLocation(excluding = listOf(location1, location2))
+
+        game.registerBid(LocationBid(location1, player0, 300))
+        game.registerBid(LocationBid(location1, player1, 350))
+
+        game.registerBid(LocationBid(location2, player2, 500))
+        game.registerBid(LocationBid(location2, player3, 400))
+        game.registerBid(LocationBid(location2, player4, 450))
+
+        game.registerBid(LocationBid(location3, player5, 400))
+
+        game.nextTurn()
+
+        assertEquals(700, player0.getBalance())
+        assertEquals(650, player1.getBalance())
+        assertEquals(500, player2.getBalance())
+        assertEquals(600, player3.getBalance())
+        assertEquals(550, player4.getBalance())
+        assertEquals(600, player5.getBalance())
+    }
+
+    @Test
+    fun registerBidThrowsIfLocationIsNotPartOfGame() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+        val location = LocationProperty(name = "I do not exist")
+
+        assertThrows(IllegalArgumentException::class.java) {
+            game.registerBid(LocationBid(location, player0, 350))
+        }
+    }
+
+    @Test
+    fun registerBidThrowsIfPlayerIsNotPartOfGame() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = Player(user = User(id = "I do not exist"))
+        val location = getRandomLocation()
+
+        assertThrows(IllegalArgumentException::class.java) {
+            game.registerBid(LocationBid(location, player0, 350))
+        }
+    }
+
+    @Test
+    fun registerBidThrowsIfPlayerAlreadyHasABid() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+
+        val location1 = getRandomLocation()
+        val location2 = getRandomLocation(excluding = listOf(location1))
+
+        game.registerBid(LocationBid(location1, player0, 300))
+        assertThrows(IllegalStateException::class.java) {
+            game.registerBid(LocationBid(location2, player0, 350))
+        }
+    }
+
+    @Test
+    fun registerBidThrowsIfPlayerDoesNotHaveEnoughMoney() {
+        val game = Game.launchFromPendingGame(TEST_GAME_LOBBY_FULL)
+
+        val player0 = game.getPlayer(TEST_USER_0.id)!!
+        val location = getRandomLocation()
+
+        assertThrows(IllegalStateException::class.java) {
+            game.registerBid(LocationBid(location, player0, 10_000))
+        }
+    }
+
+    @Test
+    fun whenNextTurnComputesTransactions() {
+
+        val game = gameLobby.start()
+        val player1 = game.players[0]
+        val player2 = game.players[1]
+        val player1MoneyBefore = player1.getBalance()
+        val player2MoneyBefore = player2.getBalance()
+
+        class MockExecutedTransaction :
+            GameTransaction("Executed Mock Transaction", Player(), true) {
+
+            override fun executeTransaction() {
+                player1.earnMoney(100)
+            }
+
+            override fun getTransactionDescription(): String {
+                return "This is a mock transaction that has been executed :) !!!"
+            }
+        }
+
+        class MockNotExecutedTransaction :
+            GameTransaction("Not Executed Mock Transaction", Player(), false) {
+
+            override fun executeTransaction() {
+                player2.earnMoney(100)
+            }
+
+            override fun getTransactionDescription(): String {
+                return "This is a mock transaction that is not executed yet :) !!!"
+            }
+        }
+
+        game.transactions.add(MockExecutedTransaction())
+        game.transactions.add(MockNotExecutedTransaction())
+
+        game.nextTurn()
+
+        assert(game.transactions.isEmpty())
+        for (transactions in game.pastTransactions.values){
+            for (transaction in transactions) {
+                assertTrue(transaction.isExecuted())
+            }
+        }
+
+        assert(player1MoneyBefore + 100 != player1.getBalance())
+        assert(player2MoneyBefore + 100 == player2.getBalance())
     }
 }

@@ -31,10 +31,13 @@ import com.github.polypoly.app.ui.theme.Padding
  * @param title The title of the dialog.
  * @param open A mutable state to open and close the dialog.
  * @param locationsOwnByPlayer The locations the current player owns.
+ * @param onClick The action to perform when a location is clicked.
  */
 @Composable
-fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPlayer: List<InGameLocation>,
-    onClick: (InGameLocation) -> Unit) {
+fun LocationsDialog(title: String,
+                    open: MutableState<Boolean>,
+                    locationsOwnByPlayer: List<InGameLocation>,
+                    onClick: (InGameLocation) -> Unit) {
     Dialog (
         onDismissRequest = { open.value = false },
     ) {
@@ -52,10 +55,13 @@ fun LocationsDialog(title: String, open: MutableState<Boolean>, locationsOwnByPl
 /**
  * Body for the locations list dialog.
  * @param locationList The list of locations to show.
+ * @param title The title of the dialog.
+ * @param open A mutable state to open and close the dialog.
  */
 @Composable
-fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open: MutableState<Boolean>,
-    onClick: (InGameLocation) -> Unit) {
+fun LocationsDialogBody(locationList: List<InGameLocation>,
+                        title: String, open: MutableState<Boolean>,
+                        onClick: (InGameLocation) -> Unit) {
     Column {
         Text(text = title,
             color = MaterialTheme.colors.onPrimary,
@@ -95,6 +101,7 @@ fun LocationsDialogBody(locationList: List<InGameLocation>, title: String, open:
 /**
  * A Location in the list.
  * @param location The location to show.
+ * @param onClick The action to perform when the location is clicked.
  */
 @Composable
 fun LocationInList(location: InGameLocation, onClick: () -> Unit) {
