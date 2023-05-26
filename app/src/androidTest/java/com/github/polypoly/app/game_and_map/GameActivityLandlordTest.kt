@@ -8,7 +8,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
-import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.game.GameActivity
@@ -97,7 +96,7 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
             currentPlayer.looseLocation(location)
         }
         // refresh game data to reflect change
-        execInMainThread { gameViewModel.refreshInGameLocationsOwned() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        execInMainThread { gameViewModel.refreshInGameLocationsOwned() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 
     /**
@@ -114,6 +113,6 @@ class GameActivityLandlordTest : PolyPolyTest(true, false) {
             currentPlayer.earnNewLocation(inGameLocation)
         }
         // refresh game data to reflect change
-        execInMainThread { composeTestRule.activity.gameModel.refreshInGameLocationsOwned() }.orTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
+        execInMainThread { composeTestRule.activity.gameModel.refreshInGameLocationsOwned() }.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
     }
 }
