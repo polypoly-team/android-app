@@ -3,7 +3,7 @@ package com.github.polypoly.app.ui.menu.rankings
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.getAllValues
+import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 
 /**

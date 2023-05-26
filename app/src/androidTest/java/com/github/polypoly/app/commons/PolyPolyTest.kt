@@ -12,7 +12,7 @@ import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.base.user.Skin
 import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.base.user.User
-import com.github.polypoly.app.network.StorableObject
+import com.github.polypoly.app.database.StorableObject
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.isSignedIn
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
@@ -69,7 +69,7 @@ abstract class PolyPolyTest(
 
         val TEST_GAME_LOBBY_FULL = GameLobby(
             TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 4, 6,
-            60, 20, getZones(), 100), "Full gameLobby", "11111"
+            60, 20, getZones(), 1000), "Full gameLobby", "11111"
         )
         val TEST_GAME_LOBBY_PRIVATE = GameLobby(
             TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
@@ -221,8 +221,10 @@ abstract class PolyPolyTest(
      * @param amongLocations list of locations to pick from
      * @return a random location in the list
      */
-    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties }): LocationProperty {
-        return amongLocations[Random.nextInt().absoluteValue % amongLocations.size]
+    fun getRandomLocation(amongLocations: List<LocationProperty> = getZones().flatMap { zone -> zone.locationProperties },
+                          excluding: List<LocationProperty> = listOf()): LocationProperty {
+        val availableLocations = amongLocations.minus(excluding.toSet())
+        return availableLocations[Random.nextInt().absoluteValue % availableLocations.size]
     }
 
     /**

@@ -35,9 +35,9 @@ import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.network.getAllValues
-import com.github.polypoly.app.network.getValue
-import com.github.polypoly.app.network.keyExists
+import com.github.polypoly.app.database.getAllValues
+import com.github.polypoly.app.database.getValue
+import com.github.polypoly.app.database.keyExists
 import com.github.polypoly.app.ui.menu.MenuActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyConstants.Companion.GAME_LOBBY_CODE_LENGTH
 import com.github.polypoly.app.ui.theme.UIElements
@@ -473,7 +473,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
      * @param testTag (String): The test tag to be used for testing
      */
     @Composable
-    fun RectangleButton(onClick: () -> Unit, description: String = "", testTag: String = "Undefined",) {
+    fun RectangleButton(onClick: () -> Unit, description: String = "", testTag: String = "Undefined") {
         Button(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
@@ -519,6 +519,7 @@ class JoinGameLobbyActivity : MenuActivity("Join a game") {
 
     /**
      * This function launches the gameLobby room activity and passes the gameLobby code to it.
+     * @param mContext The context of the activity
      */
     private fun joinGameLobbyRoom(mContext: Context) {
         remoteDB.getValue<GameLobby>(gameLobbyCode).thenAccept { gameLobby ->

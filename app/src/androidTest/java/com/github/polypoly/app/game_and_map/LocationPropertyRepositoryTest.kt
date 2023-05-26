@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import com.github.polypoly.app.base.game.location.Zone
 import com.github.polypoly.app.base.game.location.LocationPropertyRepository

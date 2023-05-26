@@ -1,4 +1,4 @@
-package com.github.polypoly.app.map
+package com.github.polypoly.app.game_and_map
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.github.polypoly.app.ui.map.MapViewModel

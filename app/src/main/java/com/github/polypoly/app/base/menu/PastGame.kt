@@ -1,6 +1,7 @@
 package com.github.polypoly.app.base.menu
 
 import com.github.polypoly.app.base.user.User
+import com.github.polypoly.app.base.game.Game
 
 /**
  * A class that represent a past [Game] played by [User]s

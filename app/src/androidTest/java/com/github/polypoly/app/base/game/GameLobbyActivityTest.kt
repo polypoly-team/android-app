@@ -3,14 +3,12 @@ package com.github.polypoly.app.base.game
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.matcher.IntentMatchers
 import com.github.polypoly.app.R
 import com.github.polypoly.app.base.menu.lobby.GameLobby
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.base.menu.lobby.GameParameters
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.lobby.GameLobbyActivity
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import org.junit.After
