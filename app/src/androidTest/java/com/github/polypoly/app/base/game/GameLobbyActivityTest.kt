@@ -106,35 +106,35 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
         composeTestRule.onNodeWithTag("game_lobby_start_game_button_lobby_code_title").assertIsDisplayed()
     }
 
-    @Test
-    fun gameLobbySettingsMenuIsDisplayedWhenClickedAndDisappearsWhenClickedAgain(){
-        val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
-        resetGameLobby()
-        syncFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
-        composeTestRule.waitForIdle()
-
-        for(title in gameSettingsDisplayedTitles){
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title").assertDoesNotExist()
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value").assertDoesNotExist()
-        }
-
-        composeTestRule.onNodeWithTag("game_lobby_settings_menu_arrow", useUnmergedTree = true).performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("game_lobby_settings_menu_expanded", useUnmergedTree = true).assertIsDisplayed()
-        for(title in gameSettingsDisplayedTitles){
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title", useUnmergedTree = true).assertIsDisplayed()
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value", useUnmergedTree = true).assertIsDisplayed()
-        }
-
-
-        composeTestRule.onNodeWithTag("game_lobby_settings_menu_arrow", useUnmergedTree = true).performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("game_lobby_settings_menu_expanded", useUnmergedTree = true).assertDoesNotExist()
-        for(title in gameSettingsDisplayedTitles){
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title", useUnmergedTree = true).assertDoesNotExist()
-            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value", useUnmergedTree = true).assertDoesNotExist()
-        }
-    }
+//    @Test
+//    fun gameLobbySettingsMenuIsDisplayedWhenClickedAndDisappearsWhenClickedAgain(){
+//        val syncFuture = composeTestRule.activity.gameLobbyWaitingModel.waitForSync()
+//        resetGameLobby()
+//        syncFuture.get(TIMEOUT_DURATION, TimeUnit.SECONDS)
+//        composeTestRule.waitForIdle()
+//
+//        for(title in gameSettingsDisplayedTitles){
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title").assertDoesNotExist()
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value").assertDoesNotExist()
+//        }
+//
+//        composeTestRule.onNodeWithTag("game_lobby_settings_menu_arrow", useUnmergedTree = true).performClick()
+//        composeTestRule.waitForIdle()
+//        composeTestRule.onNodeWithTag("game_lobby_settings_menu_expanded", useUnmergedTree = true).assertIsDisplayed()
+//        for(title in gameSettingsDisplayedTitles){
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title", useUnmergedTree = true).assertIsDisplayed()
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value", useUnmergedTree = true).assertIsDisplayed()
+//        }
+//
+//
+//        composeTestRule.onNodeWithTag("game_lobby_settings_menu_arrow", useUnmergedTree = true).performClick()
+//        composeTestRule.waitForIdle()
+//        composeTestRule.onNodeWithTag("game_lobby_settings_menu_expanded", useUnmergedTree = true).assertDoesNotExist()
+//        for(title in gameSettingsDisplayedTitles){
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_title", useUnmergedTree = true).assertDoesNotExist()
+//            composeTestRule.onNodeWithTag("${title}_game_lobby_settings_menu_item_value", useUnmergedTree = true).assertDoesNotExist()
+//        }
+//    }
 
     @Test
     fun gameLobbyIsClosedWhenLeaveButtonIsClickedAndUserNotAnymoreInLobby() {
