@@ -61,6 +61,7 @@ fun Hud(
     val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
 
     SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
+    TaxToPayNotification(gameViewModel, mapViewModel)
     HudLocation(location, testTag = "interactable_location_text")
     if (playerState == PlayerState.MOVING) {
         HudLocation(

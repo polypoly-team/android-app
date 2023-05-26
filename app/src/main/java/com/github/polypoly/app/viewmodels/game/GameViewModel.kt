@@ -12,13 +12,25 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.game.transactions.TaxTransaction
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.database.RemoteDB
 import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.database.removeValue
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import com.github.polypoly.app.viewmodels.commons.LoadingModel
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -51,6 +63,9 @@ class GameViewModel(
     private var currentTurnBid: LocationBid? = null
 
     private val tradeRequestData: MutableLiveData<TradeRequest> = MutableLiveData()
+
+    private val _taxToPayData: MutableLiveData<InGameLocation> = MutableLiveData(null)
+    val taxToPay: LiveData<InGameLocation> = _taxToPayData
 
     //used to determine if the player is close enough to a location to interact with it
     private val MAX_INTERACT_DISTANCE = 10.0 // meters
@@ -222,6 +237,8 @@ class GameViewModel(
 
                 onNextTurnEnd()
 
+                playerData.value = gameData.value?.getPlayer(playerData.value?.user?.id ?: "")
+
                 setLoading(false)
                 completionFuture.complete(syncSucceeded)
             }
@@ -249,6 +266,7 @@ class GameViewModel(
             if (gameFound.currentRound < gameUpdated.currentRound) {
                 remoteDB.setValue(gameUpdated).thenCompose{
                     gameData.value = gameUpdated
+                    refreshPlayer()
                     CompletableFuture.completedFuture(true)
                 }
             } else { // up to date version already on live db
@@ -293,6 +311,9 @@ class GameViewModel(
         playerStateFSMTransition(PlayerState.BIDDING, PlayerState.INTERACTING)
     }
 
+    /**
+     * Ends BIDDING state and moves to TURN_FINISHED
+     */
     fun endBidding() {
         playerStateFSMTransition(PlayerState.BIDDING, PlayerState.TURN_FINISHED)
     }
@@ -302,6 +323,11 @@ class GameViewModel(
      */
     fun resetTurnState() {
         playerStateData.value = PlayerState.ROLLING_DICE
+    }
+
+    fun endInteraction() {
+        _taxToPayData.postValue(null)
+        playerStateFSMTransition(PlayerState.INTERACTING, PlayerState.TURN_FINISHED)
     }
 
     /**
@@ -391,6 +417,7 @@ class GameViewModel(
 
                 remoteDB.setValue(gameUpdated).thenApply {
                     gameData.value = gameUpdated
+                    refreshPlayer()
                     currentTurnBid = bid
                     endBidding()
                     future.complete(true)
@@ -404,6 +431,25 @@ class GameViewModel(
     fun refreshInGameLocationsOwned() {
         val player = playerData.value ?: return
         _locationsOwnedData.postValue(gameData.value?.inGameLocations?.filter { it.owner == player })
+    }
+
+    fun bidOnLocationSelected(location: LocationProperty) {
+        val game = gameData.value ?: return
+        val inGameLocation = game.getInGameLocation(location) ?: return
+
+        if (inGameLocation.owner == null) {
+            startBidding()
+        } else { // location already owned so we pay the tax instead
+            _taxToPayData.value = inGameLocation
+            game.transactions.add(TaxTransaction("tax", refreshPlayer(), false,
+                inGameLocation.currentTax(), inGameLocation.owner!!, inGameLocation.locationProperty))
+        }
+    }
+
+    private fun refreshPlayer(): Player {
+        val player = gameData.value?.getPlayer(playerData.value?.user?.id ?: "") ?: Player()
+        playerData.value = player
+        return player
     }
 
     companion object {
