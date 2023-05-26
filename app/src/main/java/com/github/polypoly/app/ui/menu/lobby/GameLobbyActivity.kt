@@ -90,6 +90,7 @@ class GameLobbyActivity : ComponentActivity() {
             //TODO: implement as advised in https://github.com/polypoly-team/android-app/pull/154#discussion_r1198327499
             remoteDB.addOnChangeListener<GameLobby>(gameLobby.code, "started_game_listener") {
                 if (it.started && it.admin.id != user.id) {
+                    gameLobby.start()
                     navigateToGame(context, gameLobby)
                 }
             }
