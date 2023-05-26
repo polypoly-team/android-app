@@ -106,7 +106,7 @@ class GameActivity : ComponentActivity() {
                     // pop-ups for trades:
                     DialogsForTrade(trade, player)
 
-                    if(true) {
+                    if(gameEnded) {
                         // FIXME: for some reason no user is flagged as current user
                         GameEndUI(lastGame = game) {
                             finish()

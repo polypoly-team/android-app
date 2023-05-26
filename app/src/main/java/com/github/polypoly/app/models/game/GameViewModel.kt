@@ -19,6 +19,7 @@ import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.removeValue
 import com.github.polypoly.app.utils.global.GlobalInstances
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.*
@@ -323,23 +324,23 @@ class GameViewModel(
      * @return a future that contains true if the user was successfully updated
      */
     fun finishGame(): CompletableFuture<Boolean> {
-        val currentPlayer = playerData.value!!
-        val isWinner = gameData.value?.ranking()?.get(currentPlayer.user.key) == 1
+        val isWinner = gameData.value?.ranking()?.get(playerData.value?.user?.key) == 1
+        val user = currentUser!!
         val updatedStats = Stats(
-            accountCreation = currentPlayer.user.stats.accountCreation,
-            lastConnection = currentPlayer.user.stats.lastConnection,
-            numberOfGames = currentPlayer.user.stats.numberOfGames + 1,
-            numberOfWins = currentPlayer.user.stats.numberOfWins + if(isWinner) 1 else 0
+            accountCreation = user.stats.accountCreation,
+            lastConnection = user.stats.lastConnection,
+            numberOfGames = user.stats.numberOfGames + 1,
+            numberOfWins = user.stats.numberOfWins + if(isWinner) 1 else 0
         )
         val updatedUser = User(
-            id = currentPlayer.user.id,
-            name = currentPlayer.user.id,
-            bio = currentPlayer.user.bio,
-            skin = currentPlayer.user.skin,
+            id = user.id,
+            name = user.id,
+            bio = user.bio,
+            skin = user.skin,
             stats = updatedStats,
-            trophiesWon = currentPlayer.user.trophiesWon,
-            trophiesDisplay = currentPlayer.user.trophiesDisplay,
-            currentUser = currentPlayer.user.currentUser
+            trophiesWon = user.trophiesWon,
+            trophiesDisplay = user.trophiesDisplay,
+            currentUser = user.currentUser
         )
         val future = remoteDB.updateValue(updatedUser)
         GameRepository.game = null
