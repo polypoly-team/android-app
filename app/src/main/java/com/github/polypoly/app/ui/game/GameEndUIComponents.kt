@@ -1,6 +1,5 @@
 package com.github.polypoly.app.ui.game
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -154,7 +154,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     }
 
     // ======================================================================== END SCREEN
-    /*@Test
+    @Test
     fun endScreenIsDisplayedWhenGameEnds() {
         forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("end_screen").assertIsDisplayed()
@@ -171,7 +171,7 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
         forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithText("Return to menu").performClick()
         Intents.intended(IntentMatchers.hasComponent(WelcomeActivity::class.java.name))
-    }*/
+    }
 
 
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {

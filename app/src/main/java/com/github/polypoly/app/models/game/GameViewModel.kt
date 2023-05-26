@@ -3,20 +3,22 @@ package com.github.polypoly.app.models.game
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.github.polypoly.app.base.game.Game
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.user.Stats
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.commons.LoadingModel
 import com.github.polypoly.app.network.getAllValues
 import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.network.removeValue
+import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import kotlinx.coroutines.*
@@ -321,6 +323,25 @@ class GameViewModel(
      * // TODO: update user's score?
      */
     fun finishGame() {
+        val currentPlayer = playerData.value!!
+        val isWinner = gameData.value?.ranking()?.get(currentPlayer.user.key) == 1
+        val updatedStats = Stats(
+            accountCreation = currentPlayer.user.stats.accountCreation,
+            lastConnection = currentPlayer.user.stats.lastConnection,
+            numberOfGames = currentPlayer.user.stats.numberOfGames + 1,
+            numberOfWins = currentPlayer.user.stats.numberOfWins + if(isWinner) 1 else 0
+        )
+        val updatedUser = User(
+            id = currentPlayer.user.id,
+            name = currentPlayer.user.id,
+            bio = currentPlayer.user.bio,
+            skin = currentPlayer.user.skin,
+            stats = updatedStats,
+            trophiesWon = currentPlayer.user.trophiesWon,
+            trophiesDisplay = currentPlayer.user.trophiesDisplay,
+            currentUser = currentPlayer.user.currentUser
+        )
+        remoteDB.updateValue(updatedUser)
         GameRepository.game = null
         GameRepository.player = null
         GameRepository.gameCode = null
