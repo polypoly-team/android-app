@@ -3,6 +3,7 @@ package com.github.polypoly.app.ui.game
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -53,7 +54,8 @@ fun RollDiceButton() {
                 .offset(y = (-80).dp)
                 .testTag("roll_dice_button"),
             onClick = { showRollDiceDialog.value = true },
-            shape = CircleShape
+            shape = CircleShape,
+            elevation = ButtonDefaults.elevation(0.dp),
         ) {
             Icon(Icons.Filled.Casino, contentDescription = "Roll Dice")
         }
