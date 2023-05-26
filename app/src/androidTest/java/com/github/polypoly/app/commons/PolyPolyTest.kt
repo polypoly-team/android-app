@@ -127,6 +127,7 @@ abstract class PolyPolyTest(
             TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
             TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
             TEST_GAME_LOBBY_AVAILABLE_3.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_4))
+            TEST_GAME_LOBBY_AVAILABLE_4.addUsers(listOf(TEST_USER_1, TEST_USER_2))
             TEST_GAME_LOBBY_AVAILABLE_5.addUsers(listOf(TEST_USER_1, TEST_USER_2))
         }
     }
