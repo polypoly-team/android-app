@@ -41,7 +41,7 @@ data class User(
 
     // ====================================================================== STORABLE
     override fun toDBObject(): User {
-        return User(id, name, bio, skin, stats, trophiesWon, trophiesDisplay, currentUser)
+        return User(id, name, bio, skin, stats, trophiesWon, trophiesDisplay, currentUser = false)
     }
 
     override fun toLocalObject(dbObject: User): CompletableFuture<StorableObject<User>> {
