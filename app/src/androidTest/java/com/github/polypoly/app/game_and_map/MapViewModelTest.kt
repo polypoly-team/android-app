@@ -1,6 +1,8 @@
 package com.github.polypoly.app.game_and_map
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.github.polypoly.app.base.game.GameMilestoneRewardTransaction
+import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.ui.map.MapViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,6 +40,28 @@ class MapViewModelTest {
         testScope.advanceUntilIdle()
 
         assertEquals(expectedDistance, gameViewModel.distanceWalked.value, 0.001f)
+    }
+
+    @Test
+    fun reachMilestonesAddsToMilestonesToDisplay() = testDispatcher.run {
+        val addedDistance = 5 * GameMilestoneRewardTransaction.milestoneRewardDistance
+
+        gameViewModel.addDistanceWalked(addedDistance.toFloat())
+        testScope.advanceUntilIdle()
+        assert(gameViewModel.newMilestonesToDisplay.value.size == 5)
+    }
+
+    @Test
+    fun milestonesReachedAddsToPlayerBalanceWhenRoundEnds(){
+        val addedDistance = 5 * GameMilestoneRewardTransaction.milestoneRewardDistance
+        val player = GameRepository.player
+        val playerBalanceBefore = player!!.getBalance()
+
+        gameViewModel.addDistanceWalked(addedDistance.toFloat())
+        testScope.advanceUntilIdle()
+
+        val playerBalanceAfter = player.getBalance()
+        assert(playerBalanceAfter == playerBalanceBefore + 5 * GameMilestoneRewardTransaction.milestoneRewardValue)
     }
 
     @Test
