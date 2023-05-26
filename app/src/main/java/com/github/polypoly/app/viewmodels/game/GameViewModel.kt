@@ -12,13 +12,24 @@ import com.github.polypoly.app.base.game.TradeRequest
 import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.game.location.LocationBid
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.base.game.location.LocationPropertyRepository
+import com.github.polypoly.app.base.menu.lobby.GameLobby
+import com.github.polypoly.app.base.menu.lobby.GameMode
+import com.github.polypoly.app.base.menu.lobby.GameParameters
+import com.github.polypoly.app.base.user.Skin
+import com.github.polypoly.app.base.user.Stats
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.data.GameRepository
+import com.github.polypoly.app.database.RemoteDB
 import com.github.polypoly.app.database.getAllValues
 import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.database.removeValue
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import com.github.polypoly.app.utils.global.Settings.Companion.NUMBER_OF_LOCATIONS_ROLLED
 import com.github.polypoly.app.viewmodels.commons.LoadingModel
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.CompletableFuture
@@ -45,7 +56,7 @@ class GameViewModel(
     private val _successfulBidData: MutableLiveData<LocationBid> = MutableLiveData(null)
     val successfulBidData: LiveData<LocationBid> get() = _successfulBidData
 
-    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(null)
+    private val _locationsOwnedData: MutableLiveData<List<InGameLocation>> = MutableLiveData(game.getOwnedLocations(player))
     val locationsOwnedData: LiveData<List<InGameLocation>> get() = _locationsOwnedData
 
     private var currentTurnBid: LocationBid? = null
@@ -403,7 +414,7 @@ class GameViewModel(
 
     fun refreshInGameLocationsOwned() {
         val player = playerData.value ?: return
-        _locationsOwnedData.postValue(gameData.value?.inGameLocations?.filter { it.owner == player })
+        _locationsOwnedData.postValue(gameData.value?.getOwnedLocations(player))
     }
 
     companion object {

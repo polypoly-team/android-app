@@ -29,12 +29,14 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 private val INITIAL_POSITION = GeoPoint(46.518726, 6.566613)
 private const val INITIAL_ZOOM = 18.0
 private const val MARKER_SIDE_LENGTH = 100
 private const val STAR_SIDE_LENGTH = 50
+private const val TARGET_FACTOR = 1.8
 
 /**
  * Tile source for EPFL campus map.
@@ -88,7 +90,8 @@ fun addMarkerTo(
     mapViewModel: MapViewModel,
     gameViewModel: GameViewModel?,
     propertyLevel: PropertyLevel,
-    owned: Boolean = true
+    owned: Boolean,
+    targetLocation: Boolean
 ): Marker {
     fun buildMarkerIcon(
         context: Context,
@@ -98,8 +101,13 @@ fun addMarkerTo(
     ): Drawable {
         val markerIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_pin)
         val starIcon = BitmapFactory.decodeResource(context.resources, R.drawable.star_icon)
+
+        val markerSize: Int = when (targetLocation) {
+            true -> (MARKER_SIDE_LENGTH * TARGET_FACTOR).roundToInt()
+            false -> MARKER_SIDE_LENGTH
+        }
         val scaledMarkerBitmap =
-            Bitmap.createScaledBitmap(markerIcon, MARKER_SIDE_LENGTH, MARKER_SIDE_LENGTH, true)
+            Bitmap.createScaledBitmap(markerIcon, markerSize, markerSize, true)
         val scaledStarBitmap =
             Bitmap.createScaledBitmap(starIcon, STAR_SIDE_LENGTH, STAR_SIDE_LENGTH, true)
 
@@ -163,8 +171,6 @@ fun addMarkerTo(
         true
     }
 
-    mapView.overlays.add(marker)
-
     return marker
 }
 
@@ -203,10 +209,10 @@ fun initLocationOverlay(
             lastLocation = locationProvider.lastKnownLocation
             if (mapViewModel.currentPlayer != null
                 && gameViewModel?.getPlayerStateData()?.value == PlayerState.MOVING
-                && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationProperty
+                && mapViewModel.interactableProperty.value == mapViewModel.goingToLocationPropertyData.value
             ) {
                 gameViewModel.locationReached()
-                mapViewModel.goingToLocationProperty = null
+                mapViewModel.goToLocation(null)
             }
         }
     }
