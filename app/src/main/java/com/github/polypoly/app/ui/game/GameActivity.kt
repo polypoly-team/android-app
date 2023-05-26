@@ -110,7 +110,7 @@ class GameActivity : ComponentActivity() {
                         // FIXME: for some reason no user is flagged as current user
                         GameEndUI(lastGame = game) {
                             finish()
-                            gameModel.getGameData()
+                            gameModel.finishGame()
                             startActivity(Intent(context, WelcomeActivity::class.java))
                         }
                     }

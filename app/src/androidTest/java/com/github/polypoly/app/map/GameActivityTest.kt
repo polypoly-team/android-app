@@ -10,12 +10,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.polypoly.app.base.game.Game
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.models.game.GameViewModel
+import com.github.polypoly.app.network.getValue
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.ui.menu.profile.ProfileActivity
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
+import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -167,10 +171,35 @@ class GameActivityTest : PolyPolyTest(true, false, true) {
     }
 
     @Test
-    fun returnButtonWorksAtGameEnd() {
+    fun returnButtonReturnsToWelcomeActivityAtGameEnd() {
         forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithText("Return to menu").performClick()
         Intents.intended(IntentMatchers.hasComponent(WelcomeActivity::class.java.name))
+    }
+
+    // ======================================================================== FINISH GAME
+
+    @Test
+    fun finishGameSetsNullGame() {
+        composeTestRule.activity.gameModel.finishGame()
+        assert(GameRepository.game == null)
+        assert(GameRepository.player == null)
+    }
+
+    @Test
+    fun finishGameUpdatesUserGameCount() {
+        val gameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
+        composeTestRule.activity.gameModel.finishGame()
+        val newGameCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfGames
+        assert(newGameCount == gameCount + 1)
+    }
+
+    @Test
+    fun finishGameUpdatesUserWinCount() {
+        val winCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
+        composeTestRule.activity.gameModel.finishGame()
+        val newWinCount = remoteDB.getValue<User>(currentUser?.key!!).get(TIMEOUT_DURATION, TimeUnit.SECONDS).stats.numberOfWins
+        assert(newWinCount == winCount + 1)
     }
 
 

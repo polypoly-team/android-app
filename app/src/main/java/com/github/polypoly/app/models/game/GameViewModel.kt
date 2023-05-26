@@ -320,7 +320,6 @@ class GameViewModel(
 
     /**
      * Resets all game related code
-     * // TODO: update user's score?
      */
     fun finishGame() {
         val currentPlayer = playerData.value!!
