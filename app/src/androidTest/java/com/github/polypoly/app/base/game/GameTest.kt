@@ -36,6 +36,7 @@ class GameTest: PolyPolyTest(false, false) {
         testDuration, 10, LocationPropertyRepository.getZones(), 200)
     private val gameLobby = GameLobby(testUser1, gameRules, "test_game", "123456", false)
 
+
     @Before
     fun initLobby() {
         gameLobby.addUser(testUser2)
@@ -269,5 +270,54 @@ class GameTest: PolyPolyTest(false, false) {
         assertThrows(IllegalStateException::class.java) {
             game.registerBid(LocationBid(location, player0, 10_000))
         }
+    }
+
+    @Test
+    fun whenNextTurnComputesTransactions() {
+
+        val game = gameLobby.start()
+        val player1 = game.players[0]
+        val player2 = game.players[1]
+        val player1MoneyBefore = player1.getBalance()
+        val player2MoneyBefore = player2.getBalance()
+
+        class MockExecutedTransaction :
+            GameTransaction("Executed Mock Transaction", Player(), true) {
+
+            override fun executeTransaction() {
+                player1.earnMoney(100)
+            }
+
+            override fun getTransactionDescription(): String {
+                return "This is a mock transaction that has been executed :) !!!"
+            }
+        }
+
+        class MockNotExecutedTransaction :
+            GameTransaction("Not Executed Mock Transaction", Player(), false) {
+
+            override fun executeTransaction() {
+                player2.earnMoney(100)
+            }
+
+            override fun getTransactionDescription(): String {
+                return "This is a mock transaction that is not executed yet :) !!!"
+            }
+        }
+
+        game.transactions.add(MockExecutedTransaction())
+        game.transactions.add(MockNotExecutedTransaction())
+
+        game.nextTurn()
+
+        assert(game.transactions.isEmpty())
+        for (transactions in game.pastTransactions.values){
+            for (transaction in transactions) {
+                assertTrue(transaction.isExecuted())
+            }
+        }
+
+        assert(player1MoneyBefore + 100 != player1.getBalance())
+        assert(player2MoneyBefore + 100 == player2.getBalance())
     }
 }
