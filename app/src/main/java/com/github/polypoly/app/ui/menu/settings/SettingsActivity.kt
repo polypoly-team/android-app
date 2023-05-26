@@ -161,6 +161,7 @@ class SettingsActivity : MenuActivity("Settings") {
                         }
                         currentUser = null
                         finish()
+                        GameMusic.stopSong()
                         val backToSignIn = Intent(mContext, SignInActivity::class.java)
                         startActivity(backToSignIn)
                     },

@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
@@ -32,6 +33,7 @@ import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapUI
 import com.github.polypoly.app.ui.map.MapViewModel
+import com.github.polypoly.app.ui.menu.WelcomeActivity
 import com.github.polypoly.app.ui.theme.PolypolyTheme
 
 /**
@@ -68,6 +70,8 @@ class GameActivity : ComponentActivity() {
         val gameEnded = gameModel.getGameFinishedData().observeAsState().value
         val trade = gameModel.getTradeRequestData().observeAsState().value
 
+        val context = LocalContext.current
+
         if (player != null && game != null && gameTurn != null && gameEnded != null) {
             PolypolyTheme {
                 Surface(
@@ -94,10 +98,18 @@ class GameActivity : ComponentActivity() {
                         mapViewModel.interactableProperty.value?.name ?: "EPFL",
                         gameModel
                     )
-                    GameEndedLabel(gameEnded)
 
                     // pop-ups for trades:
                     DialogsForTrade(trade, player)
+
+                    if(gameEnded) {
+                        // FIXME: for some reason no user is flagged as current user
+                        GameEndUI(lastGame = game) {
+                            finish()
+                            gameModel.finishGame()
+                            startActivity(Intent(context, WelcomeActivity::class.java))
+                        }
+                    }
                 }
             }
         }

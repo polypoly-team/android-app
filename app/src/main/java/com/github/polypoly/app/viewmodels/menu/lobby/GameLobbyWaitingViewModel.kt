@@ -60,7 +60,10 @@ class GameLobbyWaitingViewModel(
 
     private fun listenGameLobby() {
         storage.addOnChangeListener(lobbyCode, "game_lobby_waiting_view_model", ::setGameLobby)
-        storage.getValue<GameLobby>(lobbyCode).thenAccept(::setGameLobby)
+        storage.getValue<GameLobby>(lobbyCode).thenAccept {
+            it.start()
+            setGameLobby(it)
+        }
     }
 
     companion object {

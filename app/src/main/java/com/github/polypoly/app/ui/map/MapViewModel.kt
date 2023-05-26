@@ -1,13 +1,16 @@
 package com.github.polypoly.app.ui.map
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.polypoly.app.base.game.GameMilestoneRewardTransaction
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.location.LocationProperty
+import com.github.polypoly.app.data.GameRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,10 +26,15 @@ class MapViewModel(
     private var _distanceWalked = mutableStateOf(0f)
     val distanceWalked: State<Float> get() = _distanceWalked
 
+    @SuppressLint("MutableCollectionMutableState")
+    private var _milestonesToDisplay = mutableStateOf(arrayListOf<GameMilestoneRewardTransaction>())
+    val newMilestonesToDisplay: State<ArrayList<GameMilestoneRewardTransaction>> get() = _milestonesToDisplay
+
     private var _interactableProperty = mutableStateOf(null as LocationProperty?)
     val interactableProperty: State<LocationProperty?> get() = _interactableProperty
 
-    var goingToLocationProperty: LocationProperty? = null
+    val _goingToLocationPropertyData: MutableLiveData<LocationProperty> = MutableLiveData(null)
+    val goingToLocationPropertyData: LiveData<LocationProperty> = _goingToLocationPropertyData
 
     var currentPlayer: Player? = null
 
@@ -43,6 +51,7 @@ class MapViewModel(
      */
     fun addDistanceWalked(distance: Float) {
         viewModelScope.launch(dispatcher) {
+            computeMilestones(distance, _distanceWalked.value)
             _distanceWalked.value += distance
         }
     }
@@ -53,6 +62,28 @@ class MapViewModel(
     fun resetDistanceWalked() {
         viewModelScope.launch(dispatcher) {
             _distanceWalked.value = 0f
+        }
+    }
+
+    /**
+     * Computes the milestones reached by the user and adds them to the list of new milestones to display.
+     */
+    private fun computeMilestones(addedDistance: Float, oldDistance : Float) {
+        viewModelScope.launch(dispatcher) {
+            val milestoneDistance = GameMilestoneRewardTransaction.milestoneRewardDistance
+            val distanceToNextMilestone = oldDistance % milestoneDistance
+            val milestonesNewlyReached = ((distanceToNextMilestone + addedDistance) / milestoneDistance).toInt()
+            val newMilestones = arrayListOf<GameMilestoneRewardTransaction>()
+            for (i in 1..milestonesNewlyReached) {
+                GameRepository.player?.incrementLastMilestone()
+                val milestoneTransaction = GameMilestoneRewardTransaction(
+                    if (GameRepository.player != null) GameRepository.player!!.getLastMilestone() else 0
+                )
+                GameRepository.game?.transactions?.add(milestoneTransaction)
+                newMilestones.add(milestoneTransaction)
+            }
+            newMilestones.addAll(_milestonesToDisplay.value)
+            _milestonesToDisplay.value = newMilestones
         }
     }
 
@@ -73,5 +104,9 @@ class MapViewModel(
      */
     fun selectLocation(location: LocationProperty?) {
         locationSelectedData.value = location
+    }
+
+    fun goToLocation(location: LocationProperty?) {
+        _goingToLocationPropertyData.value = location
     }
 }

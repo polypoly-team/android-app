@@ -45,12 +45,12 @@ import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.base.menu.lobby.GameMode
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
-import com.github.polypoly.app.viewmodels.game.GameViewModel
 import com.github.polypoly.app.ui.map.MapViewModel
 import com.github.polypoly.app.ui.menu.MenuComposable
 import com.github.polypoly.app.ui.theme.Padding
 import com.github.polypoly.app.ui.theme.Shapes
 import com.github.polypoly.app.utils.Constants.Companion.NOTIFICATION_DURATION
+import com.github.polypoly.app.viewmodels.game.GameViewModel
 
 /**
  * The heads-up display with player and game stats that is displayed on top of the map
@@ -71,13 +71,14 @@ fun Hud(
     gameModel: GameViewModel
 ) {
     val playerState = gameViewModel.getPlayerStateData().observeAsState().value
-    val playerPosition = mapViewModel.goingToLocationProperty?.name ?: "unknown destination" // TODO: use state data
+    val goingToLocation = mapViewModel.goingToLocationPropertyData.value?.name ?: "EPFL"
 
     SuccessfulBidNotification(gameViewModel, NOTIFICATION_DURATION)
+    TaxToPayNotification(gameViewModel, mapViewModel)
     HudLocation(location, testTag = "interactable_location_text")
     if (playerState == PlayerState.MOVING) {
         HudLocation(
-            playerPosition,
+            goingToLocation,
             DpOffset(0.dp, 140.dp),
             "going_to_location_text",
             "Going to"
@@ -88,6 +89,7 @@ fun Hud(
     HudPlayer(playerData, gameModel)
     HudOtherPlayersAndGame(otherPlayersData, gameModel)
     HudGameMenu()
+    MilestoneEventConsumer(milestonesToDisplay = mapViewModel.newMilestonesToDisplay)
 }
 
 /**

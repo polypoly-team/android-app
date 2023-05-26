@@ -97,7 +97,7 @@ fun RollDiceDialog(gameViewModel: GameViewModel, mapViewModel: MapViewModel) {
                         Button(
                             onClick = {
                                 showRollDiceDialog.value = false
-                                mapViewModel.goingToLocationProperty = location
+                                mapViewModel.goToLocation(location)
                                 gameViewModel.diceRolled()
                             },
                             modifier = Modifier

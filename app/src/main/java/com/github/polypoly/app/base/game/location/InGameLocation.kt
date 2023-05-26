@@ -47,4 +47,13 @@ data class InGameLocation (
     fun currentMortgagePrice(): Int {
         return locationProperty.baseMortgagePrice * (level.ordinal + 1)
     }
+
+    fun upgrade() {
+        level = when(level) {
+            PropertyLevel.LEVEL_0 -> PropertyLevel.LEVEL_1
+            PropertyLevel.LEVEL_1 -> PropertyLevel.LEVEL_2
+            PropertyLevel.LEVEL_2 -> PropertyLevel.LEVEL_MAX
+            PropertyLevel.LEVEL_MAX -> PropertyLevel.LEVEL_MAX
+        }
+    }
 }
