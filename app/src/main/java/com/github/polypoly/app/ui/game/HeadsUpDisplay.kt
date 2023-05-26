@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -15,6 +16,8 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,15 +29,18 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.PlayerState
+import com.github.polypoly.app.base.game.location.InGameLocation
 import com.github.polypoly.app.data.GameRepository
 import com.github.polypoly.app.data.GameRepository.Companion.game
 import com.github.polypoly.app.models.game.GameViewModel
@@ -59,7 +65,6 @@ fun Hud(
     gameViewModel: GameViewModel,
     mapViewModel: MapViewModel,
     otherPlayersData: List<Player>,
-    round: Int,
     location: String,
     gameModel: GameViewModel
 ) {
@@ -70,12 +75,12 @@ fun Hud(
     if (playerState == PlayerState.MOVING)
         HudLocation(
             playerPosition,
-            DpOffset(0.dp, 80.dp),
+            DpOffset(0.dp, 140.dp),
             "going_to_location_text",
-            "Going to: "
+            "Going to"
         )
     HudPlayer(playerData)
-    HudOtherPlayersAndGame(otherPlayersData, round, gameModel)
+    HudOtherPlayersAndGame(otherPlayersData, gameModel)
     HudGameMenu()
 }
 
@@ -85,7 +90,7 @@ fun Hud(
 @Composable
 fun HudLocation(
     location: String, offset: DpOffset = DpOffset(0.dp, 10.dp), testTag: String,
-    headerText: String = "Current Location: "
+    headerText: String = "Current location"
 ) {
     Box(
         modifier = Modifier
@@ -103,11 +108,6 @@ fun HudLocation(
                         .align(Alignment.TopCenter)
                         .offset(offset.x, offset.y)
                         .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                        .border(
-                            1.dp,
-                            MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                            shape = Shapes.medium
-                        )
                         .padding(Padding.medium),
                     style = MaterialTheme.typography.h6
                 )
@@ -118,13 +118,8 @@ fun HudLocation(
                     .testTag(testTag)
                     .offset(offset.x, offset.y + 50.dp)
                     .background(MaterialTheme.colors.background, shape = Shapes.medium)
-                    .border(
-                        1.dp,
-                        MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                        shape = Shapes.medium
-                    )
                     .padding(Padding.medium),
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h4,
             )
         }
     }
@@ -145,7 +140,7 @@ fun HudPlayer(playerData: Player) {
                 .testTag("hud_player"),
             contentAlignment = Center
         ) {
-            MoneyHudText("playerBalance", "${playerData.getBalance()} $")
+            MoneyHudText("playerBalance", "${playerData.getBalance()} $ ")
             HudButton(
                 testTag = "player_info_button",
                 onClick = { openPlayerInfo = true },
@@ -159,15 +154,20 @@ fun HudPlayer(playerData: Player) {
         Dialog(
             onDismissRequest = { openPlayerInfo = false },
         ) {
-            Surface(
-                color = MaterialTheme.colors.background,
-                shape = Shapes.medium,
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .fillMaxWidth()
-            ) {
-                // TODO: Add information about the player
-                Text(text = "Player info")
+            // FIXME: Use actual data once DB is fixed
+            val playerOwnedLocations = game?.inGameLocations?.shuffled()?.take(3)!!
+            Column(Modifier.padding(Padding.medium)) {
+                StatsHeader(textContent = "${playerData.user.name}'s stats")
+                StatsCategory(textContent = "Balance")
+                StatsData(textContent = "${playerData.getBalance()} $")
+                StatsCategory(textContent = "Owned locations")
+                playerOwnedLocations.forEach {
+                    StatsData(textContents = listOf(
+                        it.locationProperty.name,
+                        "${it.level}",
+                        "${it.currentTax()}$ tax")
+                    )
+                }
             }
         }
     }
@@ -179,7 +179,7 @@ fun HudPlayer(playerData: Player) {
  * players
  */
 @Composable
-fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel: GameViewModel) {
+fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, gameModel: GameViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -213,7 +213,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
                             .padding(Padding.medium)
                     ) {
                         Column(Modifier.padding(Padding.medium)) {
-                            HudGame(round)
+                            HudGame(gameModel)
                             otherPlayersData.forEach {
                                 HudOtherPlayer(it, gameModel)
                             }
@@ -230,7 +230,7 @@ fun HudOtherPlayersAndGame(otherPlayersData: List<Player>, round: Int, gameModel
  * and a button shows complete information on click
  */
 @Composable
-fun HudGame(round: Int) {
+fun HudGame(gameModel: GameViewModel) {
     var openGameInfo by remember { mutableStateOf(false) }
 
     Row(Modifier.padding(Padding.medium)) {
@@ -241,7 +241,7 @@ fun HudGame(round: Int) {
             description = "See game information"
         )
         Column(Modifier.padding(Padding.medium)) {
-            HudText("gameRound", text = "Round $round")
+            HudText("gameRound", text = "Round ${gameModel.getRoundTurnData().observeAsState().value}")
         }
     }
 
@@ -249,15 +249,12 @@ fun HudGame(round: Int) {
         Dialog(
             onDismissRequest = { openGameInfo = false },
         ) {
-            Surface(
-                color = MaterialTheme.colors.background,
-                shape = Shapes.medium,
-                modifier = Modifier
-                    .padding(Padding.medium)
-                    .fillMaxWidth()
-            ) {
-                // TODO: Add information about the game
-                Text(text = "Game info")
+            Column(Modifier.padding(Padding.medium)) {
+                StatsHeader(textContent = "Game stats")
+                StatsCategory(textContent = "Rules")
+                StatsData(textContent = "${game?.rules?.gameMode}")
+                StatsCategory(textContent = "Current round")
+                StatsData(textContent = "${gameModel.getRoundTurnData().observeAsState().value}")
             }
         }
     }
@@ -355,6 +352,7 @@ fun HudButton(testTag: String, onClick: () -> Unit, icon: ImageVector, descripti
             .testTag(testTag)
             .padding(bottom = Padding.large),
         shape = CircleShape,
+        elevation = ButtonDefaults.elevation(0.dp),
     ) {
         Icon(
             icon, contentDescription = null,
@@ -382,7 +380,7 @@ fun HudText(name: String, text: String) {
 
 @Composable
 fun MoneyHudText(name: String, text: String) {
-    Box(modifier = Modifier.offset(x = (-50).dp, y = -(7).dp)) {
+    Box(modifier = Modifier.offset(x = (-60).dp, y = -(7).dp)) {
         Text(
             text = text,
             modifier = Modifier
@@ -413,12 +411,92 @@ fun ToggleIconButton(
             .semantics { contentDescription = description }
             .testTag(testTag),
         shape = CircleShape,
+        elevation = ButtonDefaults.elevation(0.dp),
     )
     {
         if (toggle)
-            Icon(onIcon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Icon(onIcon, contentDescription = null, modifier = Modifier.size(50.dp))
         else
             Icon(offIcon, contentDescription = null, modifier = Modifier.size(50.dp))
     }
 }
 
+@Composable
+private fun StatsHeader(textContent: String) {
+    CustomCardSingleText(cardColor = MaterialTheme.colors.primary, textColor = MaterialTheme.colors.onPrimary, textContent = textContent)
+}
+
+@Composable
+private fun StatsCategory(textContent: String) {
+    CustomCardSingleText(cardColor = MaterialTheme.colors.secondaryVariant, textColor = MaterialTheme.colors.onSecondary, textContent = textContent)
+}
+
+@Composable
+private fun StatsData(textContent: String) {
+    CustomCardSingleText(cardColor = MaterialTheme.colors.background, textColor = MaterialTheme.colors.onBackground, textContent = textContent)
+}
+
+@Composable
+private fun StatsData(textContents: List<String>) {
+    CustomCardMultipleText(cardColor = MaterialTheme.colors.background, textColor = MaterialTheme.colors.onBackground, textContents = textContents)
+}
+
+@Composable
+private fun CustomCardSingleText(cardColor: Color, textColor: Color, textContent: String) {
+    CustomCard(cardColor) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            content = {
+                Text(
+                    text = textContent,
+                    style = MaterialTheme.typography.body1,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = Padding.medium, bottom = Padding.medium),
+                    color = textColor
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun CustomCardMultipleText(cardColor: Color, textColor: Color, textContents: List<String>) {
+    CustomCard(cardColor) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            content = {
+                for (textContent in textContents) {
+                    Text(
+                        text = textContent,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = Padding.large, top = Padding.medium, bottom = Padding.medium, end = Padding.large),
+                        color = textColor
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun CustomCard(cardColor: Color, content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(
+            // Flat cards
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp,
+            disabledElevation = 0.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = cardColor
+        )
+    ) {
+        content()
+    }
+}

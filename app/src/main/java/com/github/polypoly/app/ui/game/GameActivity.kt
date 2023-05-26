@@ -93,8 +93,7 @@ class GameActivity : ComponentActivity() {
                         player,
                         gameModel,
                         mapViewModel,
-                        game.players,
-                        gameTurn,
+                        game.players.minus(player),
                         mapViewModel.interactableProperty.value?.name ?: "EPFL",
                         gameModel
                     )
