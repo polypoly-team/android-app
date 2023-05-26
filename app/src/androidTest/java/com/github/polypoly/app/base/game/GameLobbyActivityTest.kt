@@ -45,7 +45,6 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
         resetGameLobby()
     }
 
-
     @Before
     fun setup(){
         Intents.init()
@@ -239,6 +238,8 @@ class GameLobbyActivityTest: PolyPolyTest(true, false, true) {
 //        Intents.intended(IntentMatchers.hasComponent(GameActivity::class.java.name))
 //
 //    }
+
+
 
     fun resetGameLobby(){
         for (user in baseGameLobby.usersRegistered){
