@@ -86,7 +86,7 @@ class MapViewModelTest {
     }
 
     @Test
-    fun milestonesReachedAddsToPlayerBalanceWhenRoundEnds(){
+    fun milestonesReachedAddsToGameTransactions(){
         val game = gameLobby.start()
         val addedDistance = 5 * GameMilestoneRewardTransaction.milestoneRewardDistance
         val player = GameRepository.player
