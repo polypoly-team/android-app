@@ -12,20 +12,12 @@ import com.github.polypoly.app.base.game.PlayerState
 import com.github.polypoly.app.base.user.User
 import com.github.polypoly.app.commons.PolyPolyTest
 import com.github.polypoly.app.data.GameRepository
-<<<<<<< HEAD:app/src/androidTest/java/com/github/polypoly/app/map/GameActivityTest.kt
-import com.github.polypoly.app.models.game.GameViewModel
-import com.github.polypoly.app.network.getValue
+import com.github.polypoly.app.database.getValue
 import com.github.polypoly.app.ui.game.GameActivity
 import com.github.polypoly.app.ui.menu.WelcomeActivity
-import com.github.polypoly.app.ui.menu.profile.ProfileActivity
-import com.github.polypoly.app.utils.global.GlobalInstances
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
 import com.github.polypoly.app.utils.global.GlobalInstances.Companion.remoteDB
-=======
 import com.github.polypoly.app.viewmodels.game.GameViewModel
-import com.github.polypoly.app.ui.game.GameActivity
-import com.github.polypoly.app.utils.global.GlobalInstances.Companion.currentUser
->>>>>>> main:app/src/androidTest/java/com/github/polypoly/app/game_and_map/GameActivityTest.kt
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,13 +28,9 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
-<<<<<<< HEAD:app/src/androidTest/java/com/github/polypoly/app/map/GameActivityTest.kt
 class GameActivityTest : PolyPolyTest(true, true, true) {
 
     val lobby = TEST_GAME_LOBBY_AVAILABLE_4
-=======
-class GameActivityTest : PolyPolyTest(true, false) {
->>>>>>> main:app/src/androidTest/java/com/github/polypoly/app/game_and_map/GameActivityTest.kt
 
     init {
         val newGame = Game.launchFromPendingGame(lobby)
@@ -177,9 +165,15 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("trade_button").assertDoesNotExist()
     }
 
-<<<<<<< HEAD:app/src/androidTest/java/com/github/polypoly/app/map/GameActivityTest.kt
     // ======================================================================== END SCREEN
-    /*@Test FIXME: due to nextTurn() that times out, these tests don't pass
+
+    @Test
+    fun endScreenIsNotDisplayedWhenGameNotFinished() {
+        composeTestRule.onNodeWithTag("end_screen").assertDoesNotExist()
+    }
+
+
+    /*@Test //FIXME: due to nextTurn() that times out, these tests don't pass
     fun endScreenIsDisplayedWhenGameEnds() {
         forceGameEnd().get(TIMEOUT_DURATION, TimeUnit.SECONDS)
         composeTestRule.onNodeWithTag("end_screen").assertIsDisplayed()
@@ -223,8 +217,6 @@ class GameActivityTest : PolyPolyTest(true, false) {
         assertTrue(newWinCount == winCount + 1)
     }
 
-
-=======
     @Test
     fun successfulBidNotificationIsNotDisplayedByDefault() {
         composeTestRule.onNodeWithTag("successful_bid_alert").assertDoesNotExist()
@@ -241,7 +233,6 @@ class GameActivityTest : PolyPolyTest(true, false) {
         composeTestRule.onNodeWithTag("turn_finished_notification").assertIsDisplayed()
     }
 
->>>>>>> main:app/src/androidTest/java/com/github/polypoly/app/game_and_map/GameActivityTest.kt
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
