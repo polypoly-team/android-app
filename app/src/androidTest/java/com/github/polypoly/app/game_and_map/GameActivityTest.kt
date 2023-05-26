@@ -175,7 +175,7 @@ class GameActivityTest : PolyPolyTest(true, false) {
     private fun forceOpenMarkerDialog(): CompletableFuture<Boolean> {
         return execInMainThread {
             GameActivity.mapViewModel.selectLocation(getRandomLocation())
-            GameActivity.mapViewModel.goingToLocationProperty = getRandomLocation()
+            GameActivity.mapViewModel._goingToLocationPropertyData.value = getRandomLocation()
             waitForUIToUpdate()
         }
     }
