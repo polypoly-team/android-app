@@ -28,7 +28,7 @@ class GlobalInstances {
 
         lateinit var remoteDB: IRemoteStorage
         var remoteDBInitialized = false
-        private const val rootDB = "live"
+        private const val rootDB = "live-video"
 
         fun initRemoteDB() {
             if(!remoteDBInitialized) {
@@ -47,7 +47,7 @@ class GlobalInstances {
                 if(exists) {
                     remoteDB.getValue<User>(key).thenAccept { currentUser = it }
                 } else {
-                    currentUser = User(id = key, name = name)
+                    currentUser = User(id = key, name = name, currentUser = true)
                     remoteDB.registerValue(currentUser!!)
                 }
             }

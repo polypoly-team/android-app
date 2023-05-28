@@ -142,15 +142,21 @@ class RankingsActivity : MenuActivity("Rankings") {
     private fun UserRank(rank: Int, user: User, category: RankingCategory) {
         // User ranks in the list view alternate between primary and secondary color
         val cardColor = CardDefaults.cardColors(containerColor =
-            if (rank % 2 == 0)
-                MaterialTheme.colors.primary
-            else
-                MaterialTheme.colors.secondaryVariant)
-        val textColor =
-            if (rank % 2 == 0)
-                MaterialTheme.colors.onPrimary
-            else
+            if(user.currentUser) {
                 MaterialTheme.colors.onSecondary
+            } else if (rank % 2 == 0) {
+                MaterialTheme.colors.primary
+            } else {
+                MaterialTheme.colors.secondaryVariant
+            })
+        val textColor =
+            if(user.currentUser) {
+                MaterialTheme.colors.secondaryVariant
+            } else if (rank % 2 == 0) {
+                MaterialTheme.colors.onPrimary
+            } else {
+                MaterialTheme.colors.onSecondary
+            }
 
         Card(
             modifier = Modifier.fillMaxWidth(),

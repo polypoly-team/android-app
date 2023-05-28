@@ -203,58 +203,84 @@ class SignInActivity : ComponentActivity() {
         // Miscellaneous test data
         val TEST_USER_0 = User(
             id = "0",
-            name = "John",
-            bio = "Hi, this is my bio :)",
-            skin = Skin(0,0,0),
-            stats = Stats(0, 0, 67, 28, 14),
-            trophiesWon = listOf(0, 4, 8, 11, 12, 14),
-            trophiesDisplay = mutableListOf(0, 4)
+            name = "mcfly&cartilo",
+            stats = Stats(numberOfWins = 150),
         )
 
-        val TEST_USER_1 = User("12","Carter", "Not me!", Skin.DEFAULT, Stats())
-        val TEST_USER_2 = User("123","Harry", "Ha!", Skin.DEFAULT, Stats())
-        val TEST_USER_3 = User("1234","James", "Hey!", Skin.DEFAULT, Stats())
-        val TEST_USER_4 = User("12345","Henri", "Ohh!", Skin.DEFAULT, Stats())
-        val TEST_USER_5 = User("123456", "test_user_5", "", Skin.DEFAULT, Stats())
-        val ALL_TEST_USERS = listOf(TEST_USER_0, TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5)
-
-        val TEST_GAME_LOBBY_FULL = GameLobby(
-            TEST_USER_0, GameParameters(GameMode.RICHEST_PLAYER, 5, 6,
-                60, 20, emptyList(), 100), "Full gameLobby", "1234"
-        )
-        val TEST_GAME_LOBBY_FAST = GameLobby(
-            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 2, 6,
-                5, 20, getZones(), 100), "Fast!", "fast"
-        )
-        val TEST_GAME_LOBBY_PRIVATE = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-                900, 20, emptyList(), 120), "Private gameLobby", "abc123", true
-        )
-        val TEST_GAME_LOBBY_AVAILABLE_1 = GameLobby(
-            TEST_USER_1, GameParameters(GameMode.LAST_STANDING, 3, 8,
-                600, null, emptyList(), 1500), "cool lobby", "abcd"
-        )
-        val TEST_GAME_LOBBY_AVAILABLE_2 = GameLobby(
-            TEST_USER_2, GameParameters(GameMode.RICHEST_PLAYER, 5, 5,
-                30, 20, emptyList(), 5000), "harry's game", "123abc"
-        )
-        val TEST_GAME_LOBBY_AVAILABLE_3 = GameLobby(
-            TEST_USER_3, GameParameters(GameMode.RICHEST_PLAYER, 7, 8,
-                10080, 20, emptyList(), 3000), "7days rounds!", "1234abc"
-        )
-        val TEST_GAME_LOBBY_AVAILABLE_4 = GameLobby(
-            TEST_USER_4, GameParameters(GameMode.RICHEST_PLAYER, 2, 4,
-                300, 20, emptyList(), 4000), "needpeople", "abc1234"
+        val TEST_USER_1 = User(
+            id = "1",
+            name = "Ouai c'est Greg",
+            stats = Stats(numberOfWins = 187),
         )
 
-        val ALL_TEST_GAME_LOBBIES = listOf(TEST_GAME_LOBBY_FULL, TEST_GAME_LOBBY_FAST, TEST_GAME_LOBBY_PRIVATE, TEST_GAME_LOBBY_AVAILABLE_1,
-            TEST_GAME_LOBBY_AVAILABLE_2, TEST_GAME_LOBBY_AVAILABLE_3, TEST_GAME_LOBBY_AVAILABLE_4)
+        val TEST_USER_2 = User(
+            id = "2",
+            name = "Guillaume",
+            stats = Stats(numberOfWins = 202),
+        )
 
-        TEST_GAME_LOBBY_FULL.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_3, TEST_USER_4, TEST_USER_5))
-        TEST_GAME_LOBBY_PRIVATE.addUsers(listOf(TEST_USER_2))
-        TEST_GAME_LOBBY_AVAILABLE_1.addUsers(listOf(TEST_USER_2, TEST_USER_3))
-        TEST_GAME_LOBBY_AVAILABLE_2.addUsers(listOf(TEST_USER_1, TEST_USER_4))
-        TEST_GAME_LOBBY_AVAILABLE_3.addUsers(listOf(TEST_USER_1, TEST_USER_2, TEST_USER_4))
+        val TEST_USER_3 = User(
+            id = "3",
+            name = "alilouch",
+            stats = Stats(numberOfWins = 241),
+        )
+
+        val TEST_USER_4 = User(
+            id = "4",
+            name = "xX_polygamer_Xx",
+            stats = Stats(numberOfWins = 179),
+        )
+
+        val TEST_USER_5 = User(
+            id = "5",
+            name = "m1st1gr1",
+            stats = Stats(numberOfWins = 199),
+        )
+
+        val TEST_USER_6 = User(
+            id = "6",
+            name = "v1m0",
+            stats = Stats(numberOfWins = 234),
+        )
+
+        val TEST_USER_7 = User(
+            id = "7",
+            name = "barnabé",
+            stats = Stats(numberOfWins = 239),
+        )
+
+        val TEST_USER_8 = User(
+            id = "8",
+            name = "uWu_oWo",
+            stats = Stats(numberOfWins = 202),
+        )
+
+        val TEST_USER_9 = User(
+            id = "9",
+            name = "DOGE",
+            stats = Stats(numberOfWins = 287),
+        )
+
+        val TEST_USER_10 = User(
+            id = "10",
+            name = "bigflo",
+            stats = Stats(numberOfWins = 200),
+        )
+
+
+        val ALL_TEST_USERS = listOf(
+            TEST_USER_0,
+            TEST_USER_1,
+            TEST_USER_2,
+            TEST_USER_3,
+            TEST_USER_4,
+            TEST_USER_5,
+            TEST_USER_6,
+            TEST_USER_7,
+            TEST_USER_8,
+            TEST_USER_9,
+            TEST_USER_10,
+        )
 
         // Helper function
         fun <T : StorableObject<*>> requestAddDataToDB(data: List<T>, keys: List<String>): List<CompletableFuture<Boolean>> {
@@ -263,7 +289,6 @@ class SignInActivity : ComponentActivity() {
 
         // Add data to DB
         requestAddDataToDB(ALL_TEST_USERS, ALL_TEST_USERS.map{user -> user.id })
-        requestAddDataToDB(ALL_TEST_GAME_LOBBIES, ALL_TEST_GAME_LOBBIES.map(GameLobby::code))
     }
 
 }
