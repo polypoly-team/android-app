@@ -79,6 +79,14 @@
           }
         },
         {
+          "client_id": "349880221971-rgmvbeu1098s584t7hv2s0f4se5347jn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.polypoly.app",
+            "certificate_hash": "431c178a79dc9933238e5f8ddbf54a3861d8d58c"
+          }
+        },
+        {
           "client_id": "349880221971-8u0rqd0cj42aq5mejbqtkhs5i2rl9v73.apps.googleusercontent.com",
           "client_type": 3
         }
