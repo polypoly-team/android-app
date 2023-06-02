@@ -69,15 +69,16 @@ class SignInActivity : ComponentActivity() {
      * If the user is correctly signed in Firebase, gets the user and launches [WelcomeActivity]
      */
     private fun launchWelcomeIfReady() {
-        val user = firebaseAuth?.currentUser
-        if (user != null) {
-            initCurrentUser(user.uid, user.displayName ?: "default")
+//        val user = firebaseAuth?.currentUser
+//        if (user != null) {
+
+            initCurrentUser("jaraxus-id", "jaraxus")
 
             val welcomeActivityIntent = Intent(this, WelcomeActivity::class.java)
             isSignedIn = true
             startActivity(welcomeActivityIntent)
             finish()
-        }
+//        }
     }
 
     @Deprecated("Prefer to use launchWelcomeIfReady")
