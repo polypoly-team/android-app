@@ -3,6 +3,7 @@ package com.github.polypoly.app.ui.game
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +14,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -24,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.github.polypoly.app.base.game.Player
 import com.github.polypoly.app.base.game.TradeRequest
@@ -101,6 +106,8 @@ class GameActivity : ComponentActivity() {
 
                     // pop-ups for trades:
                     DialogsForTrade(trade, player)
+                    NextTurnButton(gameEnded = false
+                    )
 
                     if(gameEnded) {
                         // FIXME: for some reason no user is flagged as current user
@@ -111,6 +118,27 @@ class GameActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+
+    @Composable
+    fun NextTurnButton(gameEnded: Boolean) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Button(
+                modifier = Modifier
+                    .size(30.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-30).dp)
+                    .testTag("next_turn_button"),
+                onClick = {
+                    if (!gameEnded) {
+                        gameModel.nextTurn()
+                    }
+                },
+                shape = CircleShape
+            ) {
             }
         }
     }
