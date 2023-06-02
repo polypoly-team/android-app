@@ -69,6 +69,8 @@ class MapViewModel(
      * Computes the milestones reached by the user and adds them to the list of new milestones to display.
      */
     private fun computeMilestones(addedDistance: Float, oldDistance : Float) {
+        if (addedDistance > 2000) return // Emulator issue
+
         viewModelScope.launch(dispatcher) {
             val milestoneDistance = GameMilestoneRewardTransaction.milestoneRewardDistance
             val distanceToNextMilestone = oldDistance % milestoneDistance

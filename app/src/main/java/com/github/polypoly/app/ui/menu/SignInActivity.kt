@@ -49,7 +49,7 @@ class SignInActivity : ComponentActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         isSignedIn = false
 
-        addFakeDataToDB()
+//        addFakeDataToDB()
 
         launchWelcomeIfReady()
         setContent { SignInContent() }

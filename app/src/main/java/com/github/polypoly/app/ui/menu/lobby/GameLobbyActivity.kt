@@ -569,7 +569,7 @@ class GameLobbyActivity : ComponentActivity() {
      * @param mContext the context of the activity
      */
     private fun getOnClickAction(isAdmin: Boolean, mContext: Context): () -> Unit {
-        return  { if (isAdmin) launchGameActivity(mContext) }
+        return  { launchGameActivity(mContext) }
     }
 
     /**
